@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{:sysconfig('site','site_name')}</title>
+    <title>{:getHtmlTitle()}</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -133,5 +133,12 @@
 <script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js?2.0.0-rc.2" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-2.3.6/require.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdVersion}" charset="utf-8"></script>
+<script>
+    require(['/tp-script-vue-curd-static.php?default.js'], function (Controller) {
+        if (eval('Controller.' + VUE_CURD.ACTION)) {
+            eval('Controller.' + VUE_CURD.ACTION + '()');
+        }
+    });
+</script>
 </body>
 </html>

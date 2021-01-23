@@ -21,15 +21,16 @@ trait BaseChildController
     use Controller,CurdChild,ExcelChild{
         ExcelChild::excelSave insteadof Controller;
         ExcelChild::excelFields insteadof Controller;
+        Controller::initialize as baseInitialize;
     }
     public VueCurlModel $model;
     public BaseModel $baseModel;
     public FieldCollection $fields;
     public FieldCollection $baseFields;
 
-    public function __construct(App $app)
+    public function initialize()
     {
-        parent::__construct($app);
+        $this->baseInitialize();
         $model=static::modelClassPath();
         $this->model=new $model;
         $this->fields=$this->model->fields();

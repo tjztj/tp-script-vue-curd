@@ -97,4 +97,9 @@ trait CurdFunc
         }
         return $this->success('删除成功');
     }
+
+
+    protected function showTpl($file,$data){
+        return $this->layoutDisplay(file_get_contents($this->tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($this->tplPath.$file),$data);
+    }
 }

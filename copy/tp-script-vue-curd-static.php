@@ -1,6 +1,6 @@
 <?php
 
-const VUE_CURD_STATIC_PATH='./tp-script-vue-curd-static';
+const VUE_CURD_STATIC_PATH='..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tp-script-vue-curd-static';
 
 if(empty($_SERVER['QUERY_STRING'])){
     header("HTTP/1.1 404 Not Found");
@@ -10,10 +10,12 @@ if(empty($_SERVER['QUERY_STRING'])){
 }
 
 
-$dirs=array_filter(explode('/',$_SERVER['QUERY_STRING']));
+$dirs=array_map(function($v){
+    return trim($v,'&');
+},array_filter(explode('/',$_SERVER['QUERY_STRING'])));
 $lastDir=end($dirs);
 $endIndex=strpos($lastDir,'?');
-$endIndex===false||$dirs[count($dirs)-1]=substr($lastDir,0,$endIndex);
+$endIndex===false||$dirs[count($dirs)-1]=rtrim(substr($lastDir,0,$endIndex),'&');
 
 $path=VUE_CURD_STATIC_PATH.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR,$dirs);
 if(!is_file($path)){

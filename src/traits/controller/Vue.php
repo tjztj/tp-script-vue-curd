@@ -33,6 +33,7 @@ trait Vue
     public function initialize()
     {
         if ($this->checkIsVueAction()) {
+            $this->app->view->engine()->layout($this->layout);
             $this->app->view->config(['view_suffix' => 'vue']);
         }
         parent::initialize();
@@ -54,7 +55,7 @@ trait Vue
             }
         }
 
-        $this->parentAssign($name, $value);
+        $this->app->view->assign($name, $value);
     }
 
 
@@ -68,7 +69,7 @@ trait Vue
     {
         if ($this->checkIsVueAction()) {
             $this->vue_data = array_merge($this->vue_data, $vars);
-            $this->parentAssign('vue_data_json', json_encode($this->vue_data));
+            $this->app->view->assign('vue_data_json', json_encode($this->vue_data));
         }
         return $this->app->view->fetch($template, $vars);
     }
@@ -87,6 +88,13 @@ trait Vue
             $this->app->view->assign('vue_data_json', json_encode($this->vue_data));
         }
         return  $this->app->view->display($content, $vars);
+    }
+
+
+    public function layoutDisplay ($layoutContents,$content = '', $vars = []) {
+        // 替换布局的主体内容
+        $content = str_replace($this->app->view->getConfig('layout_item'), $content, $layoutContents);
+        return $this->display($content,$vars);
     }
 
 

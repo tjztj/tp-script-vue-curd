@@ -24,13 +24,17 @@ use tpScriptVueCurd\traits\controller\Excel;
  */
 trait Controller
 {
-    use Vue,CurdFunc,Excel;
+    use Vue,CurdFunc,Excel{
+        Vue::initialize as vueInitialize;
+    }
 
-    public function __construct(App $app)
+    protected string $tplPath='';
+
+    public function initialize()
     {
-        parent::__construct($app);
+        $this->vueInitialize();
         if(empty($this->app)){
-            $this->app=$app;
+            $this->app=app();
         }
         if(empty($this->request)){
             $this->app=$this->app->request;
@@ -51,6 +55,9 @@ trait Controller
                 $this->guid=create_guid();
             }
         }
+
+
+        $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
 
         $this->assign('guid',$this->guid);
         $this->assign('vueCurdAction',$this->request->action());

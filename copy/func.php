@@ -16,3 +16,12 @@ function getLoginData():array{
 function getLoginUrl():string{
     return '/admin/login/index';
 }
+
+
+/**
+ * 网站名称
+ * @return string
+ */
+function getHtmlTitle():string{
+    return '';
+}

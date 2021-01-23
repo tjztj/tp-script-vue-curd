@@ -17,13 +17,15 @@ use think\App;
  */
 trait BaseController
 {
-    use Controller,Curd;
+    use Controller,Curd{
+        Controller::initialize as baseInitialize;
+    }
     public FieldCollection $fields;
 
 
-    public function __construct(App $app)
+    public function initialize()
     {
-        parent::__construct($app);
+        $this->baseInitialize();
         $model=static::modelClassPath();
         $this->model=new $model;
         $this->fields=$this->model->fields();

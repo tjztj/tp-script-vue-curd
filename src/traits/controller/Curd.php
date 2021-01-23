@@ -12,6 +12,7 @@ use think\Request;
 /**
  * Trait Curd
  * @property Request $request
+ * @property string $tplPath
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -56,32 +57,37 @@ trait Curd
 
 
 
-        return $this->fetch(file_exists(app_path('view/'.$tolDir).'index.vue')?$tolDir.'/index':'vuecurd/index'
-            ,$this->indexFetch([
-                'model'=>static::modelClassPath(),
-                'modelName'=>class_basename(static::modelClassPath()),
-                'listColumns'=>$listColumns,
-                'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
-                'editUrl'=>url('edit')->build(),
-                'showUrl'=>url('show')->build(),
-                'delUrl'=>url('del')->build(),
-                'downExcelTplUrl'=>url('downExcelTpl')->build(),
-                'importExcelTplUrl'=>url('importExcelTpl')->build(),
-                'title'=>$this->model::getTitle(),
-                'childs'=>[],//会在BaseHaveChildController中更改
-                'filterConfig'=>$this->fields->getFilterShowData(),
-                'filter_data'=>json_decode($this->request->param('filter_data','',null)),
-                'showFilter'=>$this->request->param('show_filter/d',1)===1,
-                'showTableTool'=>$showTableTool,
-                'canEdit'=>$showTableTool,
-                'canDel'=>$showTableTool,
-                'auth'=>[
-                    'edit'=>true,
-                    'del'=>true,
-                    'importExcelTpl'=>true,
-                    'downExcelTpl'=>true,
-                ]
-            ]));
+        $data=$this->indexFetch([
+            'model'=>static::modelClassPath(),
+            'modelName'=>class_basename(static::modelClassPath()),
+            'listColumns'=>$listColumns,
+            'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
+            'editUrl'=>url('edit')->build(),
+            'showUrl'=>url('show')->build(),
+            'delUrl'=>url('del')->build(),
+            'downExcelTplUrl'=>url('downExcelTpl')->build(),
+            'importExcelTplUrl'=>url('importExcelTpl')->build(),
+            'title'=>$this->model::getTitle(),
+            'childs'=>[],//会在BaseHaveChildController中更改
+            'filterConfig'=>$this->fields->getFilterShowData(),
+            'filter_data'=>json_decode($this->request->param('filter_data','',null)),
+            'showFilter'=>$this->request->param('show_filter/d',1)===1,
+            'showTableTool'=>$showTableTool,
+            'canEdit'=>$showTableTool,
+            'canDel'=>$showTableTool,
+            'auth'=>[
+                'edit'=>true,
+                'del'=>true,
+                'importExcelTpl'=>true,
+                'downExcelTpl'=>true,
+            ]
+        ]);
+
+
+        if(file_exists(app_path('view/'.$tolDir).'index.vue')){
+            return $this->fetch($tolDir.'/index',$data);
+        }
+        return $this->display($this->tplPath.'index.vue',$data);
     }
 
 
