@@ -1,0 +1,21 @@
+{
+    "name": "tj/tp-script-vue-curd",
+    "description": "",
+    "type": "library",
+    "require": {
+        "php": ">=7.4.0",
+        "topthink/framework": "^6.0.5",
+        "topthink/think-orm": "^2.0",
+        "topthink/think-multi-app": "^1.0",
+        "topthink/think-view": "^1.0",
+        "phpoffice/phpspreadsheet": ">=1.15",
+        "ext-bcmath": ">=7.4"
+    },
+    "authors": [
+        {
+            "name": "tj",
+            "email": "1079798840@qq.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
