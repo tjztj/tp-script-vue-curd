@@ -35,7 +35,9 @@ trait Vue
         if ($this->checkIsVueAction()) {
             $this->app->view->config(['view_suffix' => 'vue']);
         }
-        parent::initialize();
+        if($this->parentIsHaveMethod('initialize')){
+            parent::initialize();
+        }
     }
 
 
@@ -102,10 +104,9 @@ trait Vue
     public function success($msgOrData = '', $data = '', $url = null, $wait = 3, array $header = [])
     {
         if(is_string($msgOrData)){
-            try{
+            if($this->parentIsHaveMethod('success')){
                 parent::success($msgOrData,$data,$url,$wait,$header);
-            }catch (\Exception $exception){
-                //如果父类中没有 assign
+            }else{
                 $this->parentSuccess($msgOrData,$data,$url,$wait,$header);
             }
         }
@@ -131,60 +132,58 @@ trait Vue
             $data=[];
         }
 
-        try{
+        if($this->parentIsHaveMethod('error')){
             parent::error($msg,$data,$url,$wait,$header);
-        }catch (\Exception $exception){
-            if (is_null($url)) {
-                $url = request()->isAjax() ? '' : 'javascript:history.back(-1);';
-            } elseif ($url) {
-                $url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : app('route')->buildUrl($url)->__toString();
-            }
-
-            $type   =(request()->isJson() || request()->isAjax() || request()->isPost()) ? 'json' : 'html';
-            $result = [
-                'code' => 0,
-                'msg'  => $msg,
-                'data' => $data,
-                'url'  => $url,
-                'wait' => $wait,
-            ];
-            if ($type === 'html') {
-                $response = view(app('config')->get('app.dispatch_error_tmpl'), $result);
-            } elseif ($type === 'json') {
-                $response = json($result);
-            }
-            throw new HttpResponseException($response);
+            return;
         }
+
+        if (is_null($url)) {
+            $url = request()->isAjax() ? '' : 'javascript:history.back(-1);';
+        } elseif ($url) {
+            $url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : app('route')->buildUrl($url)->__toString();
+        }
+
+        $type   =(request()->isJson() || request()->isAjax() || request()->isPost()) ? 'json' : 'html';
+        $result = [
+            'code' => 0,
+            'msg'  => $msg,
+            'data' => $data,
+            'url'  => $url,
+            'wait' => $wait,
+        ];
+        if ($type === 'html') {
+            $response = view(app('config')->get('app.dispatch_error_tmpl'), $result);
+        } elseif ($type === 'json') {
+            $response = json($result);
+        }
+        throw new HttpResponseException($response);
     }
 
 
     private function parentAssign($name,$value){
-        try{
+        if($this->parentIsHaveMethod('assign')){
             parent::assign($name, $value);
-        }catch (\Exception $exception){
-            //如果父类中没有 assign
-            $this->app->view->assign($name, $value);
+            return;
         }
+        //如果父类中没有 assign
+        $this->app->view->assign($name, $value);
     }
 
 
     private function parentFetch($template = '', $vars = []){
-        try{
+        if($this->parentIsHaveMethod('fetch')){
             return parent::fetch($template, $vars);
-        }catch (\Exception $exception){
-            //如果父类中没有 fetch
-            return $this->app->view->fetch($template, $vars);
         }
+        //如果父类中没有 fetch
+        return $this->app->view->fetch($template, $vars);
     }
 
 
     private function parentDisplay(string $content, $vars = [], $code = 200, $filter = null){
-        try{
+        if($this->parentIsHaveMethod('display')){
             return parent::display($content, $vars,$code,$filter);
-        }catch (\Exception $exception){
-            //如果父类中没有 display
-           return  $this->app->view->display($content, $vars,$code,$filter);
         }
+        return  $this->app->view->display($content, $vars,$code,$filter);
     }
 
 
@@ -222,5 +221,21 @@ trait Vue
             $response = json($result);
         }
         throw new HttpResponseException($response);
+    }
+
+
+    /**
+     * 父类是否存在此方法
+     * @param string $method
+     * @return bool
+     */
+    private function parentIsHaveMethod(string $method){
+        $class=parent::class;
+        static $classArr=[];
+        if(!isset($classArr[$class])){
+            $classArr[$class]=new $class($this->app);
+        }
+
+        return method_exists($classArr[$class],$method);
     }
 }
