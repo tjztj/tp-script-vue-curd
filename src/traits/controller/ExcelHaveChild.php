@@ -1,0 +1,232 @@
+<?php
+
+
+namespace tpScriptVueCurd\traits\controller;
+
+
+
+
+use tpScriptVueCurd\base\controller\BaseChildController;
+use tpScriptVueCurd\base\model\BaseChildModel;
+use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\ModelField;
+use think\Request;
+
+/**
+ * Trait ExcelHaveChild
+ * @property Request $request
+ * @package tpScriptVueCurd\traits\controller
+ * @author tj 1079798840@qq.com
+ */
+trait ExcelHaveChild
+{
+    public VueCurlModel $model;
+    public FieldCollection $fields;
+
+    private bool $baseAndChildImport=true;//是父表+子表 列表导入
+    /**
+     * @var BaseModel[]
+     */
+    private array $importBaseInfos;//当前父表导入的数据集合
+
+
+
+
+    /**
+     * @NodeAnotation(title="父表+子表导入模板下载")
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    function downExcelTpl():void{
+        $this->baseAndChildImport=true;
+        parent::downExcelTpl();
+    }
+
+
+    /**
+     * @NodeAnotation(title="子表导入模板下载")
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    function justDownBaseExcelTpl():void{
+        $this->baseAndChildImport=false;
+        parent::downExcelTpl();
+    }
+
+
+    /**
+     * @NodeAnotation(title="父表+子表的数据导入")
+     * @return \think\response\Json|void
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    function importExcelTpl(){
+        $this->baseAndChildImport=true;
+        return parent::importExcelTpl();
+    }
+
+
+    /**
+     * @NodeAnotation(title="子表数据导入")
+     * @return \think\response\Json|void
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    function justImportBaseExcelTpl(){
+        $this->baseAndChildImport=false;
+        return parent::importExcelTpl();
+    }
+
+
+    /**
+     * 导入关键参数(字段集合)
+     * @return FieldCollection
+     */
+    protected function excelFields():FieldCollection{
+        if(!$this->baseAndChildImport){//只导入父表
+            return parent::excelFields();
+        }
+
+        //获取父表字段
+        $fields=parent::excelFields()->map(function(ModelField $field){
+            $field=clone $field;
+            $field->name('PARENT|'.$field->name());
+            $field->title(static::modelClassPath()::getTitle().'|'.$field->title());
+            return $field;
+        });
+
+        //子表字段
+        foreach (static::childModelObjs() as $childControllerClass=>$model){
+            /* @var BaseChildModel $model */
+            $modelName=class_basename($model);
+            $fields=$fields->merge(
+                $model->fields()
+                    ->filter(fn(ModelField $vo)=>$vo->name()!=='system_region_id'&&$vo->name()!=='system_region_pid')
+                    ->map(function(ModelField $field)use($modelName,$model){
+                        $field=clone $field;
+                        $field->name($modelName.'|'.$field->name());
+                        $field->title($model::getTitle().'|'.$field->title());
+                        return $field;
+                    })
+            );
+        }
+        return $fields;
+    }
+
+
+    /**
+     * 导入关键参数(excel标题)
+     * @return string
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function excelTilte():string{
+        return $this->model::getTitle();
+    }
+
+
+    /**
+     * 执行添加逻辑
+     * @param $saveData
+     * @return mixed
+     */
+    protected function excelSave($saveData){
+        if(!$this->baseAndChildImport){//仅导入父表数据
+            return [
+                static::modelClassPath()=>parent::excelSave($saveData)
+            ];
+        }
+
+        $datas=[];
+        foreach ($saveData as $k=>$v){
+            $arr=explode('|',$k);
+            isset($datas[$arr[0]])||$datas[$arr[0]]=[];
+            $datas[$arr[0]][$arr[1]]=$v;
+        }
+        $baseId=$this->getMainIdByImportData($datas['PARENT']);
+        $return=[
+            static::modelClassPath()=>$this->importBaseInfos[$baseId],
+        ];
+
+
+        //子表
+        /**
+         * @var BaseChildController|string $childControllerClass
+         * @var BaseChildModel $model
+         * @var BaseChildController[] $childControllerClassList
+         */
+        $childControllerClassList=[];
+        foreach (static::childControllerClassPathList() as $childControllerClass){
+            $modelClass=$childControllerClass::modelClassPath();
+            $modelName=class_basename($modelClass);
+            if(isset($datas[$modelName])){
+                $model=new $modelClass;
+                $base=$this->getExcelBaseInfo($baseId);
+
+                isset($childControllerClassList[$childControllerClass])||$childControllerClassList[$childControllerClass]=new $childControllerClass(app());
+                $childControllerClassList[$childControllerClass]->importBefore($datas[$modelName],$base);
+                $return[$modelClass]=$model->addInfo($datas[$modelName],$base,true);
+                $childControllerClassList[$childControllerClass]->importAfter($return[$modelClass],$base);
+            }
+        }
+        return $return;
+
+    }
+
+
+    /**
+     * 根据导入数据获取 导入的ID
+     * @param array $mainData
+     * @param false $inset 如果数据库没有，新增
+     * @return mixed
+     */
+    private function getMainIdByImportData(array $mainData):int{
+        static $baseIds=[];
+
+        //父表字段的值一样将会视作同一条父数据
+        $baseIdsKey=serialize($mainData);
+        if(!isset($baseIds[$baseIdsKey])){
+            $baseInfo=parent::excelSave($mainData);
+            $baseIds[$baseIdsKey]=$baseInfo->id;
+            $this->setExcelBaseInfo($baseInfo);
+        }
+        return $baseIds[$baseIdsKey];
+    }
+
+
+
+    protected function getExcelBaseInfos():array{return $this->importBaseInfos?:[];}
+    protected function getExcelBaseInfo(int $baseId):BaseModel{
+        if(empty($baseId)){
+            throw new \think\Exception('父表ID错误');
+        }
+
+        if(!isset($this->importBaseInfos[$baseId])){
+            $this->importBaseInfos[$baseId]=$this->model->find($baseId);
+        }
+        if(empty($this->importBaseInfos[$baseId])){
+            throw new \think\Exception('未找到相关周信息');
+        }
+        return $this->importBaseInfos[$baseId];
+    }
+
+    private function setExcelBaseInfo(BaseModel $info):void{
+        $this->importBaseInfos[$info->id]=$info;
+    }
+}

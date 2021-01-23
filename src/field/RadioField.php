@@ -1,0 +1,79 @@
+<?php
+
+
+namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\RadioFilter;
+use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\traits\field\CheckField;
+
+
+/**
+ * 单选
+ * Class RadioField
+ * @author tj 1079798840@qq.com
+ * @package tpScriptVueCurd
+ */
+class RadioField extends ModelField
+{
+    use CheckField;
+
+    protected string $defaultFilterClass=RadioFilter::class;
+
+    /**
+     * 设置保存的值
+     * @param array $data  数据值集合
+     * @return $this
+     */
+    public function setSave(array $data): self
+    {
+        $name=$this->name();
+        if(isset($data[$name])){
+            if($data[$name]==='') {
+                $this->defaultCheckRequired('','请选择正确的选项');
+                $this->save='';
+            }else {
+                if(!isset($this->getItemsValueTexts()[$data[$name]])){
+                    throw new \think\Exception($data[$name].' 不在可选中');
+                }
+                $this->save=$data[$name];
+            }
+        }else{
+            $this->defaultCheckRequired('');
+        }
+        return $this;
+    }
+
+
+    /**
+     * 显示时要处理的数据
+     * @param array $dataBaseData
+     */
+    public function doShowData(array &$dataBaseData): void
+    {
+        $name=$this->name();
+        if(isset($dataBaseData[$name])){
+            $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],false);
+        }
+    }
+
+    /**
+     * 模板导入备注
+     * @param ExcelFieldTpl $excelFieldTpl
+     * @return void
+     */
+    public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
+        $str='请填入以下选项：';
+        $str.="\n";
+        $texts=[];
+        foreach ($this->items as $v){
+            $texts[]=$v['text'];
+        }
+        $str.=implode("\n",$texts);
+
+        $excelFieldTpl->explain=$str;
+        $excelFieldTpl->wrapText=true;
+        $excelFieldTpl->width=40;
+    }
+
+}
