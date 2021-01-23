@@ -17,5 +17,10 @@
             "email": "1079798840@qq.com"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "tpScriptVueCurd\\": "src/"
+        }
+    }
 }
