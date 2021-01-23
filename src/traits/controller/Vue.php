@@ -35,9 +35,7 @@ trait Vue
         if ($this->checkIsVueAction()) {
             $this->app->view->config(['view_suffix' => 'vue']);
         }
-        if($this->parentIsHaveMethod('initialize')){
-            parent::initialize();
-        }
+        parent::initialize();
     }
 
 
@@ -72,7 +70,7 @@ trait Vue
             $this->vue_data = array_merge($this->vue_data, $vars);
             $this->parentAssign('vue_data_json', json_encode($this->vue_data));
         }
-        return $this->parentFetch($template, $vars);
+        return $this->app->view->fetch($template, $vars);
     }
 
 
@@ -86,9 +84,9 @@ trait Vue
     {
         if ($this->checkIsVueAction()) {
             $this->vue_data = array_merge($this->vue_data, $vars);
-            $this->parentAssign('vue_data_json', json_encode($this->vue_data));
+            $this->app->view->assign('vue_data_json', json_encode($this->vue_data));
         }
-        return $this->parentDisplay($content, $vars);
+        return  $this->app->view->display($content, $vars);
     }
 
 
@@ -104,11 +102,7 @@ trait Vue
     public function success($msgOrData = '', $data = '', $url = null, $wait = 3, array $header = [])
     {
         if(is_string($msgOrData)){
-            if($this->parentIsHaveMethod('success')){
-                parent::success($msgOrData,$data,$url,$wait,$header);
-            }else{
-                $this->parentSuccess($msgOrData,$data,$url,$wait,$header);
-            }
+            $this->parentSuccess($msgOrData,$data,$url,$wait,$header);
         }
         return json([
             'code'=>1,
@@ -132,10 +126,6 @@ trait Vue
             $data=[];
         }
 
-        if($this->parentIsHaveMethod('error')){
-            parent::error($msg,$data,$url,$wait,$header);
-            return;
-        }
 
         if (is_null($url)) {
             $url = request()->isAjax() ? '' : 'javascript:history.back(-1);';
@@ -159,32 +149,6 @@ trait Vue
         throw new HttpResponseException($response);
     }
 
-
-    private function parentAssign($name,$value){
-        if($this->parentIsHaveMethod('assign')){
-            parent::assign($name, $value);
-            return;
-        }
-        //如果父类中没有 assign
-        $this->app->view->assign($name, $value);
-    }
-
-
-    private function parentFetch($template = '', $vars = []){
-        if($this->parentIsHaveMethod('fetch')){
-            return parent::fetch($template, $vars);
-        }
-        //如果父类中没有 fetch
-        return $this->app->view->fetch($template, $vars);
-    }
-
-
-    private function parentDisplay(string $content, $vars = [], $code = 200, $filter = null){
-        if($this->parentIsHaveMethod('display')){
-            return parent::display($content, $vars,$code,$filter);
-        }
-        return  $this->app->view->display($content, $vars,$code,$filter);
-    }
 
 
     /**
@@ -224,18 +188,5 @@ trait Vue
     }
 
 
-    /**
-     * 父类是否存在此方法
-     * @param string $method
-     * @return bool
-     */
-    private function parentIsHaveMethod(string $method){
-        $class=parent::class;
-        static $classArr=[];
-        if(!isset($classArr[$class])){
-            $classArr[$class]=new $class($this->app);
-        }
 
-        return method_exists($classArr[$class],$method);
-    }
 }
