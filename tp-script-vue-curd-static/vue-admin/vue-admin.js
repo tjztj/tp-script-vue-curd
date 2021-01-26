@@ -601,6 +601,12 @@ define(['axios','qs'], function ( axios,Qs) {
                     if(document.body.clientWidth>1640){
                         return undefined;
                     }
+                    if(columnsCount<=3){
+                        return document.body.clientWidth>370?undefined:420;
+                    }
+                    if(columnsCount<=4){
+                        return document.body.clientWidth>450?undefined:500;
+                    }
                     if(columnsCount<=5){
                         return document.body.clientWidth>650?undefined:960;
                     }
