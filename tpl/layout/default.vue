@@ -25,9 +25,45 @@
     </svg>
 </div>
 <div id="app" style="display: none">
-  <a-locale-provider :locale="zhCn()">
-    {__CONTENT__}
-</a-locale-provider>
+    <a-locale-provider :locale="zhCn()">
+        {__CONTENT__}
+    </a-locale-provider>
+    <a-modal
+        wrap-class-name="body-iframe-modal"
+        :destroy-on-close="true"
+        v-model:visible="bodyModal.visible"
+        :confirm-loading="confirmLoading"
+        :footer="null"
+        :keyboard="false"
+        :mask-closable="false"
+        :width="bodyModal.width"
+        :height="bodyModal.height"
+        :z-index="bodyModal.zIndex"
+        :after-close="bodyModal.onclose"
+        @ok="handleOk"
+    >
+        <template #title>
+            <div v-html="bodyModal.title"></div>
+        </template>
+        <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyModal.url" :onload="bodyModal.onload" :style="{height:bodyModal.height==='auto'?'auto':'calc('+bodyModal.height+' - 56px)'}"></iframe>
+    </a-modal>
+    <a-drawer
+        wrap-class-name="body-iframe-drawer"
+        :destroy-on-close="true"
+        :mask-closable="false"
+        :width="bodyDrawer.width"
+        :height="bodyDrawer.height"
+        :z-index="bodyDrawer.zIndex"
+        :placement="bodyDrawer.placement"
+        v-model:visible="bodyDrawer.visible"
+        :keyboard="false"
+        @close="bodyDrawer.onclose"
+    >
+        <template #title>
+            <div v-html="bodyDrawer.title"></div>
+        </template>
+        <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyDrawer.url" :onload="bodyDrawer.onload"></iframe>
+    </a-drawer>
 </div>
 
 <script>window.vueData={$vue_data_json|raw};</script>
@@ -134,9 +170,9 @@
 <script src="/tp-script-vue-curd-static.php?require-2.3.6/require.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdVersion}" charset="utf-8"></script>
 <script>
-    require(['/tp-script-vue-curd-static.php?default.js'], function (Controller) {
-        if (eval('Controller.' + VUE_CURD.ACTION)) {
-            eval('Controller.' + VUE_CURD.ACTION + '()');
+    require(['/tp-script-vue-curd-static.php?default.js'], function (objs) {
+        if(objs[VUE_CURD.ACTION]){
+            objs[VUE_CURD.ACTION]();
         }
     });
 </script>

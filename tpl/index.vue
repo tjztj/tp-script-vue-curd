@@ -159,8 +159,8 @@
 <div class="box">
 <div class="head" v-if="showFilter">
     <a-spin :spinning="loading">
-        <div class="filter-box-title" v-if="childs.length>0">{$title}：</div>
-        <div class="filter-box">
+        <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow({name:'filterConfig',filterConfig:filterSource.filterConfig,filterData:myFilters.filterData})">{$title}：</div>
+        <div class="filter-box" v-if="filterGroupIsShow({name:'filterConfig',filterConfig:filterSource.filterConfig,filterData:myFilters.filterData})">
             <transition-group name="bounce">
                 <template v-for="(item,index) in filterSource.filterConfig">
                     <div class="filter-item-box" v-if="item.show&&!filterValues[item.name]" :key="item.name">
