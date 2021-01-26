@@ -3,6 +3,7 @@
 
 namespace tpScriptVueCurd\field;
 use app\common\constants\RegionConstant;
+use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\RegionFilter;
 use tpScriptVueCurd\ModelField;
@@ -26,10 +27,30 @@ class RegionField extends ModelField
     protected array $regionTree=[];
     protected string $defaultFilterClass=RegionFilter::class;
 
+    protected string $pField='';//父字段名
+    protected string $cField='';//子字段名
+
     public function __construct(){
+        //TODO::
         $this->regionTree=SystemRegion::getMyCascaderData();
         $this->listColumnWidth(90);
         parent::__construct();
+    }
+
+    /**父字段名
+     * @param string|null $pField
+     * @return $this|string
+     */
+    public function pField(string $pField=null){
+        return $this->doAttr('pField',$pField);
+    }
+
+    /**子字段名
+     * @param string|null $cField
+     * @return $this|string
+     */
+    public function cField(string $cField=null){
+        return $this->doAttr('cField',$cField);
     }
 
 
@@ -40,9 +61,13 @@ class RegionField extends ModelField
      */
     public function setSave(array $data): self
     {
+        if($this->pField()===''){
+            throw new \think\Exception('地区字段未配置 pField');
+        }
+
         $name=$this->name();
         if(isset($data[$name])){
-            if($this->name==='system_region_pid'){
+            if($this->name===$this->pField()){
                 $this->save=$this->getSystemRegionPidBySetSave($data[$name],$data);
             }else{
                 $val=$data[$name];
@@ -53,7 +78,7 @@ class RegionField extends ModelField
                 }
             }
         }else{
-            if($this->name==='system_region_pid'){
+            if($this->name===$this->pField()){
                 $this->save=$this->getSystemRegionPidBySetSave('',$data);
             }else{
                 $this->save='';
@@ -65,15 +90,19 @@ class RegionField extends ModelField
 
 
     private function getSystemRegionPidBySetSave($val,$data){
-        if($val===''&&isset($data['system_region_id'])){//如果是镇街
-            $system_region_id=0;
-            if(is_array($data['system_region_id'])){
-                $system_region_id=end($data['system_region_id']);
-            }else if(is_numeric($data['system_region_id'])){
-                $system_region_id=$data['system_region_id'];
+        if($this->cField()===''){
+            throw new \think\Exception('地区字段未配置 cField');
+        }
+
+        if($val===''&&isset($data[$this->cField()])){//如果是镇街
+            $cRegionId=0;
+            if(is_array($data[$this->cField()])){
+                $cRegionId=end($data[$this->cField()]);
+            }else if(is_numeric($data[$this->cField()])){
+                $cRegionId=$data[$this->cField()];
             }
-            if($system_region_id){
-                return self::getRegionPid($system_region_id);
+            if($cRegionId){
+                return self::getRegionPid($cRegionId);
             }
         }
         return $val;
@@ -96,29 +125,29 @@ class RegionField extends ModelField
 
 
 
-    public static function getRegionPid(int $system_region_id):string{
+    public static function getRegionPid(int $cRegionId):string{
         static $regions=null;
         if(is_null($regions)){
             $regions=array_column(SystemRegion::getAll(),'pid','id');
         }
-        return $regions[$system_region_id]??'';
+        return $regions[$cRegionId]??'';
     }
-    public static function getRegionName(int $system_region_id):string{
+    public static function getRegionName(int $cRegionId):string{
         static $regions=null;
         if(is_null($regions)){
             $regions=array_column(SystemRegion::getAll(),'name','id');
         }
-        return $regions[$system_region_id]??'';
+        return $regions[$cRegionId]??'';
     }
 
     /** 可以是 桐君街道 或 阆苑村 或 桐君街道-阆苑村
-     * @param string $system_region_name
+     * @param string $region_name
      * @return string
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public static function getRegionId(string $system_region_name):string{
+    public static function getRegionId(string $region_name):string{
         static $regions=null;
         if(is_null($regions)){
             foreach (SystemRegion::getAll() as $v){
@@ -129,7 +158,7 @@ class RegionField extends ModelField
                 }
             }
         }
-        return $regions[$system_region_name]??'';
+        return $regions[$region_name]??'';
     }
 
 
@@ -158,26 +187,34 @@ class RegionField extends ModelField
      * @throws \think\Exception
      */
     public function excelSaveDoData(array &$save):void{
-        if(!isset($save['system_region_id'])){
+        if($this->cField()===''){
+            throw new \think\Exception('地区字段未配置 cField');
+        }
+
+        if($this->pField()===''){
+            throw new \think\Exception('地区字段未配置 pField');
+        }
+
+        if(!isset($save[$this->cField()])){
             return;
         }
-        if(!is_numeric($save['system_region_id'])){
-            $regions=explode('-',$save['system_region_id']);
+        if(!is_numeric($save[$this->cField()])){
+            $regions=explode('-',$save[$this->cField()]);
 
             if(empty($regions[0])||empty($regions[1])){
                 throw new \think\Exception('填写格式不正确');
             }
-            $region_name=$save['system_region_id'];
-            $save['system_region_id']=self::getRegionId($region_name);
-            if($save['system_region_id']===''){
+            $region_name=$save[$this->cField()];
+            $save[$this->cField()]=self::getRegionId($region_name);
+            if($save[$this->cField()]===''){
                 throw new \think\Exception('没有找到村社：'.$region_name);
             }
         }
-        $save['system_region_pid']=self::getRegionPid($save['system_region_id']);
-        if(empty($save['system_region_id'])||empty($save['system_region_pid'])||$save['system_region_pid']==RegionConstant::FIRST_PID){
+        $save[$this->pField()]=self::getRegionPid($save[$this->cField()]);
+        if(empty($save[$this->cField()])||empty($save[$this->pField()])||$save[$this->pField()]==RegionConstant::FIRST_PID){
             throw new \think\Exception('未获取到正确的村社');
         }
-        if(self::getRegionPid($save['system_region_id'])!= $save['system_region_pid']){
+        if(self::getRegionPid($save[$this->cField()])!= $save[$this->pField()]){
             throw new \think\Exception('镇街['.$regions[0].']下未找到'.$regions[1]);
         }
 

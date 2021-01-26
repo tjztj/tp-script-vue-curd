@@ -121,7 +121,7 @@ trait ExcelHaveChild
             $modelName=class_basename($model);
             $fields=$fields->merge(
                 $model->fields()
-                    ->filter(fn(ModelField $vo)=>$vo->name()!=='system_region_id'&&$vo->name()!=='system_region_pid')
+                    ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))
                     ->map(function(ModelField $field)use($modelName,$model){
                         $field=clone $field;
                         $field->name($modelName.'|'.$field->name());

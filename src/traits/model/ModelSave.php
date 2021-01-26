@@ -34,14 +34,26 @@ trait ModelSave
         }
 
         $data['id']=$oldData['id'];
-        unset($data['system_region_id']
-            , $data['system_region_pid']
-            , $data['create_system_admin_id']
-            , $data['create_time']
+        unset( $data['create_time']
             , $data['update_time']
             , $data['delete_time']
-            , $data['delete_system_admin_id']
         );
+        if(static::getCreateLoginUserField()){
+            unset($data[static::getCreateLoginUserField()]);
+        }
+        if(static::getUpdateLoginUserField()){
+            unset($data[static::getUpdateLoginUserField()]);
+        }
+        if(static::getDeleteLoginUserField()){
+            unset($data[static::getDeleteLoginUserField()]);
+        }
+        if(static::getRegionPidField()){
+            unset($data[static::getRegionPidField()]);
+        }
+        if(static::getRegionField()){
+            unset($data[static::getRegionField()]);
+        }
+
         //onEditBefore请用doSaveDataAfter
         $info=self::update($data);
         $this->onEditAfter($info,$data);

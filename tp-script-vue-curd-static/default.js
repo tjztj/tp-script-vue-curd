@@ -465,7 +465,8 @@ define(['vueAdmin'], function (va) {
                 },
                 openChildList(row,modelInfo){
                     this.openBox({
-                        title:row.system_region_pid+row.system_region_id+' '+modelInfo.title,
+                        //TODO::标题要更详细
+                        title:modelInfo.title,
                         offset:'rt',
                         content: modelInfo.listUrl+'?base_id='+row.id,
                     }).end();
@@ -909,7 +910,7 @@ define(['vueAdmin'], function (va) {
                                     <div v-else-if="field.type==='RegionField'" class="field-box">
                                         <template v-if="form.id">
                                             <div class="l">
-                                                {{form.system_region_pid}}/{{form.system_region_id}}
+                                                {{form[field.pField]}}/{{form[[field.cField]]}}
                                             </div>
                                         </template>
                                         <template v-else>
@@ -1168,7 +1169,8 @@ define(['vueAdmin'], function (va) {
                 },
                 open(row){
                     this.openBox({
-                        title:'<div style="font-size: 15px">'+(row?'修改':'新增')+' <span style="font-size: 14px;color: rgba(0,0,0,.55)">'+this.info.system_region_pid+this.info.system_region_id+' '+vueData.title+'</span> 单条数据</div>',
+                        //TODO::标题要更详细
+                        title:'<div style="font-size: 15px">'+(row?'修改':'新增')+' <span style="font-size: 14px;color: rgba(0,0,0,.55)">'+vueData.title+'</span> 单条数据</div>',
                         offset: 'auto',
                         area: ['50vw', '72vh'],
                         content: vueData.editUrl+'?base_id='+this.info.id+'&id='+(row?row.id:''),

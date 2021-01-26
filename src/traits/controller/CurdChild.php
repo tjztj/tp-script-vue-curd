@@ -56,7 +56,7 @@ trait CurdChild{
 
         $listColumns=array_values($this->fields
             ->listShowItems()
-            ->filter(fn(ModelField $v)=>!in_array($v->name(),['system_region_id','system_region_pid']))//隐藏地区
+            ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))//隐藏地区
             ->toArray());
 
         return $this->showTpl('child_list',$this->indexFetch([
@@ -192,7 +192,7 @@ trait CurdChild{
                     }
                     $this->addAfter($this->model->addInfo($data,$baseInfo));
                 }else{
-                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>$v->name()!=='system_region_id'&&$v->name()!=='system_region_pid');
+                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
                     $this->editAfter($this->model->saveInfo($data,$fields));
                 }
             }catch (\Exception $e){
@@ -213,7 +213,7 @@ trait CurdChild{
             $info=null;
         }
 
-        $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),['system_region_id','system_region_pid']));//不编辑地区
+        $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//不编辑地区
         $this->createEditFetchDataBefore($fields,$info);//切面
         $fetchData=$this->createEditFetchData($fields,$info);//切面
         $fetchData['baseId']=$base_id;

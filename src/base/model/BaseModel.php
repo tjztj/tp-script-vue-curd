@@ -37,9 +37,12 @@ abstract class BaseModel extends VueCurlModel
         }
         $data=$this->doSaveData($oldData,$fields,$isExcelDo);
         //TODO::地区权限验证
-        //TODO::需要加入方法getLoginData
-        $data['create_system_admin_id']=getLoginData()['id'];
-        $data['update_system_admin_id']=getLoginData()['id'];
+        if(static::getCreateLoginUserField()){
+            $data[static::getCreateLoginUserField()]=getLoginData()['id'];
+        }
+        if(static::getUpdateLoginUserField()){
+            $data[static::getUpdateLoginUserField()]=getLoginData()['id'];
+        }
         //onAddBefore请用doSaveDataAfter
         $info=self::create($data);
         $this->onAddAfter($info,$data);

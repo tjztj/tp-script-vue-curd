@@ -7,10 +7,12 @@ namespace tpScriptVueCurd\traits\controller;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\Request;
+use tpScriptVueCurd\ModelField;
 
 /**
  * Trait CurdFunc
  * @property Request $request
+ * @property VueCurlModel $model
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -64,7 +66,7 @@ trait CurdFunc
         if($data){
             $info=$data->toArray();
             //只处理地区
-            $fields->filter(fn($v)=>$v->name()==='system_region_id'|| $v->name()==='system_region_pid')->doShowData($info);
+            $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()]))->doShowData($info);
             //原信息
             $info['sourceData']=$data;
         }else{

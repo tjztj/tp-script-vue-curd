@@ -30,7 +30,7 @@ trait ExcelChild
      * @return FieldCollection
      */
     protected function excelFields():FieldCollection{
-        return $this->fields->filter(fn(ModelField $v)=>$v->name()!=='system_region_id'&&$v->name()!=='system_region_pid');
+        return $this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));
     }
 
 

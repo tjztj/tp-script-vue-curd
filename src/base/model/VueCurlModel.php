@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\base\model;
 
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\traits\model\ModelBaseField;
 use tpScriptVueCurd\traits\model\ModelDelTraits;
 use tpScriptVueCurd\traits\model\ModelSave;
 
@@ -16,7 +17,7 @@ use tpScriptVueCurd\traits\model\ModelSave;
  */
 abstract class VueCurlModel extends TimeModel
 {
-    use ModelSave,ModelDelTraits;
+    use ModelSave,ModelDelTraits,ModelBaseField;
 
 
     abstract public function fields():FieldCollection;
@@ -35,13 +36,13 @@ abstract class VueCurlModel extends TimeModel
 
 
     /**
-     * 时候有村社字段，如果有，固定（system_region_id,system_region_pid）
+     * 时候有村社字段，如果有，固定（region_id,region_pid）
      * @return bool
      */
     public static function haveRegionField():bool{
         static $return=[];
         if(!isset($return[static::class])){
-            $return[static::class]=in_array('system_region_id', static::make()->fields()->column('name'), true);
+            $return[static::class]=static::getRegionField()!==''&&in_array(static::getRegionField(), static::make()->fields()->column('name'), true);
         }
         return $return[static::class];
     }

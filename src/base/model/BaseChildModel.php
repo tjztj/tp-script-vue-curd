@@ -47,14 +47,18 @@ abstract class BaseChildModel extends VueCurlModel
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
         #########################################################################################
 
-        $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!=='system_region_id'&&$v->name()!=='system_region_pid');
+        $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
         $data=$this->doSaveData($oldData,$fields,$isExcelDo);
         $data['base_id']=$baseInfo->id;
-        $this->fields()->filter(fn($v)=>$v->name()==='system_region_id')->isEmpty()||$data['system_region_id']=$baseInfo->system_region_id;
-        $this->fields()->filter(fn($v)=>$v->name()==='system_region_pid')->isEmpty()||$data['system_region_pid']=$baseInfo->system_region_pid;
-        //TODO::需要加入方法getLoginData
-        $data['create_system_admin_id']=getLoginData()['id'];
-        $data['update_system_admin_id']=getLoginData()['id'];
+        static::getRegionField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionField())->isEmpty()||$data[static::getRegionField()]=$baseInfo[static::getRegionField()];
+        static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$baseInfo[static::getRegionPidField()];
+
+        if(static::getCreateLoginUserField()){
+            $data[static::getCreateLoginUserField()]=getLoginData()['id'];
+        }
+        if(static::getUpdateLoginUserField()){
+            $data[static::getUpdateLoginUserField()]=getLoginData()['id'];
+        }
         //onAddBefore请用doSaveDataAfter
         $info=self::create($data);
         $this->onAddAfter($info,$data);
