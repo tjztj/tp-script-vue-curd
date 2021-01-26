@@ -50,8 +50,8 @@ abstract class BaseChildModel extends VueCurlModel
         $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!=='system_region_id'&&$v->name()!=='system_region_pid');
         $data=$this->doSaveData($oldData,$fields,$isExcelDo);
         $data['base_id']=$baseInfo->id;
-        $data['system_region_id']=$baseInfo->system_region_id;
-        $data['system_region_pid']=$baseInfo->system_region_pid;
+        $this->fields()->filter(fn($v)=>$v->name()==='system_region_id')->isEmpty()||$data['system_region_id']=$baseInfo->system_region_id;
+        $this->fields()->filter(fn($v)=>$v->name()==='system_region_pid')->isEmpty()||$data['system_region_pid']=$baseInfo->system_region_pid;
         //TODO::需要加入方法getLoginData
         $data['create_system_admin_id']=getLoginData()['id'];
         $data['update_system_admin_id']=getLoginData()['id'];

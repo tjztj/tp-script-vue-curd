@@ -22,6 +22,12 @@ use think\Request;
  */
 trait ExcelHaveChild
 {
+    use Excel{
+        Excel::downExcelTpl as parentDownExcelTpl;
+        Excel::importExcelTpl as parentImportExcelTpl;
+        Excel::excelFields as parentExcelFields;
+        Excel::excelSave as parentExcelExcelSave;
+    }
     public VueCurlModel $model;
     public FieldCollection $fields;
 
@@ -35,7 +41,7 @@ trait ExcelHaveChild
 
 
     /**
-     * @NodeAnotation(title="父表+子表导入模板下载")
+     * 父表+子表导入模板下载
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\Exception
@@ -45,12 +51,12 @@ trait ExcelHaveChild
      */
     function downExcelTpl():void{
         $this->baseAndChildImport=true;
-        parent::downExcelTpl();
+        $this->parentDownExcelTpl();
     }
 
 
     /**
-     * @NodeAnotation(title="子表导入模板下载")
+     * 子表导入模板下载
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\Exception
@@ -60,12 +66,12 @@ trait ExcelHaveChild
      */
     function justDownBaseExcelTpl():void{
         $this->baseAndChildImport=false;
-        parent::downExcelTpl();
+        $this->parentDownExcelTpl();
     }
 
 
     /**
-     * @NodeAnotation(title="父表+子表的数据导入")
+     * 父表+子表的数据导入
      * @return \think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -74,12 +80,12 @@ trait ExcelHaveChild
      */
     function importExcelTpl(){
         $this->baseAndChildImport=true;
-        return parent::importExcelTpl();
+        return $this->parentImportExcelTpl();
     }
 
 
     /**
-     * @NodeAnotation(title="子表数据导入")
+     * 子表数据导入
      * @return \think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -88,7 +94,7 @@ trait ExcelHaveChild
      */
     function justImportBaseExcelTpl(){
         $this->baseAndChildImport=false;
-        return parent::importExcelTpl();
+        return $this->parentImportExcelTpl();
     }
 
 
@@ -98,11 +104,11 @@ trait ExcelHaveChild
      */
     protected function excelFields():FieldCollection{
         if(!$this->baseAndChildImport){//只导入父表
-            return parent::excelFields();
+            return $this->parentExcelFields();
         }
 
         //获取父表字段
-        $fields=parent::excelFields()->map(function(ModelField $field){
+        $fields=$this->parentExcelFields()->map(function(ModelField $field){
             $field=clone $field;
             $field->name('PARENT|'.$field->name());
             $field->title(static::modelClassPath()::getTitle().'|'.$field->title());
@@ -149,7 +155,7 @@ trait ExcelHaveChild
     protected function excelSave($saveData){
         if(!$this->baseAndChildImport){//仅导入父表数据
             return [
-                static::modelClassPath()=>parent::excelSave($saveData)
+                static::modelClassPath()=>$this->parentExcelExcelSave($saveData)
             ];
         }
 
@@ -202,7 +208,7 @@ trait ExcelHaveChild
         //父表字段的值一样将会视作同一条父数据
         $baseIdsKey=serialize($mainData);
         if(!isset($baseIds[$baseIdsKey])){
-            $baseInfo=parent::excelSave($mainData);
+            $baseInfo=$this->parentExcelExcelSave($mainData);
             $baseIds[$baseIdsKey]=$baseInfo->id;
             $this->setExcelBaseInfo($baseInfo);
         }

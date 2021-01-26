@@ -680,3 +680,24 @@ body{
     flex: 1;
 }
 /****************************************************************/
+.body-iframe-drawer .ant-drawer-wrapper-body{
+    display: flex;
+    flex-direction: column;
+}
+.body-iframe-drawer .ant-drawer-wrapper-body .ant-drawer-body{
+    flex: 1;
+    padding: 0;
+}
+.body-iframe-drawer .ant-drawer-wrapper-body .ant-drawer-body iframe{
+    height: 100%;
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+}
+/****************************************************************/
+.body-iframe-modal .ant-modal-body iframe{
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+}
+/****************************************************************/

@@ -127,5 +127,6 @@ class ListField extends ModelField
      * @return void
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
+        $excelFieldTpl->explain="此列不可导入数据";
     }
 }

@@ -73,7 +73,7 @@ trait Excel
 
 
     /**
-     * @NodeAnotation(title="导入模板数据")
+     * 导入模板数据
      * @return \think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -160,7 +160,7 @@ trait Excel
 
 
     /**
-     * @NodeAnotation(title="下载excel模板")
+     * 下载excel模板
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\Exception
@@ -185,7 +185,7 @@ trait Excel
 
     /**
      * 获取excel头部字段配置
-     * @return array
+     * @return ExcelFieldTpl[]
      */
     private function getTHeadExpFields():array{
         $expFields = [];

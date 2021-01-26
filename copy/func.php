@@ -6,7 +6,9 @@
  * @return array
  */
 function getLoginData():array{
-    return [];
+    return [
+        'id'=>1,//当前登录人ID
+    ];
 }
 
 /**
@@ -16,7 +18,6 @@ function getLoginData():array{
 function getLoginUrl():string{
     return '/admin/login/index';
 }
-
 
 /**
  * 网站名称

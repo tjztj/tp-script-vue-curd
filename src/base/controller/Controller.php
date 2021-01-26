@@ -37,7 +37,7 @@ trait Controller
             $this->app=app();
         }
         if(empty($this->request)){
-            $this->app=$this->app->request;
+            $this->request=$this->app->request;
         }
         if(empty($this->guid)){
             if (!function_exists('create_guid')) {

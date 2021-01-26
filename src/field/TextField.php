@@ -27,7 +27,9 @@ class TextField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
-            $this->defaultCheckRequired($this->save);
+            if($this->required()&&$this->save===''){
+                $this->defaultCheckRequired($this->save);
+            }
         }else{
             $this->defaultCheckRequired('');
         }

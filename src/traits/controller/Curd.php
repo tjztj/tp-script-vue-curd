@@ -12,7 +12,6 @@ use think\Request;
 /**
  * Trait Curd
  * @property Request $request
- * @property string $tplPath
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -23,7 +22,7 @@ trait Curd
 
 
     /**
-     * @NodeAnotation(title="数据列表")
+     * 数据列表
      * @return mixed|\think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -50,9 +49,6 @@ trait Curd
         }
 
         $listColumns=array_values($this->fields->listShowItems()->toArray());
-
-        $paths=array_filter(explode('/',str_replace('\\', '/', static::class)));
-        $tolDir=$paths[count($paths)-1].'/'.parse_name(class_basename(static::class));
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
 
 
@@ -83,16 +79,12 @@ trait Curd
             ]
         ]);
 
-
-        if(file_exists(app_path('view/'.$tolDir).'index.vue')){
-            return $this->fetch($tolDir.'/index',$data);
-        }
-        return $this->display($this->tplPath.'index.vue',$data);
+        return $this->showTpl('index',$data);
     }
 
 
     /**
-     * @NodeAnotation(title="添加与修改")
+     * 添加与修改
      * @return mixed
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -124,13 +116,13 @@ trait Curd
         $fetchData=$this->createEditFetchData($this->fields,$info);
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
 
-        return $this->fetch('vuecurd/edit',$fetchData);
+        return $this->showTpl('edit',$fetchData);
     }
 
 
 
     /**
-     *  @NodeAnotation(title="详细页面")
+     * 详细页面
      * @return mixed|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -144,7 +136,7 @@ trait Curd
 
 
     /**
-     * @NodeAnotation(title="删除数据")
+     * 删除数据
      */
     function del(){
         return $this->doDelect($this->model,$this->request->param('ids/a',[]));

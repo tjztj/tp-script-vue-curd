@@ -24,7 +24,7 @@ trait CurdChild{
     public FieldCollection $baseFields;
 
     /**
-     * @NodeAnotation(title="子表详细页面")
+     * 子表详细页面
      * @return mixed|void
      */
     public function show(){
@@ -33,7 +33,7 @@ trait CurdChild{
 
 
     /**
-     * @NodeAnotation(title="详细子列表页面")
+     * 详细子列表页面
      * @return mixed|\think\response\Json|void
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -59,7 +59,7 @@ trait CurdChild{
             ->filter(fn(ModelField $v)=>!in_array($v->name(),['system_region_id','system_region_pid']))//隐藏地区
             ->toArray());
 
-        return $this->fetch('vuecurd/child_list',$this->indexFetch([
+        return $this->showTpl('child_list',$this->indexFetch([
             'vueCurdAction'=>'childList',
             'info'=>$info,
             'list'=>$list,
@@ -105,7 +105,7 @@ trait CurdChild{
 
 
     /**
-     * @NodeAnotation(title="获取子表显示数据+其父表数据，权限同getChildList一样")
+     * 获取子表显示数据+其父表数据，权限同getChildList一样
      * @return \think\response\Json
      * @throws \think\db\exception\DbException
      */
@@ -171,7 +171,7 @@ trait CurdChild{
 
 
     /**
-     * @NodeAnotation(title="子表数据添加修改")
+     * 子表数据添加修改
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -221,12 +221,12 @@ trait CurdChild{
 
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
 
-        return $this->fetch('vuecurd/edit',$fetchData);
+        return $this->showTpl('edit',$fetchData);
     }
 
 
     /**
-     * @NodeAnotation(title="删除子表数据")
+     * 删除子表数据
      * @return \think\response\Json|void
      */
     function del(){

@@ -29,7 +29,9 @@ trait BaseHaveChildController
         ExcelHaveChild::justDownBaseExcelTpl insteadof  BaseController;
         ExcelHaveChild::setExcelBaseInfo insteadof  BaseController;
         ExcelHaveChild::excelTilte insteadof  BaseController;
+        BaseController::indexFetch as baseIndexFetch;
     }
+
 
     /**
      * 控制器类型：base、child、base_have_child
@@ -89,7 +91,7 @@ trait BaseHaveChildController
      */
     protected function indexFetch(array $fetch):array{
         // 列表页面显示前处理
-        $fetch=parent::indexFetch($fetch);
+        $fetch=$this->baseIndexFetch($fetch);
 
         $fetch['childs']=[];
         foreach (static::childControllerClassPathList() as $childControllerClass){

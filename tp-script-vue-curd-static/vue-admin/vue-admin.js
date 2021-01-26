@@ -35,53 +35,323 @@ define(['axios','qs'], function ( axios,Qs) {
     //生成随机 GUID 数
     window.guid=function(){function S4(){return(((1+Math.random())*65536)|0).toString(16).substring(1)}return(S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())};
 
-    let openBox=function(option){
+    const openBox=function(option){
+        window.appParam=this;
         const box = top;
         let vueObj=this;
-        return MyPromise(function (trigger) {
-            option = Object.assign({
-                title: '',
-                type: 2,
-                area: ['60vw', '100vh'],
-                content: '',
-                maxmin: false,
-                moveOut: false,
-                anim: 2,
-                offset: 'rt',
-                success(layero, index) {
-                    var body = box.layui.layer.getChildFrame('body', index);
-                    layero.css('overflow','hidden');
-                    layero.find('iframe')[0].contentWindow.listVue=vueObj;//将当前页面的this保存到新页面的window里面
-                    layero.find('iframe')[0].contentWindow.parentWindow=window;
-                    layero.close=function(){
-                        box.layui.layer.close(index);
+        if(box.layer){
+            //iframe layui情况下
+            return MyPromise(function (trigger) {
+                option = Object.assign({
+                    title: '',
+                    type: 2,
+                    area: ['45vw', '100vh'],
+                    content: '',
+                    maxmin: false,
+                    moveOut: false,
+                    anim: 2,
+                    offset: 'rt',
+                    success(layero, index) {
+                        let body = box.layui.layer.getChildFrame('body', index);
+                        layero.css('overflow','hidden');
+                        layero.find('iframe')[0].contentWindow.listVue=vueObj;//将当前页面的this保存到新页面的window里面
+                        layero.find('iframe')[0].contentWindow.parentWindow=window;
+                        layero.close=function(){
+                            box.layui.layer.close(index);
+                        }
+                        if (body.length > 0) {
+                            body.on('closeIframe', function () {
+                                layero.close();
+                            })
+                            layero.find('iframe').css('padding','0px 0 28px 0')
+                            box.$.each(body, function (i, v) {
+                                // todo 优化弹出层背景色修改
+                                box.$(v).before('<style>html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}</style>');
+                            });
+                        }
+                        trigger('success', layero, index);
+                    },
+                    end() {
+                        trigger('close');
                     }
-                    if (body.length > 0) {
-                        body.on('closeIframe', function () {
-                            layero.close();
-                        })
-                        layero.find('iframe').css('padding','0px 0 28px 0')
-                        box.$.each(body, function (i, v) {
-                            // todo 优化弹出层背景色修改
-                            box.$(v).before('<style>html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}</style>');
-                        });
+                }, option);
+                if (option.type == 2) {
+                    if(option.content.indexOf('is_iframe_goto') == -1){
+                        option.content += (option.content.indexOf('?') == -1 ? '?' : '&') + 'is_iframe_goto=1';
                     }
-                    trigger('success', layero, index);
-                },
-                end() {
+                    if(option.content.indexOf('is_vue_open') == -1){
+                        option.content += (option.content.indexOf('?') == -1 ? '?' : '&') + 'is_vue_open=1';
+                    }
+                }
+                box.layer.open(option);
+            })
+        }else{
+            let vObj=box.appParam;
+            //如果不是iframe,打于开当前页面
+            return MyPromise(function (trigger) {
+                let key;
+                if(option.offset&&option.offset==='auto'){
+                    key='bodyModal';
+                }else{
+                    key='bodyDrawer';
+                    if(option.offset){
+                        switch (option.offset){
+                            case 'l': case 'lt': case 'lb':
+                                vObj.bodyDrawer.offset='left';
+                                vObj.bodyDrawer.width=vObj.bodyDrawer.width||'45vw';
+                                break;
+                            case 'r': case 'rt': case 'rb':
+                                vObj.bodyDrawer.offset='right';
+                                vObj.bodyDrawer.width=vObj.bodyDrawer.width||'45vw';
+                                break;
+                            case 't':
+                                vObj.bodyDrawer.offset='top';
+                                break;
+                            case 'b':
+                                vObj.bodyDrawer.offset='bottom';
+                                break;
+                            default:
+                                vObj.bodyDrawer.offset=option.offset;
+                        }
+                    }
+                }
+
+
+                vObj[key].title=option.title||undefined;
+                vObj[key].url=option.url||option.content||undefined;
+                if(option.area){
+                    vObj[key].width=option.area[0];
+                    vObj[key].height=option.area[1];
+                }
+                vObj[key].zIndex=option.zIndex||undefined;
+                vObj[key].onclose=function(){
                     trigger('close');
                 }
-            }, option);
-            if (option.type == 2) {
-                if(option.content.indexOf('is_iframe_goto') == -1){
-                    option.content += (option.content.indexOf('?') == -1 ? '?' : '&') + 'is_iframe_goto=1';
+
+                vObj[key].onload=function(e){
+                    let iframe=e.target;
+                    let body = iframe.contentWindow.document.querySelector('body');
+                    iframe.contentWindow.listVue=vueObj;//将当前页面的this保存到新页面的window里面
+                    iframe.contentWindow.parentWindow=window;
+                    let paramData={
+                        iframe,
+                        body,
+                        option:vObj[key],
+                        close(){
+                            vObj[key].visible=false;
+                        }
+                    };
+                    let myEvent = new Event("closeIframe",{option:vObj[key]});
+                    body.addEventListener("closeIframe", e => {
+                        paramData.close()
+                    });
+                    let style=iframe.contentWindow.document.createElement('style');
+                    style.type = 'text/css';
+                    style.innerHTML='html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}';
+                    iframe.contentWindow.document.querySelector('head').appendChild(style);
+                    trigger('success', paramData);
                 }
-                if(option.content.indexOf('is_vue_open') == -1){
-                    option.content += (option.content.indexOf('?') == -1 ? '?' : '&') + 'is_vue_open=1';
+                vObj[key].visible=true;
+            });
+        }
+    };
+
+    const uploadOneFile=function(option){
+        if(!option||!option.url)return;
+
+        if(document.querySelector('.upload-one-file-input-box')){
+            document.querySelector('.upload-one-file-input-box').remove();
+        }
+        if(!option.input){
+            option.input='<input style="display: none" type="file" name="file" accept="'+(option.accept||'')+'">'
+        }
+        let boxId='upload-one-file-input-box-'+window.guid();
+        document.body.insertAdjacentHTML('beforeend', '<div id="'+boxId+'" class="upload-one-file-input-box">'+option.input+'</div>');
+        let input=document.querySelector('#'+boxId+' input');
+        let that=this;
+        input.onchange= function(){
+            //todo
+            let formData = new FormData();
+            formData.append("file", this.files[0]);
+            that.postDataAndUpload(formData,option.url).then(function (res) {
+                if(option.success)option.success(res);
+            })
+            this.value = '';
+        };
+
+
+        return {
+            input,
+            trigger(){
+                let e = document.createEvent("MouseEvents");
+                e.initEvent("click", true, true);
+                input.dispatchEvent(e);
+            }
+        }
+    };
+
+    const uploadMethods={
+        postDataAndUpload(formdata, url){
+            return new Promise((resolve, reject)=>{
+                this.ajaxUpload(formdata,url,function(data){
+                    resolve(data);
+                },function(data){
+                    reject(data);
+                })
+            })
+        },
+        ajaxUpload (formdata, url, $function,$error) {
+            //ajax伪装
+            if (url.indexOf('_ajax=') == -1) {
+                if (url.indexOf('?') > -1) {
+                    url += "&_ajax=1";
+                } else {
+                    url += "?_ajax=1";
                 }
             }
-            box.layer.open(option);
-        })
+            let xhr = new XMLHttpRequest();
+            xhr = this.doUploadXhr(xhr, $function,$error);
+            /* 下面的url一定要改成你要发送文件的服务器url */
+            xhr.open("POST", url);
+            xhr.send(formdata);
+        },
+        /**
+         * 处理上传监听
+         * @param xhr
+         * @param $function
+         * @param $error
+         * @returns {*}
+         */
+        doUploadXhr (xhr, $function,$error) {
+            let is_upload = false,that=this;
+
+            function uploadProgress(evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+                    var current = percentComplete.toString();
+                    if (is_upload) {
+                        that.showLoadMsg("正在上传文件!（" + current + '%）');
+                    } else {
+                        if (current < 100) {
+                            is_upload = true;
+                            that.showLoadMsg('开始上传');
+                        }
+                    }
+                    if(current==100){
+                        that.showLoadMsg('正在处理...');
+                    }
+                }
+            }
+
+            function uploadComplete(evt) {
+                if (evt.target.responseText) {
+                    is_upload = false;
+                    let data;
+                    try {
+                        data = JSON.parse(evt.target.responseText);
+                    } catch(e) {
+                        that.hideLoadMsg();
+                        antd.notification.error({message: '服务器发生错误'});
+                        if($error){
+                            $error(e);
+                        }
+                        return;
+                    }
+
+                    if (data.code == 1) {
+                        that.hideLoadMsg();
+                        // var img_arr = data.data[0] ? data.data : [data.data];//返回一个数组，里面是所有文件上传成功后的信息
+                        if ($function) {
+                            $function(data);
+                        }
+                    } else {
+                        that.hideLoadMsg();
+                        antd.notification.error({message: data.msg,});
+                        if($error){
+                            $error(data);
+                        }
+                    }
+                }
+            }
+
+            function uploadFailed(evt) {
+                let msg='上传文件发生了错误尝试!';
+                antd.notification.error({message: msg,});
+                if($error){
+                    $error({
+                        code:0,
+                        data:[],
+                        msg:msg,
+                        evt:evt,
+                    })
+                }
+            }
+
+            function uploadCanceled(evt) {
+                let msg='上传被用户取消或者浏览器断开连接!';
+                antd.notification.error({message: msg,});
+                if($error){
+                    $error({
+                        code:0,
+                        data:[],
+                        msg:msg,
+                        evt:evt,
+                    })
+                }
+            }
+
+            /* 事件监听 */
+            xhr.upload.addEventListener("progress", uploadProgress, false);
+            xhr.addEventListener("load", uploadComplete, false);
+            xhr.addEventListener("error", uploadFailed, false);
+            xhr.addEventListener("abort", uploadCanceled, false);
+            xhr.onreadystatechange = function () {
+                if(xhr.readyState==2){
+                    // that.showLoadMsg('正在处理...');
+                }else if(xhr.readyState==4){
+                    // console.log(xhr.responseText);
+                }
+            };
+            return xhr;
+        },
+    }
+
+
+    const loadMsg={
+        showLoadMsg(text, parentElment) {
+            [top.document,document].forEach(v=>{
+                if(!v.querySelector('#show-load-msg-style')){
+                    console.log(v.querySelector('head'));
+                    v.querySelector('head').insertAdjacentHTML('beforeend','<style id="show-load-msg-style">.msg-loading-icon{display:block;width:34px;height:34px;margin-left:auto;margin-right:auto;margin-top:-26px;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAABlElEQVRYR+2WsUoDQRCGvxHFwiZN4gkWNvaCBtRKfAURtBWxsAg5AoqVsRa9O8FSS0ULC19AEVR8AwvBQsjFJL5BvJGVnASJnKJmm7vqYIb5P/6Z3R3hF5/j6QjCBZADGsAL8KARZ1GTy/qaVL9bXr6b2CmvDWTkizrnAjthUa6SdH4FEhcf3NYB6SWLkAXywDwwE8dFCSRip1KSp6+A/gSko1u+5lVZFmGlFX9U2Hguykmn/H8DicWGAh1XZb3lEqKUQld2P8P8O0gs6Ph6+gHTw1xYkLN2mK6BGFHH0zLCpvmPlOmaK7cfc5Q0zX8ddwI9QFlCuG9GzDZcCY1GVx0xghlPM/3ChcAYylbVlbIVECM6GOiCKMdApalMGFe67kjb8BqQhdgVayA5T6d6hBvgrlqUSWsg76fIV3PTDr/2MWoVZMjXI4VFFQpWQRxfV4F9hEO7IJ7OmDVC4douyJ5miaiZXcYqSGtgzWJVtw5i7a3p+mL008cybY21DS2pVWlr0takM5LkQDojSQ6l98hnh94AjEVzlg1mjQ8AAAAASUVORK5CYII=);color:#2196f3;content:"";position:absolute;z-index:100000000;top:50%;bottom:0;left:0;right:0;-webkit-animation:my-loading 0.8s infinite linear;animation:my-loading 0.8s infinite linear;}.loading-msg-div{position:absolute;z-index:9999999999;background-color:hsla(0,0%,100%,.85);margin:0;top:0;right:0;bottom:0;left:0;transition:opacity .3s;}html.loading-msg-parent .loading-msg-div{position:fixed;}.loading-msg-body{width:100%;height:100%;position:relative;}.loading-msg-body.no-text .msg-loading-text{display:none;}.loading-msg-body.no-text .msg-loading-icon{margin-top:0;}.msg-loading-spinner{top:50%;margin-top:-31px;width:100%;text-align:center;position:absolute;}.msg-loading-text{margin:3px 0;padding-top:35px;font-size:14px;color:#5e6d82;line-height:1.5em;}.loading-msg-parent{position:relative !important;min-height:80px;}html.loading-msg-parent,html.loading-msg-parent body{height:auto;}.loading-msg-parent{overflow:hidden;}</style>');
+                }
+            })
+            text = text || '';
+            parentElment = parentElment || top.document.querySelector('body');
+            if (parentElment.matches('body')) {
+                parentElment.closest('html').classList.add('loading-msg-parent')
+            } else {
+                parentElment.classList.add('loading-msg-parent')
+            }
+            if(parentElment.querySelector('.loading-msg-div')){
+                parentElment.querySelector('.loading-msg-div .msg-loading-text').innerHTML=text;
+            }else{
+                let body_class = 'loading-msg-body';
+                if (!text) body_class += ' no-text';
+                parentElment.insertAdjacentHTML('beforeend', '<div class="loading-msg-div"><div class="' + body_class + '"><div class="msg-loading-spinner"><i class="msg-loading-icon"></i><p class="msg-loading-text">' + text + '</p></div></div></div>');
+            }
+        },
+        hideLoadMsg(parentElment) {
+            parentElment = parentElment || top.document.querySelector('body');
+            if (parentElment.matches('body')) {
+                parentElment.closest('html').classList.remove('loading-msg-parent')
+            }else{
+                parentElment.classList.remove('loading-msg-parent')
+            }
+            parentElment.style.minHeight='';
+            if(parentElment.querySelector('.loading-msg-div')){
+                parentElment.querySelector('.loading-msg-div').remove();
+            }
+        }
     };
 
     /**
@@ -93,6 +363,9 @@ define(['axios','qs'], function ( axios,Qs) {
             window.history.back()
         },
         openBox,
+        uploadOneFile,
+        ...loadMsg,
+        ...uploadMethods,
         '$get'(url, params){
             if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
             return service({url, method: 'get',params,headers:{'X-REQUESTED-WITH':'xmlhttprequest'}})
@@ -119,9 +392,16 @@ define(['axios','qs'], function ( axios,Qs) {
 
 
     return function (option) {
-        option.data=option.data||function(){
-            return {};
+        option.data=option.data||function(){return {};};
+        let dt=option.data();
+        dt.bodyDrawer={
+            visible:false,
         };
+        dt.bodyModal={
+            visible:false,
+        },
+        option.data=()=>dt;
+
         if(!option.mounted) {
             option.mounted = function () {
                 this.pageIsInit();

@@ -82,6 +82,11 @@ define(['vueAdmin'], function (va) {
                             this.search();
                         }
                     },
+                    mounted() {
+                        if(this.filterItem.type == 'RegionFilter' && this.filterItem.regionTree.length===1  && this.filterItem.regionTree[0]['children'].length===1){
+                            this.regionValue=[this.filterItem.regionTree[0]['id'],this.filterItem.regionTree[0]['children'][0]['id']];
+                        }
+                    },
                     methods:{
                         setActive(itemIndex){
                             this.activeItemIndex=itemIndex;
@@ -469,18 +474,14 @@ define(['vueAdmin'], function (va) {
                     window.open(vueData.downExcelTplUrl);
                 },
                 importExcelTpl(){
-                    const id='pub_importExcelTpl_'+window.VUE_CURD.GUID.replace('{','').replace('}','');
-                    let input=window.top.$('#'+id);
-                    if(input.length===0){
-                        window.top.uploadThen=window.top.uploadThen||{};
-                        window.top.uploadThen[id]=res=>{
-                            window.top.common.suc(res.msg);
+                    this.uploadOneFile({
+                        url:vueData.importExcelTplUrl,
+                        accept:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+                        success:res=> {
+                            antd.message.success(res.msg);
                             this.refreshTable()
                         }
-                        input= window.top.$('<input class="common-upload-file" id="'+id+'" common-upload-id="' + id + '" style="display: none" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">');
-                        window.top.$('body').append(input).append('<div id="'+id+'-btn" common-upload-id="'+id+'" data-common-upload style="display: none" url="'+vueData.importExcelTplUrl+'"></div>');
-                    }
-                    input.trigger('click');
+                    }).trigger();
                 },
                 actionWidth(width){
                     return width
@@ -1203,18 +1204,14 @@ define(['vueAdmin'], function (va) {
                     window.open(vueData.downExcelTplUrl);
                 },
                 importExcelTpl(){
-                    const id='pub_importExcelTpl_'+window.VUE_CURD.GUID.replace('{','').replace('}','');
-                    let input=window.top.$('#'+id);
-                    if(input.length===0){
-                        window.top.uploadThen=window.top.uploadThen||{};
-                        window.top.uploadThen[id]=res=>{
-                            window.top.common.suc(res.msg);
+                    this.uploadOneFile({
+                        url:vueData.importExcelTplUrl,
+                        accept:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+                        success:res=> {
+                            antd.message.success(res.msg);
                             this.refreshTable()
                         }
-                        input= window.top.$('<input class="common-upload-file" id="'+id+'" common-upload-id="' + id + '" style="display: none" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="file">');
-                        window.top.$('body').append(input).append('<div id="'+id+'-btn" common-upload-id="'+id+'" data-common-upload style="display: none" url="'+vueData.importExcelTplUrl+'"></div>');
-                    }
-                    input.trigger('click');
+                    }).trigger();
                 },
             }
 

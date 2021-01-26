@@ -40,7 +40,8 @@ trait CurdFunc
         $fields->doShowData($info);
         $fieldArr=array_values($fields->toArray());
 
-        return $this->fetch('vuecurd/show',[
+
+        return $this->showTpl('show',[
             'title'=>$this->model::getTitle(),
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
@@ -98,8 +99,19 @@ trait CurdFunc
         return $this->success('删除成功');
     }
 
-
+    /**
+     * 显示模板内容
+     * @param $file
+     * @param $data
+     * @return mixed
+     */
     protected function showTpl($file,$data){
-        return $this->layoutDisplay(file_get_contents($this->tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($this->tplPath.$file),$data);
+        $paths=array_filter(explode('/',str_replace('\\', '/', static::class)));
+        $tolDir=$paths[count($paths)-1].'/'.parse_name(class_basename(static::class));
+        if(file_exists(app_path('view/'.$tolDir).$file.'.vue')){
+            return $this->fetch($tolDir.'/'.$file,$data);
+        }
+        $tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
+        return $this->layoutDisplay(file_get_contents($tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($tplPath.$file.'.vue'),$data);
     }
 }

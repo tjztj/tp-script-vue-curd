@@ -33,7 +33,6 @@ trait Vue
     public function initialize()
     {
         if ($this->checkIsVueAction()) {
-            $this->app->view->engine()->layout($this->layout);
             $this->app->view->config(['view_suffix' => 'vue']);
         }
         parent::initialize();
