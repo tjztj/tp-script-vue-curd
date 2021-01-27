@@ -1,7 +1,19 @@
-###  tp-script-vue-curd
 
+<div align="center">
+<h1 align="center">tp-script-vue-curd</h1>
 thinkphp6 script方式引入vue 自动生成curd逻辑
-（thinkphp6+vue3+antdv）
+</div>
+<p align="center">
+    <a href="#">
+        <img src="https://img.shields.io/badge/Vue-3.0.0+-green.svg" alt="Vue Version">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/badge/ThinkPHP-6.0.0+-green.svg" alt="ThinkPHP Version">
+    </a>
+      <a href="#">
+        <img src="https://img.shields.io/badge/ant design vue-2.0.0+-green.svg" alt="ant-design-vue Version">
+    </a>
+</p>
 
 > 项目初衷
 
@@ -9,10 +21,24 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 
 > 生成页面预览
 
-1. 列表![列表](https://images.gitee.com/uploads/images/2021/0127/101533_a9590e00_370098.png "QQ截图20210127101450.png")
-2. 编辑![编辑](https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png "QQ截图20210127101636.png")
-3. 子表![子表](https://images.gitee.com/uploads/images/2021/0127/101921_d70b4801_370098.png "QQ截图20210127101844.png")
-
+1. 列表
+   <br>
+   <div align="center">
+     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png" />
+   </div>
+   <br>
+2. 编辑
+   <br>
+   <div align="center">
+     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png" />
+   </div>
+   <br>
+3. 子表
+   <br>
+   <div align="center">
+     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101921_d70b4801_370098.png" />
+   </div>
+   <br>
 > 使用步奏
 
 1. 安装
