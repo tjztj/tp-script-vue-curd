@@ -190,7 +190,7 @@ require_once 'tp-script-vue-curd-config.php';
                     }
                     `
 
-    - 4）然后访问这个控制器的index方法就能查看结果了。更多高级使用方法，后期写一个文档
+    - 4）然后浏览器访问这个控制器的index方法就能查看结果了（如：http://127.0.0.1:8000/index.php/project/index）。更多高级使用方法，后期写一个文档
 
 ###  相关示例项目 
 
