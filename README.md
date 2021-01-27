@@ -166,6 +166,7 @@ require_once 'tp-script-vue-curd-config.php';
 
     - 4）然后访问这个控制器的index方法就能查看结果了。更多高级使用方法，后期写一个文档
 
- **相关示例项目** 
+###  相关示例项目 
+
 gitee：[tp-script-vue-curd-test，点击访问](https://gitee.com/tjztjspz/tp-script-vue-curd-test)
 
