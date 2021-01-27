@@ -5,6 +5,7 @@
 thinkphp6 script方式引入vue 自动生成curd逻辑
  <br>
 </div>
+ <br>
 <p align="center">
     <a href="#">
         <img src="https://img.shields.io/badge/Vue-3.0.0+-green.svg" alt="Vue Version">
