@@ -13,9 +13,11 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 2. 编辑![编辑](https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png "QQ截图20210127101636.png")
 3. 子表![子表](https://images.gitee.com/uploads/images/2021/0127/101921_d70b4801_370098.png "QQ截图20210127101844.png")
 
-> 使用步奏
+### > 使用步奏
+
 
 1. 安装
+
 
 ```
 composer require tj/tp-script-vue-curd
