@@ -36,11 +36,11 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 ```
 composer require tj/tp-script-vue-curd
 ```
-
+<br>
 2. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-static.php’到项目public目录下。
-
+<br>
 3. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-config.php’到项目引用目录中，如：app/admin/。
-
+<br>
 4. 在应用目录中的common.php文件（如：app/admin/common.php）中,引入tp-script-vue-curd-config.php。
 
 ```
@@ -49,9 +49,9 @@ require_once 'tp-script-vue-curd-config.php';
 
 （注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）
 (注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)
-
+<br>
 5. 修改复制出来的文件[tp-script-vue-curd-config.php]，配置相关代码
-
+<br>
 6. 基本配置已完成。 **现在是使用示例** ：
 
     - 1）数据库中建项目表
