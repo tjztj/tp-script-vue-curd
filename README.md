@@ -30,53 +30,41 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 
 ### 使用步奏
 
-<p>
+
    1. 安装
-</p>
-
-```
-composer require tj/tp-script-vue-curd
-```
-
-<p>
-   2. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-static.php’到项目public目录下。
-</p>
-<p>
-   3. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-config.php’到项目引用目录中，如：app/admin/。
-</p>
-<p>
+        ```
+        composer require tj/tp-script-vue-curd
+        ```
+   2. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-static.php’到项目public目录下。<br><br>
+   3. 复制composer安装后的文件‘vendor/tj/tp-script-vue-curd/copy/tp-script-vue-curd-config.php’到项目引用目录中，如：app/admin/。<br><br>
    4. 在应用目录中的common.php文件（如：app/admin/common.php）中,引入tp-script-vue-curd-config.php。
+        ```
+        require_once 'tp-script-vue-curd-config.php';
+        ```
+        （注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）
+        (注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)
 
-```
-require_once 'tp-script-vue-curd-config.php';
-```
 
-（注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）
-(注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)
-</p>
-<p>
-   5. 修改复制出来的文件[tp-script-vue-curd-config.php]，配置相关代码
-</p>
-<p>
+   5. 修改复制出来的文件[ _tp-script-vue-curd-config.php_ ]，配置相关代码。<br><br>
    6. 基本配置已完成。 **现在是使用示例** ：
 
        - 1）数据库中建项目表
-   
-               `CREATE TABLE `tp-script-vue-curd-testdb`.`project`  (
-                 `id` int NOT NULL AUTO_INCREMENT,
-                 `name` varchar(120) NOT NULL DEFAULT '' COMMENT '项目名称',
-                 `type` varchar(30) NOT NULL DEFAULT '' COMMENT '项目分类',
-                 `start_time` int NOT NULL DEFAULT 0 COMMENT '项目开始时间',
-                 `end_time` int NOT NULL DEFAULT 0 COMMENT '项目结束时间',
-                 `money` decimal(11, 2) NOT NULL DEFAULT 0 COMMENT '项目金额',
-                 `create_time` int(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
-                 `create_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
-                 `update_time` int(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
-                 `delete_time` int(10) NOT NULL DEFAULT 0 COMMENT '删除时间',
-                 `delete_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
-                 `update_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
-                 PRIMARY KEY (`id`)
-               ) COMMENT = '项目表';`
+         
+             CREATE TABLE `tp-script-vue-curd-testdb`.`project`  (
+                     `id` int NOT NULL AUTO_INCREMENT,
+                     `name` varchar(120) NOT NULL DEFAULT '' COMMENT '项目名称',
+                     `type` varchar(30) NOT NULL DEFAULT '' COMMENT '项目分类',
+                     `start_time` int NOT NULL DEFAULT 0 COMMENT '项目开始时间',
+                     `end_time` int NOT NULL DEFAULT 0 COMMENT '项目结束时间',
+                     `money` decimal(11, 2) NOT NULL DEFAULT 0 COMMENT '项目金额',
+                     `create_time` int(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
+                     `create_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
+                     `update_time` int(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
+                     `delete_time` int(10) NOT NULL DEFAULT 0 COMMENT '删除时间',
+                     `delete_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
+                     `update_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
+                     PRIMARY KEY (`id`)
+                   ) COMMENT = '项目表';
    
        - 2）建立模型文件
    
@@ -87,7 +75,7 @@ require_once 'tp-script-vue-curd-config.php';
    
                a）模型简单配置示例
    
-                   `<?php
+                   <?php
                        namespace app\model;
                        
                        use tpScriptVueCurd\field\DateField;
@@ -161,10 +149,12 @@ require_once 'tp-script-vue-curd-config.php';
                                        ])),
                                ]);
                            }
-                       }`
+                       }
    
+                
                b）控制器简单配置示例
-                   `<?php
+         
+                   <?php
                        namespace app\controller;
                        
                        use app\BaseController;
@@ -182,7 +172,7 @@ require_once 'tp-script-vue-curd-config.php';
                                return \app\model\Project::class;
                            }
                        }
-                       `
+                       
    
        - 4）然后浏览器访问这个控制器的index方法就能查看结果了（如：http://127.0.0.1:8000/index.php/project/index）。更多高级使用方法，后期写一个文档
 
