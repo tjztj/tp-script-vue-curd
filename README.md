@@ -23,24 +23,9 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 
 > 生成页面预览
 
-1. 列表
-   <br>
-   <div align="center">
-     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png" />
-   </div>
-   <br>
-2. 编辑
-   <br>
-   <div align="center">
-     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101748_ece8b7fb_370098.png" />
-   </div>
-   <br>
-3. 子表
-   <br>
-   <div align="center">
-     <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101921_d70b4801_370098.png" />
-   </div>
-   <br>
+1. 列表![列表](https://images.gitee.com/uploads/images/2021/0127/142357_7b7ac128_370098.png "1.png")
+2. 编辑![编辑](https://images.gitee.com/uploads/images/2021/0127/142742_07cc8b32_370098.png "2.png")
+3. 子表![子表](https://images.gitee.com/uploads/images/2021/0127/142758_e14af033_370098.png "3.png")
 
 > 使用步奏
 
