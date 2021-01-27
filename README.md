@@ -70,111 +70,107 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
                b）在控制器目录（无规定）中创建Project控制器文件
    
        - 3）配置字段等信息
-   
-               a）模型简单配置示例
-   
-                   <?php
-                       namespace app\model;
-                       
-                       use tpScriptVueCurd\field\DateField;
-                       use tpScriptVueCurd\field\DecimalField;
-                       use tpScriptVueCurd\field\RadioField;
-                       use tpScriptVueCurd\field\StringField;
-                       use tpScriptVueCurd\FieldCollection;
-                       
-                       /**
-                        * 需要继承 \tpScriptVueCurd\base\model\BaseModel 模型类
-                        * Class Project
-                        * @package app\model
-                        */
-                       class Project extends \tpScriptVueCurd\base\model\BaseModel
-                       {
-                           /**
-                            * 关联的控制器配置
-                            * @return string
-                            */
-                           public static function getControllerClass(): string
-                           {
-                               return \app\controller\Project::class;
-                           }
-                       
-                           /**
-                            * 模型名称
-                            * @return string
-                            */
-                           public static function getTitle(): string
-                           {
-                               return '项目信息';
-                           }
-                       
-                           /**
-                            * 表字段配置
-                            * @return FieldCollection
-                            */
-                           public function fields(): FieldCollection
-                           {
-                               //FieldCollection 继承了thinkphp6的 \think\Collection，所以返回的对象可以使用 \think\Collection的方法，比如->toArray();
-                               return FieldCollection::make([
-                                   //input输入框
-                                   StringField::init('name','项目名称')
-                                       ->required(true) //必填
-                                       ->listShow(true)//在列表中显示此字段
-                                   //单选
-                                   ,RadioField::init('type','项目类型')
-                                       ->items(['A类项目','B类项目'])//选项
-                                       ->required(true) //必填
-                                       ->listShow(true)//在列表中显示此字段
-                                   //日期选择
-                                   ,DateField::init('start_time','项目开始时间')
-                                       ->required(true) //必填
-                                       ->listShow(true)//在列表中显示此字段
-                                   //日期选择
-                                   ,DateField::init('end_time','项目结束时间')
-                                       ->required(true) //必填
-                                       ->listShow(true)//在列表中显示此字段
-                                   //小数
-                                   ,DecimalField::init('salary', '项目金额')
-                                       ->listShow(true)
-                                       ->ext('元')//薪资单位，结尾
-                                       ->required(true)
-                                       //筛选配置
-                                       ->doFilter(fn(\tpScriptVueCurd\filter\BetweenFilter $filter)=>$filter->setItems([
-                                           ['start'=>0,'end'=>999.99,'title'=>'1000元以下'],
-                                           ['start'=>1000,'end'=>2999.99,'title'=>'1000到3000(不包含)'],
-                                           ['start'=>3000,'end'=>4999.99,'title'=>'3000到5000（不包含）'],
-                                           ['start'=>5000,'end'=>9999.99,'title'=>'5000到10000（不包含）'],
-                                           ['start'=>10000,'end'=>0,'title'=>'10000元及以上'],
-                                       ])),
-                               ]);
-                           }
-                       }
-   
-                
-               b）控制器简单配置示例
+       - 3.1）模型简单配置示例
          
-                   <?php
-                       namespace app\controller;
-                       
-                       use app\BaseController;
-                       class Project extends BaseController
-                       {
-                           //不需要 extends ，但是需要 use trait文件：\tpScriptVueCurd\base\controller\BaseController;
-                           use \tpScriptVueCurd\base\controller\BaseController;
-                       
-                           /**
-                            * 配置控制器对应的模型类
-                            * @return string
-                            */
-                           public static function modelClassPath(): string
-                           {
-                               return \app\model\Project::class;
-                           }
-                       }
-                       
-   
-       - 4）然后浏览器访问这个控制器的index方法就能查看结果了（如：http://127.0.0.1:8000/index.php/project/index）。更多高级使用方法，后期写一个文档
+              <?php
+              namespace app\model;
 
-   </p>
+              use tpScriptVueCurd\field\DateField;
+              use tpScriptVueCurd\field\DecimalField;
+              use tpScriptVueCurd\field\RadioField;
+              use tpScriptVueCurd\field\StringField;
+              use tpScriptVueCurd\FieldCollection;
+              
+              /**
+               * 需要继承 \tpScriptVueCurd\base\model\BaseModel 模型类
+               * Class Project
+               * @package app\model
+               */
+              class Project extends \tpScriptVueCurd\base\model\BaseModel
+              {
+                  /**
+                   * 关联的控制器配置
+                   * @return string
+                   */
+                  public static function getControllerClass(): string
+                  {
+                      return \app\controller\Project::class;
+                  }
+              
+                  /**
+                   * 模型名称
+                   * @return string
+                   */
+                  public static function getTitle(): string
+                  {
+                      return '项目信息';
+                  }
+              
+                  /**
+                   * 表字段配置
+                   * @return FieldCollection
+                   */
+                  public function fields(): FieldCollection
+                  {
+                      //FieldCollection 继承了thinkphp6的 \think\Collection，所以返回的对象可以使用 \think\Collection的方法，比如->toArray();
+                      return FieldCollection::make([
+                          //input输入框
+                          StringField::init('name','项目名称')
+                              ->required(true) //必填
+                              ->listShow(true)//在列表中显示此字段
+                          //单选
+                          ,RadioField::init('type','项目类型')
+                              ->items(['A类项目','B类项目'])//选项
+                              ->required(true) //必填
+                              ->listShow(true)//在列表中显示此字段
+                          //日期选择
+                          ,DateField::init('start_time','项目开始时间')
+                              ->required(true) //必填
+                              ->listShow(true)//在列表中显示此字段
+                          //日期选择
+                          ,DateField::init('end_time','项目结束时间')
+                              ->required(true) //必填
+                              ->listShow(true)//在列表中显示此字段
+                          //小数
+                          ,DecimalField::init('salary', '项目金额')
+                              ->listShow(true)
+                              ->ext('元')//薪资单位，结尾
+                              ->required(true)
+                              //筛选配置
+                              ->doFilter(fn(\tpScriptVueCurd\filter\BetweenFilter $filter)=>$filter->setItems([
+                                  ['start'=>0,'end'=>999.99,'title'=>'1000元以下'],
+                                  ['start'=>1000,'end'=>2999.99,'title'=>'1000到3000(不包含)'],
+                                  ['start'=>3000,'end'=>4999.99,'title'=>'3000到5000（不包含）'],
+                                  ['start'=>5000,'end'=>9999.99,'title'=>'5000到10000（不包含）'],
+                                  ['start'=>10000,'end'=>0,'title'=>'10000元及以上'],
+                              ])),
+                      ]);
+                  }
+              }
+         
+      - 3.2）控制器简单配置示例
+               
+            <?php
+              namespace app\controller;
+              
+              use app\BaseController;
+              class Project extends BaseController
+              {
+                  //不需要 extends ，但是需要 use trait文件：\tpScriptVueCurd\base\controller\BaseController;
+                  use \tpScriptVueCurd\base\controller\BaseController;
+              
+                  /**
+                   * 配置控制器对应的模型类
+                   * @return string
+                   */
+                  public static function modelClassPath(): string
+                  {
+                      return \app\model\Project::class;
+                  }
+              }
+   
+       - 4）然后浏览器访问这个控制器的index方法就能查看结果了（如：http://127.0.0.1:8000/index.php/project/index）。更多高级使用方法，后期再写一个文档
+   
 ### 相关示例项目
 
 gitee：[tp-script-vue-curd-test，点击访问](https://gitee.com/tjztjspz/tp-script-vue-curd-test)
