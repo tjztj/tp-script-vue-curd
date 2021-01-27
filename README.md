@@ -1,7 +1,9 @@
-
 <div align="center">
+ <br>
 <h1 align="center">tp-script-vue-curd</h1>
+ <br>
 thinkphp6 script方式引入vue 自动生成curd逻辑
+ <br>
 </div>
 <p align="center">
     <a href="#">
@@ -39,6 +41,7 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
      <img  width="92%" style="border-radius:2px;box-shadow: 2px 0 6px gray;" src="https://images.gitee.com/uploads/images/2021/0127/101921_d70b4801_370098.png" />
    </div>
    <br>
+
 > 使用步奏
 
 1. 安装
@@ -58,7 +61,7 @@ require_once 'tp-script-vue-curd-config.php';
 ```
 
 （注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）
- (注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)
+(注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)
 
 5. 修改复制出来的文件[tp-script-vue-curd-config.php]，配置相关代码
 
@@ -82,12 +85,10 @@ require_once 'tp-script-vue-curd-config.php';
               PRIMARY KEY (`id`)
             ) COMMENT = '项目表';`
 
-
     - 2）建立模型文件
-        
+
             a）在模型目录（无规定）中创建Project模型文件
             b）在控制器目录（无规定）中创建Project控制器文件
-
 
     - 3）配置字段等信息
 
@@ -192,7 +193,7 @@ require_once 'tp-script-vue-curd-config.php';
 
     - 4）然后浏览器访问这个控制器的index方法就能查看结果了（如：http://127.0.0.1:8000/index.php/project/index）。更多高级使用方法，后期写一个文档
 
-###  相关示例项目 
+### 相关示例项目
 
 gitee：[tp-script-vue-curd-test，点击访问](https://gitee.com/tjztjspz/tp-script-vue-curd-test)
 
