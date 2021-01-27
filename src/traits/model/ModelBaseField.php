@@ -30,12 +30,15 @@ trait ModelBaseField
         return 'delete_admin_id';
     }
 
+
     /**
      * 所属地区ID字段，为空字符串，表示不记录
+     * @param bool $checkPid
      * @return string
+     * @throws \think\Exception
      */
-    public static function getRegionField():string{
-        if(static::getRegionPidField()===''){
+    public static function getRegionField($checkPid=true):string{
+        if($checkPid&&static::getRegionPidField(false)===''){
             throw new \think\Exception('设置了getRegionField，需再设置getRegionPidField');
         }
         return '';
@@ -44,10 +47,12 @@ trait ModelBaseField
 
     /**
      * 所属地区父ID字段，为空字符串，表示不记录
+     * @param bool $checkCid
      * @return string
+     * @throws \think\Exception
      */
-    public static function getRegionPidField():string{
-        if(static::getRegionField()===''){
+    public static function getRegionPidField($checkCid=true):string{
+        if($checkCid&&static::getRegionField(false)===''){
             throw new \think\Exception('设置了getRegionPidField，需再设置getRegionField');
         }
         return '';
