@@ -46,7 +46,7 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
    5. 修改复制出来的文件[ _tp-script-vue-curd-config.php_ ]，配置相关代码。<br><br>
 
 
-### 使用示例：
+### 使用示例
 
 1.数据库中建示例项目表
 
