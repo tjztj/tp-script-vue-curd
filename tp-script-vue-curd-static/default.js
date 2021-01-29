@@ -1173,6 +1173,7 @@ define(['vueAdmin'], function (va) {
             },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
+                    this.pagination=pagination;
                     this.pagination.sortField=sorter.field;
                     this.pagination.sortOrder=sorter.order;
                     this.fetch();
@@ -1187,6 +1188,7 @@ define(['vueAdmin'], function (va) {
                     }).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
+                        this.data = data.data.data
                         this.onDataLoad();//触发钩子
                         this.tableLoading = false;
                         //列表加载完成

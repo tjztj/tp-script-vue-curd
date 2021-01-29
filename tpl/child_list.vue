@@ -34,12 +34,15 @@
     width: 100%;
     flex: 1;
 }
+.title-right{
+    display: flex;
+}
 </style>
 <div class="box">
 <div class="week-box">
     <div class="week-tool-box">
         <div class="week-title">详细列表</div>
-        <div>
+        <div class="title-right">
             <template v-if="auth.edit">
                 <a-button type="primary" @click="openAdd">
                     <plus-outlined></plus-outlined>
@@ -62,6 +65,15 @@
                     <span> Excel模板下载</span>
                 </a-button>
             </template>
+            <div class="ant-pro-table-list-toolbar-divider">
+                <a-divider type="vertical"></a-divider>
+            </div>
+            <div class="ant-pro-table-list-toolbar-setting-item">
+                <a-tooltip>
+                    <template #title>刷新</template>
+                    <reload-outlined @click="refreshTable"></reload-outlined>
+                </a-tooltip>
+            </div>
         </div>
     </div>
     <div class="week-table-box">
@@ -73,6 +85,7 @@
             :list-columns="listColumns"
             :can-edit="canEdit"
             :can-del="canDel"
+            @change="handleTableChange"
             @open-show="openShow"
             @on-delete="deleteRow"
             @open-edit="openEdit">
