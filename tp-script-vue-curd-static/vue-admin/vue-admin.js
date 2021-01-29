@@ -686,7 +686,7 @@ define(['axios','qs'], function ( axios,Qs) {
                             :row-key="record => record.id"
                             :columns="columns"
                             :data-source="data"
-                            :pagination="pagination"
+                            :pagination="pagination&&pagination.pageSize?pagination:false"
                             :loading="loading"
                             @change="handleTableChange"
                             class="curd-table"

@@ -28,7 +28,7 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 2. 编辑![编辑](https://images.gitee.com/uploads/images/2021/0127/142742_07cc8b32_370098.png "2.png")
 3. 子表![子表](https://images.gitee.com/uploads/images/2021/0127/142758_e14af033_370098.png "3.png")
 
-### 使用步奏
+### 安装配置
 
 
    1. 安装
@@ -44,9 +44,11 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
         （注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）
         (注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件)<br><br>
    5. 修改复制出来的文件[ _tp-script-vue-curd-config.php_ ]，配置相关代码。<br><br>
-   6. 基本配置已完成。 **现在是使用示例** ：
 
-       - 1）数据库中建项目表
+
+### 使用示例：
+
+       - 1）数据库中建示例项目表
          
              CREATE TABLE `tp-script-vue-curd-testdb`.`project`  (
                      `id` int NOT NULL AUTO_INCREMENT,

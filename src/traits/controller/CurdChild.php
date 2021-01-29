@@ -10,10 +10,12 @@ use tpScriptVueCurd\ModelField;
 use think\db\Query;
 use think\Request;
 use tpScriptVueCurd\option\FunControllerIndexData;
+use tpScriptVueCurd\option\FunControllerIndexPage;
 
 /**
  * Trait CurdChild
  * @property Request $request
+ * @property FunControllerIndexPage $indexPageOption
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -45,13 +47,10 @@ trait CurdChild{
         $base_id||$this->error('缺少必要参数');
 
 
-        $option=new FunControllerIndexData();
-        $option->data=$this->getChildList($base_id);
-        $this->indexData($option);
-        $list=$option->data;
-
-        if($this->request->param('just_get_childs/d')===1){//只返回list
-            return $this->success($list);
+        if($this->request->isAjax()){//只返回list
+            $listData=$this->getChildList($base_id);
+            $this->indexData($listData);
+            return $this->success($listData->toArray());
         }
 
         $info=$this->baseModel->find($base_id);
@@ -66,8 +65,8 @@ trait CurdChild{
 
         return $this->showTpl('child_list',$this->indexFetch([
             'vueCurdAction'=>'childList',
+            'indexPageOption'=>$this->indexPageOption,
             'info'=>$info,
-            'list'=>$list,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems?FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
             'editUrl'=>url('edit')->build(),
@@ -90,21 +89,33 @@ trait CurdChild{
     /**
      * 获取子列表
      * @param int $base_id
-     * @return array
+     * @return FunControllerIndexData
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    private function getChildList(int $base_id):array{
-        $list=$this->model
+    private function getChildList(int $base_id):FunControllerIndexData{
+        $model=$this->model
             ->where('base_id',$base_id)
             ->where(function (Query $query){$this->indexListWhere($query);})
-            ->where($this->fields->getFilterWhere())->select()->toArray();
-        $list||$list=[];
-        foreach ($list as $k=>$v){
-            $this->fields->doShowData($list[$k]);
+            ->where($this->fields->getFilterWhere());
+
+        $option=new FunControllerIndexData();
+        if($this->indexPageOption->pageSize>0){
+            $pageData=$model->paginate($this->request->param('pageSize/d',$this->indexPageOption->pageSize))->toArray();
+            $option->data=$pageData['data'];
+            $option->currentPage=$pageData['current_page'];
+            $option->lastPage=$pageData['last_page'];
+            $option->perPage=$pageData['per_page'];
+            $option->total=$pageData['total'];
+        }else{
+            $option->data=$model->select()->toArray();
         }
-        return $list;
+        foreach ($option->data as $k=>$v){
+            $this->fields->doShowData($option->data[$k]);
+        }
+
+        return $option;
     }
 
 

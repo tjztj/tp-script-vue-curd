@@ -290,10 +290,10 @@ define(['vueAdmin'], function (va) {
 
 
                 const pagination={
-                    pageSize: 10,
+                    pageSize: vueData.indexPageOption.pageSize,
                     sortField: '',
                     sortOrder: '',
-                    showSizeChanger:true,
+                    showSizeChanger:vueData.indexPageOption.canGetRequestOption,
                 }
 
 
@@ -1147,6 +1147,12 @@ define(['vueAdmin'], function (va) {
 
 
     actions.childList=function(){
+        const pagination={
+            pageSize: vueData.indexPageOption.pageSize,
+            sortField: '',
+            sortOrder: '',
+            showSizeChanger:vueData.indexPageOption.canGetRequestOption,
+        }
         return {
             data(){
                 return {
@@ -1158,9 +1164,41 @@ define(['vueAdmin'], function (va) {
                     canDel:vueData.canDel&&vueData.auth.del,
                     canEdit:vueData.auth.edit,
                     auth:vueData.auth,
+                    pagination,
                 }
             },
+            mounted() {
+                this.pageIsInit();
+                this.fetch();
+            },
             methods:{
+                handleTableChange(pagination, filters, sorter) {
+                    this.pagination.sortField=sorter.field;
+                    this.pagination.sortOrder=sorter.order;
+                    this.fetch();
+                },
+                fetch() {
+                    this.tableLoading = true;
+                    this.$get(window.location.href,{
+                        pageSize: this.pagination.pageSize,
+                        page:this.pagination.current,
+                        sortField:this.pagination.sortField,
+                        sortOrder:this.pagination.sortOrder,
+                    }).then(data => {
+                        this.pagination.current=data.data.current_page;
+                        this.pagination.total = data.data.total;
+                        this.onDataLoad();//触发钩子
+                        this.tableLoading = false;
+                        //列表加载完成
+                        if(window.onListFetch){
+                            Vue.nextTick(function(){
+                                window.onListFetch(this.data);
+                            })
+                        }
+                    }).catch(err=>{
+                        this.tableLoading = false;
+                    });
+                },
                 openAdd(){
                     this.open()
                 },
@@ -1194,13 +1232,7 @@ define(['vueAdmin'], function (va) {
                     })
                 },
                 refreshTable(){
-                    this.tableLoading=true;
-                    this.$get(window.location.href,{just_get_childs:1}).then(res=>{
-                        this.data=res.data;
-                        this.tableLoading=false;
-                    }).catch(err=>{
-                        this.tableLoading=false;
-                    })
+                    this.fetch();
                 },
                 downExcelTpl(){
                     window.open(vueData.downExcelTplUrl);
@@ -1214,6 +1246,9 @@ define(['vueAdmin'], function (va) {
                             this.refreshTable()
                         }
                     }).trigger();
+                },
+                onDataLoad(){
+                    //数据获取完成钩子
                 },
             }
 

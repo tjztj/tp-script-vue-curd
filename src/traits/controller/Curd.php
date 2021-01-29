@@ -39,22 +39,31 @@ trait Curd
             }else{
                 $order='id DESC';
             }
-            $list=$this->model
+            $model=$this->model
                 ->where(function (Query $query){
                     $this->indexListWhere($query);
                 })
                 ->where($this->fields->getFilterWhere())
-                ->order($order)->paginate($this->request->param('pageSize/d',10))->toArray();
-            foreach ($list['data'] as $k=>$v){
-                $this->fields->doShowData($list['data'][$k]);
-            }
+                ->order($order);
+
+
 
             $option=new FunControllerIndexData();
-            $option->data=$list['data'];
-            $option->currentPage=$list['current_page'];
-            $option->lastPage=$list['last_page'];
-            $option->perPage=$list['per_page'];
-            $option->total=$list['total'];
+            if($this->indexPageOption->pageSize>0){
+                $pageData=$model->paginate($this->request->param('pageSize/d',$this->indexPageOption->pageSize))->toArray();
+                $option->data=$pageData['data'];
+                $option->currentPage=$pageData['current_page'];
+                $option->lastPage=$pageData['last_page'];
+                $option->perPage=$pageData['per_page'];
+                $option->total=$pageData['total'];
+            }else{
+                $option->data=$model->select()->toArray();
+            }
+
+            foreach ($option->data as $k=>$v){
+                $this->fields->doShowData($option->data[$k]);
+            }
+
             $this->indexData($option);
 
             return $this->success($option->toArray());

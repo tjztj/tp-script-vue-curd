@@ -68,7 +68,7 @@
         <curd-table
             ref="CurdTable"
             :data="data"
-            :pagination="false"
+            :pagination="pagination"
             :loading="tableLoading"
             :list-columns="listColumns"
             :can-edit="canEdit"
