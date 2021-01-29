@@ -41,9 +41,8 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
         ```
         require_once 'tp-script-vue-curd-config.php';
         ```
-        <font color=#bfbfbf>（注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中）</font>
-      <br>
-        <font color=#bfbfbf>（注意：如果应用目录没有common.php文件，需在应用目录中创建common.php文件</font><br><br>
+      _（注意：此时common.php文件与tp-script-vue-curd-config.php在同一目录中；如果应用目录没有common.php文件，需在应用目录中创建common.php文件）_
+      <br><br>
    5. 修改复制出来的文件[ _tp-script-vue-curd-config.php_ ]，配置相关代码。<br><br>
 
 
