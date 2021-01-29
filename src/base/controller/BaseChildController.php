@@ -7,6 +7,9 @@ namespace tpScriptVueCurd\base\controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\option\FunControllerChildImportAfter;
+use tpScriptVueCurd\option\FunControllerChildImportBefore;
+use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\CurdChild;
 use tpScriptVueCurd\traits\controller\ExcelChild;
 use think\App;
@@ -64,11 +67,21 @@ trait BaseChildController
         return '详细列表';
     }
 
-    public function importBefore(array $saveObjects,BaseModel $base):void{
+    /**
+     * 列表分页配置
+     * @return FunControllerIndexPage
+     */
+    public static function getIndexPage():FunControllerIndexPage{
+        $option=new FunControllerIndexPage;
+        $option->pageSize=0;//子表默认不分页
+        return $option;
+    }
+
+    public function importBefore(FunControllerChildImportBefore $option):void{
         // 数据导入前，方便之类处理（之类重写此方法）
     }
 
-    public function importAfter(VueCurlModel $saveObjects,BaseModel $base):void{
+    public function importAfter(FunControllerChildImportAfter $option):void{
         // 数据导入后，方便之类处理（之类重写此方法）
     }
 }

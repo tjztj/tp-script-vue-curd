@@ -10,6 +10,8 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerChildImportAfter;
+use tpScriptVueCurd\option\FunControllerChildImportBefore;
 
 /**
  * Trait ExcelChild
@@ -59,9 +61,17 @@ trait ExcelChild
         /* @var BaseChildModel $model */
         $model=(new $modelClassName);
 
-        $this->importBefore($saveData,$baseInfo);
-        $return=$model->addInfo($saveData,$baseInfo,true);
-        $this->importAfter($return,$baseInfo);
-        return $return;
+        $option=new FunControllerChildImportBefore();
+        $option->saveArr=$saveData;
+        $option->base=$baseInfo;
+        $this->importBefore($option);
+        $info=$model->addInfo($option->saveArr,$option->base,true);
+
+        $optionAfter=new FunControllerChildImportAfter();
+        $optionAfter->saveObjects=$info;
+        $optionAfter->base=$option->base;
+
+        $this->importAfter($optionAfter);
+        return $info;
     }
 }

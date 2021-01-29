@@ -13,6 +13,8 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerChildImportAfter;
+use tpScriptVueCurd\option\FunControllerChildImportBefore;
 
 /**
  * Trait ExcelHaveChild
@@ -166,7 +168,7 @@ trait ExcelHaveChild
             $datas[$arr[0]][$arr[1]]=$v;
         }
         $baseId=$this->getMainIdByImportData($datas['PARENT']);
-        $return=[
+        $infos=[
             static::modelClassPath()=>$this->importBaseInfos[$baseId],
         ];
 
@@ -186,12 +188,21 @@ trait ExcelHaveChild
                 $base=$this->getExcelBaseInfo($baseId);
 
                 isset($childControllerClassList[$childControllerClass])||$childControllerClassList[$childControllerClass]=new $childControllerClass(app());
-                $childControllerClassList[$childControllerClass]->importBefore($datas[$modelName],$base);
-                $return[$modelClass]=$model->addInfo($datas[$modelName],$base,true);
-                $childControllerClassList[$childControllerClass]->importAfter($return[$modelClass],$base);
+
+                $option=new FunControllerChildImportBefore();
+                $option->saveArr=$datas[$modelName];
+                $option->base=$base;
+                $childControllerClassList[$childControllerClass]->importBefore($option);
+                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,true);
+
+                $optionAfter=new FunControllerChildImportAfter();
+                $optionAfter->saveObjects=$infos[$modelClass];
+                $optionAfter->base=$option->base;
+
+                $childControllerClassList[$childControllerClass]->importAfter($optionAfter);
             }
         }
-        return $return;
+        return $infos;
 
     }
 

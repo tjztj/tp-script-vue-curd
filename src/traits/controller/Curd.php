@@ -8,10 +8,13 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerIndexData;
+use tpScriptVueCurd\option\FunControllerIndexPage;
 
 /**
  * Trait Curd
  * @property Request $request
+ * @property FunControllerIndexPage $indexPageOption
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -45,7 +48,16 @@ trait Curd
             foreach ($list['data'] as $k=>$v){
                 $this->fields->doShowData($list['data'][$k]);
             }
-            return $this->success($this->indexData($list));
+
+            $option=new FunControllerIndexData();
+            $option->data=$list['data'];
+            $option->currentPage=$list['current_page'];
+            $option->lastPage=$list['last_page'];
+            $option->perPage=$list['per_page'];
+            $option->total=$list['total'];
+            $this->indexData($option);
+
+            return $this->success($option->toArray());
         }
 
         $listColumns=array_values($this->fields->listShowItems()->toArray());
@@ -56,6 +68,7 @@ trait Curd
         $data=$this->indexFetch([
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
+            'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
             'editUrl'=>url('edit')->build(),

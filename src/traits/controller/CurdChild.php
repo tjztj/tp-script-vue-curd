@@ -9,6 +9,7 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerIndexData;
 
 /**
  * Trait CurdChild
@@ -43,8 +44,12 @@ trait CurdChild{
         $base_id=$this->request->param('base_id/d',0);
         $base_id||$this->error('缺少必要参数');
 
-        $list=$this->getChildList($base_id);
-        $list=$this->indexData($list);
+
+        $option=new FunControllerIndexData();
+        $option->data=$this->getChildList($base_id);
+        $this->indexData($option);
+        $list=$option->data;
+
         if($this->request->param('just_get_childs/d')===1){//只返回list
             return $this->success($list);
         }

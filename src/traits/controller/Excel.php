@@ -11,6 +11,8 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerImportAfter;
+use tpScriptVueCurd\option\FunControllerImportBefore;
 
 /**
  * Trait Excel
@@ -51,17 +53,24 @@ trait Excel
     /**
      * 执行添加逻辑，可继承然后重写
      * @param $saveData
-     * @return mixed
+     * @return VueCurlModel
      */
-    protected function excelSave($saveData){
+    protected function excelSave($saveData):VueCurlModel{
         static $modelClassName;
         if(!isset($modelClassName)){
             $modelClassName=get_class($this->model);
         }
-        $this->importBefore($saveData);
-        $return=(new $modelClassName)->addInfo($saveData,null,true);
-        $this->importAfter($return);
-        return $return;
+
+        $option=new FunControllerImportBefore();
+        $option->saveArr=$saveData;
+        $this->importBefore($option);
+        $info=(new $modelClassName)->addInfo($option->saveArr,null,true);
+
+        $optionAfter=new FunControllerImportAfter();
+        $optionAfter->saveObjects=$info;
+        $this->importAfter($optionAfter);
+
+        return $info;
     }
 
 

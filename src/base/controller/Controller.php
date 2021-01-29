@@ -7,6 +7,8 @@ namespace tpScriptVueCurd\base\controller;
 use think\App;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\option\FunControllerIndexData;
+use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Vue;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
@@ -29,6 +31,7 @@ trait Controller
     }
 
     protected string $tplPath='';
+    protected FunControllerIndexPage $indexPageOption;
 
     public function initialize()
     {
@@ -56,6 +59,8 @@ trait Controller
             }
         }
 
+        $this->indexPageOption=static::getIndexPage();
+
 
         $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
 
@@ -65,7 +70,6 @@ trait Controller
         $this->assign('vueCurdModule',$this->app->http->getName());
         //TODO::要动态的
         $this->assign('vueCurdVersion','1.0');
-
         $this->assign('loginUrl',getLoginUrl());
     }
 
@@ -83,6 +87,13 @@ trait Controller
 
 
     /**
+     * 列表分页配置
+     * @return FunControllerIndexPage
+     */
+    abstract public static function getIndexPage():FunControllerIndexPage;
+
+
+    /**
      * 列表自定义条件
      * @param Query $query
      */
@@ -90,9 +101,8 @@ trait Controller
 
     }
 
-    protected function indexData(array $data):array{
+    protected function indexData(FunControllerIndexData $option):void{
         //列表数据处理钩子
-        return $data;
     }
     protected function indexFetch(array $fetch):array{
         // 列表页面显示前处理
@@ -110,7 +120,7 @@ trait Controller
 
     protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel $data):void
     {
-        //（添加/编辑页面）生成解析数据前，处理数据
+        //（添加/编辑页面）生成解析数据前，处理数据（控制字段显示与否），$data为空代表是新增
     }
     protected function beforeAddShow(array $fetchData):array{
         //数据添加页面 解析前

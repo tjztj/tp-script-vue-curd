@@ -6,6 +6,9 @@ namespace tpScriptVueCurd\base\controller;
 
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\option\FunControllerImportAfter;
+use tpScriptVueCurd\option\FunControllerImportBefore;
+use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Curd;
 use think\App;
 
@@ -40,12 +43,17 @@ trait BaseController
         return 'base';
     }
 
+    public static function getIndexPage():FunControllerIndexPage{
+        $option=new FunControllerIndexPage;
+        $option->pageSize=10;//默认每页显示10条数据
+        return $option;
+    }
 
-    public function importBefore(array $saveObjects):void{
+    public function importBefore(FunControllerImportBefore $option):void{
         // 数据导入前，方便之类处理（之类重写此方法）
     }
 
-    public function importAfter(VueCurlModel $saveObjects):void{
+    public function importAfter(FunControllerImportAfter $option):void{
         // 数据导入后，方便之类处理（之类重写此方法）
     }
 }
