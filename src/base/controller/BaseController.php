@@ -38,7 +38,7 @@ trait BaseController
      * 控制器类型：base、child、base_have_child
      * @return string
      */
-    public static function type(): string
+    final public static function type(): string
     {
         return 'base';
     }
