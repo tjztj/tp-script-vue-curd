@@ -23,7 +23,7 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
 只需在 模型表 中配置字段信息，就可以生成 列表、筛选、编辑 页面，且页面灵活，可适应多种情况。
 
 
-###文档
+### 文档
 [访问](https://www.yuque.com/junt/tp-script-vue-curd/fk77x2)
 
 ### 生成页面预览
