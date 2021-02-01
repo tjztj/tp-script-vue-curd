@@ -50,7 +50,7 @@ abstract class BaseModel extends VueCurlModel
         return $info;
     }
 
-    public function del(array $ids): void
+    final public function del(array $ids): void
     {
         /* @var Controller $v */
         $controll=static::getControllerClass();
