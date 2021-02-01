@@ -3,6 +3,7 @@
 <h1 align="center">tp-script-vue-curd</h1>
  <br>
 thinkphp6 script方式引入vue 自动生成curd逻辑
+文档：[访问](https://www.yuque.com/junt/tp-script-vue-curd/fk77x2)
  <br>
 </div>
  <br>
