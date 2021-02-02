@@ -113,6 +113,8 @@ define(['axios','qs'], function ( axios,Qs) {
                             default:
                                 vObj.bodyDrawer.offset=option.offset;
                         }
+                    }else{
+                        option.area= ['45vw', '100vh'];
                     }
                 }
 
@@ -400,7 +402,7 @@ define(['axios','qs'], function ( axios,Qs) {
         dt.bodyModal={
             visible:false,
         },
-        option.data=()=>dt;
+            option.data=()=>dt;
 
         if(!option.mounted) {
             option.mounted = function () {
