@@ -1,6 +1,8 @@
+{block name="extend"}{/block}
 <style>
 
 </style>
+{block name="style"}{/block}
 <div class="vuecurd-def-box">
 <a-spin :spinning="loading">
 <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm">

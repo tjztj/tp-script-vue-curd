@@ -1,3 +1,4 @@
+{block name="extend"}{/block}
 <style>
 .field-group-fieldset>.row{
     display: flex;
@@ -27,6 +28,7 @@
     color: rgba(0,0,0,.65);
 }
 </style>
+{block name="style"}{/block}
 <div class="vuecurd-def-box">
 <template v-for="(groupFieldItems,groupTitle) in groupFields">
     <fieldset class="field-group-fieldset" :class="{'show-group':haveGroup}">

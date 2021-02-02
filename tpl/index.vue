@@ -1,3 +1,4 @@
+{block name="extend"}{/block}
 <style>
 .box {
     background-color: #f0f2f5;

@@ -1,3 +1,4 @@
+{block name="extend"}{/block}
 <style>
 .week-tool-box {
     padding: 24px;
@@ -38,6 +39,7 @@
     display: flex;
 }
 </style>
+{block name="style"}{/block}
 <div class="box">
 <div class="week-box">
     <div class="week-tool-box">
