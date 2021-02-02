@@ -102,7 +102,7 @@ trait CurdChild{
 
         $option=new FunControllerIndexData();
         if($this->indexPageOption->pageSize>0){
-            $pageData=$model->paginate($this->request->param('pageSize/d',$this->indexPageOption->pageSize))->toArray();
+            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->toArray();
             $option->data=$pageData['data'];
             $option->currentPage=$pageData['current_page'];
             $option->lastPage=$pageData['last_page'];
