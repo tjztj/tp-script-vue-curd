@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use think\helper\Str;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\Request;
@@ -108,10 +109,28 @@ trait CurdFunc
      * @return mixed
      */
     protected function showTpl($file,$data){
-        $paths=array_filter(explode('/',str_replace('\\', '/', static::class)));
-        $tolDir=$paths[count($paths)-1].'/'.parse_name(class_basename(static::class));
-        if(file_exists(app_path('view/'.$tolDir).$file.'.vue')){
-            return $this->fetch($tolDir.'/'.$file,$data);
+        $appName = $this->app->http->getName();
+        $view    = $this->app->view->getConfig('view_dir_name');
+        $depr =$this->app->view->getConfig('view_depr');
+
+        if (is_dir($this->app->getAppPath() . $view)) {
+            $path = $this->app->getAppPath() . $view . DIRECTORY_SEPARATOR;
+        } else {
+            $path = $this->app->getRootPath() . $view . DIRECTORY_SEPARATOR . ($appName ? $appName . DIRECTORY_SEPARATOR : '');
+        }
+        $controller = $this->app->request->controller();
+        if (strpos($controller, '.')) {
+            $pos        = strrpos($controller, '.');
+            $controller = substr($controller, 0, $pos) . '.' . Str::snake(substr($controller, $pos + 1));
+            $controller_name=Str::snake(substr($controller, $pos + 1));
+        } else {
+            $controller = Str::snake($controller);
+            $controller_name=$controller;
+        }
+        $template=$file?:Str::snake( $this->app->request->action());
+        $path .= str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . ($file ?: Str::snake($this->app->request->action())) . '.vue';
+        if(file_exists($path)){
+            return $this->fetch($controller_name.'/'.$template,$data);
         }
         $tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
         return $this->layoutDisplay(file_get_contents($tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($tplPath.$file.'.vue'),$data);
