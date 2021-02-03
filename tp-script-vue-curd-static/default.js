@@ -1036,7 +1036,7 @@ define(['vueAdmin'], function (va) {
                                                         <div class="l">
                                                             <div class="more-string-auto-complete-row">
                                                                 <div class="more-string-auto-complete-input">
-                                                                    <a-auto-complete v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name+'.'+key]" @search="onAutoCompleteSearchMoreString($event,field)"/>
+                                                                    <a-auto-complete v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name+'.'+key]" @search="onAutoCompleteSearchMoreString($event,field,key)"/>
                                                                 </div>
                                                                 <div class="more-string-auto-complete-rm" @click="removeMoreString(field,key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
                                                             </div>
