@@ -30,6 +30,8 @@ class RegionField extends ModelField
     protected string $pField='';//父字段名
     protected string $cField='';//子字段名
 
+
+
     public function __construct(){
         //TODO::
         $this->regionTree=SystemRegion::getMyCascaderData();
@@ -42,6 +44,11 @@ class RegionField extends ModelField
      * @return $this|string
      */
     public function pField(string $pField=null){
+        if(!is_null($pField)){
+            if($this->name()!==$pField){
+                $this->cField($this->name());
+            }
+        }
         return $this->doAttr('pField',$pField);
     }
 
@@ -50,6 +57,11 @@ class RegionField extends ModelField
      * @return $this|string
      */
     public function cField(string $cField=null){
+        if(!is_null($cField)){
+            if($this->name()!==$cField){
+                $this->pField($this->name());
+            }
+        }
         return $this->doAttr('cField',$cField);
     }
 
