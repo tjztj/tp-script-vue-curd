@@ -1039,7 +1039,7 @@ define(['vueAdmin'], function (va) {
                                                                 <div class="more-string-auto-complete-input">
                                                                     <a-auto-complete v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name+'.'+key]" @search="onAutoCompleteSearchMoreString($event,field)"/>
                                                                 </div>
-                                                                <div class="more-string-auto-complete-rm"><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></div>
+                                                                <div class="more-string-auto-complete-rm" @click="removeMoreString(field,key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
                                                             </div>
                                                         </div>
                                                         <div class="r">
@@ -1049,7 +1049,7 @@ define(['vueAdmin'], function (va) {
                                                 </template>
                                                 <template v-else>
                                                     <a-input v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly">
-                                                    <template v-if="!field.readOnly" #addon-after><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
+                                                    <template v-if="!field.readOnly" #addonAfter><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
                                                     </a-input>
                                                 </template>
                                                 

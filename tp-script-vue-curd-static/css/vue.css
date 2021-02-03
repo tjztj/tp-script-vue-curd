@@ -641,6 +641,26 @@ body{
 .curd-show-field-box .more-string-box{
     padding-left: 20px;
 }
+
+.more-string-auto-complete-row{
+    display: flex;
+}
+.more-string-auto-complete-input{
+    padding-right: 12px;
+    flex: 1;
+}
+.more-string-auto-complete-rm{
+    width: 40px;
+    text-align: center;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.more-string-auto-complete-rm:hover{
+    background-color: #fff1f0;
+}
+.more-string-auto-complete-rm:hover .remove-inputs-box-item-icon{
+    color: #a8071a;
+}
 .curd-show-field-box .ext-box{
     display: inline-block;
     padding-left: .5em;
