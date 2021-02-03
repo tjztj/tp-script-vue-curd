@@ -1028,7 +1028,7 @@ define(['vueAdmin'], function (va) {
                                         </div>
                                     </div>
                                     <div v-else-if="field.type==='MoreStringField'">
-                                        <div class="inputs-box" data-isinit="setMoreStringToArr(field)">
+                                        <div class="inputs-box" :data-isinit="setMoreStringToArr(field)">
                                           <transition-group name="slide-fade">
                                             <div class="inputs-box-item" v-for="(item,key) in form[field.name]" :key="key">
                                                 <template v-if="field.url">
