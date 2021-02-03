@@ -548,7 +548,7 @@ define(['axios','qs'], function ( axios,Qs) {
                 }
                 const isGroup=groupTitles.length>1||(!listColumns['']&&groupTitles.length>0);
 
-                if(!isGroup){
+                if(!isGroup&&columns[0]){
                     columns=columns[0].children;
                 }
 
