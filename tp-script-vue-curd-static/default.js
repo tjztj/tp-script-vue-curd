@@ -775,7 +775,7 @@ define(['vueAdmin'], function (va) {
                             }
                             return false;
                         },
-                        moreStringFieldIsArr(field){
+                        setMoreStringToArr(field){
                             if(typeof this.form[field.name]!=='object'){
                                 let data={};
                                 if(this.form[field.name]){
@@ -787,14 +787,13 @@ define(['vueAdmin'], function (va) {
                                 }
                                 this.form[field.name]=data;
                             }
-                            return true;
                         },
                         addMoreString(field){
-                            this.moreStringFieldIsArr(field);
+                            this.setMoreStringToArr(field);
                             this.form[field.name][window.guid()]='';
                         },
                         removeMoreString(field,key){
-                            this.moreStringFieldIsArr(field);
+                            this.setMoreStringToArr(field);
                             delete this.form[field.name][key];
                         },
                         addListField(field){
@@ -1029,7 +1028,7 @@ define(['vueAdmin'], function (va) {
                                         </div>
                                     </div>
                                     <div v-else-if="field.type==='MoreStringField'">
-                                        <div class="inputs-box">
+                                        <div class="inputs-box" data-isinit="setMoreStringToArr(field)">
                                           <transition-group name="slide-fade">
                                             <div class="inputs-box-item" v-for="(item,key) in form[field.name]" :key="key">
                                                 <template v-if="field.url">
