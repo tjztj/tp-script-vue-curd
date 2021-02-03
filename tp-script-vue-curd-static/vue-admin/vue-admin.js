@@ -359,7 +359,7 @@ define(['axios','qs'], function ( axios,Qs) {
     /**
      * 一些自定义的处理函数
      */
-    const methods = {
+    window.vueDefMethods = {
         parseTime: window.parseTime,
         back() {
             window.history.back()
@@ -402,14 +402,14 @@ define(['axios','qs'], function ( axios,Qs) {
         dt.bodyModal={
             visible:false,
         },
-            option.data=()=>dt;
+        option.data=()=>dt;
 
         if(!option.mounted) {
             option.mounted = function () {
                 this.pageIsInit();
             }
         }
-        option.methods = Object.assign(methods, option.methods || {});
+        option.methods = Object.assign(vueDefMethods, option.methods || {});
         window.app = Vue.createApp(option)
         app.use(antd)
         app.component('PlusOutlined',{

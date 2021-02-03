@@ -9,7 +9,7 @@ use tpScriptVueCurd\ModelField;
 
 /**
  * 年月###########( 保存的是月数 )
- * Class StringField
+ * Class YearMonthField
  * @author tj 1079798840@qq.com
  * @package tpScriptVueCurd
  */

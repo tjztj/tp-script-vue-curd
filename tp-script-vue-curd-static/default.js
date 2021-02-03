@@ -658,6 +658,7 @@ define(['vueAdmin'], function (va) {
                             dateDefaultValues:dateDefaultValues,
                             validateStatus:validateStatus,
                             triggerShowss:{},
+                            autoCompleteOptions:{},
                         }
                     },
                     name:'fieldGroupItem',
@@ -696,6 +697,7 @@ define(['vueAdmin'], function (va) {
                         }
                     },
                     methods:{
+                        ...vueDefMethods,
                         handleRemove(name){
                             return file => {
                                 if(file.url){
@@ -830,6 +832,20 @@ define(['vueAdmin'], function (va) {
                         },
                         changePwdType(field){
 
+                        },
+                        onAutoCompleteSearch(event,field){
+                            this.autoCompleteOptions[field.name]=[];
+                            if(!field.url){
+                                return ;
+                            }
+
+                            this.$get(field.url,{search:event}).then(res=>{
+                                let arr=[];
+                                res.data.forEach(function(v){
+                                    arr.push({value:v});
+                                })
+                                this.autoCompleteOptions[field.name]=arr;
+                            })
                         }
                     },
                     template:`
@@ -839,6 +855,14 @@ define(['vueAdmin'], function (va) {
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="field.title" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" class="form-item-row">
                                     <div v-if="field.type==='StringField'">
                                         <a-input v-model:value="form[field.name]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly"/>
+                                    </div>
+                                    <div v-if="field.type==='StringAutoCompleteField'" class="field-box">
+                                        <div class="l">
+                                            <a-auto-complete v-model:value="form[field.name]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name]" @search="onAutoCompleteSearch($event,field)"/>
+                                        </div>
+                                        <div class="r">
+                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
+                                        </div>
                                     </div>
                                     <div v-if="field.type==='TextField'" class="field-box">
                                         <div class="l">
