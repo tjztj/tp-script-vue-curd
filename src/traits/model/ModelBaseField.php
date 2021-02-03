@@ -11,7 +11,7 @@ trait ModelBaseField
      * @return string
      */
     public static function getCreateLoginUserField():string{
-        return 'create_admin_id';
+        return getModelDefaultCreateLoginUserField();
     }
 
     /**
@@ -19,7 +19,7 @@ trait ModelBaseField
      * @return string
      */
     public static function getUpdateLoginUserField():string{
-        return 'update_admin_id';
+        return getModelDefaultUpdateLoginUserField();
     }
 
     /**
@@ -27,7 +27,7 @@ trait ModelBaseField
      * @return string
      */
     public static function getDeleteLoginUserField():string{
-        return 'delete_admin_id';
+        return getModelDefaultDeleteLoginUserField();
     }
 
 
@@ -37,7 +37,7 @@ trait ModelBaseField
      * @return string
      */
     public static function getRegionField():string{
-        return '';
+        return getModelDefaultRegionField();
     }
 
 
@@ -46,6 +46,6 @@ trait ModelBaseField
      * @return string
      */
     public static function getRegionPidField():string{
-        return '';
+        return getModelDefaultRegionPidField();
     }
 }
