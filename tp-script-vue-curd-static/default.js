@@ -833,19 +833,26 @@ define(['vueAdmin'], function (va) {
                         changePwdType(field){
 
                         },
-                        onAutoCompleteSearch(event,field){
-                            this.autoCompleteOptions[field.name]=[];
-                            if(!field.url){
+                        autoCompleteSearch(val,url,key){
+                            this.autoCompleteOptions[key]=[];
+                            if(!url){
                                 return ;
                             }
 
-                            this.$get(field.url,{search:event}).then(res=>{
+                            this.$get(url,{search:val}).then(res=>{
                                 let arr=[];
                                 res.data.forEach(function(v){
                                     arr.push({value:v});
                                 })
-                                this.autoCompleteOptions[field.name]=arr;
+                                this.autoCompleteOptions[key]=arr;
                             })
+                        },
+                        onAutoCompleteSearch(event,field){
+                            this.autoCompleteSearch(event,field.url,field.name)
+                        },
+
+                        onAutoCompleteSearchMoreString(event,field,key){
+                            this.autoCompleteSearch(event,field.url,field.name+'.'+key)
                         }
                     },
                     template:`
@@ -1025,9 +1032,27 @@ define(['vueAdmin'], function (va) {
                                         <div class="inputs-box">
                                           <transition-group name="slide-fade">
                                             <div class="inputs-box-item" v-for="(item,key) in form[field.name]" :key="key">
-                                                <a-input v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly">
-                                                <template v-if="!field.readOnly" #addonAfter><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
-                                                </a-input>
+                                                <template v-if="field.url">
+                                                    <div class="field-box">
+                                                        <div class="l">
+                                                            <div class="more-string-auto-complete-row">
+                                                                <div class="more-string-auto-complete-input">
+                                                                    <a-auto-complete v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name+'.'+key]" @search="onAutoCompleteSearchMoreString($event,field)"/>
+                                                                </div>
+                                                                <div class="more-string-auto-complete-rm"><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="r">
+                                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <template v-else>
+                                                    <a-input v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly">
+                                                    <template v-if="!field.readOnly" #addon-after><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
+                                                    </a-input>
+                                                </template>
+                                                
                                             </div>
                                             </transition-group>
                                         </div>

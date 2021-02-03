@@ -20,6 +20,22 @@ class MoreStringField extends ModelField
     protected string $separate='|';
 
 
+    /**
+     * 要搜索的url,如果不需要url也能搜索的话，建议使用select（如果有，与 StringAutoCompleteField 一致）
+     * @var string
+     */
+    protected string $url='';
+
+
+    /**要搜索的url
+     * @param string|null $url
+     * @return $this|int
+     */
+    public function url(string $url = null)
+    {
+        return $this->doAttr('url', $url);
+    }
+
 
     /**分隔符
      * @param string|null $separate
