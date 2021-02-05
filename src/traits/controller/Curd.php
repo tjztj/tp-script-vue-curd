@@ -85,7 +85,7 @@ trait Curd
             'delUrl'=>url('del')->build(),
             'downExcelTplUrl'=>url('downExcelTpl')->build(),
             'importExcelTplUrl'=>url('importExcelTpl')->build(),
-            'title'=>$this->model::getTitle(),
+            'title'=>static::getTitle(),
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$this->fields->getFilterShowData(),
             'filter_data'=>json_decode($this->request->param('filter_data','',null)),

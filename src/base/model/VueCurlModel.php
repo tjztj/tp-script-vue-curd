@@ -28,12 +28,6 @@ abstract class VueCurlModel extends TimeModel
      */
     abstract public static function getControllerClass():string;
 
-    /**
-     * 获取表的标题
-     * @return string
-     */
-    abstract public static function getTitle():string;
-
 
     /**
      * 时候有村社字段，如果有，固定（region_id,region_pid）

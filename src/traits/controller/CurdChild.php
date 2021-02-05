@@ -74,7 +74,7 @@ trait CurdChild{
             'showUrl'=>url('show')->build(),
             'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$base_id])->build(),
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$base_id])->build(),
-            'title'=>$this->model::getTitle(),
+            'title'=>static::getTitle(),
             'canDel'=>true,
             'auth'=>[
                 'edit'=>true,

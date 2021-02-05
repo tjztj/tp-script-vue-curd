@@ -113,21 +113,23 @@ trait ExcelHaveChild
         $fields=$this->parentExcelFields()->map(function(ModelField $field){
             $field=clone $field;
             $field->name('PARENT|'.$field->name());
-            $field->title(static::modelClassPath()::getTitle().'|'.$field->title());
+            $field->title(static::getTitle().'|'.$field->title());
             return $field;
         });
 
         //子表字段
         foreach (static::childModelObjs() as $childControllerClass=>$model){
-            /* @var BaseChildModel $model */
+            /* @var BaseChildModel $model
+             * @var BaseChildController|string $childControllerClass
+             */
             $modelName=class_basename($model);
             $fields=$fields->merge(
                 $model->fields()
                     ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))
-                    ->map(function(ModelField $field)use($modelName,$model){
+                    ->map(function(ModelField $field)use($modelName,$childControllerClass){
                         $field=clone $field;
                         $field->name($modelName.'|'.$field->name());
-                        $field->title($model::getTitle().'|'.$field->title());
+                        $field->title($childControllerClass::getTitle().'|'.$field->title());
                         return $field;
                     })
             );
@@ -145,7 +147,7 @@ trait ExcelHaveChild
      * @throws \think\db\exception\ModelNotFoundException
      */
     protected function excelTilte():string{
-        return $this->model::getTitle();
+        return static::getTitle();
     }
 
 

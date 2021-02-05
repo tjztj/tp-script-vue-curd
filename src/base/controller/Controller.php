@@ -74,6 +74,12 @@ trait Controller
     }
 
     /**
+     * 控制器的标题
+     * @return string
+     */
+    abstract public static function getTitle():string;
+
+    /**
      * @return string|VueCurlModel
      */
     abstract public static function modelClassPath():string;

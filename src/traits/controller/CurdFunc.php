@@ -45,7 +45,7 @@ trait CurdFunc
 
 
         return $this->showTpl('show',[
-            'title'=>$this->model::getTitle(),
+            'title'=>static::getTitle(),
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
@@ -75,7 +75,7 @@ trait CurdFunc
         }
         $fieldArr=array_values($fields->toArray());
         return [
-            'title'=>$this->model::getTitle(),
+            'title'=>static::getTitle(),
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,

@@ -105,16 +105,7 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
               {
                   return \app\controller\Project::class;
               }
-          
-              /**
-               * 模型名称
-               * @return string
-               */
-              public static function getTitle(): string
-              {
-                  return '项目信息';
-              }
-          
+
               /**
                * 表字段配置
                * @return FieldCollection
@@ -167,7 +158,15 @@ thinkphp6 script方式引入vue 自动生成curd逻辑
           {
               //不需要 extends ，但是需要 use trait文件：\tpScriptVueCurd\base\controller\BaseController;
               use \tpScriptVueCurd\base\controller\BaseController;
-          
+
+              /**
+              * 控制器名称
+              * @return string
+              */
+              public static function getTitle(): string
+              {
+                  return '项目信息';
+              }
               /**
                * 配置控制器对应的模型类
                * @return string

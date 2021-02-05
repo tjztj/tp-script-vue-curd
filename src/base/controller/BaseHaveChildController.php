@@ -105,7 +105,7 @@ trait BaseHaveChildController
                 'name'=>$name,
                 'listBtn'=>$childControllerClass::baseListBtnText(),
                 'filterData'=>json_decode($this->request->param($name.'filterData','',null)),
-                'title'=>$childModel::getTitle(),
+                'title'=>$childControllerClass::getTitle(),
                 'filterConfig'=>$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField())->getFilterShowData(),
                 'listUrl'=>url(str_replace('\\','.',parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index')->build(),
             ];

@@ -46,7 +46,7 @@ trait Excel
      * @throws \think\db\exception\ModelNotFoundException
      */
     protected function excelTilte():string{
-        return $this->model::getTitle();
+        return static::getTitle();
     }
 
 
