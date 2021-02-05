@@ -32,10 +32,12 @@ trait Vue
      */
     public function initialize()
     {
+        parent::initialize();
         if ($this->checkIsVueAction()) {
             $this->app->view->config(['view_suffix' => 'vue']);
+            $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'default.vue');
         }
-        parent::initialize();
+        $this->assign('vueCurdVersion',static::vueCurdVersion());
     }
 
 
@@ -195,5 +197,13 @@ trait Vue
     }
 
 
+    final public static function getTplPath():string{
+        return root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
+    }
 
+
+    final public static function vueCurdVersion():string{
+        //TODO::要动态的
+        return '1.00';
+    }
 }

@@ -129,7 +129,7 @@ trait CurdFunc
         if(file_exists($path)){
             return $this->fetch($controller_name.'/'.$template,$data);
         }
-        $tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
+        $tplPath=static::getTplPath();
         return $this->layoutDisplay(file_get_contents($tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($tplPath.$file.'.vue'),$data);
     }
 }

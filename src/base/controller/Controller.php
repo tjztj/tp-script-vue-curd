@@ -68,8 +68,6 @@ trait Controller
         $this->assign('vueCurdAction',$this->request->action());
         $this->assign('vueCurdController',$this->request->controller());
         $this->assign('vueCurdModule',$this->app->http->getName());
-        //TODO::要动态的
-        $this->assign('vueCurdVersion','1.0');
         $this->assign('loginUrl',getLoginUrl());
     }
 
