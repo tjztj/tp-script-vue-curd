@@ -63,12 +63,6 @@ trait Controller
 
 
         $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
-
-        $this->assign('guid',$this->guid);
-        $this->assign('vueCurdAction',$this->request->action());
-        $this->assign('vueCurdController',$this->request->controller());
-        $this->assign('vueCurdModule',$this->app->http->getName());
-        $this->assign('loginUrl',getLoginUrl());
     }
 
     /**

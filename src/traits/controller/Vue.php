@@ -38,6 +38,11 @@ trait Vue
             $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'default.vue');
         }
         $this->assign('vueCurdVersion',static::vueCurdVersion());
+        $this->assign('vueCurdAction',$this->request->action());
+        $this->assign('vueCurdController',$this->request->controller());
+        $this->assign('vueCurdModule',$this->app->http->getName());
+        $this->assign('guid',$this->guid);
+        $this->assign('loginUrl',getLoginUrl());
     }
 
 
