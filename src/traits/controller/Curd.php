@@ -143,36 +143,6 @@ trait Curd
 
 
 
-    /**
-     * 详细页面
-     * @return mixed|void
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    function show(){
-        $id=$this->request->param('id/d');
-        if(empty($id)){
-            return $this->error('缺少必要参数');
-        }
-        $data=$this->model->find($id);
-        if(empty($data)){
-            return $this->error('未找到相关数据信息');
-        }
-        $info=$data->toArray();
-        $this->fields->doShowData($info);
-        $fieldArr=array_values($this->fields->toArray());
-
-        return $this->showTpl('show',$this->showFetch([
-            'title'=>static::getTitle(),
-            'fields'=>$fieldArr,
-            'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
-            'info'=>$info,
-        ]));
-    }
-
-
 
     /**
      * 删除数据
