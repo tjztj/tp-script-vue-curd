@@ -79,6 +79,7 @@ class ListField extends ModelField
             }
             if($dataBaseData[$this->name()]){
                 $list=json_decode($dataBaseData[$this->name()],true);
+                $list||$list=[];
                 foreach ($list as &$v){
                     $this->fields->doShowData($v);
                 }
