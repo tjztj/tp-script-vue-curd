@@ -97,12 +97,6 @@ trait Vue
     }
 
 
-    public function layoutDisplay ($layoutContents,$content = '', $vars = []) {
-        // 替换布局的主体内容
-        $content = str_replace($this->app->view->getConfig('layout_item'), $content, $layoutContents);
-        return $this->display($content,$vars);
-    }
-
 
     /**
      * 成功

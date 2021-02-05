@@ -130,6 +130,6 @@ trait CurdFunc
             return $this->fetch($controller_name.'/'.$template,$data);
         }
         $tplPath=static::getTplPath();
-        return $this->layoutDisplay(file_get_contents($tplPath.'layout'.DIRECTORY_SEPARATOR.'default.vue'),file_get_contents($tplPath.$file.'.vue'),$data);
+        return $this->fetch($tplPath.$file.'.vue',$data);
     }
 }
