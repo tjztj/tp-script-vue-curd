@@ -21,37 +21,6 @@ trait CurdFunc
 {
 
 
-    /**
-     * 详情页面
-     * @param VueCurlModel $model
-     * @param FieldCollection $fields
-     * @return mixed|void
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    protected function doShow(VueCurlModel $model,FieldCollection $fields){
-        $id=$this->request->param('id/d');
-        if(empty($id)){
-            return $this->error('缺少必要参数');
-        }
-        $data=$model->find($id);
-        if(empty($data)){
-            return $this->error('未找到相关数据信息');
-        }
-        $info=$data->toArray();
-        $fields->doShowData($info);
-        $fieldArr=array_values($fields->toArray());
-
-
-        return $this->showTpl('show',[
-            'title'=>static::getTitle(),
-            'fields'=>$fieldArr,
-            'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
-            'info'=>$info,
-        ]);
-    }
-
 
     /**
      * 获取编辑界面显示需要的参数

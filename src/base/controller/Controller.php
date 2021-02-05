@@ -128,6 +128,12 @@ trait Controller
     {
         //（添加/编辑页面）生成解析数据前，处理数据（控制字段显示与否），$data为空代表是新增
     }
+
+    protected function showFetch(array $fetch):array{
+        // 详情页面显示前处理
+        return $fetch;
+    }
+
     protected function beforeAddShow(array $fetchData):array{
         //数据添加页面 解析前
         return $fetchData;

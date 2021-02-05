@@ -26,13 +26,6 @@ trait CurdChild{
     public FieldCollection $fields;
     public FieldCollection $baseFields;
 
-    /**
-     * 子表详细页面
-     * @return mixed|void
-     */
-    public function show(){
-        return $this->doShow($this->model,$this->fields);
-    }
 
 
     /**

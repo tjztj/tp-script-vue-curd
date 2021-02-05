@@ -152,7 +152,24 @@ trait Curd
      * @throws \think\db\exception\ModelNotFoundException
      */
     function show(){
-       return $this->doShow($this->model,$this->fields);
+        $id=$this->request->param('id/d');
+        if(empty($id)){
+            return $this->error('缺少必要参数');
+        }
+        $data=$this->model->find($id);
+        if(empty($data)){
+            return $this->error('未找到相关数据信息');
+        }
+        $info=$data->toArray();
+        $this->fields->doShowData($info);
+        $fieldArr=array_values($this->fields->toArray());
+
+        return $this->showTpl('show',$this->showFetch([
+            'title'=>static::getTitle(),
+            'fields'=>$fieldArr,
+            'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
+            'info'=>$info,
+        ]));
     }
 
 
