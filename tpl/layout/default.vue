@@ -172,9 +172,11 @@
 <script>
     let jsPath='{$jsPath|default=""}';
     if(jsPath===''){
-        jsPath='/'+window.VUE_CURD.MODULE+'/'+(window.VUE_CURD.CONTROLLER.replace('/\./g','/'))+'.js';
+        jsPath='{:publicActionJsPathBase()}/'+window.VUE_CURD.CONTROLLER.replace(/\./g,'/')
+            .replace(/(\w)([A-Z])/g,"$1_$2")
+            .toLowerCase()+'.js'
     }
-    require([jsPath+'?v={$vueCurdVersion}'], function (objs) {
+    require([jsPath], function (objs) {
         if(objs[VUE_CURD.ACTION]){
             objs[VUE_CURD.ACTION]();
         }
