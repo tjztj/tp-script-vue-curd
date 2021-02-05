@@ -422,7 +422,7 @@ define(['vueAdmin'], function (va) {
                 },
                 openShow(row){
                     this.openBox({
-                        title:'查看 '+vueData.title,
+                        title:'查看 '+vueData.title+' 相关信息',
                         offset:'rt',
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
