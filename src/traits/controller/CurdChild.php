@@ -29,7 +29,7 @@ trait CurdChild{
 
 
     /**
-     * 详细子列表页面
+     * @title 详细子列表页面
      * @return mixed|\think\response\Json|void
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -80,7 +80,7 @@ trait CurdChild{
 
 
     /**
-     * 获取子列表
+     * @title 获取子列表
      * @param int $base_id
      * @return FunControllerIndexData
      * @throws \think\db\exception\DataNotFoundException
@@ -114,7 +114,7 @@ trait CurdChild{
 
 
     /**
-     * 获取子表显示数据+其父表数据，权限同getChildList一样
+     * @title 获取子表显示数据+其父表数据，权限同getChildList一样
      * @return \think\response\Json
      * @throws \think\db\exception\DbException
      */
@@ -180,7 +180,7 @@ trait CurdChild{
 
 
     /**
-     * 子表数据添加修改
+     * @title 子表数据添加修改
      * @return mixed
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
@@ -235,7 +235,7 @@ trait CurdChild{
 
 
     /**
-     * 删除子表数据
+     * @title 删除子表数据
      * @return \think\response\Json|void
      */
     function del(){

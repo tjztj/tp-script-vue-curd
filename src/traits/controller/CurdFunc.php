@@ -21,7 +21,7 @@ trait CurdFunc
 {
 
     /**
-     * 详细页面
+     * @title 详细页面
      * @return mixed|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException

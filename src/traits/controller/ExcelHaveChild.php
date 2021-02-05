@@ -43,7 +43,7 @@ trait ExcelHaveChild
 
 
     /**
-     * 父表+子表导入模板下载
+     * @title 父表+子表导入模板下载
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\Exception
@@ -58,7 +58,7 @@ trait ExcelHaveChild
 
 
     /**
-     * 子表导入模板下载
+     * @title 子表导入模板下载
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      * @throws \think\Exception
@@ -73,7 +73,7 @@ trait ExcelHaveChild
 
 
     /**
-     * 父表+子表的数据导入
+     * @title 父表+子表的数据导入
      * @return \think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -87,7 +87,7 @@ trait ExcelHaveChild
 
 
     /**
-     * 子表数据导入
+     * @title 子表数据导入
      * @return \think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
