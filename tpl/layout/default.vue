@@ -170,7 +170,11 @@
 <script src="/tp-script-vue-curd-static.php?require-2.3.6/require.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdVersion}" charset="utf-8"></script>
 <script>
-    require(['/tp-script-vue-curd-static.php?default.js'], function (objs) {
+    let jsPath='{$jsPath|default=""}';
+    if(jsPath===''){
+        jsPath='/'+window.VUE_CURD.MODULE+'/'+(window.VUE_CURD.CONTROLLER.replace('/\./g','/'))+'.js';
+    }
+    require([jsPath+'?v={$vueCurdVersion}'], function (objs) {
         if(objs[VUE_CURD.ACTION]){
             objs[VUE_CURD.ACTION]();
         }

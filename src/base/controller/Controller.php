@@ -63,6 +63,7 @@ trait Controller
 
 
         $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
+        $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
     }
 
     /**
