@@ -25,7 +25,7 @@ trait Curd
 
 
     /**
-     * @title 数据列表
+     * #title 数据列表
      * @return mixed|\think\response\Json|void
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -106,7 +106,7 @@ trait Curd
 
 
     /**
-     * @title 添加与修改
+     * #title 添加与修改
      * @return mixed
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
@@ -145,7 +145,7 @@ trait Curd
 
 
     /**
-     * @title 删除数据
+     * #title 删除数据
      */
     function del(){
         return $this->doDelect($this->model,$this->request->param('ids/a',[]));
