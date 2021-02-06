@@ -110,10 +110,9 @@ trait CurdFunc
         $view    = $this->app->view->getConfig('view_dir_name');
         $depr =$this->app->view->getConfig('view_depr');
 
-        if (is_dir($this->app->getAppPath() . $view)) {
-            $path = $this->app->getAppPath() . $view . DIRECTORY_SEPARATOR;
-        } else {
-            $path = $this->app->getRootPath() . $view . DIRECTORY_SEPARATOR . ($appName ? $appName . DIRECTORY_SEPARATOR : '');
+        $path = $this->app->getAppPath() . $view . DIRECTORY_SEPARATOR;
+        if (!is_dir($this->app->getAppPath() . $view)&&$appName) {
+            $path .= $appName . DIRECTORY_SEPARATOR;
         }
         $controller = $this->app->request->controller();
         if (strpos($controller, '.')) {
