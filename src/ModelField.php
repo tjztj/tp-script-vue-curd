@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd;
 
 
+use think\Validate;
 use tpScriptVueCurd\filter\EmptyFilter;
 
 /**
@@ -30,6 +31,7 @@ abstract class ModelField
     protected string $defaultFilterClass='';//筛选类型
     protected bool $pub=false;//是否在前台公开
     protected bool $canExcelImport=true;//是否可以excel导入
+    protected $validateRule=null;//数据验证
     public const REQUIRED=true;//开启必填验证
 
 
@@ -202,6 +204,15 @@ abstract class ModelField
         return $this->doAttr('editShow',$editShow);
     }
 
+    /**
+     * 字段在添加修改时是否显示
+     * @param $validateRule
+     * @return $this|mixed
+     */
+    public function validateRule($validateRule=null){
+        return $this->doAttr('validateRule',$validateRule);
+    }
+
 
     /**
      * 自定义其他属性
@@ -244,12 +255,29 @@ abstract class ModelField
 
 
     /**
-     * 设置保存的值
+     * 设置保存的值，子类不能重写
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSave(array $data): self
+    final public function setSave(array $data): self
     {
+        $this->setSaveVal($data);
+        if(isset($this->save)){
+            $checkData=$data;
+            $checkData[$this->name()]=$this->save;
+            $this->validate($checkData,false);
+        }
+        return $this;
+    }
+
+
+    /**
+     * 设置保存的值，子类可重写
+     * @param array $data
+     * @return $this
+     * @throws \think\Exception
+     */
+    protected function setSaveVal(array $data):self{
         if(isset($data[$this->name()])){
             $this->defaultCheckRequired($data[$this->name()]);
             $this->save=$data[$this->name()];
@@ -260,6 +288,33 @@ abstract class ModelField
 
     public function getSave(){
         return $this->save;
+    }
+
+
+    /**
+     * 执行数据验证，如果有验证规则的话
+     * @param array $data
+     * @param bool $throwTitle
+     * @throws \think\Exception
+     */
+    final public function validate(array $data,bool $throwTitle):void{
+        if(!$this->validateRule()){
+            return;
+        }
+
+        $title='';
+        if($throwTitle){
+            if($this->title()){
+                $title='|'.$this->title();
+            }
+        }else{
+            $title='|ERROR_TITLE';
+        }
+
+        $validate=\think\facade\Validate::rule($this->name().$title, $this->validateRule());
+        if(!$validate->check($data)){
+            throw new \think\Exception(str_replace('ERROR_TITLE','',$validate->getError()));
+        }
     }
 
 

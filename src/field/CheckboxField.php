@@ -26,7 +26,7 @@ class CheckboxField extends ModelField
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSave(array $data): self
+    public function setSaveVal(array $data): self
     {
         $name=$this->name();
         if(isset($data[$name])){

@@ -21,7 +21,7 @@ class ImagesField extends ModelField
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSave(array $data): self
+    public function setSaveVal(array $data): self
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];

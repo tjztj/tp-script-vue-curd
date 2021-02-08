@@ -74,7 +74,7 @@ class RegionField extends ModelField
      * @param array $data 数据值集合
      * @return $this
      */
-    public function setSave(array $data): self
+    public function setSaveVal(array $data): self
     {
         if ($this->pField() === '') {
             throw new \think\Exception('地区字段未配置 pField');
