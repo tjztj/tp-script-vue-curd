@@ -58,7 +58,7 @@ abstract class BaseModel extends VueCurlModel
         if($controll::type()==='base_have_child'){
             foreach ($controll::childControllerClassPathList() as $v){
                 /* @var BaseChildController $v */
-                $haveChildDataBaseId=$v::modelClassPath()::where('base_id','in',$ids)->max('base_id');
+                $haveChildDataBaseId=$v::modelClassPath()::where($v::modelClassPath()::parentField(),'in',$ids)->max($v::modelClassPath()::parentField());
                 if($haveChildDataBaseId){
                     throw new \think\Exception('需先删除下面的'.$v::getTitle().'数据');
                 }

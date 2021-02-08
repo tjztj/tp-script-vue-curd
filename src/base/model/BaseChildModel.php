@@ -17,7 +17,15 @@ abstract class BaseChildModel extends VueCurlModel
 
     public function base()
     {
-        return $this->belongsTo(static::parentModelClassPath(), 'pub_id');
+        return $this->belongsTo(static::parentModelClassPath(), static::parentField());
+    }
+
+    /**
+     * 关联字段（默认为base_id）,子类重写此方法改变
+     * @return string
+     */
+    public static function parentField():string{
+        return 'base_id';
     }
 
 
@@ -49,7 +57,7 @@ abstract class BaseChildModel extends VueCurlModel
 
         $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
         $data=$this->doSaveData($oldData,$fields,$isExcelDo);
-        $data['base_id']=$baseInfo->id;
+        $data[static::parentField()]=$baseInfo->id;
         static::getRegionField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionField())->isEmpty()||$data[static::getRegionField()]=$baseInfo[static::getRegionField()];
         static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$baseInfo[static::getRegionPidField()];
 

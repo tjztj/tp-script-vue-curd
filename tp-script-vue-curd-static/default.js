@@ -1311,7 +1311,7 @@ define(['vueAdmin'], function (va) {
         let dataObj=returnData.data();
 
         returnData.data=function(){
-            dataObj.form.base_id=vueData.baseId;
+            dataObj.form[vueData.parentField]=vueData.baseId;
             return dataObj;
         }
 

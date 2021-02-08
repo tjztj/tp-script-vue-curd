@@ -89,7 +89,7 @@ trait CurdChild{
      */
     private function getChildList(int $base_id):FunControllerIndexData{
         $model=$this->model
-            ->where('base_id',$base_id)
+            ->where($this->model::parentField(),$base_id)
             ->where(function (Query $query){$this->indexListWhere($query);})
             ->where($this->fields->getFilterWhere());
 
@@ -134,7 +134,7 @@ trait CurdChild{
 
 
         //base条件
-        $baseWhere=function(Query $query){
+        $baseWhere=function(Query $query)use($model){
             $base_where=$this->request->param('base_where',[],null);
             if(empty($base_where)){
                 $base_where=$this->request->param('baseWhere',[],null);
@@ -155,7 +155,7 @@ trait CurdChild{
                 $base_where=json_decode($base_where,true);
             }
 
-            $query->whereRaw('base_id IN '.$this->baseModel->field('id')->where($this->baseFields->getFilterWhere($base_where))->buildSql());
+            $query->whereRaw('`'.$model::parentField().'` IN '.$this->baseModel->field('id')->where($this->baseFields->getFilterWhere($base_where))->buildSql());
         };
 
 
@@ -192,10 +192,10 @@ trait CurdChild{
             $this->model->startTrans();
             try{
                 if(empty($data['id'])){
-                    if(empty($data['base_id'])){
+                    if(empty($data[$this->model::parentField()])){
                         throw new \think\Exception('缺少关键信息');
                     }
-                    $baseInfo=$this->baseModel->find($data['base_id']);
+                    $baseInfo=$this->baseModel->find($data[$this->model::parentField()]);
                     if(is_null($baseInfo)){
                         throw new \think\Exception('未找到所属数据');
                     }
@@ -226,6 +226,7 @@ trait CurdChild{
         $this->createEditFetchDataBefore($fields,$info);//切面
         $fetchData=$this->createEditFetchData($fields,$info);//切面
         $fetchData['baseId']=$base_id;
+        $fetchData['parentField']=$this->model::parentField();
         $fetchData['vueCurdAction']='childEdit';
 
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
