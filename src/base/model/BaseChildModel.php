@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\base\model;
 
 
 use app\admin\model\SystemAdmin;
+use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 
 /**
@@ -77,4 +78,10 @@ abstract class BaseChildModel extends VueCurlModel
     {
         $this->doDel($ids);
     }
+
+
+    protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,BaseModel $baseInfo,?VueCurlModel $beforeInfo):void{} //执行doSaveData前（钩子）
+    protected function doSaveDataAfter(array $saveData,int $id,BaseModel $baseInfo,?VueCurlModel $beforeInfo):array{return $saveData;} //执行doSaveData后（钩子）
+    protected function onAddAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo): void{}//添加后钩子
+    protected function onEditAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo,?VueCurlModel $beforeInfo): void{}//修改后钩子
 }

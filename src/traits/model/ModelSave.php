@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\traits\model;
 
 
 use app\admin\model\SystemAdmin;
+use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
@@ -86,16 +87,17 @@ trait ModelSave
 
 
         //切面
-        $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
-        $saveData=$fields->setSave($postData,$isExcelDo)->getSave();
-        $saveData=$this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
-
+        if($this instanceof BaseChildModel){
+            $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
+            $saveData=$fields->setSave($postData,$isExcelDo)->getSave();
+            $saveData=$this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
+        }else if($this instanceof BaseModel){
+            $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$beforeInfo);
+            $saveData=$fields->setSave($postData,$isExcelDo)->getSave();
+            $saveData=$this->doSaveDataAfter($saveData,$id,$beforeInfo);
+        }else{
+            $saveData=$fields->setSave($postData,$isExcelDo)->getSave();
+        }
         return $saveData;
     }
-
-
-    protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):void{} //执行doSaveData前（钩子）
-    protected function doSaveDataAfter(array $saveData,int $id,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):array{return $saveData;} //执行doSaveData后（钩子）
-    protected function onAddAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo=null): void{}//添加后钩子
-    protected function onEditAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null): void{}//修改后钩子
 }
