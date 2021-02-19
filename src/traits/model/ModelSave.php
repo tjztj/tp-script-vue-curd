@@ -20,20 +20,23 @@ trait ModelSave
 
     /**
      * 新增修改数据
-     * @param array $oldData    要保存的数据
+     * @param array $postData           要保存的数据
      * @param FieldCollection|null $fields
+     * @param BaseModel|null $baseInfo
+     * @param VueCurlModel|null $beforeInfo
+     * @return $this
      * @throws \think\Exception
      */
-    public function saveInfo(array $oldData,FieldCollection $fields=null): self
+    public function saveInfo(array $postData,FieldCollection $fields=null,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null): self
     {
-        $data=$this->doSaveData($oldData,$fields);
+        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo);
 
 
-        if(empty($oldData['id'])){
+        if(empty($postData['id'])){
             throw new \think\Exception('缺少ID');
         }
 
-        $data['id']=$oldData['id'];
+        $data['id']=$postData['id'];
         unset( $data['create_time']
             , $data['update_time']
             , $data['delete_time']
@@ -56,21 +59,22 @@ trait ModelSave
 
         //onEditBefore请用doSaveDataAfter
         $info=self::update($data);
-        $this->onEditAfter($info,$data);
+        $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
         return $info;
     }
 
 
-
     /**
      * 保存前 验证数据，数据处理
-     * @param array $oldData
+     * @param array $postData
      * @param FieldCollection|null $fields
-     * @param bool $isExcelDo  是否excel操作
+     * @param bool $isExcelDo                   是否excel操作
+     * @param BaseModel|null $baseInfo          base表数据
+     * @param VueCurlModel|null $beforeInfo     数据之前的老值
      * @return array
      * @throws \think\Exception
      */
-    final protected function doSaveData(array $oldData,FieldCollection $fields=null,bool $isExcelDo=false):array{
+    final protected function doSaveData(array $postData,FieldCollection $fields=null,bool $isExcelDo=false,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):array{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -78,20 +82,20 @@ trait ModelSave
 
         is_null($fields)&&$fields=$this->fields();//新的字段集合对象，批量添加时都用一个会保存的值共用问题
 
-        $id=empty($oldData['id'])?0:$oldData['id'];
+        $id=empty($postData['id'])?0:$postData['id'];
 
 
         //切面
-        $this->doSaveDataBefore($fields,$oldData,$isExcelDo,$id);
-        $saveData=$fields->setSave($oldData,$isExcelDo)->getSave();
-        $saveData=$this->doSaveDataAfter($saveData,$id);
+        $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
+        $saveData=$fields->setSave($postData,$isExcelDo)->getSave();
+        $saveData=$this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
 
         return $saveData;
     }
 
 
-    protected function doSaveDataBefore(FieldCollection $fields,array &$oldData,bool $isExcelDo,int $id):void{} //执行doSaveData前（钩子）
-    protected function doSaveDataAfter(array $saveData,int $id):array{return $saveData;} //执行doSaveData后（钩子）
-    protected function onAddAfter(VueCurlModel $info,array $oldData): void{}//添加后钩子
-    protected function onEditAfter(VueCurlModel $info,array $oldData): void{}//修改后钩子
+    protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):void{} //执行doSaveData前（钩子）
+    protected function doSaveDataAfter(array $saveData,int $id,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):array{return $saveData;} //执行doSaveData后（钩子）
+    protected function onAddAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo=null): void{}//添加后钩子
+    protected function onEditAfter(VueCurlModel $info,array $postData,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null): void{}//修改后钩子
 }

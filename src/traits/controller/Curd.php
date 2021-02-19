@@ -121,7 +121,7 @@ trait Curd
                 if(empty($data['id'])){
                     $this->addAfter($this->model->addInfo($data));
                 }else{
-                    $this->editAfter($this->model->saveInfo($data));
+                    $this->editAfter($this->model->saveInfo($data,null,null,$this->model->find($data['id'])));
                 }
             }catch (\Exception $e){
                 $this->model->rollback();

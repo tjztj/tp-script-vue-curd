@@ -202,7 +202,8 @@ trait CurdChild{
                     $this->addAfter($this->model->addInfo($data,$baseInfo));
                 }else{
                     $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
-                    $this->editAfter($this->model->saveInfo($data,$fields));
+                    $info=$this->model->find($data['id']);
+                    $this->editAfter($this->model->saveInfo($data,$fields,$this->baseModel->find($info[$this->model::parentField()]),$info));
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
@@ -215,7 +216,7 @@ trait CurdChild{
         $id=$this->request->param('id/d');
         if($id){
             $info=$this->model->find($id);
-            $base_id=$info->base_id;
+            $base_id=$info[$this->model::parentField()];
         }else{
             $base_id=$this->request->param('base_id/d',0);
             $base_id||$this->error('缺少必要参数');

@@ -43,20 +43,20 @@ abstract class BaseChildModel extends VueCurlModel
 
     /**
      * 添加子数据
-     * @param array $oldData        添加的数据
+     * @param array $postData        添加的数据
      * @param BaseModel $baseInfo   所属的数据
      * @param bool $isExcelDo       是否excel操作
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $oldData,BaseModel $baseInfo,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,BaseModel $baseInfo,bool $isExcelDo=false):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
         #########################################################################################
 
         $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
-        $data=$this->doSaveData($oldData,$fields,$isExcelDo);
+        $data=$this->doSaveData($postData,$fields,$isExcelDo,$baseInfo);
         $data[static::parentField()]=$baseInfo->id;
         static::getRegionField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionField())->isEmpty()||$data[static::getRegionField()]=$baseInfo[static::getRegionField()];
         static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$baseInfo[static::getRegionPidField()];
@@ -69,7 +69,7 @@ abstract class BaseChildModel extends VueCurlModel
         }
         //onAddBefore请用doSaveDataAfter
         $info=self::create($data);
-        $this->onAddAfter($info,$data);
+        $this->onAddAfter($info,$data,$baseInfo);
         return $info;
     }
 

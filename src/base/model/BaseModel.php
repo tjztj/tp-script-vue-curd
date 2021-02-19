@@ -25,7 +25,7 @@ abstract class BaseModel extends VueCurlModel
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $oldData,FieldCollection $fields=null,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,FieldCollection $fields=null,bool $isExcelDo=false):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -35,7 +35,7 @@ abstract class BaseModel extends VueCurlModel
         if(!is_subclass_of($this,BaseModel::class)) {
             throw new \think\Exception('当前model不能执行此操作');
         }
-        $data=$this->doSaveData($oldData,$fields,$isExcelDo);
+        $data=$this->doSaveData($postData,$fields,$isExcelDo);
         //TODO::地区权限验证
         if(static::getCreateLoginUserField()){
             $data[static::getCreateLoginUserField()]=getLoginData()['id'];
