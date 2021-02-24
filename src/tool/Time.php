@@ -13,12 +13,12 @@ class Time
         if(is_null($unixtime)){
             $unixtime=time();
         }
-        $datetime = new DateTime("@$unixtime"); //DateTime类的bug，加入@可以将Unix时间戳作为参数传入
-        $datetime->setTimezone(new DateTimeZone($timezone));
+        $datetime = new \DateTime("@$unixtime"); //DateTime类的bug，加入@可以将Unix时间戳作为参数传入
+        $datetime->setTimezone(new \DateTimeZone($timezone));
         return $datetime->format($format);
     }
     public static function dateToUnixtime($date, $timezone = 'PRC') {
-        $datetime= new DateTime($date, new DateTimeZone($timezone));
+        $datetime= new \DateTime($date, new \DateTimeZone($timezone));
         return $datetime->format('U');
     }
 }
