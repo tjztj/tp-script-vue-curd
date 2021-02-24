@@ -58,7 +58,15 @@ class SelectFilter extends ModelFilter
     public function generateWhere(Query $query,$value):void{
         if($value||$value===0||$value==='0'){
             if(method_exists($this->field,'multiple')&&$this->field->multiple()){
-                $query->whereFindInSet($this->field->name(),$value);
+                if(is_array($value)){
+                    $query->where(function(Query $q)use($value){
+                        foreach ($value as $v){
+                            $q->whereFindInSet($this->field->name(),$v);
+                        }
+                    });
+                }else{
+                    $query->whereFindInSet($this->field->name(),$value);
+                }
             }else if(is_array($value)){
                 $query->whereIn($this->field->name(),$value);
             }else{
