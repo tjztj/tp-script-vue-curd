@@ -59,6 +59,8 @@ class SelectFilter extends ModelFilter
         if($value||$value===0||$value==='0'){
             if(method_exists($this->field,'multiple')&&$this->field->multiple()){
                 $query->whereFindInSet($this->field->name(),$value);
+            }else if(is_array($value)){
+                $query->whereIn($this->field->name(),$value);
             }else{
                 $query->where($this->field->name(),$value);
             }

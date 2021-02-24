@@ -56,7 +56,11 @@ class RadioFilter extends ModelFilter
 
     public function generateWhere(Query $query,$value):void{
         if($value||$value===0||$value==='0'){
-            $query->where($this->field->name(),$value);
+            if(is_array($value)){
+                $query->whereIn($this->field->name(),$value);
+            }else{
+                $query->where($this->field->name(),$value);
+            }
         }
     }
 
