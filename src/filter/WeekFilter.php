@@ -44,11 +44,11 @@ class WeekFilter extends ModelFilter
      */
     public function getDefaultItems():array{
         $now_w_start_time=$this->getWeekStart(time());
-        $now_w_start=date('Y-m-d', $now_w_start_time);
+        $now_w_start=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $now_w_start_time);
 
         return [
             ['value'=>$now_w_start,'title'=>'本周'],
-            ['value'=>date('Y-m-d', strtotime($now_w_start.' -7 day')),'title'=>'上周'],
+            ['value'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', \tpScriptVueCurd\tool\Time::dateToUnixtime($now_w_start.' -7 day')),'title'=>'上周'],
         ];
     }
 
@@ -57,7 +57,7 @@ class WeekFilter extends ModelFilter
         if(empty($value)){
             return;
         }
-        $query->where($this->field->name(),self::getWeekStart(strtotime($value)));
+        $query->where($this->field->name(),self::getWeekStart(\tpScriptVueCurd\tool\Time::dateToUnixtime($value)));
     }
 
 
@@ -67,7 +67,7 @@ class WeekFilter extends ModelFilter
      * @return int
      */
     public static function getWeekStart(int $time):int{
-        $w=date('w',$time);
+        $w=\tpScriptVueCurd\tool\Time::unixtimeToDate('w',$time);
         return $time - (($w?:7) - 1) * 24 * 3600;
     }
 }

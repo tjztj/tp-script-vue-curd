@@ -43,13 +43,13 @@ class MonthFilter extends ModelFilter
      * @throws \think\Exception
      */
     public function getDefaultItems():array{
-        $now_m_start=date('Y-m');
-        $last_m_start= date('Y-m',strtotime($now_m_start.' -1 month'));
+        $now_m_start=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m');
+        $last_m_start= \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',\tpScriptVueCurd\tool\Time::dateToUnixtime($now_m_start.' -1 month'));
 
         return [
             ['start'=>$now_m_start,'end'=>$now_m_start,'title'=>'本月'],
             ['start'=>$last_m_start,'end'=>$last_m_start,'title'=>'上月'],
-            ['start'=>date('Y-01'),'end'=>date('Y-12'),'title'=>'今年'],
+            ['start'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-01'),'end'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-12'),'title'=>'今年'],
         ];
     }
 
@@ -59,8 +59,8 @@ class MonthFilter extends ModelFilter
             return;
         }
 
-        empty($value['start'])||$query->where($this->field->name(),'>=',strtotime($value['start'].'-01'));
-        empty($value['end'])||$query->where($this->field->name(),'<=',strtotime($value['end'].'-01 +1 month')-1);
+        empty($value['start'])||$query->where($this->field->name(),'>=',\tpScriptVueCurd\tool\Time::dateToUnixtime($value['start'].'-01'));
+        empty($value['end'])||$query->where($this->field->name(),'<=',\tpScriptVueCurd\tool\Time::dateToUnixtime($value['end'].'-01 +1 month')-1);
     }
 
 

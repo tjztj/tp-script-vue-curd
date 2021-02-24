@@ -52,7 +52,7 @@ class Excel
 
         $objPHPExcel = new Spreadsheet();
         $xlsTitle = iconv('utf-8', 'gb2312', $expTitle);//文件名称
-        $fileName = $xlsTitle ? $xlsTitle : date('YmdHis');//or $xlsTitle 文件名称可根据自己情况设定
+        $fileName = $xlsTitle ? $xlsTitle : \tpScriptVueCurd\tool\Time::unixtimeToDate('YmdHis');//or $xlsTitle 文件名称可根据自己情况设定
         foreach ($expCellName as $k => $v) {
             if (isset($v[0])) $expCellName[$k]['name'] = $v[0];
             if (isset($v[1])) {
@@ -104,7 +104,7 @@ class Excel
 //    $objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 //    $objPHPExcel->getActiveSheet()->getStyle('A1')->getFont()->setName('Simhei');
         $objPHPExcel->getActiveSheet(0)->mergeCells('A1:' . $cellName[$cellNum - 1] . '1');//合并单元格
-        // $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $expTitle.'  Export time:'.date('Y-m-d H:i:s'));
+        // $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $expTitle.'  Export time:'.\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d H:i:s'));
         $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $title);
 
         $begin_th = $th ? count($th) + 1 : 2;
@@ -414,11 +414,11 @@ class Excel
                 break;
             // 日期
             case  'date' :
-                return !empty($value) ? date($array[3], $value) : null;
+                return !empty($value) ? \tpScriptVueCurd\tool\Time::unixtimeToDate($array[3], $value) : null;
                 break;
             // 月分
             case  'month' :
-                return !empty($value) ? date($array[3].'/01', $value) : null;
+                return !empty($value) ? \tpScriptVueCurd\tool\Time::unixtimeToDate($array[3].'/01', $value) : null;
                 break;
             // 选择框
             case  'selectd' :

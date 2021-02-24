@@ -31,7 +31,7 @@ class MonthField extends ModelField
         if (isset($data[$name])) {
             if($data[$name]){
                 $data[$name]=trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
-                $this->save=strtotime($data[$name].'-01');
+                $this->save=\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name].'-01');
                 if($this->save===false){
                     throw new \think\Exception('不是正确的月份格式');
                 }
@@ -53,7 +53,7 @@ class MonthField extends ModelField
     {
         $name=$this->name();
         if (isset($dataBaseData[$name])) {
-            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : date('Y-m',$dataBaseData[$name]);
+            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',$dataBaseData[$name]);
         }
     }
 

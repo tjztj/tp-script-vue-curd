@@ -100,7 +100,7 @@ trait Excel
         is_dir($base_path) || mkdir($base_path);
         $base_path= public_path( '/upload/excel_import');
         is_dir($base_path) || mkdir($base_path);
-        $options = ['img_save_path' => $base_path.'/'. date('Ymd') . '/', 'format' => []];
+        $options = ['img_save_path' => $base_path.'/'. \tpScriptVueCurd\tool\Time::unixtimeToDate('Ymd') . '/', 'format' => []];
         is_dir($options['img_save_path']) || mkdir($options['img_save_path']);
         try{
             $data = \tpScriptVueCurd\tool\Excel::importExecl($file->getRealPath(), 0, 0, $options);
@@ -284,7 +284,7 @@ trait Excel
     private function getExcelFieldName():string{
         static $return;
         if(!isset($return)){
-            $return='导入模版__' .$this->excelTilte() . date('Y-m-d_H时i分s秒');
+            $return='导入模版__' .$this->excelTilte() . \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d_H时i分s秒');
         }
         return $return;
     }

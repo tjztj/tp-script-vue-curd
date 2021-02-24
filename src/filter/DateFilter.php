@@ -62,40 +62,40 @@ class DateFilter extends ModelFilter
      */
     public function getFilterConfigDateStr(string $dateType, $accurateTime = false)
     {
-        $now_m = date('m');
-        $now_y = date('Y');
-        $now_d = date('d');
+        $now_m = \tpScriptVueCurd\tool\Time::unixtimeToDate('m');
+        $now_y = \tpScriptVueCurd\tool\Time::unixtimeToDate('Y');
+        $now_d = \tpScriptVueCurd\tool\Time::unixtimeToDate('d');
         $end_s = $accurateTime ? ' 23:59:59' : '';
         switch ($dateType) {
             case '本周':
                 //本周
-                $begin_time = mktime(0, 0, 0, $now_m, $now_d - date('w') + 1, $now_y);
-                $end_time = mktime($accurateTime ? 23 : 0, $accurateTime ? 59 : 0, $accurateTime ? 59 : 0, $now_m, $now_d - date('w') + 7, $now_y);
+                $begin_time = mktime(0, 0, 0, $now_m, $now_d - \tpScriptVueCurd\tool\Time::unixtimeToDate('w') + 1, $now_y);
+                $end_time = mktime($accurateTime ? 23 : 0, $accurateTime ? 59 : 0, $accurateTime ? 59 : 0, $now_m, $now_d - \tpScriptVueCurd\tool\Time::unixtimeToDate('w') + 7, $now_y);
                 break;
             case '本月':
                 //本月
                 $begin_time = mktime(0, 0, 0, $now_m, 1, $now_y);
-                $end_time = mktime($accurateTime ? 23 : 0, $accurateTime ? 59 : 0, $accurateTime ? 59 : 0, date("m"), date("t"), $now_y);
+                $end_time = mktime($accurateTime ? 23 : 0, $accurateTime ? 59 : 0, $accurateTime ? 59 : 0, \tpScriptVueCurd\tool\Time::unixtimeToDate("m"), \tpScriptVueCurd\tool\Time::unixtimeToDate("t"), $now_y);
                 break;
             case '上月':
                 //上月
-                $begin_time = strtotime(date('Y-m-01', strtotime('-1 month')));
-                $end_time = strtotime(date("Y-m-d" . $end_s, strtotime(-$now_d . 'day')));
+                $begin_time = \tpScriptVueCurd\tool\Time::dateToUnixtime(\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-01', \tpScriptVueCurd\tool\Time::dateToUnixtime('-1 month')));
+                $end_time = \tpScriptVueCurd\tool\Time::dateToUnixtime(\tpScriptVueCurd\tool\Time::unixtimeToDate("Y-m-d" . $end_s, \tpScriptVueCurd\tool\Time::dateToUnixtime(-$now_d . 'day')));
                 break;
             case '今年':
                 //今年
-                $begin_time = strtotime($now_y . "-1" . "-1");
-                $end_time = strtotime($now_y . "-12" . "-31" . $end_s);
+                $begin_time = \tpScriptVueCurd\tool\Time::dateToUnixtime($now_y . "-1" . "-1");
+                $end_time = \tpScriptVueCurd\tool\Time::dateToUnixtime($now_y . "-12" . "-31" . $end_s);
                 break;
             case '去年':
                 //去年
-                $begin_time = strtotime(($now_y - 1) . "-1" . "-1");
-                $end_time = strtotime(($now_y - 1) . "-12" . "-31" . $end_s);
+                $begin_time = \tpScriptVueCurd\tool\Time::dateToUnixtime(($now_y - 1) . "-1" . "-1");
+                $end_time = \tpScriptVueCurd\tool\Time::dateToUnixtime(($now_y - 1) . "-12" . "-31" . $end_s);
                 break;
             default:
                 throw new \think\Exception('getFilterConfigDateStr传入参数错误');
         }
-        return ['start'=>date('Y-m-d', $begin_time) ,'end'=>date('Y-m-d', $end_time),'title'=>$dateType];
+        return ['start'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $begin_time) ,'end'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $end_time),'title'=>$dateType];
     }
 
 
@@ -104,11 +104,11 @@ class DateFilter extends ModelFilter
             return;
         }
         if(empty($value['end'])){
-            $query->where($this->field->name(),'>=',strtotime($value['start']));
+            $query->where($this->field->name(),'>=',\tpScriptVueCurd\tool\Time::dateToUnixtime($value['start']));
         }else if(empty($value['start'])){
-            $query->where($this->field->name(),'<=',strtotime($value['end'].' 23:59:59'));
+            $query->where($this->field->name(),'<=',\tpScriptVueCurd\tool\Time::dateToUnixtime($value['end'].' 23:59:59'));
         }else{
-            $query->whereBetween($this->field->name(),[strtotime($value['start']),strtotime($value['end'].' 23:59:59')]);
+            $query->whereBetween($this->field->name(),[\tpScriptVueCurd\tool\Time::dateToUnixtime($value['start']),\tpScriptVueCurd\tool\Time::dateToUnixtime($value['end'].' 23:59:59')]);
         }
     }
 }
