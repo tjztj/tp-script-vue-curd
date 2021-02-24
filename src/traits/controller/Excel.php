@@ -143,7 +143,7 @@ trait Excel
                 $isEmptyRow=true;
                 foreach ($data[$last_do_row] as $key=>$val){
                     if(!isset($names[$key])){
-                        return $this->error('模板错误');
+                        throw new \think\Exception('模板错误');
                     }
                     $saveData[$names[$key]]=$val;
                     if(is_string($val)&&trim($val)!==''){
