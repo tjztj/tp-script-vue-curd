@@ -74,9 +74,9 @@ abstract class BaseChildModel extends VueCurlModel
         return $info;
     }
 
-    final public function del(array $ids): void
+    final public function del(array $ids): \think\Collection
     {
-        $this->doDel($ids);
+        return $this->doDel($ids);
     }
 
 

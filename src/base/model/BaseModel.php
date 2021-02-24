@@ -50,7 +50,7 @@ abstract class BaseModel extends VueCurlModel
         return $info;
     }
 
-    final public function del(array $ids): void
+    final public function del(array $ids): \think\Collection
     {
         /* @var Controller $v */
         $controll=static::getControllerClass();
@@ -64,7 +64,7 @@ abstract class BaseModel extends VueCurlModel
                 }
             }
         }
-        $this->doDel($ids);
+        return $this->doDel($ids);
     }
 
 

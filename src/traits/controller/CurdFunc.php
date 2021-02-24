@@ -92,7 +92,9 @@ trait CurdFunc
             return $this->error('请选择要删除的数据');
         }
         try{
-            $model->del($ids);
+            $ids=$this->beforeDel($ids);
+            $list= $model->del($ids);
+            $this->afterDel($list);
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }

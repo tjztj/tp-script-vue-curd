@@ -4,6 +4,9 @@
 namespace tpScriptVueCurd\base\model;
 
 
+use tpScriptVueCurd\base\controller\BaseChildController;
+use tpScriptVueCurd\base\controller\BaseController;
+use tpScriptVueCurd\base\controller\BaseHaveChildController;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\traits\model\ModelBaseField;
@@ -24,7 +27,7 @@ abstract class VueCurlModel extends TimeModel
 
     /**
      * 相关控制器
-     * @return string|Controller
+     * @return string|BaseController|BaseHaveChildController|BaseChildController
      */
     abstract public static function getControllerClass():string;
 

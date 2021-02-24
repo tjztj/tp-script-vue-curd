@@ -136,6 +136,15 @@ trait Controller
         return $fetchData;
     }
 
+    protected function beforeDel(array $ids):array{
+        //删除前
+        return $ids;
+    }
+
+    protected function afterDel(array $delInfos):void{
+        //删除后
+    }
+
 
 
 

@@ -55,7 +55,7 @@ class YearMonthField extends ModelField
      */
     public function excelSaveDoData(array &$save):void{
         $name=$this->name();
-        if(!isset($save[$name])){
+        if(!isset($save[$name])||$save[$name]===''){
             return;
         }
         $save[$name]=self::strToMonth($save[$name]);

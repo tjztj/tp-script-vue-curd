@@ -17,8 +17,9 @@ trait ModelDelTraits
     /**
      * 数据删除方法
      * @param array $ids
+     * @return \think\Collection
      */
-    abstract public function del(array $ids):void;
+    abstract public function del(array $ids):\think\Collection;
     protected function onDelBefore(Collection $delList): void{}//删除前钩子，子类重写
     protected function onDelAfter(Collection $delList): void{}//删除后钩子，子类重写
 
@@ -31,7 +32,15 @@ trait ModelDelTraits
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    protected function doDel($ids){
+    /**
+     * @param $ids
+     * @return \think\Collection
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function doDel($ids):\think\Collection{
         $list=$this->where('id','in',array_unique($ids))->select();
         $this->startTrans();
         try{
@@ -43,5 +52,6 @@ trait ModelDelTraits
             throw new \think\Exception($e->getMessage());
         }
         $this->commit();
+        return $list;
     }
 }
