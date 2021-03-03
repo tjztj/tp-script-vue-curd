@@ -35,7 +35,6 @@ trait Controller
 
     public function initialize()
     {
-        $this->vueInitialize();
         if(empty($this->app)){
             $this->app=app();
         }
@@ -58,6 +57,8 @@ trait Controller
                 $this->guid=create_guid();
             }
         }
+        $this->vueInitialize();
+
 
         $this->indexPageOption=static::getIndexPage();
 
