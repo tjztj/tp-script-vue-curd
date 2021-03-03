@@ -29,6 +29,14 @@ function getHtmlTitle():string{
 
 
 /**
+ * 文件上传默认url
+ * @return string
+ */
+function uploadDefaultUrl():string{
+    return '/admin/ajax/upload';
+}
+
+/**
  * 自定义vue页面时可能使用
  * @return string
  */

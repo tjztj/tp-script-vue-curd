@@ -920,7 +920,7 @@ define(['vueAdmin'], function (va) {
                                         <div class="l">
                                             <a-upload
                                                 multiple
-                                                action="/admin/ajax/upload"
+                                                :action="field.url"
                                                 accept="image/*"
                                                 list-type="picture-card"
                                                 :file-list="field.fileList"

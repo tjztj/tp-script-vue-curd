@@ -24,19 +24,19 @@ class IntField extends ModelField
 
 
     /**最小值
-     * @param string|null $min
+     * @param int|null $min
      * @return $this|int
      */
-    public function min(string $min = null)
+    public function min(int $min = null)
     {
         return $this->doAttr('min', $min);
     }
 
     /**最大值
-     * @param string|null $max
+     * @param int|null $max
      * @return $this|int
      */
-    public function max(string $max = null)
+    public function max(int $max = null)
     {
         return $this->doAttr('max', $max);
     }

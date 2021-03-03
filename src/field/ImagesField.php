@@ -15,6 +15,21 @@ use tpScriptVueCurd\ModelField;
 class ImagesField extends ModelField
 {
 
+    protected string $url='';
+
+
+    /**最小值
+     * @param string|null $url
+     * @return $this|string
+     */
+    public function url(string $url = null)
+    {
+        if(is_null($url)){
+            return $this->url?:uploadDefaultUrl();
+        }
+        $this->url=$url;
+        return $this;
+    }
 
     /**
      * 设置保存的值
