@@ -734,11 +734,11 @@ define(['vueAdmin'], function (va) {
                                 }
                                 return true;
                             });
-                            this.form[name]=urls.join('|');
-                            if(this.form[name]){
-                                this.validateStatus[name]='success'
+                            this.form[field.name]=urls.join('|');
+                            if(this.form[field.name]){
+                                this.validateStatus[field.name]='success'
                             }else{
-                                this.validateStatus[name]='error'
+                                this.validateStatus[field.name]='error'
                             }
                         },
                         fieldRules(field){
