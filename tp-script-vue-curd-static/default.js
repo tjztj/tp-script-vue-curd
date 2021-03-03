@@ -510,7 +510,7 @@ define(['vueAdmin'], function (va) {
 
 
     actions.edit=function(){
-        let form={},dateDefaultValues={},validateStatus={},fieldObjs={};
+        let form={},validateStatus={},fieldObjs={};
 
         function fieldInit(field,formData,changeFormDataByInfo){
             if(changeFormDataByInfo){
@@ -538,13 +538,13 @@ define(['vueAdmin'], function (va) {
                     if(formData[field.name]){
                         if(/^\-?\d+$/g.test(formData[field.name].toString())){
                             //时间戳
-                            dateDefaultValues[field.name]=parseTime(formData[field.name],'{y}-{m}-{d}');
-                            formData[field.name]=dateDefaultValues[field.name];
+                            field.dateDefaultValue=parseTime(formData[field.name],'{y}-{m}-{d}');
+                            formData[field.name]=field.dateDefaultValue;
                         }else{
-                            dateDefaultValues[field.name]=formData[field.name];
+                            field.dateDefaultValue=formData[field.name];
                         }
                     }else{
-                        dateDefaultValues[field.name]='';
+                        field.dateDefaultValue='';
                     }
                     break;
                 case 'MonthField':
@@ -654,7 +654,6 @@ define(['vueAdmin'], function (va) {
                     data(){
                         return {
                             fieldObjs:fieldObjs,
-                            dateDefaultValues:dateDefaultValues,
                             validateStatus:validateStatus,
                             triggerShowss:{},
                             autoCompleteOptions:{},
@@ -904,7 +903,7 @@ define(['vueAdmin'], function (va) {
                                     <div v-else-if="field.type==='DateField'" class="field-box">
                                         <div class="l">
                                             <a-date-picker
-                                                v-model:value="dateDefaultValues[field.name]"
+                                                v-model:value="field.dateDefaultValue"
                                                 type="date"
                                                 :placeholder="field.placeholder||'请选择日期'"
                                                  :disabled="field.readOnly"
