@@ -510,7 +510,7 @@ define(['vueAdmin'], function (va) {
 
 
     actions.edit=function(){
-        let form={},fileList={},dateDefaultValues={},validateStatus={},fieldObjs={};
+        let form={},dateDefaultValues={},validateStatus={},fieldObjs={};
 
         function fieldInit(field,formData,changeFormDataByInfo){
             if(changeFormDataByInfo){
@@ -521,7 +521,7 @@ define(['vueAdmin'], function (va) {
                 case 'ImagesField':
                     if(formData[field.name]){
                         let imgList=typeof formData[field.name]==='string'?formData[field.name].split('|'):formData[field.name],fid=0;
-                        fileList[field.name]=imgList.map(function(v){
+                        field.fileList=imgList.map(function(v){
                             fid--;
                             return {
                                 uid:fid,
@@ -531,7 +531,7 @@ define(['vueAdmin'], function (va) {
                             };
                         })
                     }else{
-                        fileList[field.name]=[];
+                        field.fileList=[];
                     }
                     break;
                 case 'DateField':
@@ -654,7 +654,6 @@ define(['vueAdmin'], function (va) {
                     data(){
                         return {
                             fieldObjs:fieldObjs,
-                            fileList:fileList,
                             dateDefaultValues:dateDefaultValues,
                             validateStatus:validateStatus,
                             triggerShowss:{},
@@ -705,17 +704,17 @@ define(['vueAdmin'], function (va) {
                                 }
                             }
                         },
-                        handlePreview(file,name) {
-                            const images=this.fileList[name].filter(function(vo){
+                        handlePreview(file,field) {
+                            const images=field.fileList.filter(function(vo){
                                 return vo.url?true:false;
                             }).map(function(vo){
                                 return vo.url
                             });
                             window.top.showImages(images,images.indexOf(file.url))
                         },
-                        handleChange(data,name) {
+                        handleChange(data,field) {
                             let urls=[];
-                            this.fileList[name] =data.fileList.map(function(file){
+                            field.fileList =data.fileList.map(function(file){
                                 if(file.status==='done'){
                                     if(file.response){
                                         if(file.response.code==0){
@@ -924,11 +923,11 @@ define(['vueAdmin'], function (va) {
                                                 action="/admin/ajax/upload"
                                                 accept="image/*"
                                                 list-type="picture-card"
-                                                :file-list="fileList[field.name]"
+                                                :file-list="field.fileList"
                                                 :remove="handleRemove(field.name)"
                                                  :disabled="field.readOnly"
-                                                @preview="handlePreview($event,field.name)"
-                                                @change="handleChange($event,field.name)"
+                                                @preview="handlePreview($event,field)"
+                                                @change="handleChange($event,field)"
                                             >
                                                 <plus-outlined />
                                             </a-upload>
