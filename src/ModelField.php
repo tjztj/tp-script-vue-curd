@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use think\Validate;
 use tpScriptVueCurd\filter\EmptyFilter;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 /**
  * Class ModelField
@@ -394,5 +395,12 @@ abstract class ModelField
             throw new \think\Exception($msg);
         }
     }
+
+
+    /**
+     * 字段模板配置
+     * @return FieldTpl
+     */
+    abstract public static function getTpl():FieldTpl;
 
 }

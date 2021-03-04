@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\MonthFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -69,4 +70,11 @@ class MonthField extends ModelField
         $excelFieldTpl->isText=true;
     }
 
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
+    }
 }

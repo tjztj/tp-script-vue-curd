@@ -6,6 +6,7 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -132,5 +133,13 @@ class ListField extends ModelField
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
         $excelFieldTpl->explain="此列不可导入数据";
+    }
+
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

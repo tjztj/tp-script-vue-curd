@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\LikeFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -81,5 +82,12 @@ class MoreStringField extends ModelField
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
         $excelFieldTpl->width=22;
         $excelFieldTpl->explain='多个请用‘'.$this->separate().'’隔开';
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

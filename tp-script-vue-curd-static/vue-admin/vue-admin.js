@@ -478,7 +478,7 @@ define(['axios','qs'], function ( axios,Qs) {
                     window.top.showImages(imgs, start);
                 },
             },
-            template:`<div class="curd-show-field-box">
+            template:`<div class="curd-show-field-box" :data-name="field.name">
                             <div v-if="field.type==='ImagesField'">
                                 <div class="img-box">
                                     <div class="img-box-item" v-for="(vo,key) in info[field.name+'Arr']" @click="showImages(info[field.name+'Arr'],key)">

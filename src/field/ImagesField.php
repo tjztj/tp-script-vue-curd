@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\Edit;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -81,5 +83,16 @@ class ImagesField extends ModelField
             return;
         }
         $save[$name]=empty($save[$name])?'':implode('|',array_map(fn($vo)=>str_replace(public_path(), request()->domain().DIRECTORY_SEPARATOR, $vo),$save[$name]));
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        $edit=new Edit($fieldTpl);
+        $edit->jsUrl='tp-script-vue-curd-static.php?field/images/edit.js';
+
+
+        return $fieldTpl;
     }
 }

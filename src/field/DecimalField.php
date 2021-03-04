@@ -7,6 +7,7 @@ use tpScriptVueCurd\filter\BetweenFilter;
 use tpScriptVueCurd\ModelField;
 use think\facade\Validate;
 use think\validate\ValidateRule;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 /**两位小数
  * Class DecimalField
@@ -103,5 +104,12 @@ class DecimalField extends ModelField
             $excelFieldTpl->explain="填入整数";
         }
         $excelFieldTpl->width=20;
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

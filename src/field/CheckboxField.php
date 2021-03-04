@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\RadioFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\traits\field\CheckField;
 
 
@@ -100,5 +101,12 @@ class CheckboxField extends ModelField
             }
             $save[$name][]=$items[$v];
         }
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

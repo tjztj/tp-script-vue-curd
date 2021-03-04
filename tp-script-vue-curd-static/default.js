@@ -854,7 +854,7 @@ define(['vueAdmin'], function (va) {
                     },
                     template:`
                         <div>
-                            <div v-for="field in groupFieldItems">
+                            <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="field.title" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" class="form-item-row">
                                     <div v-if="field.type==='StringField'">

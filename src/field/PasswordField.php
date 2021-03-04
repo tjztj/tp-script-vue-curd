@@ -6,6 +6,7 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\filter\LikeFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -67,5 +68,13 @@ class PasswordField extends ModelField
         if(isset($dataBaseData[$name])){
             $dataBaseData[$name]='••••••';
         }
+    }
+
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

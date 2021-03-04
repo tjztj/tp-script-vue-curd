@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\LikeFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -45,5 +46,12 @@ class TextField extends ModelField
         $excelFieldTpl->isText=true;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->width=40;
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

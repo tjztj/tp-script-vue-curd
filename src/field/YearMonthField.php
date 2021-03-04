@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\YearMonthFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -117,5 +118,12 @@ class YearMonthField extends ModelField
         $excelFieldTpl->width=40;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->isText=true;
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

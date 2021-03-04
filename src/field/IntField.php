@@ -6,6 +6,7 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\BetweenFilter;
 use tpScriptVueCurd\ModelField;
 use think\facade\Validate;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -82,5 +83,12 @@ class IntField extends ModelField
     {
         $excelFieldTpl->explain="填入整数";
         $excelFieldTpl->width=12;
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

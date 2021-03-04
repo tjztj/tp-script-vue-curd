@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\RadioFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\traits\field\CheckField;
 
 
@@ -74,6 +75,14 @@ class RadioField extends ModelField
         $excelFieldTpl->explain=$str;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->width=40;
+    }
+
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 
 }

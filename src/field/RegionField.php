@@ -11,6 +11,7 @@ use tpScriptVueCurd\ModelField;
 
 
 use app\admin\model\SystemRegion;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 /**
  * 地区
@@ -237,5 +238,13 @@ class RegionField extends ModelField
             throw new \think\Exception('镇街[' . $regions[0] . ']下未找到' . $regions[1]);
         }
 
+    }
+
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }

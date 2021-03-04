@@ -6,6 +6,7 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\DateFilter;
 use tpScriptVueCurd\filter\WeekFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 
 
 /**
@@ -109,5 +110,12 @@ class WeekField extends ModelField
         $excelFieldTpl->width=40;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->isText=true;
+    }
+
+    public static function getTpl(): FieldTpl
+    {
+        $fieldTpl=new FieldTpl(class_basename(static::class));
+
+        return $fieldTpl;
     }
 }
