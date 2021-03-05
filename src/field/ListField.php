@@ -6,7 +6,10 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 
 /**
@@ -138,8 +141,11 @@ class ListField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/list/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/list/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/list/edit.js')
+        );
     }
 }

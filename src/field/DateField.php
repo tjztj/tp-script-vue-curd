@@ -5,7 +5,10 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\DateFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 /**
  * 日期
@@ -74,9 +77,12 @@ class DateField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/date/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/date/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/date/edit.js')
+        );
     }
 
 }

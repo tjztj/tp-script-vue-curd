@@ -7,11 +7,11 @@ namespace tpScriptVueCurd\tool\field_tpl;
 class Show
 {
     public string $name;
-    public FieldTpl $fieldTpl;
+    public string $jsUrl;
 
-    public function __construct(FieldTpl $fieldTpl)
+    public function __construct(string $fieldType,string $jsUrl)
     {
-        $this->name='VueCurdShow'.$fieldTpl->name;
-        $this->fieldTpl=$fieldTpl;
+        $this->name='VueCurdIndex'.$fieldType;
+        $this->jsUrl=$jsUrl;
     }
 }

@@ -135,9 +135,6 @@ trait Curd
         $id=$this->request->param('id/d');
 
         $info=$id?$this->model->find($id):null;
-        $this->fields->each(function(ModelField $field){
-            $field->tpl=$field::getTpl();
-        });
         $this->createEditFetchDataBefore($this->fields,$info);
         $fetchData=$this->createEditFetchData($this->fields,$info);
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);

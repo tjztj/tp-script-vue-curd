@@ -57,12 +57,10 @@ define([],function(){
                     }
                     return true;
                 });
-                this.$emit('update:value',urls.join('|'));
-                if(this.value){
-                    this.validateStatus='success'
-                }else{
-                    this.validateStatus='error'
-                }
+                let value=urls.join('|');
+                this.$emit('update:value',value);
+                this.$emit('update:validateStatus',value?'success':'error');
+
             },
         },
         template:`<div class="field-box">

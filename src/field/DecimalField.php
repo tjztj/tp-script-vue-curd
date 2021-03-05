@@ -7,7 +7,10 @@ use tpScriptVueCurd\filter\BetweenFilter;
 use tpScriptVueCurd\ModelField;
 use think\facade\Validate;
 use think\validate\ValidateRule;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 /**两位小数
  * Class DecimalField
@@ -108,8 +111,11 @@ class DecimalField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/decimal/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/decimal/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/decimal/edit.js')
+        );
     }
 }

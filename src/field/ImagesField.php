@@ -6,6 +6,8 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 
 /**
@@ -87,12 +89,11 @@ class ImagesField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        $edit=new Edit($fieldTpl);
-        $edit->jsUrl='tp-script-vue-curd-static.php?field/images/edit.js';
-
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/images/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/images/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/images/edit.js')
+        );
     }
 }

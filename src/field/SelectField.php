@@ -5,7 +5,10 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\SelectFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 use tpScriptVueCurd\traits\field\CheckField;
 
 
@@ -100,8 +103,11 @@ class SelectField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/select/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/select/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/select/edit.js')
+        );
     }
 }

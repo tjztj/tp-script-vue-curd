@@ -11,7 +11,10 @@ use tpScriptVueCurd\ModelField;
 
 
 use app\admin\model\SystemRegion;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 /**
  * 地区
@@ -243,8 +246,11 @@ class RegionField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/region/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/region/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/region/edit.js')
+        );
     }
 }

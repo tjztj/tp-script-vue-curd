@@ -6,7 +6,10 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\BetweenFilter;
 use tpScriptVueCurd\ModelField;
 use think\facade\Validate;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 
 
 /**
@@ -87,8 +90,11 @@ class IntField extends ModelField
 
     public static function getTpl(): FieldTpl
     {
-        $fieldTpl=new FieldTpl(class_basename(static::class));
-
-        return $fieldTpl;
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/int/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/int/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/int/edit.js')
+        );
     }
 }

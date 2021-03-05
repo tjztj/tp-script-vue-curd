@@ -1,4 +1,15 @@
-define(['vueAdmin'], function (va) {
+const requires=['vueAdmin'];
+const fieldComponents={};
+if(vueData.tpls){
+    for(let i in vueData.tpls){
+        let v=vueData.tpls[i];
+        if(v.jsUrl){
+            requires.push(v.jsUrl)
+            fieldComponents[v.name]=v.jsUrl;
+        }
+    }
+}
+define(requires, function (va) {
     let actions = {};
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -511,121 +522,27 @@ define(['vueAdmin'], function (va) {
 
     actions.edit=function(){
         let form={},validateStatus={},fieldObjs={};
-
-        function fieldInit(field,formData,changeFormDataByInfo){
+         window.fieldInit=function(field,formData,changeFormDataByInfo){
             if(changeFormDataByInfo){
                 formData[field.name]=vueData.info?vueData.info[field.name]:'';
             }
             fieldObjs[field.name]=field;
-            switch (field.type){
-                case 'ImagesField':
-                    if(formData[field.name]){
-                        let imgList=typeof formData[field.name]==='string'?formData[field.name].split('|'):formData[field.name],fid=0;
-                        field.fileList=imgList.map(function(v){
-                            fid--;
-                            return {
-                                uid:fid,
-                                name:v.substring(v.lastIndexOf("/")+1,v.length),
-                                status: 'done',
-                                url:v,
-                            };
-                        })
-                    }else{
-                        field.fileList=[];
-                    }
-                    break;
-                case 'DateField':
-                    if(formData[field.name]){
-                        if(/^\-?\d+$/g.test(formData[field.name].toString())){
-                            //时间戳
-                            field.dateDefaultValue=parseTime(formData[field.name],'{y}-{m}-{d}');
-                            formData[field.name]=field.dateDefaultValue;
-                        }else{
-                            field.dateDefaultValue=formData[field.name];
-                        }
-                    }else{
-                        field.dateDefaultValue='';
-                    }
-                    break;
-                case 'MonthField':
-                    if(formData[field.name]){
-                        if(/^\d+$/g.test(formData[field.name].toString())){
-                            //时间戳
-                            formData[field.name]=parseTime(formData[field.name],'{y}-{m}');
-                        }
-                    }
-                    break;
-                case 'WeekField':
-                    if(formData[field.name]){
-                        if(/^\d+$/g.test(formData[field.name].toString())){
-                            //时间戳
-                            formData[field.name]=parseTime(formData[field.name],'{y}-{m}-{d}');
-                        }
-                    }
-                    break;
-                case 'SelectField':
-                    if(field.multiple){
-                        formData[field.name]=formData[field.name]?formData[field.name].split(','):[];
-                    }
-                    break;
-                case 'CheckboxField':
-                    formData[field.name]=formData[field.name]?formData[field.name].split(','):[];
-                    break;
-                case 'RegionField':
-                    if(!field.readOnly&&field.editShow===true&&field.required===true&&!formData.id&&!formData[field.name]){
-                        //如果是添加，且是必填，且为空
-                        if(field.regionTree.length===1){
-                            if(!field.regionTree[0].children||field.regionTree[0].children.length===0){
-                                formData[field.name]=[field.regionTree[0].id];
-                            }else if(field.regionTree[0].children.length===1){
-                                formData[field.name]=[field.regionTree[0].id,field.regionTree[0].children[0].id];
-                            }
-                        }
-                    }
-                    break;
-                case 'YearMonthField':
-                    if(formData[field.name]){
-                        formData[field.name]=[Math.floor(formData[field.name]/12),formData[field.name]%12];
-                    }else{
-                        formData[field.name]=['',''];
-                    }
-                    break;
-                case 'ListField':
-                    let listFieldObjs={};
-                    if(formData[field.name]){
-                        let lists=JSON.parse(formData[field.name]);
-                        for(let n in lists){
-                            listFieldObjs[window.guid()]=initListField(field,lists[n]);
-                        }
-                    }else{
-                        listFieldObjs[window.guid()]=initListField(field);
-                    }
-                    formData[field.name]=listFieldObjs;
-                    break;
-            }
-
             return formData
         }
-
-        function initListField(field,data){
+        window.initListField=function(field,data){
             data=data||{};
             field.fields.forEach(function(f){
                 data=fieldInit(f,data);
             })
             return data;
         }
-
-
         vueData.fields.forEach(function(field){
             form=fieldInit(field,form,true);
         })
 
-
         if(vueData.info){
             form.id=vueData.info.id;
         }
-
-
 
 
         /**
@@ -634,7 +551,7 @@ define(['vueAdmin'], function (va) {
          * @param val
          * @returns {boolean}
          */
-        function arrHave(arr,val){
+        window.arrHave=function(arr,val){
             if(typeof arr==='string'){
                 arr=arr?[]:arr.split(',')
             }
@@ -648,15 +565,20 @@ define(['vueAdmin'], function (va) {
             return have;
         }
 
+        let components={};
+        for(let name in fieldComponents){
+            components[name]=require(fieldComponents[name]);
+        }
+
         return {
             components: {
                 'field-group-item': {
+                    components,
                     data(){
                         return {
                             fieldObjs:fieldObjs,
                             validateStatus:validateStatus,
                             triggerShowss:{},
-                            autoCompleteOptions:{},
                         }
                     },
                     name:'fieldGroupItem',
@@ -696,71 +618,11 @@ define(['vueAdmin'], function (va) {
                     },
                     methods:{
                         ...vueDefMethods,
-                        handleRemove(name){
-                            return file => {
-                                if(file.url){
-                                    this.form[name]=this.form[name].split('|').filter(url=>url&&url!==file.url).join('|');
-                                }
-                            }
-                        },
-                        handlePreview(file,field) {
-                            const images=field.fileList.filter(function(vo){
-                                return vo.url?true:false;
-                            }).map(function(vo){
-                                return vo.url
-                            });
-                            window.top.showImages(images,images.indexOf(file.url))
-                        },
-                        handleChange(data,field) {
-                            let urls=[];
-                            field.fileList =data.fileList.map(function(file){
-                                if(file.status==='done'){
-                                    if(file.response){
-                                        if(file.response.code==0){
-                                            antd.message.error('文件[ '+file.name+' ]：'+file.response.msg,6);
-                                        }else{
-                                            file.url=file.response.data.url
-                                        }
-                                    }
-                                }
-                                return file;
-                            }).filter(function(file){
-                                if(file.status==='done'){
-                                    if(urls.indexOf(file.url)!==-1||!file.url){
-                                        return false;
-                                    }
-                                    urls.push(file.url)
-                                }
-                                return true;
-                            });
-                            this.form[field.name]=urls.join('|');
-                            if(this.form[field.name]){
-                                this.validateStatus[field.name]='success'
-                            }else{
-                                this.validateStatus[field.name]='error'
-                            }
-                        },
                         fieldRules(field){
                             return {
                                 required:this.triggerShows(field.name)&&field.required,
                                 message:field.title+' ， 必填',
                             }
-                        },
-                        dateChange(date,name){
-                            this.form[name]=date.format('YYYY-MM-DD');
-                        },
-                        onRegionChange(event,name){
-                            this.validateStatus[name]='success'
-                        },
-                        selectDefValue(field){
-                            if(field.multiple&&typeof this.form[field.name]==='string'){
-                                return this.form[field.name]?this.form[field.name].split(','):[];
-                            }
-                            return this.form[field.name];
-                        },
-                        onRadioChange(e,field){
-                        },
-                        onCheckboxChange(e,field){
                         },
                         triggerShows(fieldName){
                             if(!this.triggerShowss[fieldName]){
@@ -772,33 +634,6 @@ define(['vueAdmin'], function (va) {
                                 }
                             }
                             return false;
-                        },
-                        setMoreStringToArr(field){
-                            if(typeof this.form[field.name]!=='object'){
-                                let data={};
-                                if(this.form[field.name]){
-                                    this.form[field.name].split(field.separate).forEach(v=>{
-                                        data[window.guid()]=v;
-                                    })
-                                }else{
-                                    data[window.guid()]='';
-                                }
-                                this.form[field.name]=data;
-                            }
-                        },
-                        addMoreString(field){
-                            this.setMoreStringToArr(field);
-                            this.form[field.name][window.guid()]='';
-                        },
-                        removeMoreString(field,key){
-                            this.setMoreStringToArr(field);
-                            delete this.form[field.name][key];
-                        },
-                        addListField(field){
-                            this.form[field.name][window.guid()]=initListField(field);
-                        },
-                        removeListField(field,key){
-                            delete this.form[field.name][key];
                         },
                         async validateListForm() {
                             //外部调用
@@ -827,273 +662,22 @@ define(['vueAdmin'], function (va) {
                             }
                             return isNotErr;
                         },
-                        changePwdType(field){
-
-                        },
-                        autoCompleteSearch(val,url,key){
-                            this.autoCompleteOptions[key]=[];
-                            if(!url){
-                                return ;
-                            }
-
-                            this.$get(url,{search:val}).then(res=>{
-                                let arr=[];
-                                res.data.forEach(function(v){
-                                    arr.push({value:v});
-                                })
-                                this.autoCompleteOptions[key]=arr;
-                            })
-                        },
-                        onAutoCompleteSearch(event,field){
-                            this.autoCompleteSearch(event,field.url,field.name)
-                        },
-
-                        onAutoCompleteSearchMoreString(event,field,key){
-                            this.autoCompleteSearch(event,field.url,field.name+'.'+key)
-                        }
                     },
                     template:`
                         <div>
                             <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="field.title" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" class="form-item-row">
-                                    <div v-if="field.type==='StringField'">
-                                        <a-input v-model:value="form[field.name]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly"/>
-                                    </div>
-                                    <div v-if="field.type==='StringAutoCompleteField'" class="field-box">
-                                        <div class="l">
-                                            <a-auto-complete v-model:value="form[field.name]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name]" @search="onAutoCompleteSearch($event,field)"/>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-if="field.type==='TextField'" class="field-box">
-                                        <div class="l">
-                                            <a-textarea v-model:value="form[field.name]" :auto-size="{ minRows: 2, maxRows: 5 }"
-                                                        :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly"/>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-if="field.type==='IntField'" class="field-box">
-                                        <div class="l">
-                                            <a-input-number v-model:value="form[field.name]" :min="field.min" :max="field.max"
-                                                            :placeholder="field.placeholder||'输入整数'" :disabled="field.readOnly" style="width: 100%;"/>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-if="field.type==='DecimalField'" class="field-box">
-                                        <div class="l">
-                                            <a-input-number v-model:value="form[field.name]"
-                                                            :min="field.min"
-                                                            :max="field.max"
-                                                            :placeholder="field.placeholder||(field.precision?'保留'+field.precision+'位小数':'填入整数')"
-                                                            :disabled="field.readOnly"
-                                                            @change="value => form[field.name]=value?parseFloat(Number(value).toFixed(field.precision)):''"
-                                                            style="width: 100%;"/>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='DateField'" class="field-box">
-                                        <div class="l">
-                                            <a-date-picker
-                                                v-model:value="field.dateDefaultValue"
-                                                type="date"
-                                                :placeholder="field.placeholder||'请选择日期'"
-                                                 :disabled="field.readOnly"
-                                                style="width: 100%;"
-                                                @change="dateChange($event,field.name)"
-                                            />
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='ImagesField'" class="field-box">
-                                        <div class="l">
-                                            <a-upload
-                                                multiple
-                                                :action="field.url"
-                                                accept="image/*"
-                                                list-type="picture-card"
-                                                :file-list="field.fileList"
-                                                :remove="handleRemove(field.name)"
-                                                 :disabled="field.readOnly"
-                                                @preview="handlePreview($event,field)"
-                                                @change="handleChange($event,field)"
-                                            >
-                                                <plus-outlined />
-                                            </a-upload>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='RegionField'" class="field-box">
-                                        <template v-if="form.id">
-                                            <div class="l">
-                                                {{form[field.pField]}}/{{form[[field.cField]]}}
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="l">
-                                                <a-cascader
-                                                    v-model:value="form[field.name]"
-                                                    :options="field.regionTree"
-                                                    :placeholder="field.placeholder||'请选择村社'"
-                                                    show-search
-                                                     :disabled="field.readOnly"
-                                                    @change="onRegionChange($event,field.name)"
-                                                />
-                                            </div>
-                                            <div class="r">
-                                                <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <div v-else-if="field.type==='SelectField'" class="field-box">
-                                        <div class="l">
-                                            <a-select :mode="field.multiple?'multiple':'default'"
-                                                      :default-value="selectDefValue(field)"
-                                                      v-model:value="form[field.name]"
-                                                      :placeholder="field.placeholder||'请选择'+field.title"
-                                                       :disabled="field.readOnly"
-                                                      show-search>
-                                                <a-select-option :value="optionItem.value" v-for="optionItem in field.items">
-                                                    {{optionItem.text}}
-                                                </a-select-option>
-                                            </a-select>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='RadioField'" class="field-box">
-                                        <div class="l">
-                                            <a-radio-group v-model:value="form[field.name]" @change="onRadioChange($event,field)"
-                                             :disabled="field.readOnly">
-                                                <a-radio :value="radioItem.value"  v-for="radioItem in field.items">
-                                                    {{radioItem.text}}
-                                                </a-radio>
-                                            </a-radio-group>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='CheckboxField'" class="field-box">
-                                        <div class="l">
-                                            <a-checkbox-group v-model:value="form[field.name]"  :disabled="field.readOnly">
-                                                <a-checkbox :value="checkboxItem.value"  v-for="checkboxItem in field.items" @change="onCheckboxChange($event,field)">
-                                                    {{checkboxItem.text}}
-                                                </a-checkbox>
-                                            </a-checkbox-group>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='WeekField'" class="field-box">
-                                        <div class="l">
-                                            <week-select v-model:value="form[field.name]" :placeholder="field.placeholder" :disabled="field.readOnly"></week-select>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='MonthField'" class="field-box">
-                                        <div class="l">
-                                            <a-month-picker v-model:value="form[field.name]" :placeholder="field.placeholder||'请选择月份'" 
-                                            value-format="YYYY-MM" 
-                                            :disabled="field.readOnly" style="width: 100%"/>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='MapRangeField'" class="field-box">
-                                        <div class="l">
-                                           <map-range v-model:value="form[field.name]" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择区域'" ></map-range>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='MoreStringField'">
-                                        <div class="inputs-box" :data-isinit="setMoreStringToArr(field)">
-                                          <transition-group name="slide-fade">
-                                            <div class="inputs-box-item" v-for="(item,key) in form[field.name]" :key="key">
-                                                <template v-if="field.url">
-                                                    <div class="field-box">
-                                                        <div class="l">
-                                                            <div class="more-string-auto-complete-row">
-                                                                <div class="more-string-auto-complete-input">
-                                                                    <a-auto-complete v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[field.name+'.'+key]" @search="onAutoCompleteSearchMoreString($event,field,key)"/>
-                                                                </div>
-                                                                <div class="more-string-auto-complete-rm" @click="removeMoreString(field,key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="r">
-                                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                                <template v-else>
-                                                    <a-input v-model:value="form[field.name][key]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly">
-                                                    <template v-if="!field.readOnly" #addonAfter><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
-                                                    </a-input>
-                                                </template>
-                                                
-                                            </div>
-                                            </transition-group>
-                                        </div>
-                                        <div class="inputs-add-btn-box" v-if="!field.readOnly">
-                                             <plus-outlined class="add-inputs-box-item-icon" @click="addMoreString(field)"></plus-outlined>                                        
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='YearMonthField'" class="field-box">
-                                        <div class="l year-month-field-box">
-                                            <a-input-group compact>
-                                                <a-input-number v-model:value="form[field.name][0]" min="0" max="999" placeholder="输入年数" :disabled="field.readOnly"/>
-                                                <a-input value="年" :disabled="true"/>
-                                                <a-input-number v-model:value="form[field.name][1]" min="0" max="12" placeholder="输入月数" :disabled="field.readOnly"/>
-                                                <a-input value="个月" :disabled="true"/>
-                                            </a-input-group>
-                                        </div>
-                                        <div class="r">
-                                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                                        </div>
-                                    </div>
-                                    <div v-else-if="field.type==='ListField'" >
-                                        <div class="list-field-box">
-                                            <transition-group name="slide-fade">
-                                                <div class="list-field-box-item-box" v-for="(item,key) in form[field.name]" :key="key">
-                                                    <a-divider class="list-field-box-item-divider" dashed></a-divider>
-                                                     <a-form class="list-field-box-item-form" :model="item" :label-col="listFieldLabelCol" :wrapper-col="listFieldWrapperCol" :ref="'listFieldForm'+key">
-                                                       <div class="list-field-box-remove"><close-outlined class="remove-list-field-box-item-icon" @click="removeListField(field,key)"></close-outlined></div>
-                                                       <field-group-item class="list-field-box-item" :group-field-items="field.fields" v-model:form="item"></field-group-item>
-                                                     </a-form>
-                                                </div>
-                                            </transition-group>
-                                        </div>
-                                        <div class="list-field-add-btn-box" v-if="!field.readOnly">
-                                             <plus-outlined class="add-list-field-box-item-icon" @click="addListField(field)"></plus-outlined>                                        
-                                        </div>
-                                    </div>
-                                   <div v-if="field.type==='PasswordField'" class="field-box">
-                                    <div class="l">
-                                        <input type="text" 说明="不填充密码" style="height: 1px;width:1px;padding: 0;border: 0;opacity: 0.01;position: absolute">
-                                        <input type="password" 说明="不填充密码" style="height: 1px;width:1px;padding: 0;border: 0;opacity: 0.01;position: absolute">
-                                        <a-input-password v-model:value="form[field.name]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly"></a-input-password>
-                                    </div>
-                                    <div class="r"><span v-if="field.ext" class="ext-span">{{ field.ext }}</span></div>
-                                    </div>
+                                    <component 
+                                        :is="'VueCurdEdit'+field.type" 
+                                        :field="field" 
+                                        v-model:value="form[field.name]" 
+                                        v-model:validate-status="validateStatus[field.name]" 
+                                        :form="form"
+                                        :list-field-label-col="listFieldLabelCol"
+                                        :list-field-wrapper-col="listFieldWrapperCol"
+                                        :group-field-items="groupFieldItems"
+                                    ></component>
                                 </a-form-item>
                                 </transition>
                             </div>

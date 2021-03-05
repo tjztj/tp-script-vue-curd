@@ -76,6 +76,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
+            'tpls'=>$this->getTplsByFields($fields,'edit')
         ];
     }
 
@@ -132,5 +133,26 @@ trait CurdFunc
         }
         $tplPath=static::getTplPath();
         return $this->fetch($tplPath.$file.'.vue',$data);
+    }
+
+
+    /**
+     * 获取字段相关模板内容
+     * @param FieldCollection $fields
+     * @return array
+     */
+    protected function getTplsByFields(FieldCollection $fields,$type){
+        $return=[];
+        $fields->each(function(ModelField $field)use(&$return,$type){
+            if(isset($return[$field->name()])){
+                return;
+            }
+            if(!in_array($type,['index','show','edit'])){
+                return;
+            }
+            $tpl=$field::getTpl();
+            isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
+        });
+        return $return;
     }
 }

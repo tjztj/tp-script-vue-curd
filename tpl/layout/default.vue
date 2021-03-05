@@ -25,9 +25,9 @@
     </svg>
 </div>
 <div id="app" style="display: none">
-    <a-locale-provider :locale="zhCn()">
+    <a-config-provider :locale="zhCn()">
         {__CONTENT__}
-    </a-locale-provider>
+    </a-config-provider>
     <a-modal
         wrap-class-name="body-iframe-modal"
         :destroy-on-close="true"
