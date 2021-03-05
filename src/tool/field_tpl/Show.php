@@ -11,7 +11,7 @@ class Show
 
     public function __construct(string $fieldType,string $jsUrl)
     {
-        $this->name='VueCurdIndex'.$fieldType;
+        $this->name='VueCurdShow'.$fieldType;
         $this->jsUrl=$jsUrl;
     }
 }

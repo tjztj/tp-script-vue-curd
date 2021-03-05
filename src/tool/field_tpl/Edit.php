@@ -11,7 +11,7 @@ class Edit
 
     public function __construct(string $fieldType,string $jsUrl)
     {
-        $this->name='VueCurdIndex'.$fieldType;
+        $this->name='VueCurdEdit'.$fieldType;
         $this->jsUrl=$jsUrl;
     }
 
