@@ -79,7 +79,7 @@ class MonthField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/month/show.js'),
+            new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/month/edit.js')
         );
     }

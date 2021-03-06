@@ -106,7 +106,7 @@ class SelectField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/select/show.js'),
+            new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/select/edit.js')
         );
     }

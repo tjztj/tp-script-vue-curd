@@ -54,7 +54,7 @@ class StringField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/string/show.js'),
+            new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/string/edit.js')
         );
     }

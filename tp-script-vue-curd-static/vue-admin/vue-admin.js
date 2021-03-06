@@ -474,6 +474,11 @@ define(requires, function ( axios,Qs) {
         app.component('CurdShowField',{
             props:['field','info'],
             name:'CurdShowField',
+            data(){
+                return {
+                    fieldComponents
+                }
+            },
             methods:{
                 showImages(imgs, start){
                     if(parseInt(start)!=start){
@@ -490,34 +495,12 @@ define(requires, function ( axios,Qs) {
                 },
             },
             template:`<div class="curd-show-field-box" :data-name="field.name">
-                            <div v-if="field.type==='ImagesField'">
-                                <div class="img-box">
-                                    <div class="img-box-item" v-for="(vo,key) in info[field.name+'Arr']" @click="showImages(info[field.name+'Arr'],key)">
-                                        <img :src="vo" />
-                                    </div>
-                                </div>
-                                <span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
-                            </div>
-                            <div v-else-if="field.type==='MapRangeField'">
-                                <map-range v-model:value="info[field.name]" :disabled="true"></map-range>
-                            </div>
-                            <div v-else-if="field.type==='MoreStringField'">
-                                <ul class="more-string-box">
-                                    <li class="more-string-item" v-for="(vo,key) in info[field.name+'Arr']">
-                                        {{vo}}<span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div v-else-if="field.type==='ListField'">
-                                <div class="list-field-box">
-                                    <div class="list-field-item" v-for="(vo,key) in info[field.name+'List']">
-                                        <div class="list-field-item-row" v-for="v in field.fields">
-                                            <div class="list-field-item-row-l">{{v.title}}:</div>
-                                            <div class="list-field-item-row-r"><curd-show-field :info="vo" :field="v"></curd-show-field></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                             <component 
+                                v-if="fieldComponents['VueCurdShow'+field.type]"
+                                :is="'VueCurdShow'+field.type" 
+                                :field="field" 
+                                :info="info"
+                            ></component>
                             <div v-else>
                                 <div>{{info[field.name]}}<span class="ext-box" v-if="field.ext">（{{field.ext}}）</span></div>
                             </div>
