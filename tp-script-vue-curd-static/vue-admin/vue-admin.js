@@ -471,6 +471,134 @@ define(requires, function ( axios,Qs) {
         app.component('WeekSelect',{props:['value','placeholder'],setup(props,ctx){let momentVal=null;let isOpen=Vue.ref(false);let format=()=>{if(isOpen.value){return parseTime(props.value,' {y}年')}let week=getLastWeek(props.value);return getMonthWeek(props.value)+'（'+week[0]+' ~ '+week[1]+'）'};if(props.value){if(/^\d+$/g.test(props.value.toString())){momentVal=parseTime(props.value,'{y}-{m}-{d}');props.value=momentVal}else{momentVal=props.value}momentVal=moment(momentVal);momentVal.format=format}return{momentVal:Vue.ref(momentVal),isOpen:isOpen,format}},watch:{value(val){if(!val){this.momentVal=Vue.ref(null);return}let momentVal=moment(val);momentVal.format=this.format;this.momentVal=Vue.ref(momentVal)},},methods:{weekChange(date){this.$emit('update:value',date.weekday(0).format('YYYY-MM-DD'));date.format=()=>{return this.format()}},openWeekChange(status){this.isOpen=status}},template:`<div><a-week-picker v-model:value="momentVal"type="date":placeholder="placeholder||'请选择周'"style="width: 100%;"@change="weekChange"@open-change="openWeekChange"></a-week-picker></div>`,});
 
 
+        app.component('FieldGroupItem',{
+            name:'fieldGroupItem',
+            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol'],
+            setup(props,ctx){
+                return {
+                    formVal:Vue.ref(props.form),
+                    validateStatus:Vue.ref({}),
+                    triggerShowss:Vue.ref({}),
+                }
+            },
+            watch:{
+                formVal:{
+                    handler(formVal){
+                        function arrHave(arr,val){
+                            if(typeof arr==='string'){
+                                arr=arr?[]:arr.split(',')
+                            }
+                            let have=false;
+                            arr.some(selected=>{
+                                if(selected.toString()===val.toString()){
+                                    have=true;
+                                    return true;
+                                }
+                            })
+                            return have;
+                        }
+
+                        this.groupFieldItems.forEach(field=>{
+                            if(field.items&&field.items.length>0){
+                                field.items.map(item=>{
+                                    //忘啦是要干啥的
+                                    if(item.hideFields&&item.hideFields.length>0){
+                                        item.hideFields.map(hideField=>{
+                                            this.triggerShowss[hideField.name]=this.triggerShowss[hideField.name]||{};
+                                            switch (field.type){
+                                                case 'CheckboxField':
+                                                    this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                    break;
+                                                case 'SelectField':
+                                                    if(field.multiple){
+                                                        this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                    }else{
+                                                        this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
+                                                    }
+                                                    break;
+                                                default:
+                                                    this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                        this.$emit('update:form',formVal);
+                    },
+                    immediate:true,
+                    deep: true,
+                }
+            },
+            methods:{
+                ...vueDefMethods,
+                fieldRules(field){
+                    return {
+                        required:this.triggerShows(field.name)&&field.required,
+                        message:field.title+' ， 必填',
+                    }
+                },
+                triggerShows(fieldName){
+                    if(!this.triggerShowss[fieldName]){
+                        return true;
+                    }
+                    for(let k in this.triggerShowss[fieldName]){
+                        if(this.triggerShowss[fieldName][k]===true){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+                async validateListForm() {
+                    //外部调用
+                    let isNotErr = true;
+                    for (const field of this.groupFieldItems) {
+                        if (isNotErr&&field.type === 'ListField') {
+                            for (let i in this.form[field.name]){
+                                if (this.$refs['listFieldForm' + i]) {
+                                    isNotErr=await new Promise(resolve => {
+                                        this.$refs['listFieldForm' + i].validate().then(res=>{
+                                            resolve(true);
+                                        }).catch(error => {
+                                            if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
+                                                antd.message.warning(field.title + ':' + error.errorFields[0].errors[0])
+                                            } else {
+                                                antd.message.warning('请检测' + field.title + '是否填写正确')
+                                            }
+                                            console.log('error', error);
+                                            resolve(false);
+                                        });
+                                    })
+                                }
+                            }
+
+                        }
+                    }
+                    return isNotErr;
+                },
+            },
+            template:`
+                        <div>
+                            <div v-for="field in groupFieldItems" :data-name="field.name">
+                                <transition name="slide-fade">
+                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="field.title" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" class="form-item-row">
+                                    <component 
+                                        :is="'VueCurdEdit'+field.type" 
+                                        :field="field" 
+                                        v-model:value="formVal[field.name]" 
+                                        v-model:validate-status="validateStatus[field.name]" 
+                                        :form="formVal"
+                                        :list-field-label-col="listFieldLabelCol"
+                                        :list-field-wrapper-col="listFieldWrapperCol"
+                                        :group-field-items="groupFieldItems"
+                                    ></component>
+                                </a-form-item>
+                                </transition>
+                            </div>
+                        </div>
+                    `,
+        });
+
         app.component('CurdShowField',{
             props:['field','info'],
             name:'CurdShowField',
@@ -753,10 +881,7 @@ define(requires, function ( axios,Qs) {
         })
 
         for(let componentName in fieldComponents){
-            //这个组件有所不同
-            if(name!=='VueCurdEditListField'){
-                app.component(componentName,typeof require(fieldComponents[componentName])==='function'?require(fieldComponents[componentName])():require(fieldComponents[componentName]))
-            }
+            app.component(componentName,typeof require(fieldComponents[componentName])==='function'?require(fieldComponents[componentName])():require(fieldComponents[componentName]))
         }
         app.mount('#app')
     };
