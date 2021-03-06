@@ -529,13 +529,6 @@ define(requires, function (va) {
             fieldObjs[field.name]=field;
             return formData
         }
-        window.initListField=function(field,data){
-            data=data||{};
-            field.fields.forEach(function(f){
-                data=fieldInit(f,data);
-            })
-            return data;
-        }
         vueData.fields.forEach(function(field){
             form=fieldInit(field,form,true);
         })
@@ -566,104 +559,105 @@ define(requires, function (va) {
         }
 
         let components={};
-        for(let name in fieldComponents){
-            components[name]=require(fieldComponents[name]);
-        }
-
-        return {
-            components: {
-                'field-group-item': {
-                    components,
-                    data(){
-                        return {
-                            fieldObjs:fieldObjs,
-                            validateStatus:validateStatus,
-                            triggerShowss:{},
-                        }
-                    },
-                    name:'fieldGroupItem',
-                    props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol'],
-                    watch:{
-                        form:{
-                            handler(form){
-                                this.groupFieldItems.forEach(field=>{
-                                    if(field.items&&field.items.length>0){
-                                        field.items.map(item=>{
-                                            if(item.hideFields&&item.hideFields.length>0){
-                                                item.hideFields.map(hideField=>{
-                                                    this.triggerShowss[hideField.name]=this.triggerShowss[hideField.name]||{};
-                                                    switch (field.type){
-                                                        case 'CheckboxField':
-                                                            this.triggerShowss[hideField.name][field.name]=arrHave(form[field.name],item.value);
-                                                            break;
-                                                        case 'SelectField':
-                                                            if(field.multiple){
-                                                                this.triggerShowss[hideField.name][field.name]=arrHave(form[field.name],item.value);
-                                                            }else{
-                                                                this.triggerShowss[hideField.name][field.name]=form[field.name]===item.value
-                                                            }
-                                                            break;
-                                                        default:
-                                                            this.triggerShowss[hideField.name][field.name]=form[field.name]===item.value
+        window.fieldGroupItem={
+            components,
+            name:'fieldGroupItem',
+            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol'],
+            setup(props,ctx){
+                return {
+                    formVal:Vue.ref(props.form)
+                }
+            },
+            data(){
+                return {
+                    fieldObjs:fieldObjs,
+                    validateStatus:validateStatus,
+                    triggerShowss:{},
+                }
+            },
+            watch:{
+                formVal:{
+                    handler(formVal){
+                        this.groupFieldItems.forEach(field=>{
+                            if(field.items&&field.items.length>0){
+                                field.items.map(item=>{
+                                    //忘啦是要干啥的
+                                    if(item.hideFields&&item.hideFields.length>0){
+                                        item.hideFields.map(hideField=>{
+                                            this.triggerShowss[hideField.name]=this.triggerShowss[hideField.name]||{};
+                                            switch (field.type){
+                                                case 'CheckboxField':
+                                                    this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                    break;
+                                                case 'SelectField':
+                                                    if(field.multiple){
+                                                        this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                    }else{
+                                                        this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
                                                     }
-                                                })
+                                                    break;
+                                                default:
+                                                    this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
                                             }
                                         })
                                     }
                                 })
-                            },
-                            immediate:true,
-                            deep: true,
+                            }
+                        })
+                        this.$emit('update:form',formVal);
+                    },
+                    immediate:true,
+                    deep: true,
+                }
+            },
+            methods:{
+                ...vueDefMethods,
+                fieldRules(field){
+                    return {
+                        required:this.triggerShows(field.name)&&field.required,
+                        message:field.title+' ， 必填',
+                    }
+                },
+                triggerShows(fieldName){
+                    if(!this.triggerShowss[fieldName]){
+                        return true;
+                    }
+                    for(let k in this.triggerShowss[fieldName]){
+                        if(this.triggerShowss[fieldName][k]===true){
+                            return true;
                         }
-                    },
-                    methods:{
-                        ...vueDefMethods,
-                        fieldRules(field){
-                            return {
-                                required:this.triggerShows(field.name)&&field.required,
-                                message:field.title+' ， 必填',
-                            }
-                        },
-                        triggerShows(fieldName){
-                            if(!this.triggerShowss[fieldName]){
-                                return true;
-                            }
-                            for(let k in this.triggerShowss[fieldName]){
-                                if(this.triggerShowss[fieldName][k]===true){
-                                    return true;
+                    }
+                    return false;
+                },
+                async validateListForm() {
+                    //外部调用
+                    let isNotErr = true;
+                    for (const field of this.groupFieldItems) {
+                        if (isNotErr&&field.type === 'ListField') {
+                            for (let i in this.form[field.name]){
+                                if (this.$refs['listFieldForm' + i]) {
+                                    isNotErr=await new Promise(resolve => {
+                                        this.$refs['listFieldForm' + i].validate().then(res=>{
+                                            resolve(true);
+                                        }).catch(error => {
+                                            if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
+                                                antd.message.warning(field.title + ':' + error.errorFields[0].errors[0])
+                                            } else {
+                                                antd.message.warning('请检测' + field.title + '是否填写正确')
+                                            }
+                                            console.log('error', error);
+                                            resolve(false);
+                                        });
+                                    })
                                 }
                             }
-                            return false;
-                        },
-                        async validateListForm() {
-                            //外部调用
-                            let isNotErr = true;
-                            for (const field of this.groupFieldItems) {
-                                if (isNotErr&&field.type === 'ListField') {
-                                    for (let i in this.form[field.name]){
-                                        if (this.$refs['listFieldForm' + i]) {
-                                            isNotErr=await new Promise(resolve => {
-                                                this.$refs['listFieldForm' + i].validate().then(res=>{
-                                                    resolve(true);
-                                                }).catch(error => {
-                                                    if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
-                                                        antd.message.warning(field.title + ':' + error.errorFields[0].errors[0])
-                                                    } else {
-                                                        antd.message.warning('请检测' + field.title + '是否填写正确')
-                                                    }
-                                                    console.log('error', error);
-                                                    resolve(false);
-                                                });
-                                            })
-                                        }
-                                    }
 
-                                }
-                            }
-                            return isNotErr;
-                        },
-                    },
-                    template:`
+                        }
+                    }
+                    return isNotErr;
+                },
+            },
+            template:`
                         <div>
                             <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
@@ -671,9 +665,9 @@ define(requires, function (va) {
                                     <component 
                                         :is="'VueCurdEdit'+field.type" 
                                         :field="field" 
-                                        v-model:value="form[field.name]" 
+                                        v-model:value="formVal[field.name]" 
                                         v-model:validate-status="validateStatus[field.name]" 
-                                        :form="form"
+                                        :form="formVal"
                                         :list-field-label-col="listFieldLabelCol"
                                         :list-field-wrapper-col="listFieldWrapperCol"
                                         :group-field-items="groupFieldItems"
@@ -683,7 +677,19 @@ define(requires, function (va) {
                             </div>
                         </div>
                     `,
-                }
+        };
+
+
+        for(let name in fieldComponents){
+            if(name==='VueCurdEditListField'){
+                components[name]=require(fieldComponents[name])(fieldGroupItem,components);
+            }else{
+                components[name]=require(fieldComponents[name]);
+            }
+        }
+        return {
+            components: {
+                'field-group-item':fieldGroupItem
             },
             data() {
                 return {
