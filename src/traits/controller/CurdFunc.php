@@ -46,6 +46,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
+            'tpls'=>$this->getTplsByFields($this->fields,'show'),
         ]));
     }
 
@@ -136,9 +137,11 @@ trait CurdFunc
     }
 
 
+
     /**
      * 获取字段相关模板内容
      * @param FieldCollection $fields
+     * @param $type
      * @return array
      */
     protected function getTplsByFields(FieldCollection $fields,$type){
@@ -152,6 +155,12 @@ trait CurdFunc
             }
             $tpl=$field::getTpl();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
+            if($field->getType()==='ListField'){
+                foreach ($this->getTplsByFields($field->fields(),$type) as $k=>$v){
+                    $return[$field->name().'['.$k.']']=$v;
+                }
+                $return=array_merge($return,);
+            }
         });
         return $return;
     }

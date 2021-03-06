@@ -99,7 +99,8 @@ trait Curd
                 'del'=>true,
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
-            ]
+            ],
+            'tpls'=>$this->getTplsByFields($this->fields->listShowItems(),'index'),
         ]);
 
         return $this->showTpl('index',$data);
