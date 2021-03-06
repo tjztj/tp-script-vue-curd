@@ -1,38 +1,35 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        setup(props,ctx){
-            let dateDefaultValue=Vue.ref(null);
-            if(props.value){
-                if(/^\-?\d+$/g.test(props.value.toString())){
-                    //时间戳
-                    dateDefaultValue.value=parseTime(props.value,'{y}-{m}-{d}');
-                    props.value=dateDefaultValue.value;
-                    //TODO::测试代码是否有效
-                    this.$emit('update:value',dateDefaultValue.value);
-                }else{
-                    dateDefaultValue.value=value;
-                }
-                dateDefaultValue.value=moment(dateDefaultValue.value);
-            }
-            return {
-                dateDefaultValue
-            }
-        },
-        methods:{
-            dateChange(date){
-                this.$emit('update:value',date.format('YYYY-MM-DD'));
+        computed:{
+            dateDefaultValue:{
+                get(){
+                    if(!this.value){
+                        return null;
+                    }
+                    let val='';
+                    if(/^\-?\d+$/g.test(this.value.toString())){
+                        //时间戳
+                        val=parseTime(this.value,'{y}-{m}-{d}');
+                        this.$emit('update:value',val);
+                    }else{
+                        val=this.value;
+                    }
+                    return moment(val);
+                },
+                set(val){
+                    this.$emit('update:value',val.format('YYYY-MM-DD'));
+                },
             },
         },
         template:`<div class="field-box">
                     <div class="l">
                         <a-date-picker
-                            v-model:value="field.dateDefaultValue"
+                            v-model:value="dateDefaultValue"
                             type="date"
                             :placeholder="field.placeholder||'请选择日期'"
                              :disabled="field.readOnly"
                             style="width: 100%;"
-                            @change="dateChange"
                         />
                     </div>
                     <div class="r">

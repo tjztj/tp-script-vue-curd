@@ -26,6 +26,7 @@ use think\model\concern\SoftDelete;
 class TimeModel extends Model
 {
 
+    protected $readonly = ['create_time'];
     /**
      * 自动时间戳类型
      * @var string

@@ -1,24 +1,27 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        setup(props,ctx){
-            //todo
-            props.value=props.value?props.value.split(','):[];
-            return {};
-        },
-        methods:{
-            selectDefValue(){
-                if(this.field.multiple&&typeof this.value==='string'){
-                    return this.value?this.value.split(','):[];
+        computed:{
+            val:{
+                get(){
+                    if(this.field.multiple){
+                        if(typeof this.val==='string'||typeof this.val==='number'){
+                            return this.value.toString.split(',');
+                        }
+                        return [];
+                    }
+                    return this.value;
+                },
+                set(val){
+                    this.$emit('update:value', typeof val==='object'?val.join(','):val);
                 }
-                return this.value;
-            },
+            }
         },
         template:`<div class="field-box">
                     <div class="l">
                         <a-select :mode="field.multiple?'multiple':'default'"
-                                  :default-value="selectDefValue(field)"
-                                  v-model:value="value"
+                                  :default-value="val"
+                                  v-model:value="val"
                                   :placeholder="field.placeholder||'请选择'+field.title"
                                    :disabled="field.readOnly"
                                   show-search>

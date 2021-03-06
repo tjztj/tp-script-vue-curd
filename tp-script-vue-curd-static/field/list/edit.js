@@ -1,37 +1,56 @@
-define([],function(){
-    return {
-        props:['field','value','validateStatus','listFieldLabelCol','listFieldWrapperCol','groupFieldItems'],
-        setup(props,ctx){
-            //todo
+define([], function () {
+    function initListField(field,data){
+        data=data||{};
+        field.fields.forEach(function(f){
+            data=fieldInit(f,data);
+        })
+        return data;
+    };
 
-            let listFieldObjs={};
-            if(props.value){
-                let lists=JSON.parse(props.value);
-                for(let n in lists){
-                    listFieldObjs[window.guid()]=initListField(props.field,lists[n]);
+
+    return function (fieldGroupItem, components) {
+        return {
+            components: {
+                'field-group-item': fieldGroupItem
+            },
+            props: ['field', 'value', 'validateStatus', 'listFieldLabelCol', 'listFieldWrapperCol', 'groupFieldItems'],
+            setup(props,ctx){
+                const listFieldObjs = {};
+                if (props.value) {
+                    let lists = JSON.parse(props.value);
+                    for (let n in lists) {
+                        listFieldObjs[window.guid()]=initListField(props.field, lists[n]);
+                    }
+                } else {
+                    listFieldObjs[window.guid()]=initListField(props.field);
                 }
-            }else{
-                listFieldObjs[window.guid()]=initListField(props.field);
-            }
-            props.value=listFieldObjs;
+                return {
+                    listFieldObjs:Vue.ref(listFieldObjs)
+                }
+            },
+            watch: {
+                listFieldObjs:{
+                    handler(listFieldObjs) {
+                        this.$emit('update:value', JSON.stringify(listFieldObjs));
+                    },
+                    deep: true,
+                    immediate: true,
+                }
+            },
+            methods: {
+                addListField() {
+                    this.listFieldObjs[window.guid()]=initListField(this.field);
+                },
+                removeListField(key) {
+                    delete this.listFieldObjs[key];
+                },
+            },
 
 
-          return {};
-        },
-        methods:{
-            addListField(){
-                //todo
-                this.value[window.guid()]=initListField(field);
-            },
-            removeListField(key){
-                //todo
-                delete this.value[key];
-            },
-        },
-        template:`<div>
+            template: `<div>
                     <div class="list-field-box">
                         <transition-group name="slide-fade">
-                            <div class="list-field-box-item-box" v-for="(item,key) in value" :key="key">
+                            <div class="list-field-box-item-box" v-for="(item,key) in listFieldObjs" :key="key">
                                 <a-divider class="list-field-box-item-divider" dashed></a-divider>
                                  <a-form class="list-field-box-item-form" :model="item" :label-col="listFieldLabelCol" :wrapper-col="listFieldWrapperCol" :ref="'listFieldForm'+key">
                                    <div class="list-field-box-remove"><close-outlined class="remove-list-field-box-item-icon" @click="removeListField(key)"></close-outlined></div>
@@ -44,5 +63,6 @@ define([],function(){
                          <plus-outlined class="add-list-field-box-item-icon" @click="addListField"></plus-outlined>                                        
                     </div>
                 </div>`,
+        }
     }
 });

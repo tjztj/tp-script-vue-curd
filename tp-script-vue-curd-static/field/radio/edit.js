@@ -1,14 +1,19 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        methods:{
-            onRadioChange(e){
-
-            },
+        computed:{
+            val:{
+                get(){
+                    return this.value
+                },
+                set(val){
+                    this.$emit('update:value', val);
+                }
+            }
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-radio-group v-model:value="value" @change="onRadioChange"
+                        <a-radio-group v-model:value="val"
                          :disabled="field.readOnly">
                             <a-radio :value="radioItem.value"  v-for="radioItem in field.items">
                                 {{radioItem.text}}

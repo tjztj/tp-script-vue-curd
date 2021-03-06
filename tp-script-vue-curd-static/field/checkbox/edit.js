@@ -1,22 +1,26 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        setup(props,ctx){
-            if(props.field.multiple){
-                //todo
-                props.value=props.value?props.value.split(','):[];
+        data(){
+            return {
+                modelVal:[],
             }
-            return {};
         },
-        methods:{
-            onCheckboxChange(e){
-
+        watch:{
+            value:{
+                handler(value){
+                    this.modelVal=value?value.split(','):[];
+                },
+                immediate:true,
+            },
+            modelVal(val){
+                this.$emit('update:value',val.join(','));
             },
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-checkbox-group v-model:value="value"  :disabled="field.readOnly">
-                            <a-checkbox :value="checkboxItem.value"  v-for="checkboxItem in field.items" @change="onCheckboxChange">
+                        <a-checkbox-group v-model:value="modelVal"  :disabled="field.readOnly">
+                            <a-checkbox :value="checkboxItem.value"  v-for="checkboxItem in field.items">
                                 {{checkboxItem.text}}
                             </a-checkbox>
                         </a-checkbox-group>

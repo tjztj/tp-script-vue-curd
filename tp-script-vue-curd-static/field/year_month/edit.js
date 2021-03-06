@@ -3,19 +3,37 @@ define([],function(){
         props:['field','value','validateStatus'],
         setup(props,ctx){
             //todo
+            let val;
             if(props.value){
-                props.value=[Math.floor(props.value/12),props.value%12];
+                val=[Math.floor(props.value/12),props.value%12];
             }else{
-                props.value=['',''];
+                val=['',''];
             }
-            return {};
+
+            val=Vue.ref(val);
+
+            Vue.watch(val,function(val){
+                let value=0;
+                if(val[0]){
+                    value+=val[0]*12;
+                }
+                if(val[1]){
+                    value+=parseInt(val[1]);
+                }
+                ctx.emit('update:value', value.toString());
+            },{
+                deep:true
+            })
+
+
+            return {val};
         },
         template:`<div class="field-box">
                    <div class="l year-month-field-box">
                         <a-input-group compact>
-                            <a-input-number v-model:value="value[0]" min="0" max="999" placeholder="输入年数" :disabled="field.readOnly"/>
+                            <a-input-number v-model:value="val[0]" min="0" max="999" placeholder="输入年数" :disabled="field.readOnly"/>
                             <a-input value="年" :disabled="true"/>
-                            <a-input-number v-model:value="value[1]" min="0" max="12" placeholder="输入月数" :disabled="field.readOnly"/>
+                            <a-input-number v-model:value="val[1]" min="0" max="12" placeholder="输入月数" :disabled="field.readOnly"/>
                             <a-input value="个月" :disabled="true"/>
                         </a-input-group>
                     </div>
