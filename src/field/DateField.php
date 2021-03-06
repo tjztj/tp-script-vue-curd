@@ -79,7 +79,7 @@ class DateField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/date/index.js'),
+            new Index($type,''),
             new Show($type,'/tp-script-vue-curd-static.php?field/date/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/date/edit.js')
         );

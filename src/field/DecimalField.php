@@ -113,7 +113,7 @@ class DecimalField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/decimal/index.js'),
+            new Index($type,''),
             new Show($type,'/tp-script-vue-curd-static.php?field/decimal/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/decimal/edit.js')
         );

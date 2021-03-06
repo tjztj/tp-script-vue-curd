@@ -85,7 +85,7 @@ class RadioField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/radio/index.js'),
+            new Index($type,''),
             new Show($type,'/tp-script-vue-curd-static.php?field/radio/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/radio/edit.js')
         );

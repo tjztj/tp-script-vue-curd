@@ -529,7 +529,7 @@ define(requires, function ( axios,Qs) {
             props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel'],
             setup(props,ctx){
                 const listColumns=props.listColumns;
-                let groupTitles=[],columns=[],titleItems={},columnsCount=0;
+                let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={};
                 for(let groupTtitle in listColumns){
                     groupTitles.push(groupTtitle);
                     let column={title:groupTtitle,children:[]};
@@ -542,15 +542,15 @@ define(requires, function ( axios,Qs) {
                             slots:{title:customTitle},
                             ellipsis:true,
                         };
+                        if(fieldComponents['VueCurdIndex'+item.type]){
+                            listFieldComponents[item.name]=item;
+                            col.slots.customRender='field-component-'+item.name;
+                        }else{
+                            col.slots.customRender='default-value';
+                        }
+
                         if(item.listColumnWidth){
                             col.width=item.listColumnWidth;
-                        }
-                        switch (item.type){
-                            case 'ImagesField':
-                                col.slots.customRender='images';
-                                break;
-                            default:
-                                col.slots.customRender='default-value';
                         }
                         columnsCount++;
                         column.children.push(col);
@@ -666,7 +666,8 @@ define(requires, function ( axios,Qs) {
                     titleItems,
                     scrollX,
                     scrollY,
-                    id
+                    id,
+                    listFieldComponents
                 }
             },
             watch: {
@@ -686,9 +687,6 @@ define(requires, function ( axios,Qs) {
                 },
                 openChildList(row,modelInfo){
                     this.$emit('openChildList',row,modelInfo)
-                },
-                showImages(imgs, start){
-                    window.top.showImages(imgs, start);
                 },
                 onDelete(row){
                     this.$emit('onDelete',row)
@@ -713,14 +711,15 @@ define(requires, function ( axios,Qs) {
                                 </div>
                             </template>
                             
-                            <template #images="{text:val}">
-                                <a-tooltip placement="topLeft" v-if="val">
-                                    <template #title>查看图片</template>
-                                    <a @click="showImages(val)"><file-image-outlined></file-image-outlined> 查看</a>
-                                </a-tooltip>
-                                <span v-else style="color: #f0f0f0">无</span>
-                            </template>
                             
+                             <template #['field-component-'+item.name]="record" v-for="item in listFieldComponents">
+                                 <component 
+                                        :is="'VueCurdIndex'+item.type" 
+                                        :field="item" 
+                                        :record="record"
+                                    ></component>
+                             </template>
+                             
                               <template #default-value="{text:val}">
                                 <a-tooltip placement="topLeft">
                                     <template #title>{{val}}</template>
@@ -773,7 +772,7 @@ define(requires, function ( axios,Qs) {
         for(let componentName in fieldComponents){
             //这个组件有所不同
             if(name!=='VueCurdEditListField'){
-                app.component(componentName,require(fieldComponents[componentName]))
+                app.component(componentName,typeof require(fieldComponents[componentName])==='function'?require(fieldComponents[componentName])():require(fieldComponents[componentName]))
             }
         }
         app.mount('#app')
