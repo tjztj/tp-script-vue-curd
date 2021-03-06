@@ -1,7 +1,18 @@
 /**
  * tj 1079798840@qq.com
  */
-define(['axios','qs'], function ( axios,Qs) {
+const requires=['axios','qs'];
+window.fieldComponents={};
+if(vueData.fieldComponents){
+    for(let i in vueData.fieldComponents){
+        let v=vueData.fieldComponents[i];
+        if(v.jsUrl){
+            requires.push(v.jsUrl)
+            fieldComponents[v.name]=v.jsUrl;
+        }
+    }
+}
+define(requires, function ( axios,Qs) {
     /****
      * 自定义Promise
      * @param func
@@ -758,6 +769,13 @@ define(['axios','qs'], function ( axios,Qs) {
                         </a-table>
                     </div>`,
         })
+
+        for(let componentName in fieldComponents){
+            //这个组件有所不同
+            if(name!=='VueCurdEditListField'){
+                app.component(componentName,require(fieldComponents[componentName]))
+            }
+        }
         app.mount('#app')
     };
 });

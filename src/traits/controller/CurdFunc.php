@@ -46,7 +46,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
-            'tpls'=>$this->getTplsByFields($this->fields,'show'),
+            'fieldComponents'=>$this->getComponentsByFields($this->fields,'show'),
         ]));
     }
 
@@ -77,7 +77,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
-            'tpls'=>$this->getTplsByFields($fields,'edit')
+            'fieldComponents'=>$this->getComponentsByFields($fields,'edit')
         ];
     }
 
@@ -144,7 +144,7 @@ trait CurdFunc
      * @param $type
      * @return array
      */
-    protected function getTplsByFields(FieldCollection $fields,$type){
+    protected function getComponentsByFields(FieldCollection $fields,$type){
         $return=[];
         $fields->each(function(ModelField $field)use(&$return,$type){
             if(isset($return[$field->name()])){
@@ -156,7 +156,7 @@ trait CurdFunc
             $tpl=$field::getTpl();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
             if($field->getType()==='ListField'){
-                foreach ($this->getTplsByFields($field->fields(),$type) as $k=>$v){
+                foreach ($this->getComponentsByFields($field->fields(),$type) as $k=>$v){
                     $return[$field->name().'['.$k.']']=$v;
                 }
                 $return=array_merge($return,);

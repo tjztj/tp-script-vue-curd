@@ -100,7 +100,7 @@ trait Curd
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
             ],
-            'tpls'=>$this->getTplsByFields($this->fields->listShowItems(),'index'),
+            'fieldComponents'=>$this->getComponentsByFields($this->fields->listShowItems(),'index'),
         ]);
 
         return $this->showTpl('index',$data);

@@ -75,7 +75,7 @@ trait CurdChild{
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
             ],
-            'tpls'=>$this->getTplsByFields($this->fields->listShowItems(),'index'),
+            'fieldComponents'=>$this->getComponentsByFields($this->fields->listShowItems(),'index'),
         ]));
     }
 

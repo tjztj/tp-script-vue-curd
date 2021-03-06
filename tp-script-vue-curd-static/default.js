@@ -1,15 +1,4 @@
-const requires=['vueAdmin'];
-const fieldComponents={};
-if(vueData.tpls){
-    for(let i in vueData.tpls){
-        let v=vueData.tpls[i];
-        if(v.jsUrl){
-            requires.push(v.jsUrl)
-            fieldComponents[v.name]=v.jsUrl;
-        }
-    }
-}
-define(requires, function (va) {
+define(['vueAdmin'], function (va) {
     let actions = {};
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -679,13 +668,9 @@ define(requires, function (va) {
                     `,
         };
 
-
-        for(let name in fieldComponents){
-            if(name==='VueCurdEditListField'){
-                components[name]=require(fieldComponents[name])(fieldGroupItem,components);
-            }else{
-                components[name]=require(fieldComponents[name]);
-            }
+        //这个组件有所不同
+        if(fieldComponents['VueCurdEditListField']){
+            components['VueCurdEditListField']=require(fieldComponents['VueCurdEditListField'])(fieldGroupItem,components)
         }
         return {
             components: {
