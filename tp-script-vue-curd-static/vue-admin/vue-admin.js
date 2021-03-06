@@ -12,6 +12,12 @@ if(vueData.fieldComponents){
         }
     }
 }
+if(vueData.filterComponents){
+    for(let i in vueData.filterComponents){
+        requires.push(vueData.filterComponents[i])
+    }
+}
+
 define(requires, function ( axios,Qs) {
     /****
      * 自定义Promise

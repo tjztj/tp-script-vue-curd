@@ -111,4 +111,9 @@ class DateFilter extends ModelFilter
             $query->whereBetween($this->field->name(),[\tpScriptVueCurd\tool\Time::dateToUnixtime($value['start']),\tpScriptVueCurd\tool\Time::dateToUnixtime($value['end'].' 23:59:59')]);
         }
     }
+
+
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/date.js';
+    }
 }

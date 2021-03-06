@@ -49,7 +49,7 @@ class StringField extends ModelField
         $excelFieldTpl->width=22;
     }
 
-    public static function getTpl(): FieldTpl
+    public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,

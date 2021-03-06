@@ -30,4 +30,8 @@ class RegionFilter extends ModelFilter
             $query->where($this->field->name(),$value);
         }
     }
+
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/region.js';
+    }
 }

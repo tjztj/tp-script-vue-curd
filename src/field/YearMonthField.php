@@ -123,7 +123,7 @@ class YearMonthField extends ModelField
         $excelFieldTpl->isText=true;
     }
 
-    public static function getTpl(): FieldTpl
+    public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,

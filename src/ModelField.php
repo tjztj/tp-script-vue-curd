@@ -401,6 +401,6 @@ abstract class ModelField
      * 字段模板配置
      * @return FieldTpl
      */
-    abstract public static function getTpl():FieldTpl;
+    abstract public static function componentUrl():FieldTpl;
 
 }

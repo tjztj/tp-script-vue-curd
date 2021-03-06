@@ -153,7 +153,7 @@ trait CurdFunc
             if(!in_array($type,['index','show','edit'])){
                 return;
             }
-            $tpl=$field::getTpl();
+            $tpl=$field::componentUrl();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
             if($field->getType()==='ListField'){
                 foreach ($this->getComponentsByFields($field->fields(),$type) as $k=>$v){
@@ -163,5 +163,18 @@ trait CurdFunc
             }
         });
         return $return;
+    }
+
+    /**
+     * 筛选组件地址
+     * @param FieldCollection $fields
+     * @return array
+     */
+    protected function getFilterCommonentsByFields(FieldCollection $fields){
+        $return=[];
+        $fields->each(function(ModelField $field)use(&$return){
+            $return[$field->filter()->getType()]=$field->filter()::componentUrl();
+        });
+        return array_filter($return);
     }
 }

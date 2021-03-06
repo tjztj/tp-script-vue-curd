@@ -54,4 +54,8 @@ class YearMonthFilter extends ModelFilter
             $query->whereBetween($this->field->name(),[$value['start'],$value['end']]);
         }
     }
+
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/year_month.js';
+    }
 }

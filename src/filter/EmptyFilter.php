@@ -21,4 +21,8 @@ class EmptyFilter extends ModelFilter
         return [];
     }
     public function generateWhere(Query $query,$value):void{}
+
+    static public function componentUrl():string{
+        return '';
+    }
 }

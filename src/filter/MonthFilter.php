@@ -63,5 +63,8 @@ class MonthFilter extends ModelFilter
         empty($value['end'])||$query->where($this->field->name(),'<=',\tpScriptVueCurd\tool\Time::dateToUnixtime($value['end'].'-01 +1 month')-1);
     }
 
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/month.js';
+    }
 
 }

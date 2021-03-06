@@ -86,4 +86,10 @@ abstract class ModelFilter
      * @param $value
      */
     abstract public function generateWhere(Query $query,$value):void;
+
+    /**
+     * 组件地址
+     * @return string
+     */
+    abstract static public function componentUrl():string;
 }

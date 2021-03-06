@@ -56,4 +56,8 @@ class BetweenFilter extends ModelFilter
         }
     }
 
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/between.js';
+    }
+
 }

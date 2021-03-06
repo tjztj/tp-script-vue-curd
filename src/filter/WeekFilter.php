@@ -70,4 +70,8 @@ class WeekFilter extends ModelFilter
         $w=\tpScriptVueCurd\tool\Time::unixtimeToDate('w',$time);
         return $time - (($w?:7) - 1) * 24 * 3600;
     }
+
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/week.js';
+    }
 }

@@ -106,7 +106,7 @@ class CheckboxField extends ModelField
         }
     }
 
-    public static function getTpl(): FieldTpl
+    public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,

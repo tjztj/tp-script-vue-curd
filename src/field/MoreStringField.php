@@ -87,7 +87,7 @@ class MoreStringField extends ModelField
         $excelFieldTpl->explain='多个请用‘'.$this->separate().'’隔开';
     }
 
-    public static function getTpl(): FieldTpl
+    public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,

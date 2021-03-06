@@ -87,7 +87,7 @@ class ImagesField extends ModelField
         $save[$name]=empty($save[$name])?'':implode('|',array_map(fn($vo)=>str_replace(public_path(), request()->domain().DIRECTORY_SEPARATOR, $vo),$save[$name]));
     }
 
-    public static function getTpl(): FieldTpl
+    public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,

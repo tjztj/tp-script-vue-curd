@@ -64,4 +64,8 @@ class RadioFilter extends ModelFilter
         }
     }
 
+    static public function componentUrl():string{
+        return '/tp-script-vue-curd-static.php?filter/radio.js';
+    }
+
 }
