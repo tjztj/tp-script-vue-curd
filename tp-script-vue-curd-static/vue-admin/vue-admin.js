@@ -868,7 +868,7 @@ define(requires, function ( axios,Qs) {
                                        
                                         <template v-for="vo in childs">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openChildList(record,vo)">{{vo.listBtn}}</a>
+                                            <a @click="openChildList(record,vo)" style="color: #d46b08">{{vo.listBtn}}</a>
                                         </template>
                                     </slot>
                                      <slot name="do-after" :record="record">
