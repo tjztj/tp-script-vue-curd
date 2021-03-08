@@ -541,21 +541,10 @@ define(requires, function ( axios,Qs) {
                 ...vueDefMethods,
                 fieldRules(field){
                     const required=this.triggerShows(field.name)&&field.required;
-
-                    const option={
+                    return {
                         required,
                         message:field.title+' ， 必填',
                     };
-
-                    if(required){
-                        let type='string';
-                        if(field.type==='RegionField'){
-                            type='array'
-                        }
-                        option.type=type;
-                    }
-
-                    return option;
                 },
                 triggerShows(fieldName){
                     if(!this.triggerShowss[fieldName]){
