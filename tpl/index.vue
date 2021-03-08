@@ -159,7 +159,14 @@
 {block name="style"}{/block}
 <div class="box">
 <div class="head" v-if="showFilter">
-    <curd-filter ref="filter" :filter-config="filterBase.filterConfig" :name="filterBase.name" :class="filterBase.class" :title="filterBase.title" :childs="childs" :filter-values="filterBase.filterValues" :loading="loading"></curd-filter>
+    <curd-filter ref="filter"
+                 @search="doFilter"
+                 :filter-config="filterBase.filterConfig"
+                 :name="filterBase.name" :class="filterBase.class"
+                 :title="filterBase.title"
+                 :childs="childs"
+                 :filter-values="filterBase.filterValues"
+                 :loading="loading"></curd-filter>
 </div>
 <div class="body">
     <div class="ant-pro-table-list-toolbar" v-if="showTableTool">
