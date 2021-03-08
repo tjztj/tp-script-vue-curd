@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use tpScriptVueCurd\base\controller\BaseChildController;
+use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\db\Query;
@@ -45,6 +47,29 @@ trait Curd
                     $this->indexListWhere($query);
                 })
                 ->where($this->fields->getFilterWhere())
+                ->where(function(Query $query){
+                    $childFilterData=$this->request->param('childFilterData');
+                    if($childFilterData){
+                        $childFilterData=json_decode($childFilterData,true);
+                    }
+                    if(empty($childFilterData)){
+                        return [];
+                    }
+                    if(static::type()==='base_have_child'){
+                        foreach (static::childModelObjs() as $childModel){
+                            /**
+                             * @var BaseChildModel $childModel
+                             */
+                            $type=class_basename($childModel);
+                            if(!empty($childFilterData[$type])){
+                                $sql=$childModel->where($childModel->fields()->getFilterWhere($childFilterData[$type]))->field($childModel::parentField())->buildSql();
+                                if($sql!==$childModel->field($childModel::parentField())->buildSql()){
+                                    $query->whereRaw('id IN '.$sql);
+                                }
+                            }
+                        }
+                    }
+                })
                 ->order($order);
 
 

@@ -28,327 +28,37 @@ define(['vueAdmin'], function (va) {
 
     actions.index=function(){
         return {
-            components:{
-                'filter-item':{
-                    data(){
-                        return {
-                            activeItemIndex:null,
-                            inputGroup:{
-                                start:'',
-                                end:'',
-                                separator:'',
-                            },
-                            inputValue:'',
-                            radioValue:'',
-                            range:[],
-                            regionValue:[],
-                            selectValue:null,
-                        }
-                    },
-                    props:['config','filterItem'],
-                    watch:{
-                        activeItemIndex(val){
-                            if(val===null){
-                                this.filterItem.activeValue=null;
-                            }else if(val===-1){
-                                if(this.filterItem.type==='DateFilter'){
-                                    this.filterItem.activeValue={
-                                        start:this.range[0].format('YYYY-MM-DD'),
-                                        end:this.range[1].format('YYYY-MM-DD'),
-                                    }
-                                }else if(this.filterItem.type==='MonthFilter'){
-                                    this.filterItem.activeValue={
-                                        start:this.range[0].format('YYYY-MM'),
-                                        end:this.range[1].format('YYYY-MM'),
-                                    }
-                                }else{
-                                    this.filterItem.activeValue={
-                                        start:this.inputGroup.start,
-                                        end:this.inputGroup.end,
-                                    }
-                                }
-                            }else{
-                                if(typeof this.filterItem.items[val]==='string'){
-                                    this.filterItem.activeValue=this.filterItem.items[val]
-                                }else if(this.filterItem.type==='RadioFilter'){
-                                    this.filterItem.activeValue=this.filterItem.items[val].value;
-                                }else{
-                                    this.filterItem.activeValue={
-                                        start:this.filterItem.items[val].start,
-                                        end:this.filterItem.items[val].end,
-                                    }
-                                }
-                            }
-                            this.search();
-                        }
-                    },
-                    mounted() {
-                        if(this.filterItem.type == 'RegionFilter' && this.filterItem.regionTree.length===1  && this.filterItem.regionTree[0]['children'].length===1){
-                            this.regionValue=[this.filterItem.regionTree[0]['id'],this.filterItem.regionTree[0]['children'][0]['id']];
-                        }
-                    },
-                    methods:{
-                        setActive(itemIndex){
-                            this.activeItemIndex=itemIndex;
-                            if(itemIndex===null){
-                                this.inputGroup.start='';
-                                this.inputGroup.end='';
-                                this.range=[];
-                            }else if(itemIndex!==-1){
-                                if(this.filterItem.type==='DateFilter'){
-                                    this.range=[moment(this.filterItem.items[itemIndex].start),moment(this.filterItem.items[itemIndex].end)];
-                                }else if(this.filterItem.type==='MonthFilter'){
-                                    this.range=[moment(this.filterItem.items[itemIndex].start),moment(this.filterItem.items[itemIndex].end)];
-                                }else{
-                                    this.inputGroup.start=this.filterItem.items[itemIndex].start;
-                                    this.inputGroup.end=this.filterItem.items[itemIndex].end;
-                                }
-                            }
-                        },
-                        onInputGroupSearch(){
-                            if(this.inputGroup.start===''&&this.inputGroup.end===''){
-                                this.setActive(null);
-                                return;
-                            }
-                            this.setActive(-1);
-                        },
-                        onInputValueSearch(value){
-                            if(typeof value==="string"){
-                                this.inputValue=value;
-                            }
-                            this.filterItem.activeValue=this.inputValue;
-                            this.search();
-                        },
-                        onRangeSearch(){
-                            if(this.range[0]||this.range[1]){
-                                this.setActive(-1);
-                            }else{
-                                this.setActive(null);
-                            }
-                        },
-                        onRegionChange(){
-                            if(this.regionValue[1]){
-                                this.filterItem.activeValue=this.regionValue[1];
-                            }else if(this.regionValue[0]){
-                                this.filterItem.activeValue=this.regionValue[0];
-                            }else{
-                                this.filterItem.activeValue=null;
-                            }
-
-                            this.search();
-                        },
-                        search(){
-                            this.$emit('search')
-                        },
-                        filterOption(input, option) {
-                            return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
-                        },
-                    },
-                    template:`<div class="filter-item">
-                    <div class="filter-item-l">{{filterItem.title}}</div>
-                    <div class="filter-item-r">
-                        <div v-if="filterItem.type=='BetweenFilter'">
-                            <div class="filter-item-check-item" @click="setActive(null)" :class="{active:activeItemIndex===null}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="setActive(key)" :class="{active:key===activeItemIndex}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                            <div class="filter-item-check-item filter-item-input-group" :class="{active:activeItemIndex===-1}">
-                                <a-input-group compact size="small">
-                                      <a-input
-                                        v-model:value="inputGroup.start"
-                                        style="width: 80px; text-align: center"
-                                        placeholder="开始值"
-                                      />
-                                      <a-input
-                                        v-model:value="inputGroup.separator"
-                                        style=" width: 30px; border-left: 0; pointer-events: none; backgroundColor: #fff"
-                                        placeholder="~"
-                                        disabled
-                                      />
-                                      <a-input
-                                        v-model:value="inputGroup.end"
-                                        style="width: 80px; text-align: center; border-left: 0"
-                                        placeholder="结束值"/>
-                                        <a-button @click="onInputGroupSearch" size="small">确定</a-button>
-                                    </a-input-group>
-                            </div>
-                        </div>
-                        <div v-else-if="filterItem.type=='RadioFilter'">
-                            <div class="filter-item-check-item" @click="setActive(null)" :class="{active:activeItemIndex===null}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="setActive(key)" :class="{active:key===activeItemIndex}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                        </div>
-                         <div v-else-if="filterItem.type=='ValueFilter'||filterItem.type=='LikeFilter'">
-                             <div class="input-value-div">
-                                 <a-input-group compact size="small">
-                                    <a-input v-model:value="inputValue" style="max-width: 188px" :placeholder="'填写 '+filterItem.title+(filterItem.type=='ValueFilter'?' 信息':' 关键字')"/>
-                                    <a-button @click="onInputValueSearch" size="small">确定</a-button>
-                                 </a-input-group>
-                            </div>
-                         </div>
-                         <div v-else-if="filterItem.type=='DateFilter'">
-                            <div class="filter-item-check-item" @click="setActive(null)" :class="{active:activeItemIndex===null}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="setActive(key)" :class="{active:key===activeItemIndex}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                             <div class="filter-item-check-item filter-item-input-group" :class="{active:activeItemIndex===-1}">
-                                 <a-input-group compact size="small">
-                                    <a-range-picker
-                                      style="width: 210px"
-                                        v-model:value="range"
-                                        :placeholder="['开始日期', '结束日期']"
-                                      />
-                                       <a-button @click="onRangeSearch" size="small">确定</a-button>
-                                 </a-input-group>
-                             </div>
-                         </div>
-                         <div v-else-if="filterItem.type=='RegionFilter'">
-                             <div class="region-value-div">
-                                <a-cascader
-                                    v-model:value="regionValue"
-                                    :options="filterItem.regionTree"
-                                    placeholder="请选择村社"
-                                    show-search
-                                    size="small"
-                                     change-on-select
-                                    @change="onRegionChange"
-                                />
-                             </div>
-                        </div>
-                        <div v-else-if="filterItem.type=='SelectFilter'">
-                             <div class="region-value-div">
-                              <a-input-group compact size="small">
-                                     <a-select style="width: 210px" 
-                                              v-model:value="inputValue"
-                                              allow-clear
-                                              show-search 
-                                              :filter-option="filterOption">
-                                              <a-select-option value="">
-                                              <span style="color: rgba(0,0,0,.35);">全部</span>
-                                            </a-select-option>
-                                            <a-select-option :value="optionItem.value" v-for="optionItem in filterItem.items" :title="optionItem.title">
-                                                {{optionItem.title}}
-                                            </a-select-option>
-                                    </a-select>
-                                     <a-button @click="onInputValueSearch" size="small">确定</a-button>
-                                 </a-input-group>
-                             </div>
-                        </div>
-                        <div v-else-if="filterItem.type=='WeekFilter'">
-                             <div class="filter-item-check-item" @click="onInputValueSearch('')" :class="{active:inputValue===''}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="onInputValueSearch(vo.value)" :class="{active:vo.value===inputValue}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                             <div class="filter-item-check-item filter-item-input-group" :class="{active:activeItemIndex===-1}">
-                                 <a-input-group compact size="small">
-                                    <week-select v-model:value="inputValue" style="width: 305px"></week-select>
-                                    <a-button @click="onInputValueSearch" size="small">确定</a-button>
-                                 </a-input-group>
-                             </div>
-                        </div>
-                        <div v-else-if="filterItem.type=='MonthFilter'">
-                            <div class="filter-item-check-item" @click="setActive(null)" :class="{active:activeItemIndex===null}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="setActive(key)" :class="{active:key===activeItemIndex}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                             <div class="filter-item-check-item filter-item-input-group" :class="{active:activeItemIndex===-1}">
-                                 <a-input-group compact size="small">
-                                    <a-range-picker
-                                      style="width: 210px"
-                                        v-model:value="range"
-                                        format="YYYY-MM"
-                                        :placeholder="['开始月份', '结束月份']"
-                                      />
-                                       <a-button @click="onRangeSearch" size="small">确定</a-button>
-                                 </a-input-group>
-                             </div>
-                         </div>
-                        <div v-if="filterItem.type=='YearMonthFilter'">
-                            <div class="filter-item-check-item" @click="setActive(null)" :class="{active:activeItemIndex===null}"><div class="filter-item-check-item-value">全部</div></div>
-                            <div v-for="(vo,key) in filterItem.items" class="filter-item-check-item" @click="setActive(key)" :class="{active:key===activeItemIndex}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
-                        </div>
-                    </div>
-                </div>`,
-                }
-            },
             data(){
-                let filterConfig=vueData.filterConfig.map(function(v){
-                    if(v.group){
-                        v.title=v.group+' >'+v.title
-                    }
-                    return v;
-                })
-                let filterSource={filterConfig};
-                for(let i in vueData.childs){
-                    filterSource[vueData.childs[i].name]=vueData.childs[i].filterConfig.map(function(v){
-                        if(v.group){
-                            v.title=v.group+' >'+v.title
-                        }
-                        return v;
-                    })
-                }
-
-                let modelTitles={
-                    [vueData.model]:vueData.title,
-                    [vueData.modelName]:vueData.title,
-                };
-                for(let i in vueData.childs){
-                    modelTitles[vueData.childs[i].class]=vueData.childs[i].title;
-                    modelTitles[vueData.childs[i].name]=vueData.childs[i].title;
-                }
-
-
                 const pagination={
                     pageSize: vueData.indexPageOption.pageSize,
                     sortField: '',
                     sortOrder: '',
                     showSizeChanger:vueData.indexPageOption.canGetRequestOption,
                 }
-
-
                 return {
                     listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
                     pagination: {...pagination},
                     loading: false,
                     data: [],
-                    filterSource,
-                    curdFilters:[],
-                    curdChildFilters:{},
-                    showMoreFilter:false,
                     myFilters:{
                         ...pagination,
-                        filterData:{},
-                        childFilterData:{},
                         page: 1,
                     },
-                    filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
                     showFilter:vueData.showFilter,
                     showTableTool:vueData.showTableTool,
                     canDel:vueData.canDel&&vueData.auth.del,
                     canEdit:vueData.canEdit&&vueData.auth.edit,
                     auth:vueData.auth,
                     childs:vueData.childs,
-                    modelTitles,
+                    filterBase:{
+                        filterConfig:vueData.filterConfig,
+                        class:vueData.model,
+                        name:vueData.modelName,
+                        title:vueData.title,
+                        filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
+                    },
                     //其他配置
                     ...getThisActionOhterData(),
-                }
-            },
-            watch: {
-                filterSource:{
-                    handler(filterSource){
-                        let curdFilters=[],childFilterDatas={},haveHide=false;
-                        if(filterSource.filterConfig&&filterSource.filterConfig.length>0){
-                            curdFilters=filterSource.filterConfig.filter(v=>v.show);
-                            haveHide=curdFilters.length!==filterSource.filterConfig.length;
-                        }
-                        for(let key in filterSource){
-                            if(key!=='filterConfig'){
-                                if(filterSource[key].length>0){
-                                    childFilterDatas[key]=filterSource[key].filter(v=>v.show);
-                                    haveHide=haveHide|| childFilterDatas[key].length!==filterSource[key].length;
-                                }
-                            }
-                        }
-
-                        if(this.showMoreFilter===false&&haveHide){
-                            this.showMoreFilter=true;
-                        }
-                        this.curdFilters=curdFilters;
-                        this.curdChildFilters=childFilterDatas;
-                    },
-                    immediate:true,
-                    deep: true,
                 }
             },
             mounted() {
@@ -368,14 +78,11 @@ define(['vueAdmin'], function (va) {
                 },
                 fetch() {
                     this.loading = true;
-                    let filter=JSON.parse(JSON.stringify(this.myFilters));
-                    filter.filterData=Object.assign(filter.filterData,this.filterValues);
+                    const filter=JSON.parse(JSON.stringify(this.myFilters));
+                    const filterData=this.$refs['filter'].getFilterData();
+                    filter.filterData=filterData.filterData;
+                    filter.childFilterData=filterData.childFilterData;
 
-                    let allFilterChildValues={};
-                    this.childs.forEach(v=>{
-                        allFilterChildValues[v.name]=v.filterData;
-                    })
-                    filter.childFilterData=Object.assign(filter.childFilterData,allFilterChildValues);
 
                     this.$get(VUE_CURD.CONTROLLER+'/index',filter).then(data => {
                         this.pagination.current=data.data.current_page;
@@ -440,27 +147,8 @@ define(['vueAdmin'], function (va) {
                     this.fetch();
                 },
                 doFilter(){
-                    let filterData={};
-                    this.curdFilters.forEach(function(v){
-                        if(typeof v.activeValue!=='undefined'&&v.activeValue!==null){
-                            filterData[v.name]=v.activeValue;
-                        }
-                    })
-                    let childFilterData={};
-                    for(let key in this.curdChildFilters){
-                        this.curdChildFilters[key].forEach(function(v){
-                            if(typeof v.activeValue!=='undefined'&&v.activeValue!==null){
-                                childFilterData[key]=childFilterData[key]||{};
-                                childFilterData[key][v.name]=v.activeValue;
-                            }
-                        })
-                    }
-
-
                     this.pagination.current = 1;
                     this.myFilters.page=1;
-                    this.myFilters.filterData=filterData;
-                    this.myFilters.childFilterData=childFilterData;
                     this.fetch()
                 },
                 openChildList(row,modelInfo){
@@ -486,17 +174,6 @@ define(['vueAdmin'], function (va) {
                 },
                 actionWidth(width){
                     return width
-                },
-                filterGroupIsShow(child){
-                    for(let i in this.filterSource[child.name]){
-                        if(this.filterGroupItemIsShow(this.filterSource[child.name][i],child)){
-                            return true;
-                        }
-                    }
-                    return false
-                },
-                filterGroupItemIsShow(item,child){
-                    return item.show&&(!child.filterData||!child.filterData[item.name]);
                 },
                 onDataLoad(){
                     //数据获取完成钩子

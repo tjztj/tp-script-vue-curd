@@ -2,7 +2,7 @@
  * tj 1079798840@qq.com
  */
 const requires=['axios','qs'];
-window.fieldComponents={};
+window.fieldComponents={},window.filterComponents={};
 if(vueData.fieldComponents){
     for(let i in vueData.fieldComponents){
         let v=vueData.fieldComponents[i];
@@ -15,6 +15,7 @@ if(vueData.fieldComponents){
 if(vueData.filterComponents){
     for(let i in vueData.filterComponents){
         requires.push(vueData.filterComponents[i])
+        filterComponents[i]=vueData.filterComponents[i];
     }
 }
 
@@ -886,8 +887,190 @@ define(requires, function ( axios,Qs) {
                     </div>`,
         })
 
+
+        /*** 筛选组件 ***/
+        app.component('CurdFilter',{
+            props:['filterConfig','name','class','title','childs','filterValues','loading'],
+            setup(props,ctx){
+                let filterConfig=props.filterConfig.map(function(v){
+                    if(v.group){
+                        v.title=v.group+' >'+v.title
+                    }
+                    return v;
+                })
+                let filterSource=Vue.ref({filterConfig});
+                let modelTitles={
+                    [props.class]:props.title,
+                    [props.name]:props.title,
+                };
+                for(let i in props.childs){
+                    filterSource.value[props.childs[i].name]=props.childs[i].filterConfig.map(function(v){
+                        if(v.group){
+                            v.title=v.group+' >'+v.title
+                        }
+                        return v;
+                    })
+
+                    modelTitles[props.childs[i].class]=props.childs[i].title;
+                    modelTitles[props.childs[i].name]=props.childs[i].title;
+                }
+
+                return {
+                    filterSource,
+                    modelTitles,
+                    filterData:Vue.ref({}),
+                    childFilterData:Vue.ref({}),
+                    showMoreFilter:Vue.ref(false),
+                }
+            },
+            computed: {
+                base(){
+                    return {name:'filterConfig',filterConfig:this.filterSource.filterConfig,filterData:this.filterData}
+                }
+            },
+            methods:{
+                filterGroupIsShow(child){
+                    for(let i in this.filterSource[child.name]){
+                        if(this.filterGroupItemIsShow(this.filterSource[child.name][i],child)){
+                            return true;
+                        }
+                    }
+                    return false
+                },
+                filterGroupItemIsShow(item,child){
+                    return item.show&&(!child.filterData||!child.filterData[item.name]);
+                },
+                search(val,item){
+                    item.activeValue=val;
+                    this.$emit('search',this.getFilterData());
+                },
+                getFilterData(){
+                    let curdFilters=[],curdChildFilters={},haveHide=false;
+                    if(this.filterSource.filterConfig&&this.filterSource.filterConfig.length>0){
+                        curdFilters=this.filterSource.filterConfig.filter(v=>v.show);
+                        haveHide=curdFilters.length!==this.filterSource.filterConfig.length;
+                    }
+                    for(let key in this.filterSource){
+                        if(key!=='filterConfig'){
+                            if(this.filterSource[key].length>0){
+                                curdChildFilters[key]=this.filterSource[key].filter(v=>v.show);
+                                haveHide=haveHide|| curdChildFilters[key].length!==this.filterSource[key].length;
+                            }
+                        }
+                    }
+
+                    let filterData={};
+                    curdFilters.forEach(function(v){
+                        if(typeof v.activeValue!=='undefined'&&v.activeValue!==null){
+                            filterData[v.name]=v.activeValue;
+                        }
+                    })
+                    if(this.filterValues){
+                        filterData=Object.assign(filterData,this.filterValues);
+                    }
+
+
+
+                    let childFilterData={};
+                    for(let key in curdChildFilters){
+                        curdChildFilters[key].forEach(function(v){
+                            if(typeof v.activeValue!=='undefined'&&v.activeValue!==null){
+                                childFilterData[key]=childFilterData[key]||{};
+                                childFilterData[key][v.name]=v.activeValue;
+                            }
+                        })
+                    }
+                    if(this.childs){
+                        let allFilterChildValues={};
+                        this.childs.forEach(v=>{
+                            if(v.filterData){
+                                //如果filterData有，不能筛选，只能是filterData的值
+                                childFilterData[v.name]=Object.assign(childFilterData[v.name],v.filterData);;
+                            }
+                        })
+                    }
+
+                    if(this.showMoreFilter===false&&haveHide){
+                        this.showMoreFilter=true;
+                    }
+
+                    return {
+                        filterData,childFilterData
+                    }
+                }
+            },
+            template:`<div>
+                    <a-spin :spinning="loading">
+                            <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow(base)">{$title}：</div>
+                            <div class="filter-box" v-if="filterGroupIsShow(base)">
+                                <transition-group name="bounce">
+                                    <template v-for="(item,index) in filterSource.filterConfig">
+                                        <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name">
+                                            <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
+                                             <component :is="item.type" 
+                                                        :config="item"
+                                                        @search="search($event,item)"
+                                                ></component>
+                                            </div></div>
+                                        </div>
+                                    </template>
+                                </transition-group>
+                            </div>
+                            <template v-for="child in childs">
+                                <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
+                                <div class="filter-box" v-show="filterGroupIsShow(child)">
+                                    <transition-group name="bounce">
+                                        <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
+                                            <div class="filter-item-box" v-show="filterGroupItemIsShow(item,child)">
+                                                <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
+                                                 <component :is="item.type" 
+                                                            :config="item"
+                                                            @search="search($event,item)"
+                                                    ></component>
+                                                </div></div>
+                                            </div>
+                                        </template>
+                                    </transition-group>
+                                </div>
+                            </template>
+                        </a-spin>
+                        <div class="filter-sub-btn-box">
+                            <a-divider v-if="showMoreFilter">
+                                <a-dropdown trigger="click">
+                                    <a class="ant-dropdown-link" style="font-size: 14px"> 更多筛选
+                                        <down-outlined></down-outlined>
+                                    </a>
+                                    <template #overlay>
+                                        <a-menu id="filter-menu-box">
+                                            <template v-for="(vo,key) in filterSource">
+                                                <div v-if="modelTitles[key]" class="filter-select-show-item-title">
+                                                    {{modelTitles[key]}}
+                                                </div>
+                                                <div class="filter-select-show-item-box">
+                                                    <a-menu-item v-for="item in vo">
+                                                        <a href="javascript:;"
+                                                           class="filter-select-show-item"
+                                                           :class="{checked:item.show}"
+                                                           @click="item.show=!item.show">
+                                                            <div class="filter-select-show-title">{{ item.title }}</div>
+                                                            <check-outlined></check-outlined>
+                                                        </a>
+                                                    </a-menu-item>
+                                                </div>
+                                            </template>
+                                        </a-menu>
+                                    </template>
+                                </a-dropdown>
+                            </a-divider>
+                        </div>
+                    </div>`,
+        });
+
         for(let componentName in fieldComponents){
             app.component(componentName,typeof require(fieldComponents[componentName])==='function'?require(fieldComponents[componentName])():require(fieldComponents[componentName]))
+        }
+        for(let componentName in filterComponents){
+            app.component(componentName,require(filterComponents[componentName]));
         }
         app.mount('#app')
     };
