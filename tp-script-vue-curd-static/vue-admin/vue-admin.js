@@ -540,7 +540,12 @@ define(requires, function ( axios,Qs) {
             methods:{
                 ...vueDefMethods,
                 fieldRules(field){
+                    let type='string';
+                    if(field.type==='RegionField'){
+                        type='array'
+                    }
                     return {
+                        type,
                         required:this.triggerShows(field.name)&&field.required,
                         message:field.title+' ， 必填',
                     }

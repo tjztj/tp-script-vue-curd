@@ -7,10 +7,20 @@ define([],function(){
                 if(props.field.regionTree.length===1){
                     if(!props.field.regionTree[0].children||props.field.regionTree[0].children.length===0){
                         //todo
-                        formData[field.name]=[field.regionTree[0].id];
+                        ctx.emit('update:value',[props.field.regionTree[0].id])
                     }else if(props.field.regionTree[0].children.length===1){
-                        formData[field.name]=[field.regionTree[0].id,field.regionTree[0].children[0].id];
+                        ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id])
                     }
+                }
+            }
+        },
+        computed:{
+            modelVal:{
+                get(){
+                    return this.value;
+                },
+                set(val){
+                    this.$emit('update:value',val);
                 }
             }
         },
@@ -28,7 +38,7 @@ define([],function(){
                     <template v-else>
                         <div class="l">
                             <a-cascader
-                                v-model:value="value"
+                                v-model:value="modelVal"
                                 :options="field.regionTree"
                                 :placeholder="field.placeholder||'请选择村社'"
                                 show-search
