@@ -1003,7 +1003,7 @@ define(requires, function ( axios,Qs) {
             },
             template:`<div>
                     <a-spin :spinning="loading">
-                            <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow(base)">{$title}：</div>
+                            <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow(base)">{{title}}：</div>
                             <div class="filter-box" v-if="filterGroupIsShow(base)">
                                 <transition-group name="bounce">
                                     <template v-for="(item,index) in filterSource.filterConfig">

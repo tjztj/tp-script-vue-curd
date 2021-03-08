@@ -2,7 +2,6 @@ define([],function(){
     return {
         props:['field','value','validateStatus'],
         setup(props,ctx){
-            //todo
             let val;
             if(props.value){
                 val=[Math.floor(props.value/12),props.value%12];
