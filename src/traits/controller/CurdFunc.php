@@ -173,7 +173,7 @@ trait CurdFunc
     protected function getFilterCommonentsByFields(FieldCollection $fields){
         $return=[];
         $fields->each(function(ModelField $field)use(&$return){
-            $return[$field->filter()->getType()]=$field->filter()::componentUrl();
+            is_null($field->filter())||$return[$field->filter()->getType()]=$field->filter()::componentUrl();
         });
         return array_filter($return);
     }
