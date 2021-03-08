@@ -96,7 +96,7 @@ trait CurdFunc
         try{
             $ids=$this->beforeDel($ids);
             $list= $model->del($ids);
-            $this->afterDel($list);
+            $this->afterDel($list->toArray());
         }catch (\Exception $e){
             return $this->error($e->getMessage());
         }

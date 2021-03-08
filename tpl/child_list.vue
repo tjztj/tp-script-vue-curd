@@ -43,7 +43,22 @@
 <div class="box">
 <div class="week-box">
     <div class="week-tool-box">
-        <div class="week-title">详细列表</div>
+        <div class="week-title">
+            详细列表
+            <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
+                <a-divider type="vertical"></a-divider>
+                <a-popconfirm
+                    placement="left"
+                    :title="'您确定要删除勾选的这'+rowSelection.selectedRowKeys.length+'条数据吗？'"
+                    @confirm="delSelectedRows"
+                >
+                    <a-button type="danger">
+                        <del-outlined></del-outlined>
+                        <span> 批量删除 ({{rowSelection.selectedRowKeys.length}}条数据)</span>
+                    </a-button>
+                </a-popconfirm>
+            </template>
+        </div>
         <div class="title-right">
             <template v-if="auth.edit">
                 <a-button type="primary" @click="openAdd">
@@ -87,6 +102,7 @@
             :list-columns="listColumns"
             :can-edit="canEdit"
             :can-del="canDel"
+            :row-selection="canDel?rowSelection:null"
             @change="handleTableChange"
             @open-show="openShow"
             @on-delete="deleteRow"

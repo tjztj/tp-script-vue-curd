@@ -24,6 +24,7 @@ define([],function(){
                                       v-model:value="inputValue"
                                       allow-clear
                                       show-search 
+                                      size="small"
                                       :filter-option="filterOption">
                                       <a-select-option value="">
                                       <span style="color: rgba(0,0,0,.35);">全部</span>

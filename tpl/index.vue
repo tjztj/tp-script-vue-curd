@@ -173,6 +173,23 @@
         <div class="ant-pro-table-list-toolbar-container">
             <div class="ant-pro-table-list-toolbar-left">
                 <div class="ant-pro-table-list-toolbar-title">{$title}</div>
+                <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
+                    <div class="ant-space-item">
+                        <a-divider type="vertical"></a-divider>
+                    </div>
+                    <a-popconfirm
+                        placement="left"
+                        :title="'您确定要删除勾选的这'+rowSelection.selectedRowKeys.length+'条数据吗？'"
+                        @confirm="delSelectedRows"
+                    >
+                        <div class="ant-space-item">
+                            <a-button type="danger">
+                                <del-outlined></del-outlined>
+                                <span> 批量删除 ({{rowSelection.selectedRowKeys.length}}条数据)</span>
+                            </a-button>
+                        </div>
+                    </a-popconfirm>
+                </template>
             </div>
             <div class="ant-pro-table-list-toolbar-right">
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
@@ -233,6 +250,7 @@
                 :can-edit="canEdit"
                 :can-del="canDel"
                 :action-width="actionWidth"
+                :row-selection="canDel?rowSelection:null"
                 @change="handleTableChange"
                 @on-delete="deleteRow"
                 @open-edit="openEdit"

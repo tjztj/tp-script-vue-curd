@@ -29,6 +29,7 @@ define(['vueAdmin'], function (va) {
     actions.index=function(){
         return {
             data(){
+                let delSelecteds=Vue.ref([]);
                 const pagination={
                     pageSize: vueData.indexPageOption.pageSize,
                     sortField: '',
@@ -57,6 +58,12 @@ define(['vueAdmin'], function (va) {
                         title:vueData.title,
                         filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
                     },
+                    rowSelection:{
+                        selectedRowKeys:delSelecteds,
+                        onChange(selectedRowKeys) {
+                            delSelecteds.value=selectedRowKeys;
+                        },
+                    },
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -67,6 +74,9 @@ define(['vueAdmin'], function (va) {
             },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
+                    if(!pagination.pageSize){
+                        return;
+                    }
                     this.pagination.current = pagination.current;
                     this.pagination.pageSize = pagination.pageSize;
 
@@ -133,6 +143,16 @@ define(['vueAdmin'], function (va) {
                         offset:'rt',
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
+                },
+                delSelectedRows(){
+                    this.loading = true;
+                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys}).then(res=>{
+                        antd.message.success(res.msg);
+                        this.refreshTable();
+                        this.rowSelection.selectedRowKeys=[];
+                    }).catch(err=>{
+                        this.loading = false;
+                    })
                 },
                 deleteRow(row){
                     this.loading = true;
@@ -290,6 +310,7 @@ define(['vueAdmin'], function (va) {
 
 
     actions.childList=function(){
+        let delSelecteds=Vue.ref([]);
         const pagination={
             pageSize: vueData.indexPageOption.pageSize,
             sortField: '',
@@ -308,6 +329,12 @@ define(['vueAdmin'], function (va) {
                     canEdit:vueData.auth.edit,
                     auth:vueData.auth,
                     pagination,
+                    rowSelection:{
+                        selectedRowKeys:delSelecteds,
+                        onChange(selectedRowKeys) {
+                            delSelecteds.value=selectedRowKeys;
+                        },
+                    },
                 }
             },
             mounted() {
@@ -316,6 +343,9 @@ define(['vueAdmin'], function (va) {
             },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
+                    if(!pagination.pageSize){
+                        return;
+                    }
                     this.pagination=pagination;
                     this.pagination.sortField=sorter.field;
                     this.pagination.sortOrder=sorter.order;
@@ -366,6 +396,16 @@ define(['vueAdmin'], function (va) {
                         area: ['50vw', '72vh'],
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
+                },
+                delSelectedRows(){
+                    this.tableLoading = true;
+                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys}).then(res=>{
+                        antd.message.success(res.msg);
+                        this.refreshTable();
+                        delSelecteds.value=[];
+                    }).catch(err=>{
+                        this.tableLoading = false;
+                    })
                 },
                 deleteRow(row){
                     this.tableLoading = true;

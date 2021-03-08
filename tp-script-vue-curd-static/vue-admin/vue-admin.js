@@ -644,7 +644,7 @@ define(requires, function ( axios,Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable',{
-            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel'],
+            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection'],
             setup(props,ctx){
                 const listColumns=props.listColumns;
                 let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={};
@@ -821,6 +821,7 @@ define(requires, function ( axios,Qs) {
                             class="curd-table"
                             :bordered="isGroup"
                             :scroll="{ x: scrollX ,y:scrollY}"
+                            :row-selection="rowSelection"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <div style="white-space:normal;line-height: 1.14">
