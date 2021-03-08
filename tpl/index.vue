@@ -159,61 +159,7 @@
 {block name="style"}{/block}
 <div class="box">
 <div class="head" v-if="showFilter">
-    <a-spin :spinning="loading">
-        <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow({name:'filterConfig',filterConfig:filterSource.filterConfig,filterData:myFilters.filterData})">{$title}：</div>
-        <div class="filter-box" v-if="filterGroupIsShow({name:'filterConfig',filterConfig:filterSource.filterConfig,filterData:myFilters.filterData})">
-            <transition-group name="bounce">
-                <template v-for="(item,index) in filterSource.filterConfig">
-                    <div class="filter-item-box" v-if="item.show&&!filterValues[item.name]" :key="item.name">
-                        <filter-item v-model:config="curdFilters" v-model:filter-item="item"
-                                     @search="doFilter"></filter-item>
-                    </div>
-                </template>
-            </transition-group>
-        </div>
-        <template v-for="child in childs">
-            <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
-            <div class="filter-box" v-show="filterGroupIsShow(child)">
-                <transition-group name="bounce">
-                    <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
-                        <div class="filter-item-box" v-show="filterGroupItemIsShow(item,child)">
-                            <filter-item v-model:config="curdChildFilters[child.name]" v-model:filter-item="item"
-                                         @search="doFilter"></filter-item>
-                        </div>
-                    </template>
-                </transition-group>
-            </div>
-        </template>
-    </a-spin>
-    <div class="filter-sub-btn-box">
-        <a-divider v-if="showMoreFilter">
-            <a-dropdown trigger="click">
-                <a class="ant-dropdown-link" style="font-size: 14px"> 更多筛选
-                    <down-outlined></down-outlined>
-                </a>
-                <template #overlay>
-                    <a-menu id="filter-menu-box">
-                        <template v-for="(vo,key) in filterSource">
-                            <div v-if="modelTitles[key]" class="filter-select-show-item-title">
-                                {{modelTitles[key]}}
-                            </div>
-                            <div class="filter-select-show-item-box">
-                                <a-menu-item v-for="item in vo">
-                                    <a href="javascript:;"
-                                       class="filter-select-show-item"
-                                       :class="{checked:item.show}"
-                                       @click="item.show=!item.show">
-                                        <div class="filter-select-show-title">{{ item.title }}</div>
-                                        <check-outlined></check-outlined>
-                                    </a>
-                                </a-menu-item>
-                            </div>
-                        </template>
-                    </a-menu>
-                </template>
-            </a-dropdown>
-        </a-divider>
-    </div>
+    <curd-filter ref="filter" :filter-config="filterBase.filterConfig" :name="filterBase.name" :class="filterBase.class" :title="filterBase.title" :childs="childs" :filter-values="filterBase.filterValues" :loading="loading"></curd-filter>
 </div>
 <div class="body">
     <div class="ant-pro-table-list-toolbar" v-if="showTableTool">
