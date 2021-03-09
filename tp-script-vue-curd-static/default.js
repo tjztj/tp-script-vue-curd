@@ -391,7 +391,7 @@ define(['vueAdmin'], function (va) {
                 },
                 openShow(row){
                     this.openBox({
-                        title:'查看 详细',
+                        title:'查看 详情',
                         offset: 'auto',
                         area: ['50vw', '72vh'],
                         content: vueData.showUrl+'?id='+row.id,

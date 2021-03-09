@@ -862,7 +862,7 @@ define(requires, function ( axios,Qs) {
                                    
                                     </slot>
                                     <slot name="do" :record="record">
-                                        <a @click="openShow(record)">详细</a>
+                                        <a @click="openShow(record)">详情</a>
                                           
                                         <template  v-if="canEdit!==false">
                                             <a-divider type="vertical"></a-divider>

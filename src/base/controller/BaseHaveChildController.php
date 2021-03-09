@@ -93,6 +93,8 @@ trait BaseHaveChildController
         // 列表页面显示前处理
         $fetch=$this->baseIndexFetch($fetch);
 
+        $filterComponents=$fetch['filterComponents']??[];
+
         $fetch['childs']=[];
         foreach (static::childControllerClassPathList() as $childControllerClass){
             /* @var $childControllerClass BaseChildController|string */
@@ -100,16 +102,19 @@ trait BaseHaveChildController
             $childModelClass=$childControllerClass::modelClassPath();
             $childModel=new $childModelClass;
             $name=class_basename($childModelClass);
+            $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField());
             $fetch['childs'][]=[
                 'class'=>$childModelClass,
                 'name'=>$name,
                 'listBtn'=>$childControllerClass::baseListBtnText(),
                 'filterData'=>json_decode($this->request->param($name.'filterData','',null)),
                 'title'=>$childControllerClass::getTitle(),
-                'filterConfig'=>$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField())->getFilterShowData(),
+                'filterConfig'=>$filterFields->getFilterShowData(),
                 'listUrl'=>url(str_replace('\\','.',parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index')->build(),
             ];
+            $filterComponents += $this->getFilterCommonentsByFields($filterFields);
         }
+        $fetch['filterComponents']=$filterComponents;
         return $fetch;
     }
 }
