@@ -1026,7 +1026,7 @@ define(requires, function ( axios,Qs) {
                                 <div class="filter-box" v-show="filterGroupIsShow(child)">
                                     <transition-group name="bounce">
                                         <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
-                                            <div class="filter-item-box" v-show="filterGroupItemIsShow(item,child)">
+                                            <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
                                                 <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
                                                  <component :is="item.type" 
                                                             :config="item"
