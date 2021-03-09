@@ -694,7 +694,10 @@ define(requires, function ( axios,Qs) {
                 let actionW=70;
                 if(props.childs){
                     props.childs.forEach(v=>{
-                        actionW+=38+(v.listBtn.split('').length*9);
+                        if(v.listBtn.show){
+                            actionW+=38+(v.listBtn.text.split('').length*9);
+                        }
+
                     })
                 }
                 if(props.canEdit!==false){
@@ -868,7 +871,7 @@ define(requires, function ( axios,Qs) {
                                        
                                         <template v-for="vo in childs">
                                             <a-divider type="vertical" v-if="vo.listBtn.show"></a-divider>
-                                            <a @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
+                                            <a v-if="vo.listBtn.show" @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
                                         </template>
                                     </slot>
                                      <slot name="do-after" :record="record">
