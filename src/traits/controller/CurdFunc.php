@@ -130,7 +130,7 @@ trait CurdFunc
         $template=$file?:Str::snake( $this->app->request->action());
         $path .= str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . ($file ?: Str::snake($this->app->request->action())) . '.vue';
         if(file_exists($path)){
-            return $this->fetch($controller_name.'/'.$template,$data);
+            return $this->fetch(str_replace('.', '/', $controller).'/'.$template,$data);
         }
         $tplPath=static::getTplPath();
         return $this->fetch($tplPath.$file.'.vue',$data);
