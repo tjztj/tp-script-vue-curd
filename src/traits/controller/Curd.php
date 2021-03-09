@@ -48,7 +48,7 @@ trait Curd
                 })
                 ->where($this->fields->getFilterWhere())
                 ->where(function(Query $query){
-                    $childFilterData=$this->request->param('childFilterData');
+                    $childFilterData=$this->request->param('childFilterData',null,null);
                     if($childFilterData){
                         $childFilterData=json_decode($childFilterData,true);
                     }
