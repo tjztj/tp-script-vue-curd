@@ -10,6 +10,7 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\option\FunControllerChildImportAfter;
 use tpScriptVueCurd\option\FunControllerChildImportBefore;
 use tpScriptVueCurd\option\FunControllerIndexPage;
+use tpScriptVueCurd\option\FunControllerListChildBtn;
 use tpScriptVueCurd\traits\controller\CurdChild;
 use tpScriptVueCurd\traits\controller\ExcelChild;
 use think\App;
@@ -61,10 +62,13 @@ trait BaseChildController
 
     /**
      * 子表在主表列表中的按钮文字，可重写
-     * @return string
+     * @return FunControllerListChildBtn
      */
-    public static function baseListBtnText():string{
-        return '详细列表';
+    public static function baseListBtnText():FunControllerListChildBtn{
+        $btn=new FunControllerListChildBtn();
+        $btn->color='#d46b08';
+        $btn->text='详细列表';
+        return $btn;
     }
 
     /**
