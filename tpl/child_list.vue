@@ -31,7 +31,7 @@
 }
 
 .week-table-box {
-    overflow: hidden;
+    overflow:auto;
     width: 100%;
     flex: 1;
 }
