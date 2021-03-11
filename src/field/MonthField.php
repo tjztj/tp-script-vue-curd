@@ -35,7 +35,7 @@ class MonthField extends ModelField
         if (isset($data[$name])) {
             if($data[$name]){
                 $data[$name]=trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
-                $this->save=\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name].'-01');
+                $this->save=is_numeric($data[$name])?$data[$name]:\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name].'-01');
                 if($this->save===false){
                     throw new \think\Exception('不是正确的月份格式');
                 }

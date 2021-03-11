@@ -40,7 +40,7 @@ class WeekField extends ModelField
                 $this->save =0;
             }else{
                 $data[$name]=trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
-                $time=\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name]);
+                $time=is_numeric($data[$name])?$data[$name]:\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name]);
                 if($time===false){
                     throw new \think\Exception('周时间格式不正确');
                 }
