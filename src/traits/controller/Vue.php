@@ -202,7 +202,14 @@ trait Vue
 
 
     final public static function vueCurdVersion():string{
-        //TODO::要动态的
-        return '1.0.1';
+        if(!is_file(root_path().'composer.json')){
+            return '1.0.1';
+        }
+        $content=file_get_contents(root_path().'composer.json');
+        $content = json_decode($content,true);
+        if(!$content||!isset($content['require'])||!isset($content['require']['tj/tp-script-vue-curd'])){
+            return '1.0.1';
+        }
+        return $content['require']['tj/tp-script-vue-curd'];
     }
 }
