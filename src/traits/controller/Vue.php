@@ -203,6 +203,6 @@ trait Vue
 
     final public static function vueCurdVersion():string{
         //TODO::要动态的
-        return '1.00';
+        return '1.0.1';
     }
 }
