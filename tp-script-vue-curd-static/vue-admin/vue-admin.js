@@ -742,13 +742,13 @@ define(requires, function ( axios,Qs) {
                         return document.body.clientWidth>450?undefined:500;
                     }
                     if(columnsCount<=5){
-                        return document.body.clientWidth>650?undefined:960;
+                        return document.body.clientWidth>680?undefined:960;
                     }
                     if(columnsCount<7){
-                        return document.body.clientWidth>740?undefined:1080;
+                        return document.body.clientWidth>790?undefined:1080;
                     }
                     if(columnsCount<9){
-                        return document.body.clientWidth>820?undefined:1240;
+                        return document.body.clientWidth>910?undefined:1240;
                     }
                     if(columnsCount<12){
                         return document.body.clientWidth>1460?undefined:1560;
