@@ -202,14 +202,32 @@ trait Vue
 
 
     final public static function vueCurdVersion():string{
-        if(!is_file(root_path().'composer.json')){
-            return '1.0.1';
+        $def='1.0.1';
+
+        if(!is_file(root_path().'composer.lock')){
+            return $def;
         }
-        $content=file_get_contents(root_path().'composer.json');
+        $content=file_get_contents(root_path().'composer.lock');
         $content = json_decode($content,true);
-        if(!$content||!isset($content['require'])||!isset($content['require']['tj/tp-script-vue-curd'])){
-            return '1.0.1';
+        if(!$content){
+            return $def;
         }
-        return $content['require']['tj/tp-script-vue-curd'];
+
+        if(isset($content['packages'])){
+            foreach ($content['packages'] as $v){
+                if($v['name']==='tj/tp-script-vue-curd'){
+                    return $v['version'];
+                }
+            }
+        }
+
+        if(isset($content['packages-dev'])){
+            foreach ($content['packages-dev'] as $v){
+                if($v['name']==='tj/tp-script-vue-curd'){
+                    return $v['version'];
+                }
+            }
+        }
+        return $def;
     }
 }
