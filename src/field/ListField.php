@@ -117,13 +117,19 @@ class ListField extends ModelField
                 if($data[$this->name()]!==''){
                     //如果是正确的json
                     $list=json_decode($data[$this->name()],true);
+                    if(empty($list)){
+                        $list=json_decode(htmlspecialchars_decode($data[$this->name()]),true);
+                        empty($list)||$data[$this->name()]=htmlspecialchars_decode($data[$this->name()]);
+                    }
                 }
                 $this->save=$data[$this->name()];
             }
             if(empty($list)){
+                $this->save='null';
                 $this->defaultCheckRequired('');
             }
         }else{
+            $this->save='null';
             $this->defaultCheckRequired('');
         }
         return $this;

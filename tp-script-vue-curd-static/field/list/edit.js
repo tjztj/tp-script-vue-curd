@@ -3,7 +3,7 @@ define([], function () {
         props: ['field', 'value', 'validateStatus', 'listFieldLabelCol', 'listFieldWrapperCol', 'groupFieldItems'],
         setup(props,ctx){
             const listFieldObjs = {};
-            if (props.value) {
+            if (props.value&&props.value!=='null') {
                 let lists = JSON.parse(props.value);
                 for (let n in lists) {
                     listFieldObjs[window.guid()]=lists[n];
