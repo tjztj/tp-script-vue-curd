@@ -27,6 +27,23 @@ define(['vueAdmin'], function (va) {
 
 
     actions.index=function(){
+        const warnIcon=(Vue.openBlock(), Vue.createBlock("svg", {
+            t: "1615779502296",
+            class: "icon anticon",
+            viewBox: "0 0 1024 1024",
+            version: "1.1",
+            xmlns: "http://www.w3.org/2000/svg",
+            "p-id": "2345",
+            width: "22",
+            height: "22"
+        }, [
+            Vue.createVNode("path", {
+                d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
+                fill: "#FF4343",
+                "p-id": "2346"
+            })
+        ]));
+
         return {
             data(){
                 let delSelecteds=Vue.ref([]);
@@ -144,23 +161,53 @@ define(['vueAdmin'], function (va) {
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
                 },
-                delSelectedRows(){
+                delSelectedRows(delChilds){
                     this.loading = true;
-                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys}).then(res=>{
+                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys,delChilds:delChilds?1:0}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                         this.rowSelection.selectedRowKeys=[];
                     }).catch(err=>{
-                        this.loading = false;
+                        if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
+                            antd.message.destroy();
+                            const modal = antd.Modal.confirm({
+                                content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据？',
+                                icon:warnIcon,
+                                onOk:()=> {
+                                    this.delSelectedRows(true)
+                                },
+                                onCancel:()=> {
+                                    modal.destroy();
+                                    this.loading = false;
+                                },
+                            });
+                        }else{
+                            this.loading = false;
+                        }
                     })
                 },
-                deleteRow(row){
+                deleteRow(row,delChilds){
                     this.loading = true;
-                    this.$post(vueData.delUrl,{ids:[row.id]}).then(res=>{
+                    this.$post(vueData.delUrl,{ids:[row.id],delChilds:delChilds?1:0}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                     }).catch(err=>{
-                        this.loading = false;
+                        if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
+                            antd.message.destroy();
+                            const modal = antd.Modal.confirm({
+                                content: '已有子数据，将删除下面所有子数据。确定删除本条数据及下面所有子数据？',
+                                icon:warnIcon,
+                                onOk:()=> {
+                                    this.deleteRow(row,true)
+                                },
+                                onCancel:()=> {
+                                    modal.destroy();
+                                    this.loading = false;
+                                },
+                            });
+                        }else{
+                            this.loading = false;
+                        }
                     })
                 },
                 refreshTable(){
@@ -208,7 +255,7 @@ define(['vueAdmin'], function (va) {
 
     actions.edit=function(){
         let form={},validateStatus={},fieldObjs={};
-        
+
         vueData.fields.forEach(function(field){
             fieldObjs[field.name]=field;
             form[field.name]=vueData.info?vueData.info[field.name]:'';
@@ -449,9 +496,6 @@ define(['vueAdmin'], function (va) {
             dataObj.form[vueData.parentField]=vueData.baseId;
             return dataObj;
         }
-
-
-
         return returnData;
     };
 

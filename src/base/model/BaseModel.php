@@ -8,6 +8,7 @@ use app\admin\model\SystemAdmin;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\tool\ErrorCode;
 
 /**
  * Class BaseModel
@@ -60,7 +61,7 @@ abstract class BaseModel extends VueCurlModel
                 /* @var BaseChildController $v */
                 $haveChildDataBaseId=$v::modelClassPath()::where($v::modelClassPath()::parentField(),'in',$ids)->max($v::modelClassPath()::parentField());
                 if($haveChildDataBaseId){
-                    throw new \think\Exception('需先删除下面的'.$v::getTitle().'数据');
+                    throw new \think\Exception('需先删除下面的'.$v::getTitle().'数据',ErrorCode::DELETE_HAVE_CHILD);
                 }
             }
         }

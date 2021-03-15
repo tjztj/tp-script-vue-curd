@@ -31,11 +31,11 @@ trait CurdFunc
     function show(){
         $id=$this->request->param('id/d');
         if(empty($id)){
-            return $this->error('缺少必要参数');
+            return $this->errorAndCode('缺少必要参数');
         }
         $data=$this->model->find($id);
         if(empty($data)){
-            return $this->error('未找到相关数据信息');
+            return $this->errorAndCode('未找到相关数据信息');
         }
         $info=$data->toArray();
         $this->fields->doShowData($info);
@@ -88,19 +88,10 @@ trait CurdFunc
      * @param array $ids
      * @return \think\response\Json|void
      */
-    protected function doDelect(VueCurlModel $model,array $ids){
-        $ids=array_filter($ids);
-        if(empty($ids)){
-            return $this->error('请选择要删除的数据');
-        }
-        try{
-            $ids=$this->beforeDel($ids);
-            $list= $model->del($ids);
-            $this->afterDel($list->toArray());
-        }catch (\Exception $e){
-            return $this->error($e->getMessage());
-        }
-        return $this->success('删除成功');
+    public function doDelect(VueCurlModel $model,array $ids){
+        $ids=$this->beforeDel($ids);
+        $list= $model->del($ids);
+        $this->afterDel($list->toArray());
     }
 
     /**

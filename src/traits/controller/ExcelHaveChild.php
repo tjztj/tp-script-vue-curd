@@ -212,7 +212,6 @@ trait ExcelHaveChild
     /**
      * 根据导入数据获取 导入的ID
      * @param array $mainData
-     * @param false $inset 如果数据库没有，新增
      * @return mixed
      */
     private function getMainIdByImportData(array $mainData):int{

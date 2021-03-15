@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use think\Exception;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
@@ -153,7 +154,7 @@ trait Curd
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
-                $this->error($e->getMessage());
+                $this->errorAndCode($e->getMessage());
             }
             $this->model->commit();
             $this->success((empty($data['id'])?'添加':'修改').'成功');
@@ -176,6 +177,38 @@ trait Curd
      * #title 删除数据
      */
     function del(){
-        return $this->doDelect($this->model,$this->request->param('ids/a',[]));
+        $ids=$this->request->param('ids/a',[]);
+        $ids=array_filter($ids);
+        if(empty($ids)){
+            return $this->error('请选择要删除的数据');
+        }
+        $this->model->startTrans();
+        try{
+            if(static::type()==='base_have_child'&&$this->request->param('delChilds/d')==1){
+                //先删除子数据再删除数据
+                foreach (static::childModelObjs() as $k=>$v){
+                    $childIds=[];
+                    /**
+                     * @var BaseChildController|string $baseChildController
+                     * @var BaseChildModel $v
+                     */
+                    $v->where($v::parentField(),'in',$ids)->field('id,'.$v::parentField())->select()->each(function($val)use(&$childIds,$v){
+                        isset($childIds[$val[$v::parentField()]])||$childIds[$val[$v::parentField()]]=[];
+                        $childIds[$val[$v::parentField()]][]=$v->id;
+                    });
+                    $baseChildController=new $k($this->app);
+                    foreach ($childIds as $val){
+                        $baseChildController->doDelect($v,$val);
+                    }
+                }
+            }
+            $this->doDelect($this->model,$this->request->param('ids/a',[]));
+        }catch (Exception $e){
+            $this->model->rollback();
+            return $this->errorAndCode($e->getMessage(),$e->getCode());
+        }
+
+        $this->model->commit();
+        return $this->success('删除成功');
     }
 }

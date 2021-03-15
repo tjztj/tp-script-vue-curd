@@ -121,14 +121,24 @@ trait Vue
 
 
     /**
+     * 失败且设置 errorCode
+     * @param string $msg
+     * @param int $errorCode
+     */
+    public function errorAndCode(string $msg,int $errorCode=0):void{
+        $this->error($msg,'',null,3,[],$errorCode);
+    }
+
+    /**
      * 失败
      * @param string $msg
      * @param string $data
      * @param null $url
      * @param int $wait
      * @param array $header
+     * @param int $errorCode
      */
-    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [])
+    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0)
     {
         if($data===''){
             $data=[];
@@ -148,6 +158,7 @@ trait Vue
             'data' => $data,
             'url'  => $url,
             'wait' => $wait,
+            'errorCode'=>$errorCode
         ];
         if ($type === 'html') {
             $response = view(app('config')->get('app.dispatch_error_tmpl'), $result);

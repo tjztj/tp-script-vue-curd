@@ -94,7 +94,7 @@ trait Excel
         ini_set('memory_limit', -1);
         $file = $this->request->file('file');
         if (empty($file)) {
-            return $this->error('未获取到上传文件');
+            return $this->errorAndCode('未获取到上传文件');
         }
         $base_path= public_path( '/upload');
         is_dir($base_path) || mkdir($base_path);
@@ -105,7 +105,7 @@ trait Excel
         try{
             $data = \tpScriptVueCurd\tool\Excel::importExecl($file->getRealPath(), 0, 0, $options);
         }catch (\Exception $e){
-            return $this->error($e->getMessage());
+            return $this->errorAndCode($e->getMessage(),$e->getCode());
         }
 
 
@@ -113,7 +113,7 @@ trait Excel
         ['expCellName'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         //判断标题是否一致，有些表字段一样的，防止导错
         if(trim(current($data[1]))!==trim($this->getExcelTilte())){
-            return $this->error('模版错误，请重新下载最新的模版-001');
+            return $this->errorAndCode('模版错误，请重新下载最新的模版-001');
         }
 
 
@@ -121,7 +121,7 @@ trait Excel
         foreach ($expCellName as $k => $v) {
             //对比模版，老模版提示错误
             if (current($data[2]) !== $v[1]||trim(current($data[3])) !== trim($row[$v[0]])) {
-                return $this->error('模版错误，请重新下载最新的模版-002');
+                return $this->errorAndCode('模版错误，请重新下载最新的模版-002');
             }
             $names[key($data[2])]=$v[0];
             next($data[2]);
@@ -130,7 +130,7 @@ trait Excel
         //去掉模版上的提示行
         unset($data[1],$data[2], $data[3]);
         if(empty($data)){
-            return $this->error('未找到可导入的数据');
+            return $this->errorAndCode('未找到可导入的数据');
         }
 
 
@@ -159,7 +159,7 @@ trait Excel
             }
         }catch (\Exception $e){
             $this->model->rollback();
-            return $this->error('Excel第'.$last_do_row.'行 '.$e->getMessage());
+            return $this->errorAndCode('Excel第'.$last_do_row.'行 '.$e->getMessage(),$e->getCode());
         }
 
         $this->model->commit();

@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\base\controller;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\ErrorCode;
 use tpScriptVueCurd\traits\controller\ExcelHaveChild;
 use think\App;
 
@@ -115,6 +116,7 @@ trait BaseHaveChildController
             $filterComponents += $this->getFilterCommonentsByFields($filterFields);
         }
         $fetch['filterComponents']=$filterComponents;
+        $fetch['deleteHaveChildErrorCode']=ErrorCode::DELETE_HAVE_CHILD;
         return $fetch;
     }
 }

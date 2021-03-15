@@ -37,7 +37,7 @@ trait CurdChild{
      */
     public function index(){
         $base_id=$this->request->param('base_id/d',0);
-        $base_id||$this->error('缺少必要参数');
+        $base_id||$this->errorAndCode('缺少必要参数');
 
 
         if($this->request->isAjax()){//只返回list
@@ -47,7 +47,7 @@ trait CurdChild{
         }
 
         $info=$this->baseModel->find($base_id);
-        $info||$this->error('未找到相关信息');
+        $info||$this->errorAndCode('未找到相关信息');
         $info=$info->toArray();
         $this->baseFields->doShowData($info);//有些数据不允许直接展示
 
@@ -209,7 +209,7 @@ trait CurdChild{
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
-                $this->error($e->getMessage());
+                $this->errorAndCode($e->getMessage(),$e->getCode());
             }
             $this->model->commit();
             $this->success((empty($data['id'])?'添加':'修改').'成功');
@@ -221,7 +221,7 @@ trait CurdChild{
             $base_id=$info[$this->model::parentField()];
         }else{
             $base_id=$this->request->param('base_id/d',0);
-            $base_id||$this->error('缺少必要参数');
+            $base_id||$this->errorAndCode('缺少必要参数');
             $info=null;
         }
 
@@ -243,6 +243,19 @@ trait CurdChild{
      * @return \think\response\Json|void
      */
     function del(){
-        return $this->doDelect($this->model,$this->request->param('ids/a',[]));
+        $ids=$this->request->param('ids/a',[]);
+        $ids=array_filter($ids);
+        if(empty($ids)){
+            return $this->error('请选择要删除的数据');
+        }
+        $this->model->startTrans();
+        try{
+            $this->doDelect($this->model,$ids);
+        }catch (\Exception $e){
+            $this->model->rollback();
+            return $this->errorAndCode($e->getMessage(),$e->getCode());
+        }
+        $this->model->commit();
+        return $this->success('删除成功');
     }
 }
