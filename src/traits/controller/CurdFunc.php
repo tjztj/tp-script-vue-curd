@@ -91,7 +91,7 @@ trait CurdFunc
     public function doDelect(VueCurlModel $model,array $ids){
         $ids=$this->beforeDel($ids);
         $list= $model->del($ids);
-        $this->afterDel($list->toArray());
+        $this->afterDel($list);
     }
 
     /**

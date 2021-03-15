@@ -142,7 +142,7 @@ trait Controller
         return $ids;
     }
 
-    protected function afterDel(array $delInfos):void{
+    protected function afterDel(\think\Collection $delInfos):void{
         //删除后
     }
 

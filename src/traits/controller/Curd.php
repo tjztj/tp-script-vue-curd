@@ -194,7 +194,7 @@ trait Curd
                      */
                     $v->where($v::parentField(),'in',$ids)->field('id,'.$v::parentField())->select()->each(function($val)use(&$childIds,$v){
                         isset($childIds[$val[$v::parentField()]])||$childIds[$val[$v::parentField()]]=[];
-                        $childIds[$val[$v::parentField()]][]=$v->id;
+                        $childIds[$val[$v::parentField()]][]=$val->id;
                     });
                     $baseChildController=new $k($this->app);
                     foreach ($childIds as $val){
@@ -202,7 +202,7 @@ trait Curd
                     }
                 }
             }
-            $this->doDelect($this->model,$this->request->param('ids/a',[]));
+            $this->doDelect($this->model,$ids);
         }catch (Exception $e){
             $this->model->rollback();
             return $this->errorAndCode($e->getMessage(),$e->getCode());

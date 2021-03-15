@@ -161,28 +161,26 @@ define(['vueAdmin'], function (va) {
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
                 },
-                delSelectedRows(delChilds){
+                delSelectedRows(e,delChilds){
                     this.loading = true;
                     this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys,delChilds:delChilds?1:0}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                         this.rowSelection.selectedRowKeys=[];
                     }).catch(err=>{
+                        this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
                             antd.message.destroy();
                             const modal = antd.Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据？',
                                 icon:warnIcon,
                                 onOk:()=> {
-                                    this.delSelectedRows(true)
+                                    this.delSelectedRows(e,true)
                                 },
                                 onCancel:()=> {
                                     modal.destroy();
-                                    this.loading = false;
                                 },
                             });
-                        }else{
-                            this.loading = false;
                         }
                     })
                 },
@@ -192,6 +190,7 @@ define(['vueAdmin'], function (va) {
                         antd.message.success(res.msg);
                         this.refreshTable();
                     }).catch(err=>{
+                        this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
                             antd.message.destroy();
                             const modal = antd.Modal.confirm({
@@ -202,11 +201,8 @@ define(['vueAdmin'], function (va) {
                                 },
                                 onCancel:()=> {
                                     modal.destroy();
-                                    this.loading = false;
                                 },
                             });
-                        }else{
-                            this.loading = false;
                         }
                     })
                 },

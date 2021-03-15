@@ -42,7 +42,6 @@ trait ModelDelTraits
      */
     protected function doDel($ids):\think\Collection{
         $list=$this->where('id','in',array_unique($ids))->select();
-        $this->startTrans();
         $this->onDelBefore($list);
         foreach ($list as $result){$result->delete();}
         $this->onDelAfter($list);
