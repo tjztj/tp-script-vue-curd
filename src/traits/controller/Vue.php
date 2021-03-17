@@ -42,7 +42,7 @@ trait Vue
         $this->assign('vueCurdController',$this->request->controller());
         $this->assign('vueCurdModule',$this->app->http->getName());
         $this->assign('guid',$this->guid);
-        $this->assign('loginUrl',getLoginUrl());
+        $this->assign('loginUrl',tpScriptVueCurdGetLoginUrl());
     }
 
 

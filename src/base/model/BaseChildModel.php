@@ -63,10 +63,10 @@ abstract class BaseChildModel extends VueCurlModel
         static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$baseInfo[static::getRegionPidField()];
 
         if(static::getCreateLoginUserField()){
-            $data[static::getCreateLoginUserField()]=getLoginData()['id'];
+            $data[static::getCreateLoginUserField()]=staticTpScriptVueCurdGetLoginData()['id'];
         }
         if(static::getUpdateLoginUserField()){
-            $data[static::getUpdateLoginUserField()]=getLoginData()['id'];
+            $data[static::getUpdateLoginUserField()]=staticTpScriptVueCurdGetLoginData()['id'];
         }
         //onAddBefore请用doSaveDataAfter
         $info=self::create($data);

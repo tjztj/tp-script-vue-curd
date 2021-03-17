@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{:getHtmlTitle()}</title>
+    <title>{:tpScriptVueCurdGetHtmlTitle()}</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -172,7 +172,7 @@
 <script>
     let jsPath='{$jsPath|default=""}';
     if(jsPath===''){
-        jsPath='{:publicActionJsPathBase()}/'+window.VUE_CURD.CONTROLLER.replace(/\./g,'/')
+        jsPath='{:tpScriptVueCurdPublicActionJsPathBase()}/'+window.VUE_CURD.CONTROLLER.replace(/\./g,'/')
             .replace(/(\w)([A-Z])/g,"$1_$2")
             .toLowerCase()+'.js'
     }

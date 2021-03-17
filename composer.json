@@ -19,6 +19,7 @@
     "minimum-stability": "dev",
     "license": "MIT",
     "autoload": {
+        "files":["copy/tp-script-vue-curd-config.php"],
         "psr-4": {
             "tpScriptVueCurd\\": "src/"
         }

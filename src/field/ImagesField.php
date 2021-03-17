@@ -29,7 +29,7 @@ class ImagesField extends ModelField
     public function url(string $url = null)
     {
         if(is_null($url)){
-            return $this->url?:uploadDefaultUrl();
+            return $this->url?:tpScriptVueCurdUploadDefaultUrl();
         }
         $this->url=$url;
         return $this;
