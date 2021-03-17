@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use think\Collection;
 use think\db\Query;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * 字段集合
@@ -15,6 +16,7 @@ use think\db\Query;
  */
 class FieldCollection extends Collection
 {
+    use Func;
     public array $groupItems=[];//字段分组（如果少于2个组，将为空；字段不设置group，将赋值为 基本信息）
     public function __construct($items = [])
     {

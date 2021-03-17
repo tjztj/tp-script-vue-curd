@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use tpScriptVueCurd\filter\EmptyFilter;
 use think\db\Query;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * Class ModelFilter
@@ -14,6 +15,7 @@ use think\db\Query;
  */
 abstract class ModelFilter
 {
+    use Func;
 
     protected ModelField $field;
     protected string $type;

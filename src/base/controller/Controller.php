@@ -15,6 +15,7 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\traits\controller\Curd;
 use tpScriptVueCurd\traits\controller\CurdFunc;
 use tpScriptVueCurd\traits\controller\Excel;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * Trait Controller
@@ -26,7 +27,7 @@ use tpScriptVueCurd\traits\controller\Excel;
  */
 trait Controller
 {
-    use Vue,CurdFunc,Excel{
+    use Func,Vue,CurdFunc,Excel{
         Vue::initialize as vueInitialize;
     }
 

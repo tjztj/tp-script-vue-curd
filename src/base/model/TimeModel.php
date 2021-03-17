@@ -16,6 +16,7 @@ namespace tpScriptVueCurd\base\model;
 
 use think\Model;
 use think\model\concern\SoftDelete;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * 有关时间的模型
@@ -48,7 +49,7 @@ class TimeModel extends Model
     /**
      * 软删除
      */
-    use SoftDelete;
+    use Func,SoftDelete;
     protected $deleteTime = 'delete_time';
     protected $defaultSoftDelete = 0;//软删除默认值
 

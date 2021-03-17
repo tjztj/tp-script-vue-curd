@@ -7,6 +7,7 @@ namespace tpScriptVueCurd;
 use think\Validate;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * Class ModelField
@@ -15,6 +16,8 @@ use tpScriptVueCurd\tool\field_tpl\FieldTpl;
  */
 abstract class ModelField
 {
+    use Func;
+
     protected string $name='';//字段名
     protected array $tag=[];//标签
     protected string $group='';//分组
