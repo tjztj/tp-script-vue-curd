@@ -106,9 +106,27 @@ define(['vueAdmin'], function (va) {
                 fetch() {
                     this.loading = true;
                     const filter=JSON.parse(JSON.stringify(this.myFilters));
-                    const filterData=this.$refs['filter'].getFilterData();
-                    filter.filterData=filterData.filterData;
-                    filter.childFilterData=filterData.childFilterData;
+                    if(this.showFilter){
+                        const filterData=this.$refs['filter'].getFilterData();
+                        filter.filterData=filterData.filterData;
+                        filter.childFilterData=filterData.childFilterData;
+                    }else{
+                        if(this.filterBase.filterValues){
+                            filter.filterData=this.filterBase.filterValues;
+                        }
+                        if(this.childs){
+                            let allFilterChildValues={};
+                            this.childs.forEach(v=>{
+                                if(v.filterData){
+                                    allFilterChildValues[v.name]=v.filterData;
+                                }
+                            })
+                            filter.childFilterData=allFilterChildValues;
+                        }
+
+                    }
+
+
 
 
                     this.$get(VUE_CURD.CONTROLLER+'/index',filter).then(data => {
