@@ -507,7 +507,7 @@ define(requires, function ( axios,Qs) {
                         this.groupFieldItems.forEach(field=>{
                             if(field.items&&field.items.length>0){
                                 field.items.map(item=>{
-                                    //忘啦是要干啥的
+                                    //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
                                         item.hideFields.map(hideField=>{
                                             this.triggerShowss[hideField.name]=this.triggerShowss[hideField.name]||{};

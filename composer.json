@@ -18,6 +18,7 @@
     ],
     "minimum-stability": "dev",
     "license": "MIT",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "tpScriptVueCurd\\": "src/"
