@@ -11,7 +11,6 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\db\Query;
 use think\Request;
-use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 
