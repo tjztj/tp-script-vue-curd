@@ -2,6 +2,7 @@
     "name": "tj/tp-script-vue-curd",
     "description": "",
     "type": "library",
+    "version":"1.0",
     "require": {
         "php": ">=7.4.0",
         "topthink/framework": "^6.0.5",
