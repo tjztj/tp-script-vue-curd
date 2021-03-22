@@ -41,8 +41,6 @@ trait CurdFunc
         return $this->doShow(static::getTitle(),$info,$this->fields);
     }
 
-
-
     /**
      * 方便可以调用其他模型的查看页面（项目开发中可能会用到）
      * @param string $title
