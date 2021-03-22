@@ -20,10 +20,10 @@ use tpScriptVueCurd\ModelField;
 trait CurdFunc
 {
 
+
     /**
      * #title 详细页面
      * @return mixed|void
-     * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
@@ -38,15 +38,30 @@ trait CurdFunc
             return $this->errorAndCode('未找到相关数据信息');
         }
         $info=$data->toArray();
-        $this->fields->doShowData($info);
-        $fieldArr=array_values($this->fields->toArray());
+        return $this->doShow(static::getTitle(),$info,$this->fields);
+    }
+
+
+
+    /**
+     * 方便可以调用其他模型的查看页面（项目开发中可能会用到）
+     * @param string $title
+     * @param array $info
+     * @param FieldCollection $fields
+     * @return mixed
+     */
+    protected function doShow(string $title,array $info,FieldCollection $fields){
+        $this->assign('thisAction','show');//使用它的js
+
+        $fields->doShowData($info);
+        $fieldArr=array_values($fields->toArray());
 
         return $this->showTpl('show',$this->showFetch([
-            'title'=>static::getTitle(),
+            'title'=>$title,
             'fields'=>$fieldArr,
-            'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
+            'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
-            'fieldComponents'=>$this->getComponentsByFields($this->fields,'show'),
+            'fieldComponents'=>$this->getComponentsByFields($fields,'show'),
         ]));
     }
 
