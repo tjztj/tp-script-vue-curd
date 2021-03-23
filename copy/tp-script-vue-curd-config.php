@@ -38,6 +38,9 @@ if (!function_exists('tpScriptVueCurdGetHtmlTitle')) {
 }
 
 
+########################################################################################################################
+#####################################################字段配置默认值############################################################
+
 if (!function_exists('tpScriptVueCurdUploadDefaultUrl')) {
     /**
      * 文件上传默认url
@@ -55,6 +58,17 @@ if (!function_exists('tpScriptVueCurdPublicActionJsPathBase')) {
      */
     function tpScriptVueCurdPublicActionJsPathBase():string{
         return '/static/'.app('http')->getName().'/js/';
+    }
+
+}
+
+if (!function_exists('tpScriptVueCurdImageRemoveMissings')) {
+    /**
+     * 自定义vue页面时可能使用
+     * @return string
+     */
+    function tpScriptVueCurdImageRemoveMissings():bool{
+        return false;
     }
 
 }

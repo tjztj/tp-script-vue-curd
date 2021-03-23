@@ -48,7 +48,7 @@ class ListField extends ModelField
      */
     public function listShow(bool $listShow=null){
         if($listShow===true){
-            throw new \think\Exception('字段类型[ListField]不能设置listShow未true');
+            throw new \think\Exception('字段类型[ListField]不能设置listShow为true');
         }
         return $this->doAttr('listShow',$listShow);
     }

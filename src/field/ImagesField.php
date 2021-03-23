@@ -19,7 +19,9 @@ use tpScriptVueCurd\tool\field_tpl\Show;
 class ImagesField extends ModelField
 {
 
-    protected string $url='';
+    protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
+    protected bool $removeMissings;//默认值是 tpScriptVueCurdImageRemoveMissings
+
 
 
     /**最小值
@@ -34,6 +36,25 @@ class ImagesField extends ModelField
         $this->url=$url;
         return $this;
     }
+
+    /**
+     * 图片丢失了，在编辑、查看、列表中是否显示出来
+     * @param bool|null $removeMissings
+     * @return $this|bool
+     */
+    public function removeMissings(bool $removeMissings = null)
+    {
+        if(is_null($removeMissings)){//获取
+            if(is_null($this->removeMissings)){
+                return tpScriptVueCurdImageRemoveMissings();
+            }
+            return $this->removeMissings;
+        }else{//设置
+            $this->removeMissings=$removeMissings;
+            return $this;
+        }
+    }
+
 
     /**
      * 设置保存的值

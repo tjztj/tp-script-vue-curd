@@ -2,7 +2,7 @@ define([],function(){
     return {
         props:['field','value','validateStatus'],
         setup(props,ctx){
-            let fileList=Vue.ref([]);
+            let fileList=Vue.ref([]),id='upload-class-'+window.guid();
             if(props.value){
                 let imgList=props.value.split('|'),fid=0;
                 fileList.value=imgList.map(function(v){
@@ -14,9 +14,25 @@ define([],function(){
                         url:v,
                     };
                 })
+
+                if(props.field.removeMissings){
+                    //删掉丢失的图片
+                    setTimeout(()=>{
+                        for(let i in fileList.value){
+                            let ImgObj=new Image();
+                            ImgObj.onerror=()=>{
+                                fileList.value=fileList.value.filter(v=>{
+                                    return v.url!==fileList.value[i].url
+                                })
+                            }
+                            ImgObj.src= fileList.value[i].url;
+                        }
+                    },1)
+                }
             }
             return {
-                fileList
+                fileList,
+                id
             }
         },
         methods:{
@@ -63,7 +79,7 @@ define([],function(){
 
             },
         },
-        template:`<div class="field-box">
+        template:`<div class="field-box" :class="[id]">
                     <div class="l">
                         <a-upload
                             multiple
@@ -72,7 +88,7 @@ define([],function(){
                             list-type="picture-card"
                             :file-list="fileList"
                             :remove="handleRemove"
-                             :disabled="field.readOnly"
+                            :disabled="field.readOnly"
                             @preview="handlePreview"
                             @change="handleChange"
                         >
