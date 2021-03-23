@@ -59,7 +59,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
-            'fieldComponents'=>$this->getComponentsByFields($fields,'show'),
+            'fieldComponents'=>$fields->getComponents('show'),
         ]));
     }
 
@@ -90,7 +90,7 @@ trait CurdFunc
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
-            'fieldComponents'=>$this->getComponentsByFields($fields,'edit')
+            'fieldComponents'=>$fields->getComponents('edit'),
         ];
     }
 
@@ -138,35 +138,6 @@ trait CurdFunc
         }
         $tplPath=static::getTplPath();
         return $this->fetch($tplPath.$file.'.vue',$data);
-    }
-
-
-
-    /**
-     * 获取字段相关模板内容
-     * @param FieldCollection $fields
-     * @param $type
-     * @return array
-     */
-    protected function getComponentsByFields(FieldCollection $fields,$type){
-        $return=[];
-        $fields->each(function(ModelField $field)use(&$return,$type){
-            if(isset($return[$field->name()])){
-                return;
-            }
-            if(!in_array($type,['index','show','edit'])){
-                return;
-            }
-            $tpl=$field::componentUrl();
-            isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
-            if($field->getType()==='ListField'){
-                foreach ($this->getComponentsByFields($field->fields(),$type) as $k=>$v){
-                    $return[$field->name().'['.$k.']']=$v;
-                }
-                $return=array_merge($return,);
-            }
-        });
-        return $return;
     }
 
     /**

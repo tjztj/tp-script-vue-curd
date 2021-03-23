@@ -47,9 +47,9 @@ class FieldCollection extends Collection
 
     /**
      * 获取所有列表中要显示出来的字段集合
-     * @return FieldCollection
+     * @return $this
      */
-    public function listShowItems(): FieldCollection
+    public function listShowItems(): self
     {
         return $this->filter(fn($v)=>$v->listShow());
     }
@@ -72,7 +72,7 @@ class FieldCollection extends Collection
      * @return $this
      * @throws \think\Exception
      */
-    public function setSave(array $data,bool $isExcelDo=false): FieldCollection
+    public function setSave(array $data,bool $isExcelDo=false): self
     {
         $this->filterHideFieldsByData($data)->each(function(ModelField $v)use($data,$isExcelDo){
             try{
@@ -292,5 +292,32 @@ class FieldCollection extends Collection
             //如果全为false,代表不显示
             return false;
         });
+    }
+
+
+    /**
+     * 获取字段相关模板内容 url
+     * @param string $type
+     * @return array
+     */
+    public function getComponents(string $type):array{
+        $return=[];
+        $this->each(function(ModelField $field)use(&$return,$type){
+            if(isset($return[$field->name()])){
+                return;
+            }
+            if(!in_array($type,['index','show','edit'])){
+                return;
+            }
+            $tpl=$field::componentUrl();
+            isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
+            if($field->getType()==='ListField'){
+                foreach ($field->fields()->getComponents($type) as $k=>$v){
+                    $return[$field->name().'['.$k.']']=$v;
+                }
+                $return=array_merge($return,);
+            }
+        });
+        return $return;
     }
 }
