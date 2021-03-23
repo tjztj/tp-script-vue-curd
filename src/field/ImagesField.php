@@ -45,7 +45,7 @@ class ImagesField extends ModelField
     public function removeMissings(bool $removeMissings = null)
     {
         if(is_null($removeMissings)){//获取
-            if(is_null($this->removeMissings)){
+            if(!isset($this->removeMissings)||is_null($this->removeMissings)){
                 return tpScriptVueCurdImageRemoveMissings();
             }
             return $this->removeMissings;
