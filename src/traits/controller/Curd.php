@@ -126,7 +126,7 @@ trait Curd
                 'downExcelTpl'=>true,
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
-            'filterComponents'=>$this->getFilterCommonentsByFields($this->fields),
+            'filterComponents'=>$this->fields->getFilterComponents(),
         ]);
 
         return $this->showTpl('index',$data);

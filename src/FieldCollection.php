@@ -320,4 +320,17 @@ class FieldCollection extends Collection
         });
         return $return;
     }
+
+
+    /**
+     * 获取字段筛选组件 url
+     * @return array
+     */
+    public function getFilterComponents():array{
+        $return=[];
+        $this->each(function(ModelField $field)use(&$return){
+            is_null($field->filter())||$return[$field->filter()->getType()]=$field->filter()::componentUrl();
+        });
+        return array_filter($return);
+    }
 }

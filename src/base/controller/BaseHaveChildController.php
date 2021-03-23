@@ -113,7 +113,7 @@ trait BaseHaveChildController
                 'filterConfig'=>$filterFields->getFilterShowData(),
                 'listUrl'=>url(str_replace('\\','.',parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index')->build(),
             ];
-            $filterComponents += $this->getFilterCommonentsByFields($filterFields);
+            $filterComponents += $filterFields->getFilterComponents();
         }
         $fetch['filterComponents']=$filterComponents;
         $fetch['deleteHaveChildErrorCode']=ErrorCode::DELETE_HAVE_CHILD;

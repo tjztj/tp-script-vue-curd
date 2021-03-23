@@ -139,17 +139,4 @@ trait CurdFunc
         $tplPath=static::getTplPath();
         return $this->fetch($tplPath.$file.'.vue',$data);
     }
-
-    /**
-     * 筛选组件地址
-     * @param FieldCollection $fields
-     * @return array
-     */
-    protected function getFilterCommonentsByFields(FieldCollection $fields){
-        $return=[];
-        $fields->each(function(ModelField $field)use(&$return){
-            is_null($field->filter())||$return[$field->filter()->getType()]=$field->filter()::componentUrl();
-        });
-        return array_filter($return);
-    }
 }
