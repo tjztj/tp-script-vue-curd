@@ -42,4 +42,6 @@ if($ext==='css'){
 }else if($ext==='js'){
     header('Content-type:text/javascript');
 }
+//缓存
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT');
 echo file_get_contents($path);
