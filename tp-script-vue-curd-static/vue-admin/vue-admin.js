@@ -419,7 +419,7 @@ define(requires, function ( axios,Qs) {
         dt.bodyModal={
             visible:false,
         },
-        option.data=()=>dt;
+            option.data=()=>dt;
 
         if(!option.mounted) {
             option.mounted = function () {
@@ -484,7 +484,7 @@ define(requires, function ( axios,Qs) {
                 return {
                     formVal:Vue.ref(props.form),
                     validateStatus:Vue.ref({}),
-                    triggerShowss:Vue.ref({}),
+                    fieldHideList:Vue.ref({}),
                 }
             },
             watch:{
@@ -494,62 +494,87 @@ define(requires, function ( axios,Qs) {
                             if(typeof arr==='string'){
                                 arr=arr?[]:arr.split(',')
                             }
-                            let have=false;
                             arr.some(selected=>{
                                 if(selected.toString()===val.toString()){
-                                    have=true;
                                     return true;
                                 }
                             })
-                            return have;
+                            return false;
                         }
 
-                        function fieldsShow(field,fields,isShow){
-                            fields.forEach(v=>{
-                                this.triggerShowss[v.name][field.name]=isShow
-                            })
+                        const changeFieldHideList=(key,fieldName,hide)=>{
+                            if(hide){
+                                this.fieldHideList[key]=this.fieldHideList[key]||[];
+                                this.fieldHideList[key].push(fieldName);
+                                return;
+                            }
+                            if(typeof this.fieldHideList[key]==='undefined'){
+                                return;
+                            }
+                            if(this.fieldHideList[key].length>0){
+                                this.fieldHideList[key]=this.fieldHideList[key].filter(v=>v!==fieldName);
+                            }
+                            if(this.fieldHideList[key].length===0){
+                                delete this.fieldHideList[key]
+                            }
                         }
 
                         this.groupFieldItems.forEach(field=>{
                             if(field.hideFields){
-                                field.hideFields.forEach(item=>{
+                                let allFields=[],hideFileds=[];
+                                field.hideFields.filter(item=>{
+                                    item.fields.forEach(f=>{
+                                        if(!allFields.includes(f.name)){
+                                            allFields.push(f.name)
+                                        }
+                                    })
+                                    if(formVal[field.name]===''){
+                                        return false;
+                                    }
                                     if(item.start===null&&item.end===null){
-                                        fieldsShow(field,item.fields,true);
-                                        return;
+                                        return false;
                                     }
                                     if(item.start===null){
                                         //无限小
-                                        fieldsShow(field,item.fields,formVal[field.name]<=item.end);
-                                        return;
+                                        return formVal[field.name]<=item.end;
                                     }
                                     if(item.end===null){
                                         //无限大
-                                        fieldsShow(field,item.fields,formVal[field.name]>=item.start);
-                                        return;
+                                        return formVal[field.name]>=item.start;
                                     }
-                                    fieldsShow(field,item.fields,formVal[field.name]>=item.start&&formVal[field.name]<=item.end);
-                                    return;
+                                    return formVal[field.name]>=item.start&&formVal[field.name]<=item.end;
+                                }).forEach(item=>{
+                                    item.fields.forEach(f=>{
+                                        if(!hideFileds.includes(f.name)){
+                                            hideFileds.push(f.name)
+                                        }
+                                    })
                                 })
+                                allFields.forEach(f=>{
+                                    changeFieldHideList(f,field.name,hideFileds.includes(f))
+                                });
                             }else if(field.items&&field.items.length>0){
                                 field.items.map(item=>{
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
                                         item.hideFields.map(hideField=>{
-                                            this.triggerShowss[hideField.name]=this.triggerShowss[hideField.name]||{};
+                                            let have;
                                             switch (field.type){
                                                 case 'CheckboxField':
-                                                    this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                    have=arrHave(formVal[field.name],item.value);
                                                     break;
                                                 case 'SelectField':
                                                     if(field.multiple){
-                                                        this.triggerShowss[hideField.name][field.name]=arrHave(formVal[field.name],item.value);
+                                                        have=arrHave(formVal[field.name],item.value);
                                                     }else{
-                                                        this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
+                                                        have=formVal[field.name]===item.value
                                                     }
                                                     break;
                                                 default:
-                                                    this.triggerShowss[hideField.name][field.name]=formVal[field.name]===item.value
+                                                    have=formVal[field.name]===item.value;
                                             }
+                                            //have 是否符合条件，符合条件就隐藏
+                                            changeFieldHideList(hideField.name,field.name,have)
                                         })
                                     }
                                 })
@@ -571,13 +596,8 @@ define(requires, function ( axios,Qs) {
                     };
                 },
                 triggerShows(fieldName){
-                    if(!this.triggerShowss[fieldName]){
+                    if(!this.fieldHideList[fieldName]){
                         return true;
-                    }
-                    for(let k in this.triggerShowss[fieldName]){
-                        if(this.triggerShowss[fieldName][k]===true){
-                            return true;
-                        }
                     }
                     return false;
                 },

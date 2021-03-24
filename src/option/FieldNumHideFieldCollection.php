@@ -18,21 +18,21 @@ class FieldNumHideFieldCollection extends Collection
 
 
     /**
-     * 筛选获取符合条件的结果
+     * 筛选获取符合隐藏条件的结果
      * @param $value
      * @return $this
      */
     public function getAccordWithFieds($value):self{
-        $this->checkAccordWithFieds($value,true);
+        return $this->checkAccordWithFieds($value,true);
     }
 
     /**
-     * 筛选获取不符合条件的结果
+     * 筛选获取不符合隐藏条件的结果
      * @param $value
      * @return $this
      */
     public function getNotAccordWithFieds($value):self{
-        $this->checkAccordWithFieds($value,false);
+        return $this->checkAccordWithFieds($value,false);
     }
 
 
@@ -46,7 +46,7 @@ class FieldNumHideFieldCollection extends Collection
         return $this->filter(function(FieldNumHideField $v)use($value,$isAccordWith){
             $start=$v->getStart();
             $end=$v->getEnd();
-            if(is_null($start)&&is_null($end)){
+            if($value===''||(is_null($start)&&is_null($end))){
                 return $isAccordWith;
             }
             if(is_null($start)){

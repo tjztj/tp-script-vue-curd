@@ -108,9 +108,9 @@ class FieldCollection extends Collection
     public function getSave():array{
 
         return $this->filter(function(ModelField $v){
-                //如果是null,代表没有赋值
-                return !is_null($v->getSave())&&!$v->readOnly();
-            })
+            //如果是null,代表没有赋值
+            return !is_null($v->getSave())&&!$v->readOnly();
+        })
             ->column('save','name');
     }
 
@@ -229,7 +229,7 @@ class FieldCollection extends Collection
      * @param array $data  用户提交上来的数据
      * @return $this
      */
-    private function filterHideFieldsByData(array $data):self{
+    private function filterHideFieldsByData(array $data,$isDataBaseInfo=true):self{
         $arrHave= static function($arr, $val){
             if(is_string($arr)){
                 $arr=explode(',',$arr);
@@ -240,18 +240,28 @@ class FieldCollection extends Collection
         };
 
 
-        $triggerShowss=[];//【hideFields】不显示的字段
+        $fieldHideList=[];//【hideFields】不显示的字段
 
-        return $this->each(function(ModelField $v)use(&$triggerShowss,$arrHave,$data){
-            $vName=$v->name();
-            $vType=$v->getType();
-            if(!isset($data[$vName])){
-                //TODO::如果没有提交这个字段的值（不执行），写在这里是想以后某些字段的值获取方式不是 $data[$vName]
+
+        $changeFieldHideList=function($key,$fieldName,$hide)use(&$fieldHideList) {
+            if ($hide) {
+                isset($fieldHideList[$key]) || $fieldHideList[$key] = [];
+                $fieldHideList[$key][] = $fieldName;
                 return;
             }
-            $vValue=$data[$vName];
-
-
+            if (!isset($fieldHideList[$key])) {
+                return;
+            }
+            if (count($fieldHideList[$key]) > 0) {
+                $fieldHideList[$key] = array_filter($fieldHideList[$key], fn($v) => $v !== $fieldName);
+            }
+            if (count($fieldHideList[$key]) === 0) {
+                unset($fieldHideList[$key]);
+            }
+        };
+        return $this->each(function(ModelField $v)use($arrHave,$data,$changeFieldHideList,$isDataBaseInfo){
+            $vName=$v->name();
+            $vType=$v->getType();
 
             /*** 获取【hideFields】不显示的字段 ***/
             if(method_exists($v,'hideFields')){
@@ -259,53 +269,69 @@ class FieldCollection extends Collection
                  * @var FieldNumHideFieldCollection $hideFields
                  */
                 $hideFields=$v->hideFields();
-                $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use(&$triggerShowss,$vName){
-                    foreach ($v->getFields()->column('name') as $val){
-                        $triggerShowss[$val][$vName]=false;
-                    }
+                if(is_null($hideFields)||!isset($data[$vName])){
+                    return;
+                }
+                if($isDataBaseInfo){
+                    $vValue=$data[$vName];
+                }else{
+                    $fieldCopy=clone $v;
+                    $vValue=$fieldCopy->setSave($data)->getSave();
+                }
+                $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
+                    $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
+                        $changeFieldHideList($f->name(),$vName,true);
+                    });
+                });
+                $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
+                    $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
+                        $changeFieldHideList($f->name(),$vName,false);
+                    });
                 });
             }else if(method_exists($v,'items')){
+                if(!isset($data[$vName])){
+                    return;
+                }
+                $vValue=null;
                 foreach ($v->items() as $item){
-                    if(isset($item['hideFields'])){
-                        $item['hideFields']->each(function(ModelField $hidelField)use(&$triggerShowss,$vName,$vType,$vValue,$arrHave,$item,$v){
-                            $name=$hidelField->name();
-                            isset($triggerShowss[$name])||$triggerShowss[$name]=[];
-                            //与JS中的一致
-                            switch ($vType) {
-                                case 'CheckboxField':
-                                    $triggerShowss[$name][$vName] = $arrHave($vValue, $item['value']);
-                                    break;
-                                case 'SelectField':
-                                    if ($v->multiple()) {
-                                        $triggerShowss[$name][$vName] = $arrHave($vValue, $item['value']);
-                                    } else {
-                                        $triggerShowss[$name][$vName] = (string)$vValue === (string)$item['value'];
-                                    }
-                                    break;
-                                default:
-                                    $triggerShowss[$name][$vName] = (string)$vValue === (string)$item['value'];
-                            }
-                        });
+                    if(!isset($item['hideFields'])){
+                        continue;
                     }
+                    if(is_null($vValue)){
+                        if($isDataBaseInfo){
+                            $vValue=$data[$vName];
+                        }else{
+                            $fieldCopy=clone $v;
+                            $vValue=$fieldCopy->setSave($data)->getSave();
+                        }
+                    }
+                    $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v){
+                        //与JS中的一致
+                        switch ($vType) {
+                            case 'CheckboxField':
+                                $hide=$arrHave($vValue, $item['value']);
+                                break;
+                            case 'SelectField':
+                                if ($v->multiple()) {
+                                    $hide=$arrHave($vValue, $item['value']);
+                                } else {
+                                    $hide=(string)$vValue === (string)$item['value'];
+                                }
+                                break;
+                            default:
+                                $hide= (string)$vValue === (string)$item['value'];
+                        }
+                        $changeFieldHideList($hidelField->name(),$vName,$hide);
+                    });
                 }
             }
-        })->filter(function(ModelField $v)use($triggerShowss){
+        })->filter(function(ModelField $v)use($fieldHideList){
             /*** 过滤掉【hideFields】不显示的字段 ***/
             $name=$v->name();
-            if(!isset($triggerShowss[$name])){
+            if(!isset($fieldHideList[$name])){
                 //没有设置代表无限制
                 return true;
             }
-            foreach ($triggerShowss[$name] as $val){
-                /**
-                 * 为 true 显示否则隐藏
-                 * @var bool $val
-                 */
-                if($val){
-                    return true;
-                }
-            }
-            //如果全为false,代表不显示
             return false;
         });
     }

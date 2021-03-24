@@ -21,7 +21,7 @@ trait NumHideFields
      */
     public function hideFields($hideFields=null){
         if(is_null($hideFields)){
-            return $this->hideFields;
+            return $this->hideFields??null;
         }
 
         if(is_array($hideFields)){
