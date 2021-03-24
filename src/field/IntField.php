@@ -10,6 +10,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\NumHideFields;
 
 
 /**
@@ -20,7 +21,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
  */
 class IntField extends ModelField
 {
-
+    use NumHideFields;
     protected int $min = 0;//最小值
     protected int $max = 9999999999;//最大值
     protected int $listColumnWidth=85;//设置默认值

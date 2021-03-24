@@ -11,6 +11,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\NumHideFields;
 
 /**两位小数
  * Class DecimalField
@@ -19,7 +20,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
  */
 class DecimalField extends ModelField
 {
-
+    use NumHideFields;
     protected float $min = 0.00;//最小值
     protected float $max = 99999999999999.99;//最大值
     protected int $listColumnWidth=110;//设置默认值

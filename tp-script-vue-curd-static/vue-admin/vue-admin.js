@@ -504,8 +504,33 @@ define(requires, function ( axios,Qs) {
                             return have;
                         }
 
+                        function fieldsShow(field,fields,isShow){
+                            fields.forEach(v=>{
+                                this.triggerShowss[v.name][field.name]=isShow
+                            })
+                        }
+
                         this.groupFieldItems.forEach(field=>{
-                            if(field.items&&field.items.length>0){
+                            if(field.hideFields){
+                                field.hideFields.forEach(item=>{
+                                    if(item.start===null&&item.end===null){
+                                        fieldsShow(field,item.fields,true);
+                                        return;
+                                    }
+                                    if(item.start===null){
+                                        //无限小
+                                        fieldsShow(field,item.fields,formVal[field.name]<=item.end);
+                                        return;
+                                    }
+                                    if(item.end===null){
+                                        //无限大
+                                        fieldsShow(field,item.fields,formVal[field.name]>=item.start);
+                                        return;
+                                    }
+                                    fieldsShow(field,item.fields,formVal[field.name]>=item.start&&formVal[field.name]<=item.end);
+                                    return;
+                                })
+                            }else if(field.items&&field.items.length>0){
                                 field.items.map(item=>{
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){

@@ -9,6 +9,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\NumHideFields;
 
 /**
  * 日期
@@ -18,6 +19,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
  */
 class DateField extends ModelField
 {
+    use NumHideFields;
 
     protected int $listColumnWidth=108;//设置默认值
     protected string $defaultFilterClass=DateFilter::class;

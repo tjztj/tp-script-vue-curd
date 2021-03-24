@@ -10,6 +10,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\NumHideFields;
 
 
 /**
@@ -20,7 +21,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
  */
 class WeekField extends ModelField
 {
-
+    use NumHideFields;
     protected int $listColumnWidth = 330;//设置默认值
     protected string $defaultFilterClass = WeekFilter::class;
 

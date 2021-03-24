@@ -253,6 +253,10 @@ abstract class ModelField
             }else{
                 $data[$k]=$this->$k;
             }
+
+            if(is_object($data[$k])&&method_exists($data[$k],'toArray')){
+                $data[$k]=$data[$k]->toArray();
+            }
         }
         return $data;
     }

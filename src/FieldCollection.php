@@ -6,6 +6,8 @@ namespace tpScriptVueCurd;
 
 use think\Collection;
 use think\db\Query;
+use tpScriptVueCurd\option\FieldNumHideField;
+use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 use tpScriptVueCurd\traits\Func;
 
 /**
@@ -241,17 +243,28 @@ class FieldCollection extends Collection
         $triggerShowss=[];//【hideFields】不显示的字段
 
         return $this->each(function(ModelField $v)use(&$triggerShowss,$arrHave,$data){
+            $vName=$v->name();
+            $vType=$v->getType();
+            if(!isset($data[$vName])){
+                //TODO::如果没有提交这个字段的值（不执行），写在这里是想以后某些字段的值获取方式不是 $data[$vName]
+                return;
+            }
+            $vValue=$data[$vName];
 
-            if(method_exists($v,'items')){
-                /*** 获取【hideFields】不显示的字段 ***/
-                $vName=$v->name();
-                $vType=$v->getType();
-                if(!isset($data[$vName])){
-                    //TODO::如果没有提交这个字段的值（不执行），写在这里是想以后某些字段的值获取方式不是 $data[$vName]
-                    return;
-                }
-                $vValue=$data[$vName];
 
+
+            /*** 获取【hideFields】不显示的字段 ***/
+            if(method_exists($v,'hideFields')){
+                /**
+                 * @var FieldNumHideFieldCollection $hideFields
+                 */
+                $hideFields=$v->hideFields();
+                $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use(&$triggerShowss,$vName){
+                    foreach ($v->getFields()->column('name') as $val){
+                        $triggerShowss[$val][$vName]=false;
+                    }
+                });
+            }else if(method_exists($v,'items')){
                 foreach ($v->items() as $item){
                     if(isset($item['hideFields'])){
                         $item['hideFields']->each(function(ModelField $hidelField)use(&$triggerShowss,$vName,$vType,$vValue,$arrHave,$item,$v){
@@ -276,7 +289,6 @@ class FieldCollection extends Collection
                     }
                 }
             }
-
         })->filter(function(ModelField $v)use($triggerShowss){
             /*** 过滤掉【hideFields】不显示的字段 ***/
             $name=$v->name();
@@ -285,6 +297,10 @@ class FieldCollection extends Collection
                 return true;
             }
             foreach ($triggerShowss[$name] as $val){
+                /**
+                 * 为 true 显示否则隐藏
+                 * @var bool $val
+                 */
                 if($val){
                     return true;
                 }
