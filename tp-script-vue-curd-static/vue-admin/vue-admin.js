@@ -521,14 +521,23 @@ define(requires, function ( axios,Qs) {
 
                         this.groupFieldItems.forEach(field=>{
                             if(field.hideFields){
-                                let allFields=[],hideFileds=[];
+                                let allFields=[],hideFileds=[],inputVal='';
+                                if(formVal[field.name]!==''){
+                                    inputVal=formVal[field.name];
+                                    //如果是时间格式
+                                    if(field.type==='DateField'||field.type==='MonthField'||field.type==='WeekField'){
+                                        if(!/^\d+$/.test(formVal[field.name].toString())||formVal[field.name]<10000){
+                                            inputVal=moment(formVal[field.name]).unix()
+                                        }
+                                    }
+                                }
                                 field.hideFields.filter(item=>{
                                     item.fields.forEach(f=>{
                                         if(!allFields.includes(f.name)){
                                             allFields.push(f.name)
                                         }
                                     })
-                                    if(formVal[field.name]===''){
+                                    if(inputVal===''){
                                         return false;
                                     }
                                     if(item.start===null&&item.end===null){
@@ -536,13 +545,13 @@ define(requires, function ( axios,Qs) {
                                     }
                                     if(item.start===null){
                                         //无限小
-                                        return formVal[field.name]<=item.end;
+                                        return inputVal<=item.end;
                                     }
                                     if(item.end===null){
                                         //无限大
-                                        return formVal[field.name]>=item.start;
+                                        return inputVal>=item.start;
                                     }
-                                    return formVal[field.name]>=item.start&&formVal[field.name]<=item.end;
+                                    return inputVal>=item.start&&inputVal<=item.end;
                                 }).forEach(item=>{
                                     item.fields.forEach(f=>{
                                         if(!hideFileds.includes(f.name)){
