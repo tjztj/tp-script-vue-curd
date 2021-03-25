@@ -6,6 +6,8 @@ namespace tpScriptVueCurd;
 
 use think\Validate;
 use tpScriptVueCurd\filter\EmptyFilter;
+use tpScriptVueCurd\option\FieldStep;
+use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\traits\Func;
 
@@ -409,5 +411,41 @@ abstract class ModelField
      * @return FieldTpl
      */
     abstract public static function componentUrl():FieldTpl;
+
+
+    protected FieldStepCollection $steps;
+
+    /**
+     * 字段所属步奏配置
+     * @param null $steps
+     * @return $this|FieldStepCollection|null
+     * @throws \think\Exception
+     */
+    public function steps(&$steps=null){
+        if(is_null($steps)){
+            return $this->steps??null;
+        }
+
+        if(is_array($steps)){
+            $stepList=FieldStepCollection::make();
+            foreach ($steps as &$v){
+                $stepList->push(clone $v);
+                $v->removeFieldData();
+            }
+        }else if($steps instanceof FieldStep){
+            $stepList=FieldStepCollection::make([clone $steps]);
+            $steps->removeFieldData();
+        }else{
+            throw new \think\Exception($this->name().' 的steps设置类型错误');
+        }
+
+
+        $stepList=$stepList->map(function(FieldStep $val){
+            $val->setField($this);
+            return $val;
+        });
+        $this->steps=$stepList;
+        return $this;
+    }
 
 }

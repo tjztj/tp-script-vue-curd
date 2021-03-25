@@ -8,6 +8,7 @@ use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
+use tpScriptVueCurd\traits\field\FieldCollectionStep;
 use tpScriptVueCurd\traits\Func;
 
 /**
@@ -18,7 +19,7 @@ use tpScriptVueCurd\traits\Func;
  */
 class FieldCollection extends Collection
 {
-    use Func;
+    use Func,FieldCollectionStep;
     public array $groupItems=[];//字段分组（如果少于2个组，将为空；字段不设置group，将赋值为 基本信息）
     public function __construct($items = [])
     {
@@ -375,4 +376,6 @@ class FieldCollection extends Collection
         });
         return array_filter($return);
     }
+
+
 }
