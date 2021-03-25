@@ -64,6 +64,11 @@
         </template>
         <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyDrawer.url" :onload="bodyDrawer.onload"></iframe>
     </a-drawer>
+    <div style="display: none" id="vue-curd-imgs-show-box">
+        <a-image-preview-group>
+            <a-image v-for="item in imgShowConfig.list" :src="item" />
+        </a-image-preview-group>
+    </div>
 </div>
 
 <script>window.vueData={$vue_data_json|raw};</script>

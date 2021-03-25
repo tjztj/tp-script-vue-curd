@@ -399,6 +399,33 @@ define(requires, function ( axios,Qs) {
         pageIsInit(){
             if (document.getElementById('app')) document.getElementById('app').style.display = 'block'
             if (document.getElementById('app-loading')) document.getElementById('app-loading').style.display = 'none'
+            if(typeof window.top.showImages==='undefined'){
+                window.top.showImages= (imgs, start)=>{
+                    if(typeof imgs==='string'){
+                        if(imgs===''){
+                            imgs=[];
+                        }else{
+                            imgs=imgs.split('|');
+                        }
+                    }
+                    if(imgs.length===0){
+                        return;
+                    }
+
+                    this.imgShowConfig.list=imgs;
+                    this.$nextTick(()=>{
+                        let index=0;
+                        if(start){
+                            if(/^\d+$/.test(start.toString())){
+                                index=start;
+                            }else{
+                                index=imgs.indexOf(index);
+                            }
+                        }
+                        document.querySelectorAll('#vue-curd-imgs-show-box .ant-image-img')[index].click()
+                    })
+                }
+            }
         },
         showImages(imgs, start){
             window.top.showImages(imgs, start);
@@ -418,6 +445,9 @@ define(requires, function ( axios,Qs) {
         };
         dt.bodyModal={
             visible:false,
+        };
+        dt.imgShowConfig={
+            list:[],
         },
             option.data=()=>dt;
 
