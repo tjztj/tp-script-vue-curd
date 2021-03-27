@@ -17,6 +17,10 @@ define([],function(){
             }
         },
         methods:{
+            '$get'(url, params){
+                if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
+                return service({url, method: 'get',params,headers:{'X-REQUESTED-WITH':'xmlhttprequest'}})
+            },
             onAutoCompleteSearch(event){
                 this.autoCompleteSearch(event,this.field.url)
             },
