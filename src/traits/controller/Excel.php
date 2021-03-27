@@ -114,7 +114,7 @@ trait Excel
 
         ['expCellName'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         //判断标题是否一致，有些表字段一样的，防止导错
-        if(trim(current($data[1]))!==trim($this->getExcelTilte())){
+        if(preg_replace('/\s+/','',current($data[1]))!==preg_replace('/\s+/','',$this->getExcelTilte())){
             return $this->errorAndCode('模版错误，请重新下载最新的模版-001');
         }
 
@@ -122,7 +122,7 @@ trait Excel
         $names=[];
         foreach ($expCellName as $k => $v) {
             //对比模版，老模版提示错误
-            if (current($data[2]) !== $v[1]||trim(current($data[3])) !== trim($row[$v[0]])) {
+            if (current($data[2]) !== $v[1]||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v[0]])) {
                 return $this->errorAndCode('模版错误，请重新下载最新的模版-002');
             }
             $names[key($data[2])]=$v[0];
