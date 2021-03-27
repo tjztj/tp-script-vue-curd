@@ -35,14 +35,22 @@
         <div class="legend-box">
             <legend>{{groupTitle}}</legend>
         </div>
-        <div v-for="field in groupFieldItems" class="row">
-            <div class="l">
-                {{field.title}}：
+        <template v-for="field in groupFieldItems">
+            <div class="row" v-if="!field.showUseComponent">
+                <div class="l">
+                    {{field.title}}：
+                </div>
+                <div class="r">
+                    <curd-show-field :field="field" :info="info"></curd-show-field>
+                </div>
             </div>
-            <div class="r">
-                <curd-show-field :field="field" :info="info"></curd-show-field>
-            </div>
-        </div>
+            <component
+                v-else-if="fieldComponents['VueCurdShow'+field.type]"
+                :is="'VueCurdShow'+field.type"
+                :field="field"
+                :info="info"
+            ></component>
+        </template>
     </fieldset>
 </template>
 </div>

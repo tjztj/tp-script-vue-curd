@@ -36,6 +36,10 @@ abstract class ModelField
     protected string $defaultFilterClass='';//筛选类型
     protected bool $pub=false;//是否在前台公开
     protected bool $canExcelImport=true;//是否可以excel导入
+    protected ?array $editLabelCol=null;//编辑界面 label布局
+    protected string $editLabelAlign='right';//编辑界面 label对齐
+    protected ?array $editWrapperCol=null;//编辑界面 为输入控件设置布局样式 用法同 editLabelCol
+    protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule=null;//数据验证
     public const REQUIRED=true;//开启必填验证
 
@@ -208,6 +212,55 @@ abstract class ModelField
     public function editShow(bool $editShow=null){
         return $this->doAttr('editShow',$editShow);
     }
+
+    /**
+     * 编辑界面 label布局
+     * @param array|null $editLabelCol
+     * @param bool $forceSet  是否强制设置值，当要设置值为null时使用
+     * @return $this|array|null
+     */
+    public function editLabelCol(array $editLabelCol=null,bool $forceSet=false){
+        if($forceSet){
+            $this->editLabelCol=$editLabelCol;
+            return $this;
+        }
+        return $this->doAttr('editLabelCol',$editLabelCol);
+    }
+
+    /**
+     * 标签文本对齐方式
+     * @param string|null $editLabelAlign
+     * @return $this|string
+     */
+    public function editLabelAlign(string $editLabelAlign=null){
+        return $this->doAttr('editLabelAlign',$editLabelAlign);
+    }
+
+    /**
+     * 编辑界面 为输入控件设置布局样式 用法同 editLabelCol
+     * @param array|null $editWrapperCol
+     * @param bool $forceSet  是否强制设置值，当要设置值为null时使用
+     * @return $this|array|null
+     */
+    public function editWrapperCol(array $editWrapperCol=null,bool $forceSet=false){
+        if($forceSet){
+            $this->editWrapperCol=$editWrapperCol;
+            return $this;
+        }
+        return $this->doAttr('editWrapperCol',$editWrapperCol);
+    }
+
+
+    /**
+     * 查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
+     * @param bool|null $showUseComponent
+     * @return $this|bool
+     */
+    public function showUseComponent(bool $showUseComponent=null){
+        return $this->doAttr('showUseComponent',$showUseComponent);
+    }
+
+
 
     /**
      * 字段在添加修改时是否显示
