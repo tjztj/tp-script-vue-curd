@@ -686,7 +686,7 @@ define(requires, function ( axios,Qs) {
                                         :list-field-label-col="listFieldLabelCol"
                                         :list-field-wrapper-col="listFieldWrapperCol"
                                         :group-field-items="groupFieldItems"
-                                        :submit="submit($event)"
+                                        @submit="$emit('submit',$event)"
                                     ></component>
                                 </a-form-item>
                                 </transition>

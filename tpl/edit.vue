@@ -16,8 +16,8 @@
                     :list-field-label-col="labelCol"
                     :list-field-wrapper-col="wrapperCol"
                     :group-field-items="groupFieldItems"
-                    :submit="onSubmit($event)"
                     v-model:form="form"
+                    @submit="onSubmit($event)"
                     :ref="'fieldGroup'+groupTitle"></field-group-item>
             </fieldset>
         </template>
