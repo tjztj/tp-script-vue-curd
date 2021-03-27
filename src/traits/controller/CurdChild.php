@@ -209,6 +209,8 @@ trait CurdChild{
         if($this->request->isAjax()){
             $data=$this->request->post();
             $this->model->startTrans();
+            $savedInfo=null;
+            $baseInfo=null;
             try{
                 if(empty($data['id'])){
                     if(empty($data[$this->model::parentField()])){
@@ -225,7 +227,8 @@ trait CurdChild{
                     $this->fields=$this->fields->filterNextStepFields(null,$baseInfo,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
-                    $this->addAfter($this->model->addInfo($data,$baseInfo,$this->fields));
+                    $savedInfo=$this->model->addInfo($data,$baseInfo,$this->fields);
+                    $this->addAfter($savedInfo);
                 }else{
                     $info=$this->model->find($data['id']);
                     $baseInfo=$this->baseModel->find($info[$this->model::parentField()]);
@@ -241,14 +244,19 @@ trait CurdChild{
 
                     $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
 
-                    $this->editAfter($this->model->saveInfo($data,$fields,$baseInfo,$info));
+                    $savedInfo=$this->model->saveInfo($data,$fields,$baseInfo,$info);
+                    $this->editAfter($savedInfo);
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
                 $this->errorAndCode($e->getMessage(),$e->getCode());
             }
             $this->model->commit();
-            $this->success((empty($data['id'])?'添加':'修改').'成功');
+            $this->success((empty($data['id'])?'添加':'修改').'成功',[
+                'data'=>$data,
+                'info'=>$savedInfo,
+                'baseInfo'=>$baseInfo
+            ]);
         }
 
         $id=$this->request->param('id/d');

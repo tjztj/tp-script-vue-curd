@@ -295,7 +295,10 @@ define(['vueAdmin'], function (va) {
                 }
             },
             methods:{
-                onSubmit(){
+                onSubmit(option){
+                    //我想要子组件可以不关闭当前窗口提交（就是自定义的字段可以新增数据后继续编辑）
+                    option=option||{};
+
                     this.$refs.pubForm.validate().then(async() => {
                         for(let i in this.groupFields){
                             if(this.$refs['fieldGroup'+i]){
@@ -308,7 +311,17 @@ define(['vueAdmin'], function (va) {
                         this.$post(window.location.href,this.form).then(async res=>{
                             parentWindow.antd.message.success(res.msg);
                             window.listVue.refreshTable();
-                            this.close();
+                            if(option.notClose){
+                                this.close();
+                            }else{
+                                //因为数据有其他处理，所以这里返回过来的值就不再赋值到form中了
+                                if(!this.form.id){
+                                    this.form.id=res.data.info.id
+                                }
+                            }
+                            if(option.success){
+                                option.success(res)
+                            }
                         }).finally(()=>{
                             this.loading=false;
                         })

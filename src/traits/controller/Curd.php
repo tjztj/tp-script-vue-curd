@@ -175,6 +175,7 @@ trait Curd
         if($this->request->isAjax()){
             $data=$this->request->post();
             $this->model->startTrans();
+            $savedInfo=null;
             try{
                 if(empty($data['id'])){
                     $this->addBefore($data);
@@ -182,7 +183,8 @@ trait Curd
                     $this->fields=$this->fields->filterNextStepFields(null,null,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
-                    $this->addAfter($this->model->addInfo($data,$this->fields));
+                    $savedInfo=$this->model->addInfo($data,$this->fields);
+                    $this->addAfter($savedInfo);
                 }else{
                     $old=$this->model->find($data['id']);
 
@@ -194,15 +196,18 @@ trait Curd
                         :$this->fields->filterCurrentStepFields($old,null,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
-
-                    $this->editAfter($this->model->saveInfo($data,$this->fields,null,$old));
+                    $savedInfo=$this->model->saveInfo($data,$this->fields,null,$old);
+                    $this->editAfter($savedInfo);
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
                 $this->errorAndCode($e->getMessage());
             }
             $this->model->commit();
-            $this->success((empty($data['id'])?'添加':'修改').'成功');
+            $this->success((empty($data['id'])?'添加':'修改').'成功',[
+                'data'=>$data,
+                'info'=>$savedInfo,
+            ]);
         }
 
         $id=$this->request->param('id/d');
