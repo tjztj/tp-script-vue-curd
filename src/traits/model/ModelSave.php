@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd\traits\model;
 
 
-use app\admin\model\SystemAdmin;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
@@ -20,24 +19,51 @@ trait ModelSave
 
 
     /**
-     * 新增修改数据
+     * 修改数据
      * @param array $postData           要保存的数据
-     * @param FieldCollection|null $fields
+     * @param FieldCollection $fields
      * @param BaseModel|null $baseInfo
-     * @param VueCurlModel|null $beforeInfo
+     * @param VueCurlModel $beforeInfo
      * @return $this
      * @throws \think\Exception
      */
-    public function saveInfo(array $postData,FieldCollection $fields=null,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null): self
+    public function saveInfo(array $postData,FieldCollection $fields,BaseModel $baseInfo=null,VueCurlModel $beforeInfo): self
     {
-        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo);
+        //为了防止在doSaveData中被删除，在这里先获取了
+        $saveStepInfo=$fields->saveStepInfo??null;
 
+        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo);
 
         if(empty($postData['id'])){
             throw new \think\Exception('缺少ID');
         }
 
         $data['id']=$postData['id'];
+
+        //没有设置当前步骤
+        if(!isset($data[static::getStepField()])&&$fields->stepIsEnable()){
+            if(!$saveStepInfo){
+                throw new \think\Exception('未能获取到当前步骤信息');
+            }
+            $stepData=[
+                'step'=>$saveStepInfo->getStep(),
+                'time'=>time(),
+                'user'=>staticTpScriptVueCurdGetLoginData()['id'],
+                'back'=>'0',//后退步数
+            ];
+            if($beforeInfo[static::getStepField()]){
+                $stepsArr=is_string($beforeInfo[static::getStepField()])?json_decode($beforeInfo[static::getStepField()],true):$beforeInfo[static::getStepField()];
+                $nowStep=end($stepsArr);
+                if($nowStep['step']!==$saveStepInfo->getStep()){
+                    //新的步骤
+                    $stepsArr[]=$stepData;
+                }
+            }else{
+                $stepsArr=[$stepData];
+            }
+            $data[static::getStepField()]=json_encode($stepsArr);
+        }
+
         unset( $data['create_time']
             , $data['update_time']
             , $data['delete_time']

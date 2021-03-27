@@ -26,6 +26,21 @@ trait Curd
     public VueCurlModel $model;
     public FieldCollection $fields;
 
+    private bool $saveStepNext;//编辑的时候，是否是下一步
+    public bool $emptySaveStepNextUseRequest=true;//如果未设置saveStepNext，是否又获取到的参数[step-next]决定
+    public function getSaveStepNext():bool{
+        if(!isset($this->saveStepNext)||is_null($this->saveStepNext)){
+            return $this->emptySaveStepNextUseRequest&&$this->request->param('step-next/d')===1;
+        }
+        return $this->saveStepNext;
+    }
+    public function setSaveStepNext(bool $saveStepNext):self{
+        $this->saveStepNext=$saveStepNext;
+        return $this;
+    }
+
+
+
 
     /**
      * #title 数据列表
@@ -74,16 +89,30 @@ trait Curd
 
 
 
+            $doSteps=function(VueCurlModel $info){
+                if(!$this->fields->stepIsEnable()){
+                    return $info;
+                }
+
+                $stepInfo=$this->fields->getCurrentStepInfo($info);
+                $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
+
+                $nextStepInfo=$this->fields->getNextStepInfo($info);
+                $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
+
+                return $info;
+            };
+
             $option=new FunControllerIndexData();
             if($this->indexPageOption->pageSize>0){
-                $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->toArray();
+                $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->map($doSteps)->toArray();
                 $option->data=$pageData['data'];
                 $option->currentPage=$pageData['current_page'];
                 $option->lastPage=$pageData['last_page'];
                 $option->perPage=$pageData['per_page'];
                 $option->total=$pageData['total'];
             }else{
-                $option->data=$model->select()->toArray();
+                $option->data=$model->select()->map($doSteps)->toArray();
             }
 
             foreach ($option->data as $k=>$v){
@@ -127,6 +156,7 @@ trait Curd
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
+            'fieldStepConfig'=>$this->fields->getStepConfig(),
         ]);
 
         return $this->showTpl('index',$data);
@@ -147,9 +177,25 @@ trait Curd
             $this->model->startTrans();
             try{
                 if(empty($data['id'])){
-                    $this->addAfter($this->model->addInfo($data));
+                    $this->addBefore($data);
+                    //步骤字段
+                    $this->fields=$this->fields->filterNextStepFields(null,null,$stepInfo);
+                    $this->fields->saveStepInfo=$stepInfo;
+
+                    $this->addAfter($this->model->addInfo($data,$this->fields));
                 }else{
-                    $this->editAfter($this->model->saveInfo($data,null,null,$this->model->find($data['id'])));
+                    $old=$this->model->find($data['id']);
+
+                    $this->editBefore($data,$old);
+
+                    //步骤
+                    $this->fields=$this->getSaveStepNext()
+                        ?$this->fields->filterNextStepFields($old,null,$stepInfo)
+                        :$this->fields->filterCurrentStepFields($old,null,$stepInfo);
+                    $this->fields->saveStepInfo=$stepInfo;
+
+
+                    $this->editAfter($this->model->saveInfo($data,$this->fields,null,$old));
                 }
             }catch (\Exception $e){
                 $this->model->rollback();

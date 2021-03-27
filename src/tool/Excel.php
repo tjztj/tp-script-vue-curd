@@ -10,8 +10,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
-use PhpOffice\PhpSpreadsheet\Writer\Html;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -52,7 +50,7 @@ class Excel
 
         $objPHPExcel = new Spreadsheet();
         $xlsTitle = iconv('utf-8', 'gb2312', $expTitle);//文件名称
-        $fileName = $xlsTitle ? $xlsTitle : \tpScriptVueCurd\tool\Time::unixtimeToDate('YmdHis');//or $xlsTitle 文件名称可根据自己情况设定
+        $fileName = $xlsTitle ?: Time::unixtimeToDate('YmdHis');//or $xlsTitle 文件名称可根据自己情况设定
         foreach ($expCellName as $k => $v) {
             if (isset($v[0])) $expCellName[$k]['name'] = $v[0];
             if (isset($v[1])) {
@@ -103,7 +101,7 @@ class Excel
         $objPHPExcel->getActiveSheet()->getRowDimension('1')->setRowHeight(50);
 //    $objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
 //    $objPHPExcel->getActiveSheet()->getStyle('A1')->getFont()->setName('Simhei');
-        $objPHPExcel->getActiveSheet(0)->mergeCells('A1:' . $cellName[$cellNum - 1] . '1');//合并单元格
+        $objPHPExcel->getActiveSheet()->mergeCells('A1:' . $cellName[$cellNum - 1] . '1');//合并单元格
         // $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $expTitle.'  Export time:'.\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d H:i:s'));
         $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $title);
 
@@ -117,7 +115,7 @@ class Excel
             $objPHPExcel->getActiveSheet()
                 ->getStyle('A2')
                 ->applyFromArray($styleArray2);
-            $objPHPExcel->getActiveSheet(0)->mergeCells('A2:' . $cellName[$cellNum - 1] . '2'); // 合并单元格
+            $objPHPExcel->getActiveSheet()->mergeCells('A2:' . $cellName[$cellNum - 1] . '2'); // 合并单元格
             // $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A1', $expTitle.' Export time:'.date('Y-m-d H:i:s'));
             $objPHPExcel->setActiveSheetIndex(0)->setCellValue('A2', $ftitle);
             $begin_th++;
@@ -129,12 +127,12 @@ class Excel
                     $objPHPExcel->getActiveSheet()->getStyle($v[0] . $key)->applyFromArray(
                         ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER], 'font' => ['bold' => true]]
                     );
-                    if (!empty($v[1]) || !empty($v[1])) {
+                    if (!empty($v[0]) || !empty($v[1])) {
                         $x = $key;
                         $y = $v[0];
                         empty($v[2]) || $x += $v[2] - 1;
                         empty($v[1]) || $y = $cellName[array_search($v[0], $cellName) + $v[1] - 1];
-                        $objPHPExcel->getActiveSheet(0)->mergeCells($v[0] . $key . ':' . $y . $x);
+                        $objPHPExcel->getActiveSheet()->mergeCells($v[0] . $key . ':' . $y . $x);
                     }
                 }
             }
@@ -172,10 +170,10 @@ class Excel
                 } else {
                     $data_value = empty($data_key) ? '' : $expTableData[$i][$data_key];
                 }
-                $objPHPExcel->getActiveSheet(0)->setCellValue($cellName[$j + $n] . ($i + $begin_th), $data_value);
+                $objPHPExcel->getActiveSheet()->setCellValue($cellName[$j + $n] . ($i + $begin_th), $data_value);
                 if (!empty($expCellName[$j]['rowspan']) && $th) {
                     $n += $expCellName[$j]['rowspan'] - 1;
-                    $objPHPExcel->getActiveSheet(0)->mergeCells($cellName[$j] . ($i + $begin_th) . ':' . $cellName[$j + $n] . ($i + $begin_th));
+                    $objPHPExcel->getActiveSheet()->mergeCells($cellName[$j] . ($i + $begin_th) . ':' . $cellName[$j + $n] . ($i + $begin_th));
                 }
             }
         }
@@ -248,7 +246,7 @@ class Excel
             foreach ($currSheet->getDrawingCollection()->getIterator() as $drawing){
                 $source=null;
                 list($startColumn, $startRow) = Coordinate::coordinateFromString($drawing->getCoordinates());
-                $imageFileName = $drawing->getCoordinates().'_'. mt_rand(1000, 9999).'_'.time().'_'.$drawing->getHashCode();
+                $imageFileName = $drawing->getCoordinates().'_'. random_int(1000, 9999).'_'.time().'_'.$drawing->getHashCode();
                 if($drawing instanceof MemoryDrawing){
                     $imageFileName .= '.png';
                     $source = $drawing->getImageResource();
@@ -411,23 +409,18 @@ class Excel
             // 文本
             case 'text' :
                 return $value;
-                break;
             // 日期
             case  'date' :
-                return !empty($value) ? \tpScriptVueCurd\tool\Time::unixtimeToDate($array[3], $value) : null;
-                break;
+                return !empty($value) ? Time::unixtimeToDate($array[3], $value) : null;
             // 月分
             case  'month' :
-                return !empty($value) ? \tpScriptVueCurd\tool\Time::unixtimeToDate($array[3].'/01', $value) : null;
-                break;
+                return !empty($value) ? Time::unixtimeToDate($array[3].'/01', $value) : null;
             // 选择框
             case  'selectd' :
                 return  $array[3][$value] ?? null ;
-                break;
             // 匿名函数
             case  'function' :
                 return isset($array[3]) ? call_user_func($array[3], $row) : null;
-                break;
             // 默认
             default :
 

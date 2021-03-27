@@ -48,13 +48,5 @@ trait ModelBaseField
     public static function getRegionPidField():string{
         return getModelDefaultRegionPidField();
     }
-
-
-    /**
-     * 步奏字段
-     * @return string
-     */
-    public static function getStepField():string{
-        return getModelDefaultStepField();
-    }
+    
 }

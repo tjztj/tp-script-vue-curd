@@ -12,7 +12,6 @@ use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Vue;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
-use tpScriptVueCurd\traits\controller\Curd;
 use tpScriptVueCurd\traits\controller\CurdFunc;
 use tpScriptVueCurd\traits\controller\Excel;
 use tpScriptVueCurd\traits\Func;
@@ -109,7 +108,7 @@ trait Controller
         // 列表页面显示前处理
         return $fetch;
     }
-
+    
     protected function addAfter(VueCurlModel $info): void
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）

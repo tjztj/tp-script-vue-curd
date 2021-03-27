@@ -13,7 +13,6 @@ use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
 use tpScriptVueCurd\traits\controller\CurdChild;
 use tpScriptVueCurd\traits\controller\ExcelChild;
-use think\App;
 
 /**
  * trait BaseChildController
@@ -87,5 +86,14 @@ trait BaseChildController
 
     public function importAfter(FunControllerChildImportAfter $option):void{
         // 数据导入后，方便之类处理（之类重写此方法）
+    }
+
+    protected function addBefore(array &$data,BaseModel $baseInfo): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
+    }
+    protected function editBefore(array &$data,VueCurlModel $old,BaseModel $baseInfo): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
     }
 }

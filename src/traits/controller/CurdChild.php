@@ -77,6 +77,7 @@ trait CurdChild{
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
+            'fieldStepConfig'=>$this->fields->getStepConfig(),
         ]));
     }
 
@@ -95,16 +96,32 @@ trait CurdChild{
             ->where(function (Query $query){$this->indexListWhere($query);})
             ->where($this->fields->getFilterWhere());
 
+        $baseInfo=$this->baseModel->find($base_id);
+
+        $doSteps=function(VueCurlModel $info)use($baseInfo){
+            if(!$this->fields->stepIsEnable()){
+                return $info;
+            }
+
+            $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
+            $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
+
+            $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
+            $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
+
+            return $info;
+        };
+
         $option=new FunControllerIndexData();
         if($this->indexPageOption->pageSize>0){
-            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->toArray();
+            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->map($doSteps)->toArray();
             $option->data=$pageData['data'];
             $option->currentPage=$pageData['current_page'];
             $option->lastPage=$pageData['last_page'];
             $option->perPage=$pageData['per_page'];
             $option->total=$pageData['total'];
         }else{
-            $option->data=$model->select()->toArray();
+            $option->data=$model->select()->map($doSteps)->toArray();
         }
         foreach ($option->data as $k=>$v){
             $this->fields->doShowData($option->data[$k]);
@@ -201,11 +218,30 @@ trait CurdChild{
                     if(is_null($baseInfo)){
                         throw new \think\Exception('未找到所属数据');
                     }
-                    $this->addAfter($this->model->addInfo($data,$baseInfo));
+
+                    $this->addBefore($data,$baseInfo);
+
+                    //步骤字段
+                    $this->fields=$this->fields->filterNextStepFields(null,$baseInfo,$stepInfo);
+                    $this->fields->saveStepInfo=$stepInfo;
+
+                    $this->addAfter($this->model->addInfo($data,$baseInfo,$this->fields));
                 }else{
-                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
                     $info=$this->model->find($data['id']);
-                    $this->editAfter($this->model->saveInfo($data,$fields,$this->baseModel->find($info[$this->model::parentField()]),$info));
+                    $baseInfo=$this->baseModel->find($info[$this->model::parentField()]);
+
+                    $this->editBefore($data,$info,$baseInfo);
+
+                    //步骤
+                    $this->fields=$this->getSaveStepNext()
+                        ?$this->fields->filterNextStepFields($info,$baseInfo,$stepInfo)
+                        :$this->fields->filterCurrentStepFields($info,$baseInfo,$stepInfo);
+                    $this->fields->saveStepInfo=$stepInfo;
+
+
+                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
+
+                    $this->editAfter($this->model->saveInfo($data,$fields,$baseInfo,$info));
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
@@ -226,9 +262,14 @@ trait CurdChild{
         }
 
         $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//不编辑地区
+
         $this->createEditFetchDataBefore($fields,$info);//切面
-        $fetchData=$this->createEditFetchData($fields,$info);//切面
+
+        $baseInfo=$this->baseModel->find($info[$this->model::parentField()]);
+
+        $fetchData=$this->createEditFetchData($fields,$info,$baseInfo);//切面
         $fetchData['baseId']=$base_id;
+        $fetchData['baseInfo']=$baseInfo;
         $fetchData['parentField']=$this->model::parentField();
         $fetchData['vueCurdAction']='childEdit';
 

@@ -10,7 +10,6 @@ use tpScriptVueCurd\option\FunControllerImportAfter;
 use tpScriptVueCurd\option\FunControllerImportBefore;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Curd;
-use think\App;
 
 
 /**
@@ -55,5 +54,14 @@ trait BaseController
 
     public function importAfter(FunControllerImportAfter $option):void{
         // 数据导入后，方便之类处理（之类重写此方法）
+    }
+
+    protected function addBefore(array &$data): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
+    }
+    protected function editBefore(array &$data,VueCurlModel $old): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
     }
 }

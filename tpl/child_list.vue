@@ -103,6 +103,7 @@
             :can-edit="canEdit"
             :can-del="canDel"
             :row-selection="canDel?rowSelection:null"
+            :field-step-config="fieldStepConfig"
             @change="handleTableChange"
             @open-show="openShow"
             @on-delete="deleteRow"

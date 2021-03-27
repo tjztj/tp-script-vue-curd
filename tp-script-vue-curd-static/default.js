@@ -81,6 +81,7 @@ define(['vueAdmin'], function (va) {
                             delSelecteds.value=selectedRowKeys;
                         },
                     },
+                    fieldStepConfig:vueData.fieldStepConfig,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -166,8 +167,12 @@ define(['vueAdmin'], function (va) {
                     }).end();
                 },
                 openEdit(row){
+                    let title='修改 '+vueData.title;
+                    if(row.stepInfo&&row.stepInfo.title){
+                        title+=' [ '+row.stepInfo.title+' ]';
+                    }
                     this.openBox({
-                        title:'修改 '+vueData.title,
+                        title:row,
                         offset:'rt',
                         content: vueData.editUrl+'?id='+row.id,
                     }).end();
@@ -396,6 +401,7 @@ define(['vueAdmin'], function (va) {
                             delSelecteds.value=selectedRowKeys;
                         },
                     },
+                    fieldStepConfig:vueData.fieldStepConfig,
                 }
             },
             mounted() {

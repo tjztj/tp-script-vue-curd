@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd\base\model;
 
 
-use app\admin\model\SystemAdmin;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
@@ -21,12 +20,12 @@ abstract class BaseModel extends VueCurlModel
     /**
      * 添加基本事项
      * @param array $oldData
-     * @param FieldCollection|null $fields
+     * @param FieldCollection $fields
      * @param bool $isExcelDo 是否excel操作
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $postData,FieldCollection $fields=null,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,FieldCollection $fields,bool $isExcelDo=false):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -36,7 +35,27 @@ abstract class BaseModel extends VueCurlModel
         if(!is_subclass_of($this,BaseModel::class)) {
             throw new \think\Exception('当前model不能执行此操作');
         }
+
+        //为了防止在doSaveData中被删除，在这里先获取了
+        $saveStepInfo=$fields->saveStepInfo??null;
+
         $data=$this->doSaveData($postData,$fields,$isExcelDo);
+
+        //没有设置当前步骤， excel导入不分步骤
+        if(!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable()){
+            if(!$saveStepInfo){
+                throw new \think\Exception('未能获取到当前步骤信息');
+            }
+            $data[static::getStepField()]=json_encode([
+                [
+                    'step'=>$saveStepInfo->getStep(),
+                    'time'=>time(),
+                    'user'=>staticTpScriptVueCurdGetLoginData()['id'],
+                    'back'=>'0',//后退步数
+                ]
+            ]);
+        }
+
         //TODO::地区权限验证
         if(static::getCreateLoginUserField()){
             $data[static::getCreateLoginUserField()]=staticTpScriptVueCurdGetLoginData()['id'];

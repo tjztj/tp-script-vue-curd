@@ -9,7 +9,6 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\tool\ErrorCode;
 use tpScriptVueCurd\traits\controller\ExcelHaveChild;
-use think\App;
 
 /**
  * trait BaseHaveChildController

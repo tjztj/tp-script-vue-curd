@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd;
 
 
-use think\Validate;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
@@ -421,14 +420,14 @@ abstract class ModelField
      * @return $this|FieldStepCollection|null
      * @throws \think\Exception
      */
-    public function steps(&$steps=null){
+    public function steps($steps=null){
         if(is_null($steps)){
             return $this->steps??null;
         }
 
         if(is_array($steps)){
             $stepList=FieldStepCollection::make();
-            foreach ($steps as &$v){
+            foreach ($steps as $v){
                 $stepList->push(clone $v);
                 $v->removeFieldData();
             }
@@ -441,7 +440,7 @@ abstract class ModelField
 
 
         $stepList=$stepList->map(function(FieldStep $val){
-            $val->setField($this);
+            $val->setFieldName($this->name());
             return $val;
         });
         $this->steps=$stepList;

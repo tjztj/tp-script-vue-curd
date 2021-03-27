@@ -65,7 +65,7 @@ trait ExcelChild
         $option->saveArr=$saveData;
         $option->base=$baseInfo;
         $this->importBefore($option);
-        $info=$model->addInfo($option->saveArr,$option->base,true);
+        $info=$model->addInfo($option->saveArr,$option->base,$model->fields(),true);
 
         $optionAfter=new FunControllerChildImportAfter();
         $optionAfter->saveObjects=$info;

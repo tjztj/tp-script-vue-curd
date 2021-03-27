@@ -133,7 +133,7 @@ if (!function_exists('getModelDefaultRegionPidField')) {
 
 if (!function_exists('getModelDefaultStepField')) {
     /**
-     * 记录删除人的字段，为空字符串，表示不记录（所有表初始默认）
+     * 字段步骤默认名称
      * @return string
      */
     function getModelDefaultStepField():string{

@@ -251,6 +251,7 @@
                 :can-del="canDel"
                 :action-width="actionWidth"
                 :row-selection="canDel?rowSelection:null"
+                :field-step-config="fieldStepConfig"
                 @change="handleTableChange"
                 @on-delete="deleteRow"
                 @open-edit="openEdit"

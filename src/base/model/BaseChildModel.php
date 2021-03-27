@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd\base\model;
 
 
-use app\admin\model\SystemAdmin;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 
@@ -42,22 +41,46 @@ abstract class BaseChildModel extends VueCurlModel
         return $return;
     }
 
+
     /**
      * 添加子数据
-     * @param array $postData        添加的数据
-     * @param BaseModel $baseInfo   所属的数据
-     * @param bool $isExcelDo       是否excel操作
+     * @param array $postData           添加的数据
+     * @param BaseModel $baseInfo       所属的数据
+     * @param FieldCollection $fields   添加的字段信息
+     * @param bool $isExcelDo           是否excel操作
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $postData,BaseModel $baseInfo,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,BaseModel $baseInfo,FieldCollection $fields,bool $isExcelDo=false):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
         #########################################################################################
 
-        $fields=$this->fields()->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
+        $fields=$fields->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
+
+        //为了防止在doSaveData中被删除，在这里先获取了
+        $saveStepInfo=$fields->saveStepInfo??null;
+
         $data=$this->doSaveData($postData,$fields,$isExcelDo,$baseInfo);
+
+
+        //没有设置当前步骤， excel导入不分步骤
+        if(!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable()){
+            if(!$saveStepInfo){
+                throw new \think\Exception('未能获取到当前步骤信息');
+            }
+            $data[static::getStepField()]=json_encode([
+                [
+                    'step'=>$saveStepInfo->getStep(),
+                    'time'=>time(),
+                    'user'=>staticTpScriptVueCurdGetLoginData()['id'],
+                    'back'=>'0',//后退步数
+                ]
+            ]);
+        }
+
+
         $data[static::parentField()]=$baseInfo->id;
         static::getRegionField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionField())->isEmpty()||$data[static::getRegionField()]=$baseInfo[static::getRegionField()];
         static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$baseInfo[static::getRegionPidField()];

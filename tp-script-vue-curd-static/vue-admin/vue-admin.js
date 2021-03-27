@@ -2,7 +2,8 @@
  * tj 1079798840@qq.com
  */
 const requires=['axios','qs'];
-window.fieldComponents={},window.filterComponents={};
+window.fieldComponents={};
+window.filterComponents={};
 if(vueData.fieldComponents){
     for(let i in vueData.fieldComponents){
         let v=vueData.fieldComponents[i];
@@ -20,10 +21,9 @@ if(vueData.filterComponents){
 }
 
 define(requires, function ( axios,Qs) {
-    /****
+    /**
      * 自定义Promise
-     * @param func
-     * @param functions
+     * @param doFunction
      * @returns {f}
      * @constructor
      */
@@ -728,7 +728,7 @@ define(requires, function ( axios,Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable',{
-            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection'],
+            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection','fieldStepConfig'],
             setup(props,ctx){
                 const listColumns=props.listColumns;
                 let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={};
@@ -765,6 +765,15 @@ define(requires, function ( axios,Qs) {
                     columns=columns[0].children;
                 }
 
+                if(props.fieldStepConfig&&props.fieldStepConfig.enable&&props.fieldStepConfig.listShow===true){
+                    columns.push({
+                        title:'步骤',
+                        ellipsis:true,
+                        dataIndex: "stepInfo",
+                        slots: { customRender: 'step-info' },
+                    })
+                    columnsCount++;
+                }
                 columns.push({
                     title:'创建时间',
                     ellipsis:true,
@@ -933,6 +942,12 @@ define(requires, function ( axios,Qs) {
                                 </a-tooltip>
                               </template>
                             
+                                <template #step-info="{ text: stepInfo }">
+                                    <a-tooltip v-if="stepInfo">
+                                        <template #title>{{ stepInfo.title }}</template>
+                                        <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
+                                    </a-tooltip>
+                                </template>
                                <template #create-time="{ text: create_time }">
                                     <a-tooltip>
                                         <template #title>{{ create_time }}</template>

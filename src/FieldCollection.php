@@ -23,11 +23,15 @@ class FieldCollection extends Collection
     public array $groupItems=[];//字段分组（如果少于2个组，将为空；字段不设置group，将赋值为 基本信息）
     public function __construct($items = [])
     {
+        $this->setGroupItems($items);
+        parent::__construct($items);
+    }
+
+    private function setGroupItems(array $items){
         $groupItems=self::groupListByItems($items);
         if(count($groupItems)>1){
             $this->groupItems=$groupItems;
         }
-        parent::__construct($items);
     }
 
 
@@ -377,5 +381,20 @@ class FieldCollection extends Collection
         return array_filter($return);
     }
 
-
+    /**
+     * 用回调函数过滤数组中的元素
+     * @access public
+     * @param callable|null $callback 回调
+     * @return static
+     */
+    public function filter(callable $callback = null)
+    {
+        $new=clone $this;
+        if ($callback) {
+            $new->items = $new->convertToArray(array_filter($new->items, $callback));
+        }else{
+            $new->items = $new->convertToArray(array_filter($new->items));
+        }
+        return $new;
+    }
 }

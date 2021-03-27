@@ -195,7 +195,7 @@ trait ExcelHaveChild
                 $option->saveArr=$datas[$modelName];
                 $option->base=$base;
                 $childControllerClassList[$childControllerClass]->importBefore($option);
-                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,true);
+                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,$model->fields(),true);
 
                 $optionAfter=new FunControllerChildImportAfter();
                 $optionAfter->saveObjects=$infos[$modelClass];

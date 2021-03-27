@@ -5,6 +5,8 @@ namespace tpScriptVueCurd\traits\controller;
 
 
 use think\helper\Str;
+use tpScriptVueCurd\base\model\BaseChildModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\Request;
@@ -37,8 +39,17 @@ trait CurdFunc
         if(empty($data)){
             return $this->errorAndCode('未找到相关数据信息');
         }
+
+
+        $baseInfo=null;
+        if($this->model instanceof BaseChildModel){
+            $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
+        }
+        $fields=$this->fields->filterShowStepFields($data,$baseInfo);
+
+
         $info=$data->toArray();
-        return $this->doShow(static::getTitle(),$info,$this->fields);
+        return $this->doShow(static::getTitle(),$info,$fields);
     }
 
     /**
@@ -64,24 +75,31 @@ trait CurdFunc
     }
 
 
+
     /**
      * 获取编辑界面显示需要的参数
      * @param FieldCollection $fields
      * @param VueCurlModel|null $data
+     * @param BaseModel|null $baseModel
      * @return array
      * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
      */
-    protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data){
+    protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
+            $fields=$this->getSaveStepNext()
+                ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
+                :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
+            $fields->saveStepInfo=$stepInfo;
+
+
             $info=$data->toArray();
             //只处理地区
             $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()]))->doShowData($info);
             //原信息
             $info['sourceData']=$data;
         }else{
+            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
+            $fields->saveStepInfo=$stepInfo;
             $info=null;
         }
         $fieldArr=array_values($fields->toArray());
@@ -91,6 +109,8 @@ trait CurdFunc
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('edit'),
+            'stepNext'=>$this->request->param('step-next/d')===1?1:0,
+            'stepInfo'=>$stepInfo?$stepInfo->toArray():null,
         ];
     }
 
