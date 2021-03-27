@@ -274,60 +274,80 @@ class FieldCollection extends Collection
                  * @var FieldNumHideFieldCollection $hideFields
                  */
                 $hideFields=$v->hideFields();
-                if(is_null($hideFields)||!isset($data[$vName])){
+                if(is_null($hideFields)){
                     return;
                 }
+                if(!isset($data[$vName])){
+                    $vValue=null;
+                }else{
+                    if($isDataBaseInfo){
+                        $vValue=$data[$vName];
+                    }else{
+                        $fieldCopy=clone $v;
+                        $vValue=$fieldCopy->setSave($data)->getSave();
+                    }
+                }
+
+                //有值才显示
+                if($vValue){
+                    $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
+                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
+                            $changeFieldHideList($f->name(),$vName,true);
+                        });
+                    });
+                    $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
+                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
+                            $changeFieldHideList($f->name(),$vName,false);
+                        });
+                    });
+                }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){ //默认隐藏所有
+                    $hideFields->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
+                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
+                            $changeFieldHideList($f->name(),$vName,false);
+                        });
+                    });
+                }
+            }else if(method_exists($v,'items')){
                 if($isDataBaseInfo){
-                    $vValue=$data[$vName];
+                    $vValue=$data[$vName]??null;
                 }else{
                     $fieldCopy=clone $v;
                     $vValue=$fieldCopy->setSave($data)->getSave();
                 }
-                $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
-                    $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
-                        $changeFieldHideList($f->name(),$vName,true);
-                    });
-                });
-                $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
-                    $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
-                        $changeFieldHideList($f->name(),$vName,false);
-                    });
-                });
-            }else if(method_exists($v,'items')){
-                if(!isset($data[$vName])){
-                    return;
-                }
-                $vValue=null;
-                foreach ($v->items() as $item){
-                    if(!isset($item['hideFields'])){
-                        continue;
-                    }
-                    if(is_null($vValue)){
-                        if($isDataBaseInfo){
-                            $vValue=$data[$vName];
-                        }else{
-                            $fieldCopy=clone $v;
-                            $vValue=$fieldCopy->setSave($data)->getSave();
+                //有值才显示
+                if($vValue) {
+                    foreach ($v->items() as $item){
+                        if(!isset($item['hideFields'])){
+                            continue;
                         }
-                    }
-                    $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v){
-                        //与JS中的一致
-                        switch ($vType) {
-                            case 'CheckboxField':
-                                $hide=$arrHave($vValue, $item['value']);
-                                break;
-                            case 'SelectField':
-                                if ($v->multiple()) {
+                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v){
+                            //与JS中的一致
+                            switch ($vType) {
+                                case 'CheckboxField':
                                     $hide=$arrHave($vValue, $item['value']);
-                                } else {
-                                    $hide=(string)$vValue === (string)$item['value'];
-                                }
-                                break;
-                            default:
-                                $hide= (string)$vValue === (string)$item['value'];
+                                    break;
+                                case 'SelectField':
+                                    if ($v->multiple()) {
+                                        $hide=$arrHave($vValue, $item['value']);
+                                    } else {
+                                        $hide=(string)$vValue === (string)$item['value'];
+                                    }
+                                    break;
+                                default:
+                                    $hide= (string)$vValue === (string)$item['value'];
+                            }
+                            $changeFieldHideList($hidelField->name(),$vName,$hide);
+                        });
+                    }
+                }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){//默认隐藏所有
+                    foreach ($v->items() as $item){
+                        if(!isset($item['hideFields'])){
+                            continue;
                         }
-                        $changeFieldHideList($hidelField->name(),$vName,$hide);
-                    });
+                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName){
+                            $changeFieldHideList($hidelField->name(),$vName,true);
+                        });
+                    }
                 }
             }
         })->filter(function(ModelField $v)use($fieldHideList){

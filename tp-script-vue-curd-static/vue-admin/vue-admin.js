@@ -567,8 +567,8 @@ define(requires, function ( axios,Qs) {
                                             allFields.push(f.name)
                                         }
                                     })
-                                    if(inputVal===''){
-                                        return false;
+                                    if(inputVal===''||inputVal===0||inputVal==='0'||inputVal===null){
+                                        return field.defHideAboutFields?true:false;
                                     }
                                     if(item.start===null&&item.end===null){
                                         return false;
@@ -597,23 +597,27 @@ define(requires, function ( axios,Qs) {
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
                                         item.hideFields.map(hideField=>{
-                                            let have;
-                                            switch (field.type){
-                                                case 'CheckboxField':
-                                                    have=arrHave(formVal[field.name],item.value);
-                                                    break;
-                                                case 'SelectField':
-                                                    if(field.multiple){
+                                            if(item.value){
+                                                let have;
+                                                switch (field.type){
+                                                    case 'CheckboxField':
                                                         have=arrHave(formVal[field.name],item.value);
-                                                    }else{
-                                                        have=formVal[field.name]===item.value
-                                                    }
-                                                    break;
-                                                default:
-                                                    have=formVal[field.name]===item.value;
+                                                        break;
+                                                    case 'SelectField':
+                                                        if(field.multiple){
+                                                            have=arrHave(formVal[field.name],item.value);
+                                                        }else{
+                                                            have=formVal[field.name]===item.value
+                                                        }
+                                                        break;
+                                                    default:
+                                                        have=formVal[field.name]===item.value;
+                                                }
+                                                //have 是否符合条件，符合条件就隐藏
+                                                changeFieldHideList(hideField.name,field.name,have)
+                                            }else if(field.defHideAboutFields){
+                                                changeFieldHideList(hideField.name,field.name,true)
                                             }
-                                            //have 是否符合条件，符合条件就隐藏
-                                            changeFieldHideList(hideField.name,field.name,have)
                                         })
                                     }
                                 })

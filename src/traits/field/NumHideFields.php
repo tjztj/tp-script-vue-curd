@@ -12,6 +12,7 @@ trait NumHideFields
 {
 
     protected FieldNumHideFieldCollection $hideFields;
+    protected bool $defHideAboutFields=true;//默认隐藏相关字段
 
 
     /**
@@ -46,5 +47,14 @@ trait NumHideFields
             $this->hideFields=$hideFields;
         }
         return $this;
+    }
+
+    /**
+     * 默认隐藏相关字段
+     * @param bool|null $defHideAboutFields
+     * @return bool|$this
+     */
+    public function defHideAboutFields(bool $defHideAboutFields=null){
+        return $this->doAttr('defHideAboutFields',$defHideAboutFields);
     }
 }
