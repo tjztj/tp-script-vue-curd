@@ -39,6 +39,7 @@ abstract class ModelField
     protected ?array $editLabelCol=null;//编辑界面 label布局
     protected string $editLabelAlign='right';//编辑界面 label对齐
     protected ?array $editWrapperCol=null;//编辑界面 为输入控件设置布局样式 用法同 editLabelCol
+    protected bool $editColon=true;//是否显示label后面的冒号
     protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule=null;//数据验证
     public const REQUIRED=true;//开启必填验证
@@ -260,6 +261,14 @@ abstract class ModelField
         return $this->doAttr('showUseComponent',$showUseComponent);
     }
 
+    /**
+     * 是否显示label后面的冒号
+     * @param bool|null $editColon
+     * @return $this|bool
+     */
+    public function editColon(bool $editColon=null){
+        return $this->doAttr('editColon',$editColon);
+    }
 
 
     /**
