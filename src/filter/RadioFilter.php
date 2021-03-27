@@ -31,7 +31,7 @@ class RadioFilter extends ModelFilter
                 throw new \think\Exception('字段'.$this->field->name().'设置的filter错误，此filter需 字段 继承'.(CheckField::class));
             }
             if(empty($this->items)){
-                throw new \think\Exception('字段'.$this->field->name().'items 不可未空');
+                throw new \think\Exception('字段'.$this->field->name().' items 不可未空');
             }
         }
         return [

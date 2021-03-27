@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\traits\field;
 
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\filter\RadioFilter;
+use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\ModelFilter;
 
 
@@ -57,7 +58,19 @@ trait CheckField
             if($v['title']!==$v['text']){
                 throw new \think\Exception('不可又设置text又设置title，只能设置一个或者他们相同');
             }
-            isset($v['hideFields'])||$v['hideFields']=FieldCollection::make();//选中后隐藏的字段
+            //选中后隐藏的字段
+            if(isset($v['hideFields'])){
+                if(!$v['hideFields'] instanceof FieldCollection){
+                    if($v['hideFields'] instanceof ModelField){
+                        FieldCollection::make([$v['hideFields']]);
+                    }else if(is_array($v['hideFields'])){
+                        FieldCollection::make($v['hideFields']);
+                    }
+                }
+            }
+            if(empty($v['hideFields'])||!$v['hideFields'] instanceof FieldCollection){
+                $v['hideFields']=FieldCollection::make();
+            }
         }
         return $items;
     }
