@@ -267,8 +267,7 @@ trait FieldCollectionStep
             $this->items=[];
             return $this;
         }
-        $this->filter(fn(ModelField $v)=>$v->steps()->filter(fn(FieldStep $val)=>in_array($val->getStep(),$stepVals)));
-        return $this;
+        return $this->filter(fn(ModelField $v)=>$v->steps()->filter(fn(FieldStep $val)=>in_array($val->getStep(),$stepVals))->count()>0);
     }
 
 

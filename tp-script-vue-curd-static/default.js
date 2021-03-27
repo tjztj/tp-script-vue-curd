@@ -172,7 +172,7 @@ define(['vueAdmin'], function (va) {
                         title+=' [ '+row.stepInfo.title+' ]';
                     }
                     this.openBox({
-                        title:row,
+                        title:title,
                         offset:'rt',
                         content: vueData.editUrl+'?id='+row.id,
                     }).end();

@@ -447,4 +447,22 @@ abstract class ModelField
         return $this;
     }
 
+
+    /**
+     * 设置 steps 和group,如果没有传入group，group为步骤标题
+     * @param $step
+     * @param string|null $group
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function setStepsAndGroup($step,string $group=null): self
+    {
+        $this->steps($step);
+        if(is_null($group)){
+            $group=$this->steps()[0]->getTitle();
+        }
+        $this->group($group);
+        return $this;
+    }
+
 }
