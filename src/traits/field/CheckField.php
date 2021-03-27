@@ -63,9 +63,9 @@ trait CheckField
             if(isset($v['hideFields'])){
                 if(!$v['hideFields'] instanceof FieldCollection){
                     if($v['hideFields'] instanceof ModelField){
-                        FieldCollection::make([$v['hideFields']]);
+                        $v['hideFields']=FieldCollection::make([$v['hideFields']]);
                     }else if(is_array($v['hideFields'])){
-                        FieldCollection::make($v['hideFields']);
+                        $v['hideFields']=FieldCollection::make($v['hideFields']);
                     }
                 }
             }

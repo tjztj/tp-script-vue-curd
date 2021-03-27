@@ -597,7 +597,7 @@ define(requires, function ( axios,Qs) {
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
                                         item.hideFields.map(hideField=>{
-                                            if(item.value){
+                                            if(formVal[field.name]){
                                                 let have;
                                                 switch (field.type){
                                                     case 'CheckboxField':
