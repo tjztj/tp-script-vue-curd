@@ -40,7 +40,7 @@ define(requires, function ( axios,Qs) {
     /**
      * 初始化请求
      */
-    const service=axios.create({baseURL:'/'+window.VUE_CURD.MODULE+'/',withCredentials:true,timeout:150000});service.interceptors.response.use(response=>{const res=response.data; if(res.code==1){return res}antd.message.error(res.msg||'失败');if(res.url&&res.url.indexOf(vueData.loginUrl)!==-1){antd.Modal.confirm({content:'登录或已过期，可以取消以留在此页，或重新登录',okText:'确认退出',cancelText:'取消',onOk(){location.href=res.url}})}return Promise.reject(res)},error=>{if(typeof error==='string'){error={code:0,msg:error,data:[],}}else if(!error.msg){console.error(error);error={code:0,msg:'发生错误',data:[],}}antd.message.error(error.msg,6);return Promise.reject(error)})
+    window.service=axios.create({baseURL:'/'+window.VUE_CURD.MODULE+'/',withCredentials:true,timeout:150000});service.interceptors.response.use(response=>{const res=response.data; if(res.code==1){return res}antd.message.error(res.msg||'失败');if(res.url&&res.url.indexOf(vueData.loginUrl)!==-1){antd.Modal.confirm({content:'登录或已过期，可以取消以留在此页，或重新登录',okText:'确认退出',cancelText:'取消',onOk(){location.href=res.url}})}return Promise.reject(res)},error=>{if(typeof error==='string'){error={code:0,msg:error,data:[],}}else if(!error.msg){console.error(error);error={code:0,msg:'发生错误',data:[],}}antd.message.error(error.msg,6);return Promise.reject(error)})
 
 
     /****窗口方法***/
