@@ -311,7 +311,7 @@ define(['vueAdmin'], function (va) {
                         this.$post(window.location.href,this.form).then(async res=>{
                             parentWindow.antd.message.success(res.msg);
                             window.listVue.refreshTable();
-                            if(option.notClose){
+                            if(!option.notClose){
                                 this.close();
                             }else{
                                 //因为数据有其他处理，所以这里返回过来的值就不再赋值到form中了
