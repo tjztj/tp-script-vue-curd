@@ -134,6 +134,7 @@ define(requires, function ( axios,Qs) {
                             default:
                                 vObj.bodyDrawer.offset=option.offset;
                         }
+                        vObj.bodyDrawer.placement=vObj.bodyDrawer.offset;
                     }else{
                         option.area= ['45vw', '100vh'];
                     }
@@ -531,13 +532,13 @@ define(requires, function ( axios,Qs) {
                     handler(formVal){
                         function arrHave(arr,val){
                             if(typeof arr==='string'){
-                                arr=arr?[]:arr.split(',')
+                                arr=arr?arr.split(','):[]
                             }
-                            arr.some(selected=>{
-                                if(selected.toString()===val.toString()){
+                            for(let i in arr){
+                                if(arr[i].toString()===val.toString()){
                                     return true;
                                 }
-                            })
+                            }
                             return false;
                         }
 
@@ -602,15 +603,20 @@ define(requires, function ( axios,Qs) {
                                     changeFieldHideList(f,field.name,hideFileds.includes(f))
                                 });
                             }else if(field.items&&field.items.length>0){
+                                let hideFileds=[],allFields=[];
                                 field.items.map(item=>{
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
                                         item.hideFields.map(hideField=>{
+                                            if(!allFields.includes(hideField.name)){
+                                                allFields.push(hideField.name)
+                                            }
                                             if(formVal[field.name]){
                                                 let have;
                                                 switch (field.type){
                                                     case 'CheckboxField':
                                                         have=arrHave(formVal[field.name],item.value);
+                                                        // console.log(hideField.name,have,formVal[field.name],item.value);
                                                         break;
                                                     case 'SelectField':
                                                         if(field.multiple){
@@ -623,13 +629,20 @@ define(requires, function ( axios,Qs) {
                                                         have=formVal[field.name]===item.value;
                                                 }
                                                 //have 是否符合条件，符合条件就隐藏
-                                                changeFieldHideList(hideField.name,field.name,have)
+                                                // changeFieldHideList(hideField.name,field.name,have)
+                                                if(have&&!hideFileds.includes(hideField.name)){
+                                                    hideFileds.push(hideField.name)
+                                                }
                                             }else if(field.defHideAboutFields){
-                                                changeFieldHideList(hideField.name,field.name,true)
+                                                // changeFieldHideList(hideField.name,field.name,true)
+                                                hideFileds.push(hideField.name);
                                             }
                                         })
                                     }
                                 })
+                                allFields.forEach(f=>{
+                                    changeFieldHideList(f,field.name,hideFileds.includes(f))
+                                });
                             }
                         })
                         this.$emit('update:form',formVal);

@@ -91,6 +91,7 @@ class FieldCollection extends Collection
                 throw new \think\Exception($v->title().'：'.$e->getMessage());
             }
         });
+
         return $this;
     }
 
@@ -316,11 +317,15 @@ class FieldCollection extends Collection
                 }
                 //有值才显示
                 if($vValue) {
+                    $hideAllFieldArr=[];
+                    $hideFieldArr=[];
+
                     foreach ($v->items() as $item){
                         if(!isset($item['hideFields'])){
                             continue;
                         }
-                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v){
+                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v,&$hideAllFieldArr,&$hideFieldArr){
+                            $hideAllFieldArr[]=$hidelField->name();
                             //与JS中的一致
                             switch ($vType) {
                                 case 'CheckboxField':
@@ -336,8 +341,14 @@ class FieldCollection extends Collection
                                 default:
                                     $hide= (string)$vValue === (string)$item['value'];
                             }
-                            $changeFieldHideList($hidelField->name(),$vName,$hide);
+//                            $changeFieldHideList($hidelField->name(),$vName,$hide);
+                            if($hide){
+                                $hideFieldArr[]=$hidelField->name();
+                            }
                         });
+                    }
+                    foreach ($hideAllFieldArr as $fName){
+                        $changeFieldHideList($fName,$vName,in_array($fName,$hideFieldArr));
                     }
                 }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){//默认隐藏所有
                     foreach ($v->items() as $item){
