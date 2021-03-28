@@ -104,6 +104,9 @@ define(requires, function ( axios,Qs) {
                 box.layer.open(option);
             })
         }else{
+            if(!box.appParam.bodyModal||!box.appParam.bodyDrawer){
+                box.appParam=box.appPage;
+            }
             let vObj=box.appParam;
             //如果不是iframe,打于开当前页面
             return MyPromise(function (trigger) {
@@ -456,6 +459,12 @@ define(requires, function ( axios,Qs) {
                 this.pageIsInit();
             }
         }
+        beforeMount=option.beforeMount||function(){};
+        option.beforeMount=function(){
+            window.appPage=this;
+            beforeMount();
+        }
+
         option.methods = Object.assign(vueDefMethods, option.methods || {});
         window.app = Vue.createApp(option)
         app.use(antd)
