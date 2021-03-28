@@ -53,7 +53,7 @@ define(requires, function ( axios,Qs) {
     //生成随机 GUID 数
     window.guid=function(){function S4(){return(((1+Math.random())*65536)|0).toString(16).substring(1)}return(S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4())};
 
-    const openBox=function(option){
+    window.openBox=function(option){
         window.appParam=this;
         const box = top;
         let vueObj=this;
