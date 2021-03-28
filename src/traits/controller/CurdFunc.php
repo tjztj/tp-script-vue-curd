@@ -23,6 +23,20 @@ trait CurdFunc
 {
 
 
+
+    private bool $saveStepNext;//编辑的时候，是否是下一步
+    public bool $emptySaveStepNextUseRequest=false;//如果未设置saveStepNext，是否又获取到的参数[step-next]决定
+    public function getSaveStepNext():bool{
+        if(!isset($this->saveStepNext)||is_null($this->saveStepNext)){
+            return $this->emptySaveStepNextUseRequest&&$this->request->param('step-next/d')===1;
+        }
+        return $this->saveStepNext;
+    }
+    public function setSaveStepNext(bool $saveStepNext):self{
+        $this->saveStepNext=$saveStepNext;
+        return $this;
+    }
+
     /**
      * #title 详细页面
      * @return mixed|void
