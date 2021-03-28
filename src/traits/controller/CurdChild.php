@@ -263,17 +263,19 @@ trait CurdChild{
         if($id){
             $info=$this->model->find($id);
             $base_id=$info[$this->model::parentField()];
+            $baseInfo=$this->baseModel->find($info[$this->model::parentField()]);
         }else{
             $base_id=$this->request->param('base_id/d',0);
             $base_id||$this->errorAndCode('缺少必要参数');
             $info=null;
+            $baseInfo=null;
         }
 
         $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//不编辑地区
 
         $this->createEditFetchDataBefore($fields,$info);//切面
 
-        $baseInfo=$this->baseModel->find($info[$this->model::parentField()]);
+
 
         $fetchData=$this->createEditFetchData($fields,$info,$baseInfo);//切面
         $fetchData['baseId']=$base_id;
