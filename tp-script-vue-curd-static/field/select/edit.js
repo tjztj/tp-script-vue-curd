@@ -5,8 +5,14 @@ define([],function(){
             val:{
                 get(){
                     if(this.field.multiple){
-                        if(typeof this.val==='string'||typeof this.val==='number'){
-                            return this.value.toString.split(',');
+                        if(this.value===''){
+                            return [];
+                        }
+                        if(typeof this.value==='number'){
+                            return this.value.toString();
+                        }
+                        if(typeof this.value==='string'){
+                            return this.value.split(',');
                         }
                         return [];
                     }
