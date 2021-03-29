@@ -18,9 +18,10 @@ use tpScriptVueCurd\ModelFilter;
 trait CheckField
 {
 
+    use HideFields;
+
     protected array $items=[];//选项集合
     private string $itemsSerialize='';
-    protected bool $defHideAboutFields=true;//默认隐藏相关字段
 
 
     /**
@@ -103,14 +104,6 @@ trait CheckField
         return $arr;
     }
 
-    /**
-     * 默认隐藏相关字段
-     * @param bool|null $defHideAboutFields
-     * @return bool|$this
-     */
-    public function defHideAboutFields(bool $defHideAboutFields=null){
-        return $this->doAttr('defHideAboutFields',$defHideAboutFields);
-    }
 
 
     final protected function getItemsTextValues():array{

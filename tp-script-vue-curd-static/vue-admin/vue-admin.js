@@ -560,6 +560,7 @@ define(requires, function ( axios,Qs) {
                         }
 
                         this.groupFieldItems.forEach(field=>{
+                            let reversalHideFields=!!field.reversalHideFields;
                             if(field.hideFields){
                                 let allFields=[],hideFileds=[],inputVal='';
                                 if(formVal[field.name]!==''){
@@ -599,8 +600,9 @@ define(requires, function ( axios,Qs) {
                                         }
                                     })
                                 })
+
                                 allFields.forEach(f=>{
-                                    changeFieldHideList(f,field.name,hideFileds.includes(f))
+                                    changeFieldHideList(f,field.name,reversalHideFields!==hideFileds.includes(f));
                                 });
                             }else if(field.items&&field.items.length>0){
                                 let hideFileds=[],allFields=[];
@@ -641,7 +643,7 @@ define(requires, function ( axios,Qs) {
                                     }
                                 })
                                 allFields.forEach(f=>{
-                                    changeFieldHideList(f,field.name,hideFileds.includes(f))
+                                    changeFieldHideList(f,field.name,reversalHideFields!==hideFileds.includes(f))
                                 });
                             }
                         })

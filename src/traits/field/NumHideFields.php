@@ -10,10 +10,9 @@ use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 
 trait NumHideFields
 {
+    use HideFields;
 
     protected FieldNumHideFieldCollection $hideFields;
-    protected bool $defHideAboutFields=true;//默认隐藏相关字段
-
 
     /**
      * 字段的值在什么范围时隐藏某值（传入的时间范围是时间戳）

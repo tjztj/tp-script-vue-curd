@@ -268,6 +268,7 @@ class FieldCollection extends Collection
         return $this->each(function(ModelField $v)use($arrHave,$data,$changeFieldHideList,$isDataBaseInfo){
             $vName=$v->name();
             $vType=$v->getType();
+            $reversalHideFields=method_exists($v,'reversalHideFields')&&$v->reversalHideFields()===true;
 
             /*** 获取【hideFields】不显示的字段 ***/
             if(method_exists($v,'hideFields')){
@@ -289,16 +290,22 @@ class FieldCollection extends Collection
                     }
                 }
 
+
+
                 //有值才显示
                 if($vValue){
-                    $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
-                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
-                            $changeFieldHideList($f->name(),$vName,true);
+
+                    //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
+                    $hideVal=!$reversalHideFields;
+
+                    $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName,$hideVal){
+                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName,$hideVal){
+                            $changeFieldHideList($f->name(),$vName,$hideVal);
                         });
                     });
-                    $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
-                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
-                            $changeFieldHideList($f->name(),$vName,false);
+                    $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName,$hideVal){
+                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName,$hideVal){
+                            $changeFieldHideList($f->name(),$vName,$hideVal);
                         });
                     });
                 }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){ //默认隐藏所有
@@ -348,7 +355,8 @@ class FieldCollection extends Collection
                         });
                     }
                     foreach ($hideAllFieldArr as $fName){
-                        $changeFieldHideList($fName,$vName,in_array($fName,$hideFieldArr));
+                        //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
+                        $changeFieldHideList($fName,$vName,$reversalHideFields!==in_array($fName,$hideFieldArr));
                     }
                 }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){//默认隐藏所有
                     foreach ($v->items() as $item){
