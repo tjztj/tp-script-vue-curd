@@ -292,6 +292,7 @@ define(['vueAdmin'], function (va) {
                     labelCol: { span: 4 },
                     wrapperCol: { span: 18 },
                     form:form,
+                    fieldHideList:{},
                 }
             },
             methods:{
@@ -339,7 +340,7 @@ define(['vueAdmin'], function (va) {
                 },
                 checkShowGroup(groupFieldItems){
                     for(let i in groupFieldItems){
-                        if(groupFieldItems[i].editShow){
+                        if(groupFieldItems[i].editShow&&!this.fieldHideList[groupFieldItems[i].name]){
                             return true;
                         }
                     }

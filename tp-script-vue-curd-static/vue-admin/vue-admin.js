@@ -519,12 +519,21 @@ define(requires, function ( axios,Qs) {
 
         app.component('FieldGroupItem',{
             name:'fieldGroupItem',
-            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol'],
+            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol','fieldHideList'],
             setup(props,ctx){
                 return {
                     formVal:Vue.ref(props.form),
                     validateStatus:Vue.ref({}),
-                    fieldHideList:Vue.ref({}),
+                }
+            },
+            computed: {
+                currentFieldHideList:{
+                    get(){
+                        return this.fieldHideList;
+                    },
+                    set(val){
+                        this.$emit('update:field-hide-list',val)
+                    }
                 }
             },
             watch:{
@@ -544,31 +553,32 @@ define(requires, function ( axios,Qs) {
 
                         const changeFieldHideList=(key,fieldName,hide)=>{
                             if(hide){
-                                this.fieldHideList[key]=this.fieldHideList[key]||[];
-                                this.fieldHideList[key].push(fieldName);
+                                this.currentFieldHideList[key]=this.currentFieldHideList[key]||[];
+                                this.currentFieldHideList[key].push(fieldName);
                                 return;
                             }
-                            if(typeof this.fieldHideList[key]==='undefined'){
+                            if(typeof this.currentFieldHideList[key]==='undefined'){
                                 return;
                             }
-                            if(this.fieldHideList[key].length>0){
-                                this.fieldHideList[key]=this.fieldHideList[key].filter(v=>v!==fieldName);
+                            if(this.currentFieldHideList[key].length>0){
+                                this.currentFieldHideList[key]=this.currentFieldHideList[key].filter(v=>v!==fieldName);
                             }
-                            if(this.fieldHideList[key].length===0){
-                                delete this.fieldHideList[key]
+                            if(this.currentFieldHideList[key].length===0){
+                                delete this.currentFieldHideList[key]
                             }
                         }
 
-                        this.groupFieldItems.forEach(field=>{
-                            let reversalHideFields=!!field.reversalHideFields;
+
+                        const checkHideField=(field,checkVal)=>{
+                            let reversalHideFields=!!field.reversalHideFields,oldHideFields=Object.keys(this.currentFieldHideList);
                             if(field.hideFields){
                                 let allFields=[],hideFileds=[],inputVal='';
-                                if(formVal[field.name]!==''){
-                                    inputVal=formVal[field.name];
+                                if(checkVal!==''){
+                                    inputVal=checkVal;
                                     //如果是时间格式
                                     if(field.type==='DateField'||field.type==='MonthField'||field.type==='WeekField'){
-                                        if(!/^\d+$/.test(formVal[field.name].toString())||formVal[field.name]<10000){
-                                            inputVal=moment(formVal[field.name]).unix()
+                                        if(!/^\d+$/.test(checkVal.toString())||checkVal<10000){
+                                            inputVal=moment(checkVal).unix()
                                         }
                                     }
                                 }
@@ -615,22 +625,21 @@ define(requires, function ( axios,Qs) {
                                             if(!allFields.includes(hideField.name)){
                                                 allFields.push(hideField.name)
                                             }
-                                            if(formVal[field.name]){
+                                            if(checkVal){
                                                 let have;
                                                 switch (field.type){
                                                     case 'CheckboxField':
-                                                        have=arrHave(formVal[field.name],item.value);
-                                                        // console.log(hideField.name,have,formVal[field.name],item.value);
+                                                        have=arrHave(checkVal,item.value);
                                                         break;
                                                     case 'SelectField':
                                                         if(field.multiple){
-                                                            have=arrHave(formVal[field.name],item.value);
+                                                            have=arrHave(checkVal,item.value);
                                                         }else{
-                                                            have=formVal[field.name]===item.value
+                                                            have=checkVal===item.value
                                                         }
                                                         break;
                                                     default:
-                                                        have=formVal[field.name]===item.value;
+                                                        have=checkVal===item.value;
                                                 }
                                                 //have 是否符合条件，符合条件就隐藏
                                                 // changeFieldHideList(hideField.name,field.name,have)
@@ -649,7 +658,35 @@ define(requires, function ( axios,Qs) {
                                     changeFieldHideList(f,field.name,isDefHideAboutFields?true:reversalHideFields!==hideFileds.includes(f))
                                 });
                             }
+
+                            //-----------------
+                            //隐藏(显示)其他相关字段
+                            let newHideFields=Object.keys(this.currentFieldHideList);
+                            oldHideFields.forEach(f=>{
+                                if(newHideFields.includes(f)){return;}
+                                //重新显示的字段下面要重新判断
+                                let fieldInfos=this.groupFieldItems.filter(v=>v.name===f);
+                                if(fieldInfos&&fieldInfos.length>0){
+                                    checkHideField(fieldInfos[0],formVal[field.name]);
+                                }
+                            });
+                            newHideFields.forEach(f=>{
+                                if(oldHideFields.includes(f)){return;}
+                                //新隐藏的字段
+                                let fieldInfos=this.groupFieldItems.filter(v=>v.name===f);
+                                if(fieldInfos&&fieldInfos.length>0){
+                                    checkHideField(fieldInfos[0],'');
+                                }
+                            })
+                            //-------------------------
+                        }
+
+
+
+                        this.groupFieldItems.forEach(field=>{
+                            checkHideField(field,this.currentFieldHideList[field.name]?'':formVal[field.name]);
                         })
+
                         this.$emit('update:form',formVal);
                     },
                     immediate:true,
@@ -666,7 +703,7 @@ define(requires, function ( axios,Qs) {
                     };
                 },
                 triggerShows(fieldName){
-                    if(!this.fieldHideList[fieldName]){
+                    if(!this.currentFieldHideList[fieldName]){
                         return true;
                     }
                     return false;

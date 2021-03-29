@@ -59,7 +59,7 @@ trait CurdFunc
         if($this->model instanceof BaseChildModel){
             $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
         }
-        $fields=$this->fields->filterShowStepFields($data,$baseInfo);
+        $fields=$this->fields->filterShowStepFields($data,$baseInfo)->filterHideFieldsByShow($data);
 
 
         $info=$data->toArray();

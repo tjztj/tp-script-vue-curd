@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use think\Collection;
 use think\db\Query;
+use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 use tpScriptVueCurd\traits\field\FieldCollectionStep;
@@ -158,6 +159,16 @@ class FieldCollection extends Collection
 
 
     /**
+     * 查看页面过滤掉 隐藏的字段
+     * @param VueCurlModel $sourceData
+     * @return array
+     */
+    public function filterHideFieldsByShow(VueCurlModel $sourceData){
+        return $this->filterHideFieldsByData($sourceData->toArray(),true);
+    }
+
+
+    /**
      * 获取字段筛选集合
      * @return array
      */
@@ -235,7 +246,7 @@ class FieldCollection extends Collection
      * @param array $data  用户提交上来的数据
      * @return $this
      */
-    private function filterHideFieldsByData(array $data,$isDataBaseInfo=true):self{
+    private function filterHideFieldsByData(array $data,$isSourceData=true):self{
         $arrHave= static function($arr, $val){
             if(is_string($arr)){
                 $arr=explode(',',$arr);
@@ -265,36 +276,32 @@ class FieldCollection extends Collection
                 unset($fieldHideList[$key]);
             }
         };
-        return $this->each(function(ModelField $v)use($arrHave,$data,$changeFieldHideList,$isDataBaseInfo){
-            $vName=$v->name();
-            $vType=$v->getType();
-            $reversalHideFields=method_exists($v,'reversalHideFields')&&$v->reversalHideFields()===true;
+
+
+        $checkHideField=function($field,$checkVal)use($arrHave,&$data,&$changeFieldHideList,$isSourceData,&$checkHideField,&$fieldHideList){
+            $vName=$field->name();
+            $vType=$field->getType();
+            $reversalHideFields=method_exists($field,'reversalHideFields')&&$field->reversalHideFields()===true;
+            $oldHideFields=array_keys($fieldHideList);
 
             /*** 获取【hideFields】不显示的字段 ***/
-            if(method_exists($v,'hideFields')){
+            if(method_exists($field,'hideFields')){
                 /**
                  * @var FieldNumHideFieldCollection $hideFields
                  */
-                $hideFields=$v->hideFields();
+                $hideFields=$field->hideFields();
                 if(is_null($hideFields)){
                     return;
                 }
-                if(!isset($data[$vName])){
-                    $vValue=null;
-                }else{
-                    if($isDataBaseInfo){
-                        $vValue=$data[$vName];
-                    }else{
-                        $fieldCopy=clone $v;
-                        $vValue=$fieldCopy->setSave($data)->getSave();
-                    }
+                $vValue=$checkVal;
+                if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
+                    $fieldCopy=clone $field;
+                    $vValue=$fieldCopy->setSave($data)->getSave();
                 }
-
 
 
                 //有值才显示
                 if($vValue){
-
                     //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
                     $hideVal=!$reversalHideFields;
 
@@ -308,30 +315,31 @@ class FieldCollection extends Collection
                             $changeFieldHideList($f->name(),$vName,$hideVal);
                         });
                     });
-                }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){ //默认隐藏所有
+                }else if(method_exists($field,'defHideAboutFields')&&$field->defHideAboutFields()){ //默认隐藏所有
                     $hideFields->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
                         $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
                             $changeFieldHideList($f->name(),$vName,false);
                         });
                     });
                 }
-            }else if(method_exists($v,'items')){
-                if($isDataBaseInfo){
-                    $vValue=$data[$vName]??null;
-                }else{
-                    $fieldCopy=clone $v;
+            }else if(method_exists($field,'items')){
+                $vValue=$checkVal;
+                if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
+                    $fieldCopy=clone $field;
                     $vValue=$fieldCopy->setSave($data)->getSave();
                 }
+
+
                 //有值才显示
                 if($vValue) {
                     $hideAllFieldArr=[];
                     $hideFieldArr=[];
 
-                    foreach ($v->items() as $item){
+                    foreach ($field->items() as $item){
                         if(!isset($item['hideFields'])){
                             continue;
                         }
-                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$v,&$hideAllFieldArr,&$hideFieldArr){
+                        $item['hideFields']->each(function(ModelField $hidelField)use($changeFieldHideList,$vName,$vType,$vValue,$arrHave,$item,$field,&$hideAllFieldArr,&$hideFieldArr){
                             $hideAllFieldArr[]=$hidelField->name();
                             //与JS中的一致
                             switch ($vType) {
@@ -339,7 +347,7 @@ class FieldCollection extends Collection
                                     $hide=$arrHave($vValue, $item['value']);
                                     break;
                                 case 'SelectField':
-                                    if ($v->multiple()) {
+                                    if ($field->multiple()) {
                                         $hide=$arrHave($vValue, $item['value']);
                                     } else {
                                         $hide=(string)$vValue === (string)$item['value'];
@@ -348,7 +356,6 @@ class FieldCollection extends Collection
                                 default:
                                     $hide= (string)$vValue === (string)$item['value'];
                             }
-//                            $changeFieldHideList($hidelField->name(),$vName,$hide);
                             if($hide){
                                 $hideFieldArr[]=$hidelField->name();
                             }
@@ -358,8 +365,8 @@ class FieldCollection extends Collection
                         //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
                         $changeFieldHideList($fName,$vName,$reversalHideFields!==in_array($fName,$hideFieldArr));
                     }
-                }else if(method_exists($v,'defHideAboutFields')&&$v->defHideAboutFields()){//默认隐藏所有
-                    foreach ($v->items() as $item){
+                }else if(method_exists($field,'defHideAboutFields')&&$field->defHideAboutFields()){//默认隐藏所有
+                    foreach ($field->items() as $item){
                         if(!isset($item['hideFields'])){
                             continue;
                         }
@@ -369,6 +376,32 @@ class FieldCollection extends Collection
                     }
                 }
             }
+
+
+            //-----------------
+            //隐藏(显示)其他相关字段
+            $newHideFields=array_keys($fieldHideList);
+            foreach ($oldHideFields as $f){
+                if(in_array($f,$newHideFields)){
+                    continue;
+                }
+                //重新显示的字段下面要重新判断
+                $fieldInfo=$this->findByName($f);
+                $checkHideField($fieldInfo,$data[$fieldInfo->name()]);
+            }
+            foreach ($newHideFields as $f){
+                if(in_array($f,$oldHideFields)){
+                    continue;
+                }
+                //新隐藏的字段
+                $fieldInfo=$this->findByName($f);
+                $checkHideField($fieldInfo,null);
+            }
+            //-------------------------
+        };
+
+        return $this->each(function(ModelField $v)use(&$fieldHideList,$data,&$checkHideField){
+            $checkHideField($v,isset($fieldHideList[$v->name()])?null:($data[$v->name()]??null));
         })->filter(function(ModelField $v)use($fieldHideList){
             /*** 过滤掉【hideFields】不显示的字段 ***/
             $name=$v->name();
