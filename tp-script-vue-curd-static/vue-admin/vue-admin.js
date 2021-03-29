@@ -460,7 +460,7 @@ define(requires, function ( axios,Qs) {
                 this.pageIsInit();
             }
         }
-        beforeMount=option.beforeMount||function(){};
+        const beforeMount=option.beforeMount||function(){};
         option.beforeMount=function(){
             window.appPage=this;
             beforeMount();
