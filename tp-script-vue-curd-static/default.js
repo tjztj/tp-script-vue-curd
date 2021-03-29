@@ -357,6 +357,7 @@ define(['vueAdmin'], function (va) {
                     info:vueData.info,
                     haveGroup:vueData.groupFields?true:false,
                     groupFields:vueData.groupFields||{'':vueData.fields},
+                    fieldComponents
                 }
             },
             methods:{

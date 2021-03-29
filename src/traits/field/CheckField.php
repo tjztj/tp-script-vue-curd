@@ -131,7 +131,7 @@ trait CheckField
         }
         $textArr=[];
         if($isMultiple){
-            foreach (explode(',',$isMultiple) as $v){
+            foreach (explode(',',$val) as $v){
                 $textArr[]=$this->getShowText($v,false);
             }
         }else{
