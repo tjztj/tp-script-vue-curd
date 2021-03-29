@@ -746,6 +746,7 @@ define(requires, function ( axios,Qs) {
                                         :field="field" 
                                         v-model:value="formVal[field.name]" 
                                         v-model:validate-status="validateStatus[field.name]" 
+                                        v-model:field-hide-list="currentFieldHideList"
                                         :form="formVal"
                                         :list-field-label-col="listFieldLabelCol"
                                         :list-field-wrapper-col="listFieldWrapperCol"

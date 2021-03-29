@@ -27,6 +27,7 @@
                     :list-field-label-col="labelCol"
                     :list-field-wrapper-col="wrapperCol"
                     :group-field-items="groupFieldItems"
+                    v-model:field-hide-list="fieldHideList"
                     v-model:form="form"
                     :ref="'fieldGroup'+groupTitle"></field-group-item>
             </template>
