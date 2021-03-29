@@ -572,13 +572,16 @@ define(requires, function ( axios,Qs) {
                                         }
                                     }
                                 }
+
+                                let vueIsNull=inputVal===''||inputVal===0||inputVal==='0'||inputVal===null;
+                                let isDefHideAboutFields=vueIsNull&&field.defHideAboutFields;
                                 field.hideFields.filter(item=>{
                                     item.fields.forEach(f=>{
                                         if(!allFields.includes(f.name)){
                                             allFields.push(f.name)
                                         }
                                     })
-                                    if(inputVal===''||inputVal===0||inputVal==='0'||inputVal===null){
+                                    if(vueIsNull){
                                         return field.defHideAboutFields?true:false;
                                     }
                                     if(item.start===null&&item.end===null){
@@ -600,12 +603,11 @@ define(requires, function ( axios,Qs) {
                                         }
                                     })
                                 })
-
                                 allFields.forEach(f=>{
-                                    changeFieldHideList(f,field.name,reversalHideFields!==hideFileds.includes(f));
+                                    changeFieldHideList(f,field.name,isDefHideAboutFields?true:reversalHideFields!==hideFileds.includes(f));
                                 });
                             }else if(field.items&&field.items.length>0){
-                                let hideFileds=[],allFields=[];
+                                let hideFileds=[],allFields=[],isDefHideAboutFields=false;
                                 field.items.map(item=>{
                                     //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
                                     if(item.hideFields&&item.hideFields.length>0){
@@ -638,12 +640,13 @@ define(requires, function ( axios,Qs) {
                                             }else if(field.defHideAboutFields){
                                                 // changeFieldHideList(hideField.name,field.name,true)
                                                 hideFileds.push(hideField.name);
+                                                isDefHideAboutFields=true;
                                             }
                                         })
                                     }
                                 })
                                 allFields.forEach(f=>{
-                                    changeFieldHideList(f,field.name,reversalHideFields!==hideFileds.includes(f))
+                                    changeFieldHideList(f,field.name,isDefHideAboutFields?true:reversalHideFields!==hideFileds.includes(f))
                                 });
                             }
                         })
