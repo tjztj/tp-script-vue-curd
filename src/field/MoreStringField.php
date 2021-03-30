@@ -21,6 +21,8 @@ class MoreStringField extends ModelField
 {
     protected string $defaultFilterClass=LikeFilter::class;
 
+    protected bool $defaultOpen=false;//是否点击输入框的是否蓦然展开选项
+
     protected string $separate='|';
 
 
@@ -38,6 +40,15 @@ class MoreStringField extends ModelField
     public function url(string $url = null)
     {
         return $this->doAttr('url', $url);
+    }
+
+    /**是否点击输入框的是否蓦然展开选项
+     * @param bool|null $defaultOpen
+     * @return $this|bool
+     */
+    public function defaultOpen(bool $defaultOpen = null)
+    {
+        return $this->doAttr('defaultOpen', $defaultOpen);
     }
 
 

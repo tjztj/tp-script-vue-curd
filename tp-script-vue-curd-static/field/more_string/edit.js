@@ -62,7 +62,7 @@ define([], function () {
                                     <div class="l">
                                         <div class="more-string-auto-complete-row">
                                             <div class="more-string-auto-complete-input">
-                                                <a-auto-complete v-model:value="val[key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[key]" @search="onAutoCompleteSearchMoreString($event,key)"/>
+                                                <a-auto-complete v-model:value="val[key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[key]" :default-open="field.defaultOpen" @search="onAutoCompleteSearchMoreString($event,key)"/>
                                             </div>
                                             <div class="more-string-auto-complete-rm" @click="removeMoreString(field,key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
                                         </div>
