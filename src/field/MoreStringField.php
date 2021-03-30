@@ -21,7 +21,7 @@ class MoreStringField extends ModelField
 {
     protected string $defaultFilterClass=LikeFilter::class;
 
-    protected bool $defaultOpen=false;//是否点击输入框的是否蓦然展开选项
+    protected bool $beginGetOptions=false;//在开始时，如果值为空，先获取所有选项
 
     protected string $separate='|';
 
@@ -42,13 +42,13 @@ class MoreStringField extends ModelField
         return $this->doAttr('url', $url);
     }
 
-    /**是否点击输入框的是否蓦然展开选项
-     * @param bool|null $defaultOpen
+    /**在开始时，如果值为空，先获取所有选项
+     * @param bool|null $beginGetOptions
      * @return $this|bool
      */
-    public function defaultOpen(bool $defaultOpen = null)
+    public function beginGetOptions(bool $beginGetOptions = null)
     {
-        return $this->doAttr('defaultOpen', $defaultOpen);
+        return $this->doAttr('beginGetOptions', $beginGetOptions);
     }
 
 
