@@ -94,7 +94,8 @@ trait CurdChild{
         $model=$this->model
             ->where($this->model::parentField(),$base_id)
             ->where(function (Query $query){$this->indexListWhere($query);})
-            ->where($this->fields->getFilterWhere());
+            ->where($this->fields->getFilterWhere())
+            ->order($this->getListOrder());
 
         $baseInfo=$this->baseModel->find($base_id);
 

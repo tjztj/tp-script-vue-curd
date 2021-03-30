@@ -813,6 +813,7 @@ define(requires, function ( axios,Qs) {
                             // title:item.title,
                             slots:{title:customTitle},
                             ellipsis:true,
+                            sorter: true,
                         };
                         if(fieldComponents['VueCurdIndex'+item.type]){
                             listFieldComponents[item.name]=item;
@@ -850,6 +851,7 @@ define(requires, function ( axios,Qs) {
                     dataIndex: "create_time",
                     slots: { customRender: 'create-time' },
                     width:160,
+                    sorter: true,
                 })
                 columnsCount++;
 

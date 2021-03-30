@@ -173,4 +173,33 @@ trait CurdFunc
         $tplPath=static::getTplPath();
         return $this->fetch($tplPath.$file.'.vue',$data);
     }
+
+
+    /**
+     * 获取列表排序
+     * @return string
+     */
+    protected function getListOrder():string{
+        $sortField=$this->request->param('sortField');
+        if($sortField){
+            $sortOrder=$this->request->param('sortOrder','');
+            switch (strtolower($sortOrder)){
+                case 'desc':
+                case 'asc':
+                    break;
+                case 'ascend':
+                    $sortOrder='ASC';
+                    break;
+                case 'descend':
+                    $sortOrder='DESC';
+                    break;
+                default:
+                    $sortOrder='DESC';
+            }
+            $order=$sortField.' '.$sortOrder;
+        }else{
+            $order='id DESC';
+        }
+        return $order;
+    }
 }

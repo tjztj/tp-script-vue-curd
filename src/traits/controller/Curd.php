@@ -39,11 +39,7 @@ trait Curd
      */
     function index(){
         if($this->request->isAjax()){
-            if($this->request->param('sortField')){
-                $order=$this->request->param('sortField').' '.$this->request->param('sortOrder');
-            }else{
-                $order='id DESC';
-            }
+
             $model=$this->model
                 ->where(function (Query $query){
                     $this->indexListWhere($query);
@@ -72,7 +68,7 @@ trait Curd
                         }
                     }
                 })
-                ->order($order);
+                ->order($this->getListOrder());
 
 
 
