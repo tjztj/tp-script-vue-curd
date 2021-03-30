@@ -16,9 +16,13 @@ define([],function(){
                         }
                         return [];
                     }
-                    return this.value;
+                    return this.value===''?undefined:this.value;
                 },
                 set(val){
+                    if(val===undefined){
+                        this.$emit('update:value', '');
+                        return;
+                    }
                     this.$emit('update:value', typeof val==='object'?val.join(','):val);
                 }
             },
