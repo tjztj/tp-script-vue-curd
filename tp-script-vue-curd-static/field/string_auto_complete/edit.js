@@ -16,6 +16,11 @@ define([],function(){
                 }
             }
         },
+        mounted(){
+            if(this.field.beginGetOptions&&(this.value===''||typeof this.value==='undefined')){
+                this.onAutoCompleteSearch('');
+            }
+        },
         methods:{
             '$get'(url, params){
                 if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
