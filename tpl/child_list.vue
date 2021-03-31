@@ -104,6 +104,7 @@
             :can-del="canDel"
             :row-selection="canDel?rowSelection:null"
             :field-step-config="fieldStepConfig"
+            @refresh-table="refreshTable"
             @change="handleTableChange"
             @open-show="openShow"
             @on-delete="deleteRow"

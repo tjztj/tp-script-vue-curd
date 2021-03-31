@@ -1004,6 +1004,7 @@ define(requires, function ( axios,Qs) {
                                         :is="'VueCurdIndex'+item.type" 
                                         :field="item" 
                                         :record="record"
+                                        @refresh-table="$emit('refreshTable')"
                                     ></component>
                              </template>
                              

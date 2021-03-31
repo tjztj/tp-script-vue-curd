@@ -252,6 +252,7 @@
                 :action-width="actionWidth"
                 :row-selection="canDel?rowSelection:null"
                 :field-step-config="fieldStepConfig"
+                @refresh-table="refreshTable"
                 @change="handleTableChange"
                 @on-delete="deleteRow"
                 @open-edit="openEdit"

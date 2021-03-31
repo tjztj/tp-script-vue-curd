@@ -1,0 +1,137 @@
+<?php
+
+
+namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\RadioFilter;
+use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\tool\field_tpl\Edit;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\CheckField;
+
+
+/**
+ * 开关
+ * Class RadioField
+ * @author tj 1079798840@qq.com
+ * @package tpScriptVueCurd
+ */
+class SwitchField extends ModelField
+{
+    use CheckField{
+        items as checkFieldItems;
+    }
+
+    protected string $defaultFilterClass=RadioFilter::class;
+
+    protected string $indexChangeUrl='';//列表中更改开关时执行（如果设置为空字符串，列表中将只读）
+
+
+
+    /**
+     * 选项集合(获取与设置)
+     * @param array|null $items
+     * @return $this|array
+     */
+    public function items(array $items = null)
+    {
+        if(is_null($items)){
+            return $this->items;
+        }
+        if(count($items)<2){
+            throw new \think\Exception('设置的选项小于2个，不满足开关条件');
+        }
+        if(count($items)>2){
+            throw new \think\Exception('设置的选项大于2个，超出开关条件');
+        }
+
+        return $this->checkFieldItems($items);
+    }
+
+
+    /**
+     * 列表中开关状态改变时，要执行的url
+     * @param callable|null $getDoUrl   请在这个函数中自行判断当前用户是否有执行权限，如果没有请返回空字符串，如果有，请返回url
+     * @return $this|string
+     */
+    public function indexChangeUrl(callable $getDoUrl=null){
+        if(is_null($getDoUrl)){
+            return $this->indexChangeUrl;
+        }
+        $this->indexChangeUrl=$getDoUrl();
+        return $this;
+    }
+
+    /**
+     * 设置保存的值
+     * @param array $data  数据值集合
+     * @return $this
+     */
+    public function setSaveVal(array $data): self
+    {
+        $name=$this->name();
+        if(isset($data[$name])){
+            if($data[$name]==='') {
+                $this->defaultCheckRequired('','请选择正确的选项');
+                $this->save='';
+            }else {
+                if(!isset($this->getItemsValueTexts()[$data[$name]])){
+                    throw new \think\Exception($data[$name].' 不在可选中');
+                }
+                $this->save=$data[$name];
+            }
+        }else{
+            $this->defaultCheckRequired('');
+        }
+        return $this;
+    }
+
+
+    /**
+     * 显示时要处理的数据
+     * @param array $dataBaseData
+     */
+    public function doShowData(array &$dataBaseData): void
+    {
+        $name=$this->name();
+        if(isset($dataBaseData[$name])){
+            $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],false);
+        }
+    }
+
+
+
+
+    /**
+     * 模板导入备注
+     * @param ExcelFieldTpl $excelFieldTpl
+     * @return void
+     */
+    public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
+        $str='请填入以下选项：';
+        $str.="\n";
+        $texts=[];
+        foreach ($this->items as $v){
+            $texts[]=$v['text'];
+        }
+        $str.=implode("\n",$texts);
+
+        $excelFieldTpl->explain=$str;
+        $excelFieldTpl->wrapText=true;
+        $excelFieldTpl->width=40;
+    }
+
+
+    public static function componentUrl(): FieldTpl
+    {
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/switch/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/switch/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/switch/edit.js')
+        );
+    }
+
+}
