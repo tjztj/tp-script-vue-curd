@@ -26,6 +26,16 @@ class SelectField extends ModelField
     protected string $defaultFilterClass=SelectFilter::class;
 
 
+    //[
+    //  [
+    //      'value'=>'',
+    //      'text'=>'',
+    //      'group'=>'',
+    //      'hide'=>false,
+    //   ]
+    //]
+
+
     /**
      * 是否可多选
      * @param bool|null $multiple

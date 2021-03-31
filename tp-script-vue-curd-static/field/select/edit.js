@@ -48,13 +48,13 @@ define([],function(){
                                   
                                   <template v-if="field.items&&field.items[0].group">
                                         <a-select-opt-group v-for="(items,key) in groupItems" :label="key">
-                                              <a-select-option :value="optionItem.value" v-for="optionItem in items">
+                                              <a-select-option :value="optionItem.value" v-for="optionItem in items" v-show="!optionItem.hide">
                                                     {{optionItem.text}}
                                               </a-select-option>
                                         </a-select-opt-group>
                                    </template>
                                    <template v-else>
-                                        <a-select-option :value="optionItem.value" v-for="optionItem in field.items">
+                                        <a-select-option :value="optionItem.value" v-for="optionItem in field.items" v-show="!optionItem.hide">
                                             {{optionItem.text}}
                                         </a-select-option>
                                     </template>
