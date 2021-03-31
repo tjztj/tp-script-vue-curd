@@ -17,6 +17,8 @@ define([],function(){
                 if(this.field.items[1].default){
                     //如果选项默认选中
                     this.checked=true;
+                }else{
+                    this.$emit('update:value', this.field.items[0].value);
                 }
             }
         },
