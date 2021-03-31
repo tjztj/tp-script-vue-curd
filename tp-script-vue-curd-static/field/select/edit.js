@@ -1,51 +1,64 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        data(){
-            return {
-                autoCompleteOptions:[],
-            }
-        },
         computed:{
             val:{
                 get(){
-                    return this.value
+                    if(this.field.multiple){
+                        if(this.value===''){
+                            return [];
+                        }
+                        if(typeof this.value==='number'){
+                            return this.value.toString();
+                        }
+                        if(typeof this.value==='string'){
+                            return this.value.split(',');
+                        }
+                        return [];
+                    }
+                    return this.value===''?undefined:this.value;
                 },
                 set(val){
-                    this.$emit('update:value', val);
+                    if(val===undefined){
+                        this.$emit('update:value', '');
+                        return;
+                    }
+                    this.$emit('update:value', typeof val==='object'?val.join(','):val);
                 }
-            }
-        },
-        mounted(){
-            if(this.field.beginGetOptions&&(typeof this.value==='undefined'||this.value==='')){
-                this.onAutoCompleteSearch('');
-            }
-        },
-        methods:{
-            '$get'(url, params){
-                if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
-                return service({url, method: 'get',params,headers:{'X-REQUESTED-WITH':'xmlhttprequest'}})
             },
-            onAutoCompleteSearch(event){
-                this.autoCompleteSearch(event,this.field.url)
-            },
-            autoCompleteSearch(val,url){
-                this.autoCompleteOptions=[];
-                if(!url){
-                    return ;
-                }
-                this.$get(url,{search:val}).then(res=>{
-                    let arr=[];
-                    res.data.forEach(function(v){
-                        arr.push({value:v});
-                    })
-                    this.autoCompleteOptions=arr;
+            groupItems(){
+                let items={};
+                this.field.items.forEach(v=>{
+                    if(!items[v.group]){
+                        items[v.group]=[];
+                    }
+                    items[v.group].push(v);
                 })
-            },
+                return items;
+            }
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-auto-complete v-model:value="val" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions" @search="onAutoCompleteSearch"/>
+                        <a-select :mode="field.multiple?'multiple':'default'"
+                                  :default-value="val"
+                                  v-model:value="val"
+                                  :placeholder="field.placeholder||'请选择'+field.title"
+                                   :disabled="field.readOnly"
+                                  show-search>
+                                  
+                                  <template v-if="field.items&&field.items[0].group">
+                                        <a-select-opt-group v-for="(items,key) in groupItems" :label="key">
+                                              <a-select-option :value="optionItem.value" v-for="optionItem in items">
+                                                    {{optionItem.text}}
+                                              </a-select-option>
+                                        </a-select-opt-group>
+                                   </template>
+                                   <template v-else>
+                                        <a-select-option :value="optionItem.value" v-for="optionItem in field.items">
+                                            {{optionItem.text}}
+                                        </a-select-option>
+                                    </template>
+                        </a-select>
                     </div>
                     <div class="r">
                         <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>

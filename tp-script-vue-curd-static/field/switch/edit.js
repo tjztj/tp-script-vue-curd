@@ -1,6 +1,6 @@
 define([],function(){
     return {
-        props:['field','value','validateStatus'],
+        props:['field','value','validateStatus','form'],
         computed:{
             checked:{
                 get(){
