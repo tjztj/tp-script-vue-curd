@@ -181,6 +181,12 @@
             .replace(/(\w)([A-Z])/g,"$1_$2")
             .toLowerCase()+'.js'
     }
+    //可以自定义js版本号
+    if('{$version|default=\'\'}'!==''&&jsPath.indexOf('tp-script-vue-curd-static.php')===-1){
+        require.config({
+            urlArgs: "?v={$version|default=\'1.0.0\'}",
+        });
+    }
     require([jsPath], function (objs) {
         if(objs[VUE_CURD.ACTION]){
             objs[VUE_CURD.ACTION]();
