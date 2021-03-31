@@ -798,7 +798,7 @@ define(requires, function ( axios,Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable',{
-            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection','fieldStepConfig'],
+            props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection','fieldStepConfig','actionDefWidth'],
             setup(props,ctx){
                 const listColumns=props.listColumns;
                 let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={};
@@ -855,7 +855,7 @@ define(requires, function ( axios,Qs) {
                 })
                 columnsCount++;
 
-                let actionW=70;
+                let actionW=props.actionDefWidth||70;
                 if(props.childs){
                     props.childs.forEach(v=>{
                         if(v.listBtn.show){
