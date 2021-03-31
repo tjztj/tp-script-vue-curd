@@ -82,6 +82,7 @@ define(['vueAdmin'], function (va) {
                         },
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
+                    actionDefWidth:0,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -417,6 +418,7 @@ define(['vueAdmin'], function (va) {
                         },
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
+                    actionDefWidth:0,
                 }
             },
             mounted() {
