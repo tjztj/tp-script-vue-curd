@@ -59,7 +59,7 @@ trait CurdFunc
         if($this->model instanceof BaseChildModel){
             $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
         }
-        $fields=$this->fields->filterShowStepFields($data,$baseInfo)->filterHideFieldsByShow($data);
+        $fields=$this->fields->filterShowStepFields($data,$baseInfo)->filterHideFieldsByShow($data)->rendGroup();
 
 
         $info=$data->toArray();
@@ -103,6 +103,8 @@ trait CurdFunc
             $fields=$this->getSaveStepNext()
                 ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
                 :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
+
+            $fields=$fields->rendGroup();
             $fields->saveStepInfo=$stepInfo;
 
 
@@ -112,7 +114,7 @@ trait CurdFunc
             //原信息
             $info['sourceData']=$data;
         }else{
-            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
+            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo)->rendGroup();
             $fields->saveStepInfo=$stepInfo;
             $info=null;
         }

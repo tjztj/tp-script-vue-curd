@@ -35,6 +35,15 @@ class FieldCollection extends Collection
         }
     }
 
+    /**
+     * 重新生成 分组
+     * @return $this
+     */
+    public function rendGroup():self{
+        $this->setGroupItems($this->items);
+        return $this;
+    }
+
 
     /**
      * 根据字段信息获取分组信息（写在这里主要是为了方便字段集合 toArray 后调用）
