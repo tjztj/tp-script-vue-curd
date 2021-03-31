@@ -89,7 +89,7 @@ trait CheckField
             /** [ ['value'=>1,'text'=>'张三','hideFields'=>[字段1,字段2]], ['value'=>2,'text'=>'李四'] ] **/
             $vals=[];
             foreach ($items as $v){
-                $v['value']=(string)$v;
+                $v['value']=(string)$v['value'];
                 $vals[]=$v;
             }
             return $vals;
