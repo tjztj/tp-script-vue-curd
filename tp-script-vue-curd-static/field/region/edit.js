@@ -1,4 +1,5 @@
 define([],function(){
+    let regions={};
     return {
         props:['field','value','validateStatus','form'],
         setup(props,ctx){
@@ -13,11 +14,30 @@ define([],function(){
                     }
                 }
             }
+
+            props.field.regionTree.forEach(v=>{
+                regions[parseInt(v.id)]=v;
+                if(v.children){
+                    v.children.forEach(val=>{
+                        regions[parseInt(val.id)]=val;
+                    })
+                }
+            })
         },
         computed:{
             modelVal:{
                 get(){
-                    return this.value;
+                    if(this.field.canEdit===false||typeof this.value==='undefined'||typeof this.value==='object'){
+                        return this.value;
+                    }
+                    if(this.value&&(typeof this.value==='string'||typeof this.value==='number')){
+                        const vals=this.value.toString().split(',').map(v=>parseInt(v));
+                        if(vals.length===1&&regions[vals[0]]&&!regions[vals[0]].children){
+                            return [regions[vals[0]].pid,vals[0]];
+                        }
+                        return vals
+                    }
+                    return [];
                 },
                 set(val){
                     this.$emit('update:value',val);
@@ -30,7 +50,7 @@ define([],function(){
             },
         },
         template:`<div class="field-box">
-                   <template v-if="form.id">
+                   <template v-if="form.id&&field.canEdit===false">
                         <div class="l">
                             {{form[field.pField]}}/{{form[[field.cField]]}}
                         </div>
@@ -42,7 +62,8 @@ define([],function(){
                                 :options="field.regionTree"
                                 :placeholder="field.placeholder||'请选择村社'"
                                 show-search
-                                 :disabled="field.readOnly"
+                                :disabled="field.readOnly"
+                                change-on-select="canCheckParent"
                                 @change="onRegionChange"
                             />
                         </div>

@@ -87,18 +87,23 @@ trait CheckField
         if(is_array(current($items))){
             //全局搜索 hideFields 查看例子
             /** [ ['value'=>1,'text'=>'张三','hideFields'=>[字段1,字段2]], ['value'=>2,'text'=>'李四'] ] **/
-            return array_values($items);
+            $vals=[];
+            foreach ($items as $v){
+                $v['value']=(string)$v;
+                $vals[]=$v;
+            }
+            return $vals;
         }
         $arr=[];
         if(array_values($items)===$items){
             /** [ '张三','李四' ] **/
             foreach ($items as $v){
-                $arr[]=['value'=>$v,'text'=>$v];
+                $arr[]=['value'=>(string)$v,'text'=>(string)$v];
             }
         }else{
             /** [ 1=>'张三',2=>'李四','王五'=>'王五' ] **/
             foreach ($items as $k=>$v){
-                $arr[]=['value'=>$k,'text'=>$v];
+                $arr[]=['value'=>(string)$k,'text'=>(string)$v];
             }
         }
         return $arr;

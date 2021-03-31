@@ -8,6 +8,7 @@ use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\ModelField;
 
 /**
  * Trait ModelSave
@@ -78,10 +79,16 @@ trait ModelSave
             unset($data[static::getDeleteLoginUserField()]);
         }
         if(static::getRegionPidField()){
-            unset($data[static::getRegionPidField()]);
+            $fs=$fields->filter(fn(ModelField $v)=>$v->name()===static::getRegionPidField());
+            if($fs->count()===0||$fs->findByName(static::getRegionPidField())->canEdit()===false){
+                unset($data[static::getRegionPidField()]);
+            }
         }
         if(static::getRegionField()){
-            unset($data[static::getRegionField()]);
+            $fs=$fields->filter(fn(ModelField $v)=>$v->name()===static::getRegionField());
+            if($fs->count()===0||$fs->findByName(static::getRegionField())->canEdit()===false){
+                unset($data[static::getRegionField()]);
+            }
         }
 
         //onEditBefore请用doSaveDataAfter

@@ -31,9 +31,12 @@ class RegionField extends ModelField
      */
     protected array $regionTree = [];
     protected string $defaultFilterClass = RegionFilter::class;
+    protected bool $canEdit=false;//编辑页面是否可修改
+    protected bool $canCheckParent=false;//是否可选中父级
 
     protected string $pField = '';//父字段名
     protected string $cField = '';//子字段名
+
 
 
     public function __construct()
@@ -56,6 +59,32 @@ class RegionField extends ModelField
             }
         }
         return $this->doAttr('pField', $pField);
+    }
+
+    /**父字段名
+     * @param string|null $canCheckParent
+     * @return $this|string
+     */
+    public function canCheckParent(string $canCheckParent = null)
+    {
+        if (!is_null($canCheckParent)) {
+            if ($this->cField() === '' && $this->name() !== $canCheckParent) {
+                $this->cField($this->name());
+            }
+        }
+        return $this->doAttr('canCheckParent', $canCheckParent);
+    }
+
+
+
+
+    /**
+     * 编辑页面是否可修改
+     * @param bool|null $canEdit
+     * @return RegionField|bool
+     */
+    public function canEdit(bool $canEdit=null){
+        return $this->doAttr('canEdit',$canEdit);
     }
 
     /**子字段名
@@ -114,7 +143,7 @@ class RegionField extends ModelField
             throw new \think\Exception('地区字段未配置 cField');
         }
 
-        if ($val === '' && isset($data[$this->cField()])) {//如果是镇街
+        if (isset($data[$this->cField()])) {//如果是镇街
             $cRegionId = 0;
             if (is_array($data[$this->cField()])) {
                 $cRegionId = end($data[$this->cField()]);

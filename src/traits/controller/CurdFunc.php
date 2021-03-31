@@ -108,7 +108,7 @@ trait CurdFunc
 
             $info=$data->toArray();
             //只处理地区
-            $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()]))->doShowData($info);
+            $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()])&&$v->canEdit()===false)->doShowData($info);
             //原信息
             $info['sourceData']=$data;
         }else{

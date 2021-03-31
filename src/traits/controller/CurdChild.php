@@ -243,7 +243,7 @@ trait CurdChild{
                     $this->fields->saveStepInfo=$stepInfo;
 
 
-                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//隐藏地区
+                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//隐藏地区
 
                     $savedInfo=$this->model->saveInfo($data,$fields,$baseInfo,$info);
                     $this->editAfter($savedInfo);
@@ -272,7 +272,7 @@ trait CurdChild{
             $baseInfo=null;
         }
 
-        $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]));//不编辑地区
+        $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
 
         $this->createEditFetchDataBefore($fields,$info);//切面
 
