@@ -31,7 +31,8 @@ class SelectField extends ModelField
     //      'value'=>'',
     //      'text'=>'',
     //      'group'=>'',
-    //      'hide'=>false,
+    //      'hideFields'=>[],
+    //      'hide'=>false,//编辑页面中不显示此选项
     //   ]
     //]
 

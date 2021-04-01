@@ -20,9 +20,9 @@ define([],function(){
         template:`<div class="field-box">
                     <div class="l">
                         <a-checkbox-group v-model:value="modelVal"  :disabled="field.readOnly">
-                            <a-checkbox :value="checkboxItem.value"  v-for="checkboxItem in field.items">
-                                {{checkboxItem.text}}
-                            </a-checkbox>
+                            <template v-for="checkboxItem in field.items">
+                                <a-checkbox :value="checkboxItem.value" v-of="!checkboxItem.hide">{{checkboxItem.text}}</a-checkbox>
+                            </template>
                         </a-checkbox-group>
                     </div>
                     <div class="r">

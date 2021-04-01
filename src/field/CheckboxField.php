@@ -24,6 +24,16 @@ class CheckboxField extends ModelField
 
     protected string $defaultFilterClass=RadioFilter::class;
 
+    //[
+    //  [
+    //      'value'=>'',
+    //      'text'=>'',
+    //      'group'=>'',
+    //      'hideFields'=>[],
+    //      'hide'=>false,//编辑页面中不显示此选项
+    //   ]
+    //]
+
 
     /**
      * 设置保存的值

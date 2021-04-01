@@ -15,9 +15,9 @@ define([],function(){
                     <div class="l">
                         <a-radio-group v-model:value="val"
                          :disabled="field.readOnly">
-                            <a-radio :value="radioItem.value"  v-for="radioItem in field.items">
-                                {{radioItem.text}}
-                            </a-radio>
+                            <template v-for="radioItem in field.items">
+                                <a-radio :value="radioItem.value" v-if="!radioItem.hide">{{radioItem.text}}</a-radio>
+                            </template>
                         </a-radio-group>
                     </div>
                     <div class="r">
