@@ -110,6 +110,8 @@ trait CurdChild{
             $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
 
+            $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo)->column('name'):[];
+
             return $info;
         };
 

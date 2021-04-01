@@ -83,6 +83,8 @@ trait Curd
                 $nextStepInfo=$this->fields->getNextStepInfo($info);
                 $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
 
+                $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info)->column('name'):[];
+
                 return $info;
             };
 
