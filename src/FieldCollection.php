@@ -128,6 +128,7 @@ class FieldCollection extends Collection
         $fields->each(function(ModelField $v)use($data,$nullNames){
             try{
                 if(in_array($v->name(),$nullNames,true)){
+                    $v->required(false);
                     $v->setSaveToNull();
                 }else{
                     $v->setSave($data);

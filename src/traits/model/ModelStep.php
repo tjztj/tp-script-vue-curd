@@ -19,7 +19,7 @@ trait ModelStep
 
 
     /**
-     * @todo 步骤撤回的时候，删掉撤回的步骤的字段的值，不然统计可能出问题！！！
+     * @todo 步骤撤回的时候，删掉撤回的步骤的字段的值，不然统计可能出问题！！！  setSaveToNull
      * 获取要撤回的新的状态 $info->getBackStepData($step)  ;保存到数据库的操作需自己实现
      * @param FieldStep $newStep
      * @param BaseModel $baseInfo 如果有父表，需要传入父表的
