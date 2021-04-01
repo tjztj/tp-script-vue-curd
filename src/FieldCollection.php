@@ -163,6 +163,9 @@ class FieldCollection extends Collection
      */
     public function doShowData(array &$data): void
     {
+        foreach ($data as $k=>$v){
+            $data['_Original_'.$k]=$v;//原数据
+        }
         $this->each(function(ModelField $v)use(&$data){
             $v->doShowData($data);
         });

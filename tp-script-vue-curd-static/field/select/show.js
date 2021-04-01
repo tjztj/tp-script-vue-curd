@@ -3,13 +3,10 @@ define([],function(){
         props:['info','field'],
         computed:{
           lists(){
-              if(!this.info[this.field.name]){
+              if(typeof this.info['_Original_'+this.field.name]==='undefined'||this.info['_Original_'+this.field.name]===''){
                   return [];
               }
-              if(!this.field.multiple){
-                  return [this.info[this.field.name]];
-              }
-              return this.info[this.field.name].split(',');
+              return this.info['_Original_'+this.field.name].toString().split(',');
           }
         },
         methods:{

@@ -3,12 +3,13 @@ define([],function(){
         props:['info','field'],
         methods:{
           color(){
-              if(this.info[this.field.name]){
-                  for(let key in this.field.items){
-                      if(this.field.items[key].value.toString()===this.info[this.field.name].toString()){
-                          if(this.field.items[key].color){
-                             return this.field.items[key].color;
-                          }
+              if(typeof this.info['_Original_'+this.field.name]==='undefined'||this.info['_Original_'+this.field.name]===''){
+                  return ;
+              }
+              for(let key in this.field.items){
+                  if(this.field.items[key].value.toString()===this.info['_Original_'+this.field.name].toString()){
+                      if(this.field.items[key].color){
+                          return this.field.items[key].color;
                       }
                   }
               }

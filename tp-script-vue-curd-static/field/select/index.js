@@ -3,20 +3,17 @@ define([],function(){
         props:['record','field'],
         computed:{
             lists(){
-                if(!this.record.record[this.field.name]){
+                if(typeof this.record.record['_Original_'+this.field.name]==='undefined'||this.record.record['_Original_'+this.field.name]===''){
                     return [];
                 }
-                if(!this.field.multiple){
-                    return [this.record.record[this.field.name]]
-                }
-                return this.record.record[this.field.name].split(',');
+                return this.record.record['_Original_'+this.field.name].toString().split(',');
             }
         },
         methods:{
           color(val){
               if(val){
                   for(let key in this.field.items){
-                      if(this.field.items[key].value.toString()===val){
+                      if(this.field.items[key].value.toString()===val.toString()){
                           if(this.field.items[key].color){
                              return this.field.items[key].color;
                           }
