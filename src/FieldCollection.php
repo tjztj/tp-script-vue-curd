@@ -7,6 +7,7 @@ namespace tpScriptVueCurd;
 use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 use tpScriptVueCurd\traits\field\FieldCollectionStep;
@@ -21,6 +22,7 @@ use tpScriptVueCurd\traits\Func;
 class FieldCollection extends Collection
 {
     use Func,FieldCollectionStep;
+    private bool $saveHideFieldSetNull=true;//当字段未隐藏时，设置字段的值为空
     public array $groupItems=[];//字段分组（如果少于2个组，将为空；字段不设置group，将赋值为 基本信息）
     public function __construct($items = [])
     {
@@ -64,6 +66,16 @@ class FieldCollection extends Collection
     }
 
 
+    public function setSaveHideFieldSetNull(bool $saveHideFieldSetNull):self{
+        $this->saveHideFieldSetNull=$saveHideFieldSetNull;
+        return $this;
+    }
+
+    public function getSaveHideFieldSetNull():bool{
+        return $this->saveHideFieldSetNull;
+    }
+
+
     /**
      * 获取所有列表中要显示出来的字段集合
      * @return $this
@@ -93,12 +105,33 @@ class FieldCollection extends Collection
      */
     public function setSave(array $data,bool $isExcelDo=false): self
     {
-        $this->filterHideFieldsByData($data)->each(function(ModelField $v)use($data,$isExcelDo){
-            try{
-                if($isExcelDo){
+        if($isExcelDo){
+            //先处理一遍数据
+            $this->each(function(ModelField $v)use(&$data){
+                try{
                     $v->excelSaveDoData($data);
+                }catch (\Exception $e){
+                    throw new \think\Exception($v->title().'：'.$e->getMessage());
                 }
-                $v->setSave($data);
+            });
+        }
+
+
+        $nullNames=[];
+        if($this->getSaveHideFieldSetNull()){
+            //隐藏的字符串要设置为空
+            $nullNames=$this->filterHideFieldsByData($data)->column('name');
+            $fields=$this;
+        }else{
+            $fields=$this->filterHideFieldsByData($data);
+        }
+        $fields->each(function(ModelField $v)use($data,$nullNames){
+            try{
+                if(in_array($v->name(),$nullNames,true)){
+                    $v->setSaveToNull();
+                }else{
+                    $v->setSave($data);
+                }
             }catch (\Exception $e){
                 throw new \think\Exception($v->title().'：'.$e->getMessage());
             }
@@ -163,9 +196,12 @@ class FieldCollection extends Collection
      */
     public function doShowData(array &$data): void
     {
-        foreach ($data as $k=>$v){
-            $data['_Original_'.$k]=$v;//原数据
-        }
+        $this->each(function(ModelField $v)use(&$data){
+            if($v instanceof PasswordField){
+                return ;
+            }
+            $data['_Original_'.$v->name()]=$data[$v->name()];//原数据
+        });
         $this->each(function(ModelField $v)use(&$data){
             $v->doShowData($data);
         });

@@ -343,6 +343,26 @@ abstract class ModelField
 
 
     /**
+     * 设置为空值（子字段有需要的话，继承重写）
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function setSaveToNull():self{
+        $nullVal=$this->nullVal();
+        $this->defaultCheckRequired($nullVal);
+        $this->save=$nullVal;
+        return $this;
+    }
+
+    /**
+     * 字段为空时的值
+     * @return string
+     */
+    protected function nullVal(){
+        return '';
+    }
+
+    /**
      * 设置保存的值，子类可重写
      * @param array $data
      * @return $this

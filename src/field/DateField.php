@@ -51,6 +51,15 @@ class DateField extends ModelField
         return $this;
     }
 
+
+    /**
+     * 字段为空时的值
+     * @return int
+     */
+    public function nullVal(){
+        return 0;
+    }
+
     /**
      * 显示时要处理的数据
      * @param array $dataBaseData

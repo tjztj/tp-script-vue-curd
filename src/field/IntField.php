@@ -80,6 +80,14 @@ class IntField extends ModelField
     }
 
     /**
+     * 字段为空时的值
+     * @return int
+     */
+    public function nullVal(){
+        return 0;
+    }
+
+    /**
      * 模板导入时备注
      * @param ExcelFieldTpl $excelFieldTpl
      */

@@ -136,6 +136,14 @@ class RegionField extends ModelField
         return $this;
     }
 
+    /**
+     * 字段为空时的值
+     * @return int
+     */
+    public function nullVal(){
+        return 0;
+    }
+
 
     private function getSystemRegionPidBySetSave($val, $data)
     {

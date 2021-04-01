@@ -96,6 +96,14 @@ class DecimalField extends ModelField
     }
 
     /**
+     * 字段为空时的值
+     * @return int
+     */
+    public function nullVal(){
+        return 0;
+    }
+
+    /**
      * 模板导入备注
      * @param ExcelFieldTpl $excelFieldTpl
      * @return void
