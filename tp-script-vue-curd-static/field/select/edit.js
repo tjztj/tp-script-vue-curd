@@ -16,7 +16,7 @@ define([],function(){
                         }
                         return [];
                     }
-                    return this.value===''?undefined:this.value.toString();
+                    return typeof this.value==='undefined'||this.value===''?undefined:this.value.toString();
                 },
                 set(val){
                     if(val===undefined){

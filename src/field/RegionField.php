@@ -41,7 +41,6 @@ class RegionField extends ModelField
 
     public function __construct()
     {
-        //TODO::
         $this->regionTree = SystemRegion::getMyCascaderData();
         $this->listColumnWidth(90);
         parent::__construct();
@@ -224,6 +223,11 @@ class RegionField extends ModelField
     public function getRegionTree(): array
     {
         return $this->regionTree;
+    }
+
+    public function setRegionTree(array $RegionTree):self{
+        $this->regionTree=$RegionTree;
+        return $this;
     }
 
 

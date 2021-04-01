@@ -3,6 +3,24 @@ define([],function(){
     return {
         props:['field','value','validateStatus','form'],
         setup(props,ctx){
+
+            let level_3=false;
+            props.field.regionTree.forEach(v=>{
+                regions[parseInt(v.id)]=v;
+                if(v.children){
+                    v.children.forEach(val=>{
+                        regions[parseInt(val.id)]=val;
+                        if(val.children){
+                            val.children.forEach(vo=>{
+                                regions[parseInt(vo.id)]=vo;
+                                level_3=true;
+                            })
+                        }
+                    })
+                }
+            })
+
+
             if(!props.field.readOnly&&props.field.editShow===true&&props.field.required===true&&!props.form.id&&!props.value){
                 //如果是添加，且是必填，且为空
                 if(props.field.regionTree.length===1){
@@ -10,19 +28,20 @@ define([],function(){
                         //todo
                         ctx.emit('update:value',[props.field.regionTree[0].id])
                     }else if(props.field.regionTree[0].children.length===1){
-                        ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id])
+                        if(level_3&&props.field.regionTree[0].children[0].children){
+                            if(props.field.regionTree[0].children[0].children.length===1){
+                                ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id,props.field.regionTree[0].children[0].children[0].id])
+                            }
+                        }else{
+                            ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id])
+                        }
                     }
                 }
             }
 
-            props.field.regionTree.forEach(v=>{
-                regions[parseInt(v.id)]=v;
-                if(v.children){
-                    v.children.forEach(val=>{
-                        regions[parseInt(val.id)]=val;
-                    })
-                }
-            })
+            return {
+                level_3
+            }
         },
         computed:{
             modelVal:{
@@ -33,6 +52,9 @@ define([],function(){
                     if(this.value&&(typeof this.value==='string'||typeof this.value==='number')){
                         const vals=this.value.toString().split(',').map(v=>parseInt(v));
                         if(vals.length===1&&regions[vals[0]]&&!regions[vals[0]].children){
+                            if(this.level_3){
+                                return [regions[regions[vals[0]].pid].pid,regions[vals[0]].pid,vals[0]];
+                            }
                             return [regions[vals[0]].pid,vals[0]];
                         }
                         return vals
@@ -52,7 +74,7 @@ define([],function(){
         template:`<div class="field-box">
                    <template v-if="form.id&&field.canEdit===false">
                         <div class="l">
-                            {{form[field.pField]}}/{{form[[field.cField]]}}
+                            <span v-if="form[field.pField]">{{form[field.pField]}}/</span>{{form[[field.cField]]}}
                         </div>
                     </template>
                     <template v-else>

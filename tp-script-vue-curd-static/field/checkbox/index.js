@@ -6,17 +6,18 @@ define([],function(){
                 if(typeof this.record.record['_Original_'+this.field.name]==='undefined'||this.record.record['_Original_'+this.field.name]===''){
                     return [];
                 }
-                return this.record.record['_Original_'+this.field.name].toString().split(',');
+                return typeof this.record.record['_Original_'+this.field.name]==='undefined'?[]:this.record.record['_Original_'+this.field.name].toString().split(',');
             }
         },
         methods:{
           color(val){
-              if(val){
-                  for(let key in this.field.items){
-                      if(this.field.items[key].value.toString()===val.toString()){
-                          if(this.field.items[key].color){
-                             return this.field.items[key].color;
-                          }
+              if(val===''||val===undefined){
+                  return;
+              }
+              for(let key in this.field.items){
+                  if(this.field.items[key].value.toString()===val.toString()){
+                      if(this.field.items[key].color){
+                          return this.field.items[key].color;
                       }
                   }
               }
@@ -25,10 +26,12 @@ define([],function(){
                 if(typeof val==='undefined'||val===''){
                     return '';
                 }
-                if(typeof this.field.items[val]==='undefined'){
-                    return val;
+                for(let key in this.field.items){
+                    if(this.field.items[key].value.toString()===val.toString()){
+                        return this.field.items[key].title;
+                    }
                 }
-                return this.field.items[val].text;
+                return val;
             }
         },
         template:`<div>
