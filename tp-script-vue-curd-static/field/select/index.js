@@ -21,13 +21,22 @@ define([],function(){
                   }
               }
           },
+            text(val){
+                if(typeof val==='undefined'||val===''){
+                    return '';
+                }
+                if(typeof this.field.items[val]==='undefined'){
+                    return val;
+                }
+                return this.field.items[val].text;
+            }
         },
         template:`<div>
                     <a-tooltip placement="topLeft" v-if="record.text">
                         <a-tooltip placement="topLeft"><template #title>
-                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{item}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
                         </template>
-                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{item}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
                         </a-tooltip>
                     </a-tooltip>
                 </div>`,
