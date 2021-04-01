@@ -21,7 +21,7 @@ trait CheckField
     use HideFields;
 
     protected array $items=[];//选项集合
-    private string $itemsSerialize='';
+    private string $itemsKey='';
 
 
     /**
@@ -34,7 +34,7 @@ trait CheckField
             return $this->items;
         }
         $this->items=$this->getItemsByItems($items);
-        $this->itemsSerialize=serialize($this->items);
+        $this->itemsKey=create_guid();
         return $this;
     }
 
@@ -113,20 +113,20 @@ trait CheckField
 
     final protected function getItemsTextValues():array{
         static $items=[];
-        if(empty($items[$this->itemsSerialize]))$items[$this->itemsSerialize]=array_column($this->items,'value','text');
-        return $items[$this->itemsSerialize];
+        if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'value','text');
+        return $items[$this->itemsKey];
     }
 
     final protected function getItemsValueTexts():array{
         static $items=[];
-        if(empty($items[$this->itemsSerialize]))$items[$this->itemsSerialize]=array_column($this->items,'text','value');
-        return $items[$this->itemsSerialize];
+        if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'text','value');
+        return $items[$this->itemsKey];
     }
 
     final protected function getItemsValue():array{
         static $items=[];
-        if(empty($items[$this->itemsSerialize]))$items[$this->itemsSerialize]=array_column($this->items,'value');
-        return $items[$this->itemsSerialize];
+        if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'value');
+        return $items[$this->itemsKey];
     }
 
 
