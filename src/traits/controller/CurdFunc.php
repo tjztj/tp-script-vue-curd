@@ -104,7 +104,6 @@ trait CurdFunc
                 ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
                 :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
 
-            $fields=$fields->rendGroup();
             $fields->saveStepInfo=$stepInfo;
 
 
@@ -114,11 +113,11 @@ trait CurdFunc
             //原信息
             $info['sourceData']=$data;
         }else{
-            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo)->rendGroup();
+            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
             $fields->saveStepInfo=$stepInfo;
             $info=null;
         }
-        $fieldArr=array_values($fields->toArray());
+        $fieldArr=array_values($fields->rendGroup()->toArray());
         return [
             'title'=>static::getTitle(),
             'fields'=>$fieldArr,

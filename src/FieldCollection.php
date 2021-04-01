@@ -32,6 +32,8 @@ class FieldCollection extends Collection
         $groupItems=self::groupListByItems($items);
         if(count($groupItems)>1){
             $this->groupItems=$groupItems;
+        }else{
+            $this->groupItems=[];
         }
     }
 
