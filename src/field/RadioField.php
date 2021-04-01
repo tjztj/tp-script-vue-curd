@@ -31,6 +31,7 @@ class RadioField extends ModelField
     //      'group'=>'',
     //      'hideFields'=>[],
     //      'hide'=>false,//编辑页面中不显示此选项
+    //      'color'=>'编辑列表查看选项颜色'
     //   ]
     //]
 

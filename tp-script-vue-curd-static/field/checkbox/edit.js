@@ -21,7 +21,7 @@ define([],function(){
                     <div class="l">
                         <a-checkbox-group v-model:value="modelVal"  :disabled="field.readOnly">
                             <template v-for="checkboxItem in field.items">
-                                <a-checkbox :value="checkboxItem.value" v-of="!checkboxItem.hide">{{checkboxItem.text}}</a-checkbox>
+                                <a-checkbox :value="checkboxItem.value" v-of="!checkboxItem.hide"><span :style="{color:checkboxItem.color}">{{checkboxItem.text}}</span></a-checkbox>
                             </template>
                         </a-checkbox-group>
                     </div>

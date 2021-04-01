@@ -16,7 +16,7 @@ define([],function(){
                         <a-radio-group v-model:value="val"
                          :disabled="field.readOnly">
                             <template v-for="radioItem in field.items">
-                                <a-radio :value="radioItem.value" v-if="!radioItem.hide">{{radioItem.text}}</a-radio>
+                                <a-radio :value="radioItem.value" v-if="!radioItem.hide"><span :style="{color:checkboxItem.color}">{{radioItem.text}}</span></a-radio>
                             </template>
                         </a-radio-group>
                     </div>
