@@ -120,7 +120,7 @@ class FieldCollection extends Collection
         $notNullNames=null;
         if($this->getSaveHideFieldSetNull()){
             //隐藏的字符串要设置为空
-            $nullNames=$this->filterHideFieldsByData($data)->column('name');
+            $notNullNames=$this->filterHideFieldsByData($data)->column('name');
             $fields=$this;
         }else{
             $fields=$this->filterHideFieldsByData($data);
