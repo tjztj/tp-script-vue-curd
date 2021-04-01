@@ -120,10 +120,10 @@ class FieldCollection extends Collection
         $notNullNames=null;
         if($this->getSaveHideFieldSetNull()){
             //隐藏的字符串要设置为空
-            $notNullNames=$this->filterHideFieldsByData($data)->column('name');
+            $notNullNames=$this->filterHideFieldsByData($data,false)->column('name');
             $fields=$this;
         }else{
-            $fields=$this->filterHideFieldsByData($data);
+            $fields=$this->filterHideFieldsByData($data,false);
         }
         $fields->each(function(ModelField $v)use($data,$notNullNames){
             try{
@@ -212,9 +212,9 @@ class FieldCollection extends Collection
     /**
      * 查看页面过滤掉 隐藏的字段
      * @param VueCurlModel $sourceData
-     * @return array
+     * @return $this
      */
-    public function filterHideFieldsByShow(VueCurlModel $sourceData){
+    public function filterHideFieldsByShow(VueCurlModel $sourceData):self{
         return $this->filterHideFieldsByData($sourceData->toArray(),true);
     }
 
