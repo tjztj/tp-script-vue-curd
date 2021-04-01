@@ -38,7 +38,10 @@ define([],function(){
                     start:this.range[0]?this.range[0].format('YYYY-MM'):'',
                     end:this.range[1]?this.range[1].format('YYYY-MM'):'',
                 });
-            }
+            },
+            handlePanelChange(val, mode){
+                this.range = val;
+            },
         },
         template:`<div>
                     <div class="filter-item-check-item" @click="val('','')" :class="{active:checked('','')}"><div class="filter-item-check-item-value">全部</div></div>
@@ -49,7 +52,9 @@ define([],function(){
                                       style="width: 210px"
                                         v-model:value="range"
                                         format="YYYY-MM"
+                                        :mode="['month', 'month']"
                                         :placeholder="['开始月份', '结束月份']"
+                                         @panelChange="handlePanelChange"
                                       />
                                        <a-button @click="search" size="small">确定</a-button>
                                  </a-input-group>
