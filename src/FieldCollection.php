@@ -117,7 +117,7 @@ class FieldCollection extends Collection
         }
 
 
-        $nullNames=[];
+        $notNullNames=null;
         if($this->getSaveHideFieldSetNull()){
             //隐藏的字符串要设置为空
             $nullNames=$this->filterHideFieldsByData($data)->column('name');
@@ -125,13 +125,13 @@ class FieldCollection extends Collection
         }else{
             $fields=$this->filterHideFieldsByData($data);
         }
-        $fields->each(function(ModelField $v)use($data,$nullNames){
+        $fields->each(function(ModelField $v)use($data,$notNullNames){
             try{
-                if(in_array($v->name(),$nullNames,true)){
+                if(is_null($notNullNames)||in_array($v->name(),$notNullNames,true)){
+                    $v->setSave($data);
+                }else{
                     $v->required(false);
                     $v->setSaveToNull();
-                }else{
-                    $v->setSave($data);
                 }
             }catch (\Exception $e){
                 throw new \think\Exception($v->title().'：'.$e->getMessage());
