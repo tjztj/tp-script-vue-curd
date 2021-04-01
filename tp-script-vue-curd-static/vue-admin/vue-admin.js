@@ -1175,10 +1175,10 @@ define(requires, function ( axios,Qs) {
                     }
                 }
             },
-            template:`<div>
+            template:`<div class="curd-filter-box">
                     <a-spin :spinning="loading">
-                            <div class="filter-box-title" v-if="childs.length>0&&filterGroupIsShow(base)">{{title}}：</div>
-                            <div class="filter-box" v-if="filterGroupIsShow(base)">
+                            <div class="filter-box-title" v-if="childs&&childs.length>0&&filterGroupIsShow(base)">{{title}}：</div>
+                            <div class="filter-box-div" v-if="filterGroupIsShow(base)">
                                 <transition-group name="bounce">
                                     <template v-for="(item,index) in filterSource.filterConfig">
                                         <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name">
@@ -1192,22 +1192,24 @@ define(requires, function ( axios,Qs) {
                                     </template>
                                 </transition-group>
                             </div>
-                            <template v-for="child in childs">
-                                <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
-                                <div class="filter-box" v-show="filterGroupIsShow(child)">
-                                    <transition-group name="bounce">
-                                        <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
-                                            <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
-                                                <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
-                                                 <component :is="item.type" 
-                                                            :config="item"
-                                                            @search="search($event,item)"
-                                                    ></component>
-                                                </div></div>
-                                            </div>
-                                        </template>
-                                    </transition-group>
-                                </div>
+                            <template v-if="childs">
+                                <template v-for="child in childs">
+                                    <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
+                                    <div class="filter-box-div" v-show="filterGroupIsShow(child)">
+                                        <transition-group name="bounce">
+                                            <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
+                                                <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
+                                                    <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
+                                                     <component :is="item.type" 
+                                                                :config="item"
+                                                                @search="search($event,item)"
+                                                        ></component>
+                                                    </div></div>
+                                                </div>
+                                            </template>
+                                        </transition-group>
+                                    </div>
+                                </template>
                             </template>
                         </a-spin>
                         <div class="filter-sub-btn-box">
