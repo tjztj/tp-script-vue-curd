@@ -198,7 +198,7 @@ class FieldCollection extends Collection
     public function doShowData(array &$data): void
     {
         $this->each(function(ModelField $v)use(&$data){
-            if($v instanceof PasswordField){
+            if($v instanceof PasswordField||!isset($data[$v->name()])){
                 return ;
             }
             $data['_Original_'.$v->name()]=$data[$v->name()];//原数据
