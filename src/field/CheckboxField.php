@@ -121,8 +121,8 @@ class CheckboxField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,''),
-            new Show($type,''),
+            new Index($type,'/tp-script-vue-curd-static.php?field/checkbox/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/checkbox/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/checkbox/edit.js')
         );
     }
