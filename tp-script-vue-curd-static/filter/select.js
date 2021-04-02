@@ -10,13 +10,22 @@ define([], function () {
             groupItems(){
                 let items={};
                 this.config.items.forEach(v=>{
+                    v.group=v.group||'';
                     if(!items[v.group]){
                         items[v.group]=[];
                     }
                     items[v.group].push(v);
                 })
                 return items;
-            }
+            },
+            haveGroup(){
+                for(let i in this.config.items){
+                    if(this.config.items[i].group){
+                        return true;
+                    }
+                }
+                return false;
+            },
         },
         methods: {
             search(value) {
@@ -38,11 +47,18 @@ define([], function () {
                                       show-search 
                                       size="small"
                                       :filter-option="filterOption">
-                                      <template v-if="field.items&&field.items[0].group">
-                                         <a-select-option value=""><span style="color: rgba(0,0,0,.35);">全部</span></a-select-option>
-                                         <a-select-opt-group v-for="(items,key) in groupItems" :label="key">
-                                             <a-select-option :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                         </a-select-opt-group>
+                                      <template v-if="haveGroup">
+                                         <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
+                                         <template v-for="(items,key) in groupItems">
+                                            <template v-if="key">
+                                                 <a-select-opt-group :label="key">
+                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                 </a-select-opt-group>
+                                            </template>
+                                             <template v-else>
+                                                <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                             </template>
+                                         </template>
                                      </template>
                                      <template v-else>
                                          <a-select-option :value="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>

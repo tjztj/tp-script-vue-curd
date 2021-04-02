@@ -29,13 +29,22 @@ define([],function(){
             groupItems(){
                 let items={};
                 this.field.items.forEach(v=>{
+                    v.group=v.group||'';
                     if(!items[v.group]){
                         items[v.group]=[];
                     }
                     items[v.group].push(v);
                 })
                 return items;
-            }
+            },
+            haveGroup(){
+                for(let i in this.field.items){
+                    if(this.field.items[i].group){
+                        return true;
+                    }
+                }
+                return false;
+            },
         },
         template:`<div class="field-box">
                     <div class="l">
@@ -46,12 +55,17 @@ define([],function(){
                                    :disabled="field.readOnly"
                                   show-search>
                                   
-                                  <template v-if="field.items&&field.items[0].group">
-                                        <a-select-opt-group v-for="(items,key) in groupItems" :label="key">
-                                            <template v-for="optionItem in items">
-                                                <a-select-option :value="optionItem.value" v-if="!optionItem.hide"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                  <template v-if="haveGroup">
+                                         <template v-for="(items,key) in groupItems">
+                                            <template v-if="key">
+                                                 <a-select-opt-group :label="key">
+                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                 </a-select-opt-group>
                                             </template>
-                                        </a-select-opt-group>
+                                             <template v-else>
+                                                <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                             </template>
+                                         </template>
                                    </template>
                                    <template v-else>
                                         <template v-for="optionItem in field.items">
