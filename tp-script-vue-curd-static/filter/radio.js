@@ -14,7 +14,7 @@ define([],function(){
         },
         template:`<div>
                     <div class="filter-item-check-item" @click="val('')" :class="{active:value===''}"><div class="filter-item-check-item-value">全部</div></div>
-                    <div v-for="(vo,key) in config.items" class="filter-item-check-item" @click="val(vo.value)" :class="{active:vo.value===value}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
+                    <div v-for="(vo,key) in config.items" class="filter-item-check-item" @click="val(vo.value)" :class="{active:vo.value.toString()===value.toString()}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
 </div>`,
     }
 });
