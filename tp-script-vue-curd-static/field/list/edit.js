@@ -2,18 +2,22 @@ define([], function () {
     return {
         props: ['field', 'value', 'validateStatus', 'listFieldLabelCol', 'listFieldWrapperCol', 'groupFieldItems','fieldHideList'],
         setup(props,ctx){
-            const listFieldObjs = {};
+            const listFieldObjs = {},currentFieldHideList={};
             if (props.value&&props.value!=='null') {
                 let lists = JSON.parse(props.value);
                 for (let n in lists) {
-                    listFieldObjs[window.guid()]=lists[n];
+                    const guid=window.guid();
+                    currentFieldHideList[guid]={};
+                    listFieldObjs[guid]=lists[n];
                 }
             } else {
-                listFieldObjs[window.guid()]={};
+                const guid=window.guid();
+                currentFieldHideList[guid]={};
+                listFieldObjs[guid]={};
             }
             return {
                 listFieldObjs:Vue.ref(listFieldObjs),
-                currentFieldHideList:Vue.ref({}),
+                currentFieldHideList:Vue.ref(currentFieldHideList),
             }
         },
         watch: {
@@ -29,7 +33,7 @@ define([], function () {
             addListField() {
                 const guid=window.guid();
                 this.currentFieldHideList[guid]={};
-                this.listFieldObjs[window.guid()]={};
+                this.listFieldObjs[guid]={};
             },
             removeListField(key) {
                 delete this.listFieldObjs[key];
