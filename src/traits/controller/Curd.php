@@ -86,7 +86,7 @@ trait Curd
                 $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info):FieldCollection::make();
                 $info->stepFields=$stepFields->column('name');
 
-                $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,null,$info->stepFields):false;
+                $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,null,$stepFields):false;
 
                 return $info;
             };
