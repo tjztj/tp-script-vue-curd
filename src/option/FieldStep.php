@@ -5,6 +5,11 @@ namespace tpScriptVueCurd\option;
 
 
 
+use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\ModelField;
+
 class FieldStep
 {
 
@@ -13,6 +18,7 @@ class FieldStep
     private string $fieldName;//相关字段名称，只有在字段中使用steps方法后获取到的 steps 才会有
     private StepCheck $checkFunc;
     private StepCheck $fieldCheckFunc;
+    private $auth;//用来判断是否有编辑当前步骤的权限
     public array $config=[//一些其他配置，如颜色
         'color'=>null,
     ];
@@ -106,6 +112,37 @@ class FieldStep
         return $this;
     }
 
+
+    /**
+     * 用来判断是否有编辑当前步骤的权限
+     * @param bool|callable $auth
+     * @return $this
+     */
+    public function auth($auth):self{
+        if(is_callable($auth)){
+            $this->auth=$auth;
+        }else if(is_bool($auth)){
+            $this->auth=fn()=>$auth;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+        return $this;
+    }
+
+    /**
+     * 验证是否有编辑当前步骤的权限
+     * @param VueCurlModel|null $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @return bool
+     */
+    public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
+        if(!isset($this->auth)){
+            return true;
+        }
+        $auth=$this->auth;
+        return $auth($info,$baseInfo,$fields);
+    }
     
 
 

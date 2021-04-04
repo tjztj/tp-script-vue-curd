@@ -60,7 +60,7 @@
             </template>
         </div>
         <div class="title-right">
-            <template v-if="auth.edit">
+            <template v-if="auth.add">
                 <a-button type="primary" @click="openAdd">
                     <plus-outlined></plus-outlined>
                     <span> 添加</span>

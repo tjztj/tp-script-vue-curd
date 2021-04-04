@@ -1035,7 +1035,7 @@ define(requires, function ( axios,Qs) {
                                     <slot name="do" :record="record">
                                         <a @click="openShow(record)">详情</a>
                                           
-                                        <template v-if="canEdit!==false&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0))">
+                                        <template v-if="canEdit!==false&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0&&record.stepCanEdit))">
                                             <a-divider type="vertical"></a-divider>
                                             <a @click="openEdit(record)">修改</a>
                                         </template>

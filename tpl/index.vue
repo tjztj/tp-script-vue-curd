@@ -64,7 +64,7 @@
             </div>
             <div class="ant-pro-table-list-toolbar-right">
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
-                    <template v-if="auth.edit">
+                    <template v-if="auth.add">
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">
                                 <plus-outlined></plus-outlined>

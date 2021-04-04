@@ -70,6 +70,7 @@ trait CurdChild{
             'title'=>static::getTitle(),
             'canDel'=>true,
             'auth'=>[
+                'add'=>$this->getAuthAdd(),
                 'edit'=>true,
                 'del'=>true,
                 'importExcelTpl'=>true,
@@ -111,6 +112,8 @@ trait CurdChild{
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
 
             $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo)->column('name'):[];
+
+            $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,$baseInfo,$info->stepFields):false;
 
             return $info;
         };
@@ -230,6 +233,11 @@ trait CurdChild{
                     $this->fields=$this->fields->filterNextStepFields(null,$baseInfo,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
+                    //步骤权限验证
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck(null,$baseInfo,$this->fields)===false){
+                        return $this->error('您不能进行此操作');
+                    }
+
                     $savedInfo=$this->model->addInfo($data,$baseInfo,$this->fields);
                     $this->addAfter($savedInfo);
                 }else{
@@ -243,6 +251,11 @@ trait CurdChild{
                         ?$this->fields->filterNextStepFields($info,$baseInfo,$stepInfo)
                         :$this->fields->filterCurrentStepFields($info,$baseInfo,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
+
+                    //步骤权限验证
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($info,$baseInfo,$this->fields)===false){
+                        return $this->error('您不能进行此操作');
+                    }
 
 
                     $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//隐藏地区

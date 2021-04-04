@@ -37,6 +37,24 @@ trait CurdFunc
         return $this;
     }
 
+
+    /**
+     *是否能添加
+     * @return bool
+     */
+    protected function getAuthAdd():bool{
+        if(!$this->fields->stepIsEnable()){
+            return true;
+        }
+        $stepInfo=$this->fields->getNextStepInfo();
+        if($stepInfo){
+            $fields=$this->fields->getFilterStepFields($stepInfo,true);
+            return $fields->count()>0&&$stepInfo->authCheck(null,null,$fields);
+        }else{
+            return false;
+        }
+    }
+
     /**
      * #title 详细页面
      * @return mixed|void
@@ -117,6 +135,11 @@ trait CurdFunc
             $fields->saveStepInfo=$stepInfo;
             $info=null;
         }
+
+        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck(null,$baseModel,$fields)===false){
+            return $this->error('您不能进行此操作');
+        }
+
         $fieldArr=array_values($fields->rendGroup()->toArray());
         return [
             'title'=>static::getTitle(),

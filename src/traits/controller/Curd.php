@@ -85,6 +85,8 @@ trait Curd
 
                 $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info)->column('name'):[];
 
+                $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,null,$info->stepFields):false;
+
                 return $info;
             };
 
@@ -114,6 +116,17 @@ trait Curd
 
 
 
+        $authAdd=null;
+        if($this->fields->stepIsEnable()){
+            $stepInfo=$this->fields->getNextStepInfo();
+            if($stepInfo){
+                $fields=$this->fields->getFilterStepFields($stepInfo,true);
+                $authAdd=$fields->count()>0&&$stepInfo->authCheck(null,null,$fields);
+            }else{
+                $authAdd=false;
+            }
+        }
+
         $data=$this->indexFetch([
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
@@ -134,6 +147,7 @@ trait Curd
             'canEdit'=>$showTableTool,
             'canDel'=>$showTableTool,
             'auth'=>[
+                'add'=>$this->getAuthAdd(),
                 'edit'=>true,
                 'del'=>true,
                 'importExcelTpl'=>true,
@@ -168,6 +182,11 @@ trait Curd
                     $this->fields=$this->fields->filterNextStepFields(null,null,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
+                    //步骤权限验证
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck(null,null,$this->fields)===false){
+                        return $this->error('您不能进行此操作');
+                    }
+
                     $savedInfo=$this->model->addInfo($data,$this->fields);
                     $this->addAfter($savedInfo);
                 }else{
@@ -180,6 +199,11 @@ trait Curd
                         ?$this->fields->filterNextStepFields($old,null,$stepInfo)
                         :$this->fields->filterCurrentStepFields($old,null,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
+
+                    //步骤权限验证
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($old,null,$this->fields)===false){
+                        return $this->error('您不能进行此操作');
+                    }
 
                     $savedInfo=$this->model->saveInfo($data,$this->fields,null,$old);
                     $this->editAfter($savedInfo);

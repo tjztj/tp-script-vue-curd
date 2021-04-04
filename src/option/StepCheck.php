@@ -55,6 +55,7 @@ class StepCheck
     }
 
 
+
     /**
      * 当未设置 check 的时候，可以设置为 数据步骤与 步奏对象的值相同就为true
      * @param string $step
