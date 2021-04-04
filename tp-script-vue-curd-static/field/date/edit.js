@@ -5,6 +5,7 @@ define([],function(){
             dateDefaultValue:{
                 get(){
                     if(!this.value){
+                        this.$emit('update:value','');
                         return null;
                     }
                     let val='';

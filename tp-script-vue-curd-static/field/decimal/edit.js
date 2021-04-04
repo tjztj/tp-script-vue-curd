@@ -2,15 +2,20 @@ define([],function(){
     return {
         props:['field','value','validateStatus'],
         setup(props,ctx){
+            if(typeof props.value==='undefined'||props.value===null){
+                ctx.emit('update:value','');
+            }else if(typeof props.value==='number'){
+                ctx.emit('update:value',props.value.toString());
+            }
             return {
                 modelVal:Vue.ref(props.value)
             }
         },
         methods:{
-          change(val){
-              this.modelVal=val?parseFloat(Number(val).toFixed(this.field.precision)).toString():'';
-              this.$emit('update:value',this.modelVal);
-          }
+            change(val){
+                this.modelVal=val?parseFloat(Number(val).toFixed(this.field.precision)).toString():'';
+                this.$emit('update:value',this.modelVal);
+            }
         },
         template:`<div class="field-box">
                         <div class="l">

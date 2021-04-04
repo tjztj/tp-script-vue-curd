@@ -349,10 +349,8 @@ class FieldCollection extends Collection
                     $fieldCopy=clone $field;
                     $vValue=$fieldCopy->setSave($data)->getSave();
                 }
-
-
                 //有值才显示
-                if($vValue){
+                if(!is_null($vValue)&&$vValue!==''){
                     //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
                     $hideVal=!$reversalHideFields;
 
@@ -363,7 +361,7 @@ class FieldCollection extends Collection
                     });
                     $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName,$hideVal){
                         $v->getFields()->each(function($f)use($changeFieldHideList,$vName,$hideVal){
-                            $changeFieldHideList($f->name(),$vName,$hideVal);
+                            $changeFieldHideList($f->name(),$vName,!$hideVal);
                         });
                     });
                 }else if(method_exists($field,'defHideAboutFields')&&$field->defHideAboutFields()){ //默认隐藏所有

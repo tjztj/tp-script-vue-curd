@@ -46,7 +46,7 @@ class FieldNumHideFieldCollection extends Collection
         return $this->filter(function(FieldNumHideField $v)use($value,$isAccordWith){
             $start=$v->getStart();
             $end=$v->getEnd();
-            if($value===''||(is_null($start)&&is_null($end))){
+            if($value===''||is_null($value)||(is_null($start)&&is_null($end))){
                 return $isAccordWith;
             }
             if(is_null($start)){
