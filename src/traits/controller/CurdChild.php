@@ -70,11 +70,12 @@ trait CurdChild{
             'title'=>static::getTitle(),
             'canDel'=>true,
             'auth'=>[
-                'add'=>$this->getAuthAdd(),
+                'add'=>true,
                 'edit'=>true,
                 'del'=>true,
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
+                'stepAdd'=>$this->getAuthAdd(),
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
