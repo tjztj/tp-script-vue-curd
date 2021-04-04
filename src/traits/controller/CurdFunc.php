@@ -136,7 +136,8 @@ trait CurdFunc
             $info=null;
         }
 
-        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($info,$baseModel,$fields)===false){
+
+        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){
             return $this->error('您不能进行此操作');
         }
 
