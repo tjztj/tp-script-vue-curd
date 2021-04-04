@@ -83,7 +83,7 @@ trait Curd
                 $nextStepInfo=$this->fields->getNextStepInfo($info);
                 $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
 
-                $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info)->column('name'):[];
+                $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info)->column('name'):FieldCollection::make();
 
                 $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,null,$info->stepFields):false;
 
@@ -115,17 +115,6 @@ trait Curd
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
 
 
-
-        $authAdd=null;
-        if($this->fields->stepIsEnable()){
-            $stepInfo=$this->fields->getNextStepInfo();
-            if($stepInfo){
-                $fields=$this->fields->getFilterStepFields($stepInfo,true);
-                $authAdd=$fields->count()>0&&$stepInfo->authCheck(null,null,$fields);
-            }else{
-                $authAdd=false;
-            }
-        }
 
         $data=$this->indexFetch([
             'model'=>static::modelClassPath(),
