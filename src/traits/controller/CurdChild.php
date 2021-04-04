@@ -112,9 +112,10 @@ trait CurdChild{
             $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
 
-            $info->stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo)->column('name'):FieldCollection::make();
+            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
+            $info->stepFields=$stepFields->column('name');
 
-            $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,$baseInfo,$info->stepFields):false;
+            $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,$baseInfo,$stepFields):false;
 
             return $info;
         };
