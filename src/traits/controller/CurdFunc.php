@@ -175,7 +175,7 @@ trait CurdFunc
      */
     protected function showTpl($file,$data){
         if(isset($this->fetchPath)&&$this->fetchPath!==''){
-            return $this->fetch($file,$data);
+            return $this->fetch($this->fetchPath,$data);
         }
 
         $appName = $this->app->http->getName();
