@@ -58,8 +58,10 @@
                     </a-button>
                 </a-popconfirm>
             </template>
+            {block name="toolTitleRight"}{/block}
         </div>
         <div class="title-right">
+            {block name="toolBtnLeft"}{/block}
             <template v-if="auth.add&&auth.stepAdd">
                 <a-button type="primary" @click="openAdd">
                     <plus-outlined></plus-outlined>
@@ -82,6 +84,7 @@
                     <span> Excel模板下载</span>
                 </a-button>
             </template>
+            {block name="toolBtnRight"}{/block}
             <div class="ant-pro-table-list-toolbar-divider">
                 <a-divider type="vertical"></a-divider>
             </div>
@@ -110,9 +113,11 @@
             @open-show="openShow"
             @on-delete="deleteRow"
             @open-edit="openEdit">
-
+            {block name="tableSlot"}{/block}
         </curd-table>
     </div>
     <div class="week-foot-box"></div>
 </div>
 </div>
+
+{block name="script"}{/block}
