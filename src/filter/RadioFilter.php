@@ -15,6 +15,9 @@ use think\db\Query;
  */
 class RadioFilter extends ModelFilter
 {
+    //是否FindInSet查询
+    private bool $isFindInSet=false;
+
     protected array $items=[];
 
     public function config():array{
@@ -56,16 +59,47 @@ class RadioFilter extends ModelFilter
 
     public function generateWhere(Query $query,$value):void{
         if($value||$value===0||$value==='0'){
-            if(is_array($value)){
-                $query->whereIn($this->field->name(),$value);
+            if($this->isFindInSet()){
+                is_array($value)||$value=[$value];
+                if(count($value)>1){
+                    $whereArr=[];
+                    foreach ($value as $v){
+                        $whereArr[]='FIND_IN_SET("'.addslashes($v).'",`'.$this->field->name().'`)';
+                    }
+                    $query->whereRaw(implode(' OR ',$whereArr));
+                }else{
+                    $query->whereFindInSet($this->field->name(),current($value));
+                }
             }else{
-                $query->where($this->field->name(),$value);
+                if(is_array($value)){
+                    $query->whereIn($this->field->name(),$value);
+                }else{
+                    $query->where($this->field->name(),$value);
+                }
             }
+
+
+
         }
     }
 
-    static public function componentUrl():string{
+
+    /**
+     * 查询方式
+     * @param bool|null $isFindInSet
+     * @return $this|bool
+     */
+    public function isFindInSet(bool $isFindInSet=null){
+        if(is_null($isFindInSet)){
+            return $this->isFindInSet;
+        }
+        $this->isFindInSet=$isFindInSet;
+        return $this;
+    }
+
+    public static function componentUrl():string{
         return '/tp-script-vue-curd-static.php?filter/radio.js';
     }
+
 
 }

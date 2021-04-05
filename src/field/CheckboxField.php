@@ -35,6 +35,12 @@ class CheckboxField extends ModelField
     //   ]
     //]
 
+    public function __construct(){
+        parent::__construct();
+        if(isset($this->filter)&& $this->filter&&$this->filter instanceof RadioFilter){
+            $this->filter->isFindInSet(true);
+        }
+    }
 
     /**
      * 设置保存的值
