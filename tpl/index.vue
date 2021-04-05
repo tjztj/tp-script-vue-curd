@@ -61,6 +61,7 @@
                         </div>
                     </a-popconfirm>
                 </template>
+                {block name="toolTitleRight"}{/block}
             </div>
             <div class="ant-pro-table-list-toolbar-right">
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
