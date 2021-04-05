@@ -46,7 +46,7 @@ define(['vueAdmin'], function (va) {
 
         return {
             data(){
-                let delSelecteds=Vue.ref([]);
+                let rowSelecteds=Vue.ref([]);
                 const pagination={
                     pageSize: vueData.indexPageOption.pageSize,
                     sortField: '',
@@ -76,9 +76,9 @@ define(['vueAdmin'], function (va) {
                         filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
                     },
                     rowSelection:{
-                        selectedRowKeys:delSelecteds,
+                        selectedRowKeys:rowSelecteds,
                         onChange(selectedRowKeys) {
-                            delSelecteds.value=selectedRowKeys;
+                            rowSelecteds.value=selectedRowKeys;
                         },
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
@@ -392,7 +392,7 @@ define(['vueAdmin'], function (va) {
 
 
     actions.childList=function(){
-        let delSelecteds=Vue.ref([]);
+        let rowSelecteds=Vue.ref([]);
         const pagination={
             pageSize: vueData.indexPageOption.pageSize,
             sortField: '',
@@ -412,9 +412,9 @@ define(['vueAdmin'], function (va) {
                     auth:vueData.auth,
                     pagination,
                     rowSelection:{
-                        selectedRowKeys:delSelecteds,
+                        selectedRowKeys:rowSelecteds,
                         onChange(selectedRowKeys) {
-                            delSelecteds.value=selectedRowKeys;
+                            rowSelecteds.value=selectedRowKeys;
                         },
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
@@ -486,7 +486,7 @@ define(['vueAdmin'], function (va) {
                     this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
-                        delSelecteds.value=[];
+                        rowSelecteds.value=[];
                     }).catch(err=>{
                         this.tableLoading = false;
                     })
