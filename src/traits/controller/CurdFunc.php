@@ -16,6 +16,7 @@ use tpScriptVueCurd\ModelField;
  * Trait CurdFunc
  * @property Request $request
  * @property VueCurlModel $model
+ * @property FieldCollection $fields
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
@@ -95,6 +96,7 @@ trait CurdFunc
     protected function doShow(string $title,array $info,FieldCollection $fields){
         $this->assign('thisAction','show');//使用它的js
 
+        $fields=$fields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
         $fields->doShowData($info);
         $fieldArr=array_values($fields->toArray());
 

@@ -30,6 +30,7 @@ abstract class ModelField
     protected bool $required=false;//字段是否必填
     protected bool $readOnly=false;//找到是否只读
     protected bool $editShow=true;//字段在添加修改时是否显示
+    protected bool $showPage=true;//字段在详情页面中是否显示
     protected string $type='';//字段类型，不可修改
     protected $save;//提交保存时，要提交的数据库的值
     protected ?ModelFilter $filter=null;//筛选对象
@@ -212,6 +213,16 @@ abstract class ModelField
      */
     public function editShow(bool $editShow=null){
         return $this->doAttr('editShow',$editShow);
+    }
+
+
+    /**
+     * 字段在详情页面中是否显示
+     * @param bool|null $showPage
+     * @return $this|bool
+     */
+    public function showPage(bool $showPage=null){
+        return $this->doAttr('showPage',$showPage);
     }
 
     /**
