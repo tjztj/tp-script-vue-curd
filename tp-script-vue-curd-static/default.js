@@ -20,6 +20,12 @@ define(['vueAdmin'], function (va) {
     function getThisActionOhterMethods(){
         return window.thisAction.methods||{};
     }
+    function getThisActionOhterWatchs(){
+        return window.thisAction.watch||{};
+    }
+    function getThisActionOhterComputeds(){
+        return window.thisAction.computed||{};
+    }
     ////--------------////
 
 
@@ -90,6 +96,12 @@ define(['vueAdmin'], function (va) {
             mounted() {
                 this.pageIsInit();
                 this.fetch();
+            },
+            computed:{
+                ...getThisActionOhterComputeds(),
+            },
+            watch:{
+                ...getThisActionOhterWatchs(),
             },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
