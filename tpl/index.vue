@@ -64,6 +64,8 @@
             </div>
             <div class="ant-pro-table-list-toolbar-right">
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
+                    {block name="toolBtnLeft"}{/block}
+
                     <template v-if="auth.add&&auth.stepAdd">
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">

@@ -22,6 +22,7 @@ use tpScriptVueCurd\ModelField;
 trait CurdFunc
 {
 
+    public string $fetchPath;
 
 
     private bool $saveStepNext;//编辑的时候，是否是下一步
@@ -168,11 +169,15 @@ trait CurdFunc
 
     /**
      * 显示模板内容
-     * @param $file
+     * @param string $file      直接在控制器下面的模板位置添加模板文件就可替换默认的模板，或者使用fetchPath
      * @param $data
      * @return mixed
      */
     protected function showTpl($file,$data){
+        if(isset($this->fetchPath)&&$this->fetchPath!==''){
+            return $this->fetch($file,$data);
+        }
+
         $appName = $this->app->http->getName();
         $view    = $this->app->view->getConfig('view_dir_name');
         $depr =$this->app->view->getConfig('view_depr');
