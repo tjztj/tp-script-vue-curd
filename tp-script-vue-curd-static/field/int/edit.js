@@ -4,6 +4,9 @@ define([],function(){
         computed:{
             modelVal:{
                 get(){
+                    if(typeof this.value==='number'){
+                        this.$emit('update:value',this.value.toString());
+                    }
                     return this.value;
                 },
                 set(val){
