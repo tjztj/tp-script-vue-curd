@@ -26,7 +26,9 @@ define([],function(){
         methods: {
             onRegionChange(){
                 let val=null;
-                if(this.regionValue[1]){
+                if(this.regionValue[2]){
+                    val=this.regionValue[2];
+                }else if(this.regionValue[1]){
                     val=this.regionValue[1];
                 }else if(this.regionValue[0]){
                     val=this.regionValue[0];
