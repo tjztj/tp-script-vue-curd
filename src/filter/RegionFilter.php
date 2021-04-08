@@ -21,13 +21,21 @@ class RegionFilter extends ModelFilter
     }
     public function generateWhere(Query $query,$value):void{
         if($value){
+            $name=$this->field->name();
+            if($this->field->canCheckParent()){
+                if($this->field->pField()){
+                    $name.='|'.$this->field->pField();
+                }else if($this->field->cField()){
+                    $name.='|'.$this->field->cField();
+                }
+            }
             foreach ($this->field->getRegionTree() as $v){
                 if($v['id']==$value&&!empty($v['children'])){
-                    $query->where($this->field->name(),'in',array_column($v['children'],'id'));
+                    $query->where($name,'in',array_column($v['children'],'id'));
                     return;
                 }
             }
-            $query->where($this->field->name(),$value);
+            $query->where($name,$value);
         }
     }
 
