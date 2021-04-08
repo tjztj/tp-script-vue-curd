@@ -1,18 +1,27 @@
 define([],function(){
-    let regions={};
+    let regions={},regionValues={};
     return {
         props:['field','value','validateStatus','form'],
         setup(props,ctx){
 
-            let level_3=false;
+            let justOne=true;
             props.field.regionTree.forEach(v=>{
                 regions[parseInt(v.id)]=v;
+                regionValues[parseInt(v.id)]=[parseInt(v.id)];
                 if(v.children){
+                    if(v.children.length>1){
+                        justOne=false;
+                    }
                     v.children.forEach(val=>{
                         regions[parseInt(val.id)]=val;
+                        regionValues[parseInt(val.id)]=[parseInt(v.id),parseInt(val.id)];
                         if(val.children){
+                            if(val.children.length>1){
+                                justOne=false;
+                            }
                             val.children.forEach(vo=>{
                                 regions[parseInt(vo.id)]=vo;
+                                regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
                                 level_3=true;
                             })
                         }
@@ -23,24 +32,9 @@ define([],function(){
 
             if(!props.field.readOnly&&props.field.editShow===true&&props.field.required===true&&!props.form.id&&!props.value){
                 //如果是添加，且是必填，且为空
-                if(props.field.regionTree.length===1){
-                    if(!props.field.regionTree[0].children||props.field.regionTree[0].children.length===0){
-                        //todo
-                        ctx.emit('update:value',[props.field.regionTree[0].id])
-                    }else if(props.field.regionTree[0].children.length===1){
-                        if(level_3&&props.field.regionTree[0].children[0].children){
-                            if(props.field.regionTree[0].children[0].children.length===1){
-                                ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id,props.field.regionTree[0].children[0].children[0].id])
-                            }
-                        }else{
-                            ctx.emit('update:value',[props.field.regionTree[0].id,props.field.regionTree[0].children[0].id])
-                        }
-                    }
+                if(justOne){
+                    ctx.emit('update:value', regionValues[Object.keys(regionValues)[Object.keys(regionValues).length - 1]]);
                 }
-            }
-
-            return {
-                level_3
             }
         },
         computed:{
@@ -51,13 +45,7 @@ define([],function(){
                     }
                     if(this.value&&(typeof this.value==='string'||typeof this.value==='number')){
                         const vals=this.value.toString().split(',').map(v=>parseInt(v));
-                        if(vals.length===1&&regions[vals[0]]&&!regions[vals[0]].children){
-                            if(this.level_3){
-                                return [regions[regions[vals[0]].pid].pid,regions[vals[0]].pid,vals[0]];
-                            }
-                            return [regions[vals[0]].pid,vals[0]];
-                        }
-                        return vals
+                        return regionValues[vals[vals.length-1]];
                     }
                     return [];
                 },

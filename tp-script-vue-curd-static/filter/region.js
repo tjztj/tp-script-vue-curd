@@ -7,8 +7,20 @@ define([],function(){
             }
         },
         mounted() {
-            if( this.config.regionTree.length===1  && this.config.regionTree[0]['children'].length===1){
-                this.regionValue=[this.config.regionTree[0]['id'],this.config.regionTree[0]['children'][0]['id']];
+            if(this.config.regionTree.length!==1){
+                return;
+            }
+            if(!this.config.regionTree[0].children||this.config.regionTree[0].children.length!=1){
+                this.regionValue=[this.config.regionTree[0].id]
+                return;
+            }
+            if(!this.config.regionTree[0].children[0].children||this.config.regionTree[0].children[0].children.length!=1){
+                this.regionValue=[this.config.regionTree[0].id,this.config.regionTree[0].children[0].id]
+                return;
+            }
+            if(!this.config.regionTree[0].children[0].children[0].children||this.config.regionTree[0].children[0].children[0].children.length!=1){
+                this.regionValue=[this.config.regionTree[0].id,this.config.regionTree[0].children[0].id,this.config.regionTree[0].children[0].children[0].id]
+                return;
             }
         },
         methods: {
