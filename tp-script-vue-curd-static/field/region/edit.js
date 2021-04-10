@@ -73,7 +73,7 @@ define([],function(){
                                 :placeholder="field.placeholder||'请选择村社'"
                                 show-search
                                 :disabled="field.readOnly"
-                                change-on-select="canCheckParent"
+                                :change-on-select="canCheckParent"
                                 @change="onRegionChange"
                             />
                         </div>
