@@ -41,7 +41,7 @@ define([],function(){
                     <a-cascader
                         v-model:value="regionValue"
                         :options="config.regionTree"
-                        placeholder="请选择村社"
+                        :placeholder="'请选择'+this.config.title"
                         show-search
                         size="small"
                          change-on-select
