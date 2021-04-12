@@ -18,6 +18,11 @@ class RadioFilter extends ModelFilter
     //是否FindInSet查询
     private bool $isFindInSet=false;
 
+    //是否可多选
+    private bool $isMore=false;
+    //多选时筛选类型 OR 或者 AND
+    private string $moreWhereType='OR';
+
     protected array $items=[];
 
     public function config():array{
@@ -66,13 +71,17 @@ class RadioFilter extends ModelFilter
                     foreach ($value as $v){
                         $whereArr[]='FIND_IN_SET("'.addslashes($v).'",`'.$this->field->name().'`)';
                     }
-                    $query->whereRaw(implode(' OR ',$whereArr));
+                    $query->whereRaw(implode(' '.$this->moreWhereType().' ',$whereArr));
                 }else{
                     $query->whereFindInSet($this->field->name(),current($value));
                 }
             }else{
                 if(is_array($value)){
-                    $query->whereIn($this->field->name(),$value);
+                    if($this->moreWhereType()==='OR'){
+                        $query->whereIn($this->field->name(),$value);
+                    }else{
+                        throw new \think\Exception('查询的参数错误或应设置moreWhereType为OR');
+                    }
                 }else{
                     $query->where($this->field->name(),$value);
                 }
@@ -95,6 +104,47 @@ class RadioFilter extends ModelFilter
         }
         $this->isFindInSet=$isFindInSet;
         return $this;
+    }
+
+    /**
+     * 是否可多选
+     * @param bool|null $isMore
+     * @return $this|bool
+     */
+    public function isMore(bool $isMore=null){
+        if(is_null($isMore)){
+            return $this->isMore;
+        }
+        $this->isMore=$isMore;
+        return $this;
+    }
+
+
+    /**
+     * 是否可多选
+     * @param string|null $moreWhereType
+     * @return $this|string
+     */
+    public function moreWhereType(string $moreWhereType=null){
+        if(is_null($moreWhereType)){
+            return $this->moreWhereType;
+        }
+        $moreWhereType=strtoupper(trim($moreWhereType));
+        if($moreWhereType!=='OR'&&$moreWhereType!=='AND'){
+            throw new \think\Exception('传入参数错误');
+        }
+        $this->moreWhereType=$moreWhereType;
+        return $this;
+    }
+
+    /**
+     * 获取筛选配置
+     * @return array
+     */
+    public function getConfig():array{
+        $config=parent::getConfig();
+        $config['isMore']=$this->isMore();
+        return $config;
     }
 
     public static function componentUrl():string{
