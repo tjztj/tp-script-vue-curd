@@ -26,6 +26,13 @@ class RegionFilter extends ModelFilter
                 $name.='|'.$this->field->pField();
             }else if($this->field->cField()){
                 $name.='|'.$this->field->cField();
+            }else{
+                foreach ($this->field->getRegionTree() as $v){
+                    if($v['value']==$value&&!empty($v['children'])){
+                        $query->where($name,'in',array_column($v['children'],'value'));
+                        return;
+                    }
+                }
             }
             $query->where($name,$value);
         }
