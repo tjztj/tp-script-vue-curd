@@ -510,17 +510,17 @@ define(requires, function ( axios,Qs) {
         })
 
         /*** 年选择器 ***/
-        app.component('AYearPicker',{data(){return{yearOpen:false,}},props:['value'],methods:{handleOpenChange(status){this.yearOpen=status},handlePanelChange(value){this.$emit('update:value',value.format('YYYY'));this.handleOpenChange(false)},clearYear(){this.$emit('update:value','')},},template:`<a-date-picker v-model:value="value"mode="year"format="YYYY"value-format="YYYY"placeholder="请选择年份"style="width: 100%":open="yearOpen"@open-change="handleOpenChange"@panel-change="handlePanelChange"@change="clearYear"></a-date-picker>`,})
+        app.component('AYearPicker',{data(){return{yearOpen:false,}},props:['value'],methods:{handleOpenChange(status){this.yearOpen=status},handlePanelChange(value){this.$emit('update:value',value.format('YYYY'));this.handleOpenChange(false)},clearYear(){this.$emit('update:value','')},},template:`<a-date-picker v-model:value="value" mode="year" format="YYYY" value-format="YYYY" placeholder="请选择年份" style="width: 100%" :open="yearOpen" @open-change="handleOpenChange" @panel-change="handlePanelChange" @change="clearYear"></a-date-picker>`,})
 
 
         /*** 周选择器 ***/
-        app.component('WeekSelect',{props:['value','placeholder'],setup(props,ctx){let momentVal=null;let isOpen=Vue.ref(false);let format=()=>{if(isOpen.value){return parseTime(props.value,' {y}年')}let week=getLastWeek(props.value);return getMonthWeek(props.value)+'（'+week[0]+' ~ '+week[1]+'）'};if(props.value){if(/^\d+$/g.test(props.value.toString())){momentVal=parseTime(props.value,'{y}-{m}-{d}');props.value=momentVal}else{momentVal=props.value}momentVal=moment(momentVal);momentVal.format=format}return{momentVal:Vue.ref(momentVal),isOpen:isOpen,format}},watch:{value(val){if(!val){this.momentVal=Vue.ref(null);return}let momentVal=moment(val);momentVal.format=this.format;this.momentVal=Vue.ref(momentVal)},},methods:{weekChange(date){this.$emit('update:value',date.weekday(0).format('YYYY-MM-DD'));date.format=()=>{return this.format()}},openWeekChange(status){this.isOpen=status}},template:`<div><a-week-picker v-model:value="momentVal"type="date":placeholder="placeholder||'请选择周'"style="width: 100%;"@change="weekChange"@open-change="openWeekChange"></a-week-picker></div>`,});
+        app.component('WeekSelect',{props:['value','placeholder'],setup(props){let momentVal=null;let isOpen=Vue.ref(false);let format=()=>{if(isOpen.value){return parseTime(props.value,' {y}年')}let week=getLastWeek(props.value);return getMonthWeek(props.value)+'（'+week[0]+' ~ '+week[1]+'）'};if(props.value){if(/^\d+$/g.test(props.value.toString())){momentVal=parseTime(props.value,'{y}-{m}-{d}');props.value=momentVal}else{momentVal=props.value}momentVal=moment(momentVal);momentVal.format=format}return{momentVal:Vue.ref(momentVal),isOpen:isOpen,format}},watch:{value(val){if(!val){this.momentVal=Vue.ref(null);return}let momentVal=moment(val);momentVal.format=this.format;this.momentVal=Vue.ref(momentVal)},},methods:{weekChange(date){this.$emit('update:value',date.weekday(0).format('YYYY-MM-DD'));date.format=()=>{return this.format()}},openWeekChange(status){this.isOpen=status}},template:`<div><a-week-picker v-model:value="momentVal" type="date" :placeholder="placeholder||'请选择周'" style="width: 100%;" @change="weekChange" @open-change="openWeekChange"></a-week-picker></div>`,});
 
 
         app.component('FieldGroupItem',{
             name:'fieldGroupItem',
             props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol','fieldHideList'],
-            setup(props,ctx){
+            setup(props){
                 return {
                     formVal:Vue.ref(props.form),
                     validateStatus:Vue.ref({}),
@@ -703,10 +703,7 @@ define(requires, function ( axios,Qs) {
                     };
                 },
                 triggerShows(fieldName){
-                    if(!this.currentFieldHideList[fieldName]){
-                        return true;
-                    }
-                    return false;
+                    return !this.currentFieldHideList[fieldName];
                 },
                 async validateListForm() {
                     //外部调用
@@ -716,7 +713,7 @@ define(requires, function ( axios,Qs) {
                             for (let i in this.form[field.name]){
                                 if (this.$refs['listFieldForm' + i]) {
                                     isNotErr=await new Promise(resolve => {
-                                        this.$refs['listFieldForm' + i].validate().then(res=>{
+                                        this.$refs['listFieldForm' + i].validate().then(()=>{
                                             resolve(true);
                                         }).catch(error => {
                                             if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
@@ -801,11 +798,12 @@ define(requires, function ( axios,Qs) {
             props:['childs','pagination','data','loading','listColumns','canEdit','actionWidth','canDel','rowSelection','fieldStepConfig','actionDefWidth'],
             setup(props,ctx){
                 const listColumns=props.listColumns;
-                let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={};
+                let groupTitles=[],columns=[],titleItems={},columnsCount=0,listFieldComponents={},fieldObjs={};
                 for(let groupTtitle in listColumns){
                     groupTitles.push(groupTtitle);
                     let column={title:groupTtitle,children:[]};
                     listColumns[groupTtitle].forEach(function(item){
+                        fieldObjs[item.name]=item;
                         let customTitle='customTitle-'+item.name;
                         titleItems[customTitle]=item;
                         let col={
@@ -954,6 +952,7 @@ define(requires, function ( axios,Qs) {
                     scrollY,
                     id,
                     listFieldComponents,
+                    fieldObjs,
                 }
             },
             watch: {
@@ -1000,32 +999,44 @@ define(requires, function ( axios,Qs) {
                             
                             
                              <template #['field-component-'+item.name]="record" v-for="item in listFieldComponents">
-                                 <component 
+                                 <slot :name="'f-'+item.name"
+                                    :field="item" 
+                                    :record="record">
+                                   <component 
                                         :is="'VueCurdIndex'+item.type" 
                                         :field="item" 
                                         :record="record"
                                         @refresh-table="$emit('refreshTable')"
                                     ></component>
+                                </slot>
                              </template>
                              
-                              <template #default-value="{text:val}">
-                                <a-tooltip placement="topLeft">
-                                    <template #title>{{val}}</template>
-                                    {{val}}
-                                </a-tooltip>
+                              <template #default-value="record">
+                                <slot :name="'f-'+record.column.dataIndex"
+                                    :field="fieldObjs[record.column.dataIndex]" 
+                                    :record="record">
+                                    <a-tooltip placement="topLeft">
+                                        <template #title>{{record.text}}</template>
+                                        {{record.text}}
+                                    </a-tooltip>
+                                </slot>
                               </template>
                             
                                 <template #step-info="{ text: stepInfo }">
-                                    <a-tooltip v-if="stepInfo">
-                                        <template #title>{{ stepInfo.title }}</template>
-                                        <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
-                                    </a-tooltip>
+                                    <slot name="step-info">
+                                        <a-tooltip v-if="stepInfo">
+                                            <template #title>{{ stepInfo.title }}</template>
+                                            <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
+                                        </a-tooltip>
+                                    </slot>
                                 </template>
                                <template #create-time="{ text: create_time }">
-                                    <a-tooltip>
-                                        <template #title>{{ create_time }}</template>
-                                        {{ create_time }}
-                                    </a-tooltip>
+                                    <slot name="f-create_time">
+                                        <a-tooltip>
+                                            <template #title>{{ create_time }}</template>
+                                            {{ create_time }}
+                                        </a-tooltip>
+                                    </slot>
                                 </template>
                                 
                                 <template #action="{ record }">
