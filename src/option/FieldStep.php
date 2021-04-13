@@ -179,7 +179,7 @@ class FieldStep
      * @param FieldCollection|null $fields
      * @return void
      */
-    public function doSaveBefore($saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null): void
+    public function doSaveBefore(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null): void
     {
         if(!isset($this->saveBefore)||is_null($this->saveBefore)){
             return;
