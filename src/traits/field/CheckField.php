@@ -110,19 +110,30 @@ trait CheckField
     }
 
 
-
+    /**
+     * 获取选项 [val=>title,val=>title] 形式
+     * @return array
+     */
     final protected function getItemsTextValues():array{
         static $items=[];
         if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'value','text');
         return $items[$this->itemsKey];
     }
 
+    /**
+     * 获取所有选项的标题
+     * @return array
+     */
     final protected function getItemsValueTexts():array{
         static $items=[];
         if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'text','value');
         return $items[$this->itemsKey];
     }
 
+    /**
+     * 获取所有选项的值的数组
+     * @return array
+     */
     final protected function getItemsValue():array{
         static $items=[];
         if(empty($items[$this->itemsKey]))$items[$this->itemsKey]=array_column($this->items,'value');
@@ -130,7 +141,14 @@ trait CheckField
     }
 
 
-    final protected function getShowText(string $val,bool $isMultiple){
+    /**
+     * 根据值获取显示的内容
+     * @param string $val
+     * @param bool $isMultiple
+     * @return string
+     */
+    final protected function getShowText(string $val,bool $isMultiple): string
+    {
         if($val===''){
             return '';
         }
@@ -143,6 +161,21 @@ trait CheckField
             $textArr[]=$this->getItemsValueTexts()[$val];
         }
         return implode(',',$textArr);
+    }
+
+
+    /**
+     * 选项中是否有 value=0 的选项
+     * @return bool
+     */
+    final protected function haveZeroValue(): bool
+    {
+        foreach ($this->items as $v){
+            if($v['value']==='0'||$v['value']===0){
+                return true;
+            }
+        }
+        return false;
     }
 
 }

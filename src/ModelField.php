@@ -60,9 +60,9 @@ abstract class ModelField
      * @param string|null $group
      * @return $this
      */
-    public static function init(string $name=null,string $title=null,string $group=null): self
+    public static function init(string $name=null,string $title=null,string $group=null,$otherConfig=null): self
     {
-        $obj=new static();
+        $obj=new static($otherConfig);
         is_null($name)||$obj->name($name);
         is_null($title)||$obj->title($title);
         is_null($group)||$obj->group($group);

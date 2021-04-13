@@ -39,9 +39,9 @@ class RegionField extends ModelField
 
 
 
-    public function __construct()
+    public function __construct($otherConfig)
     {
-        $this->regionTree = SystemRegion::getMyCascaderData();
+        $this->regionTree = $otherConfig?:SystemRegion::getMyCascaderData();
         $this->listColumnWidth(90);
         parent::__construct();
     }

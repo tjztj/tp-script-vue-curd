@@ -82,9 +82,15 @@ class SelectField extends ModelField
     public function doShowData(array &$dataBaseData): void
     {
         $name=$this->name();
-        if(isset($dataBaseData[$name])){
-            $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],$this->multiple);
+        if(!isset($dataBaseData[$name])){
+            return;
         }
+        //如果值等于0，并且选项中没有等于0的选项，设置显示为空
+        if(($dataBaseData[$name]===0||$dataBaseData[$name]==='0')&&!$this->haveZeroValue()){
+            $dataBaseData[$name]='';
+            return;
+        }
+        $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],$this->multiple);
     }
 
     /**
