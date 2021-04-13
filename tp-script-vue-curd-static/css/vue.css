@@ -598,10 +598,10 @@ body{
         opacity: 1;
     }
 }
-.red{
+.red,.red:hover{
     color: #a61d24;
 }
-.yellow{
+.yellow,.yellow:hover{
     color: #d89614;
 }
 a.red:hover,a.yellow:hover{
