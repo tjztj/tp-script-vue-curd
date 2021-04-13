@@ -966,7 +966,7 @@ define(requires, function ( axios,Qs) {
                 data(data){
                     let stepWidth=0;
                     data.forEach(record=>{
-                        if(record.nextStepInfo.config.listBtnText){
+                        if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
                             if(record.nextStepInfo.config.listBtnWidth&&stepWidth<record.nextStepInfo.config.listBtnWidth){
                                 stepWidth=record.nextStepInfo.config.listBtnWidth;
                             }
