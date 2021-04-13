@@ -19,6 +19,7 @@ trait ModelStep
 
 
     /**
+     * 使用 $info->getBackStepData($newStep,$baseInfo)
      * @param FieldStep $newStep
      * @param BaseModel|null $baseInfo 如果有父表，需要传入父表的
      * @return array

@@ -9,6 +9,7 @@ use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldStep;
 
 /**
  * Trait ModelSave
@@ -49,6 +50,10 @@ trait ModelSave
             $saveStepInfo->doSaveBefore($data,null,$baseInfo,$fields);
             //如果已经在doSaveBefore中设置了，就不再设置
             isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson($beforeInfo[static::getStepField()]);
+        }
+        if(isset($data[static::getStepField()])){
+            //为了防止赋值错误，修正为正确的步骤的值，主要是back
+            $data[static::getStepField()]=FieldStep::correctSteps($data[static::getStepField()]);
         }
 
         unset( $data['create_time']

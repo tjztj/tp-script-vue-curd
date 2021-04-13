@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\base\model;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\tool\ErrorCode;
 
 /**
@@ -49,6 +50,10 @@ abstract class BaseModel extends VueCurlModel
             $saveStepInfo->doSaveBefore($data,null,null,$fields);
             //如果已经在doSaveBefore中设置了，就不再设置
             isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson(null);
+        }
+        if(isset($data[static::getStepField()])){
+            //为了防止赋值错误，修正为正确的步骤的值，主要是back
+            $data[static::getStepField()]=FieldStep::correctSteps($data[static::getStepField()]);
         }
 
         //TODO::地区权限验证

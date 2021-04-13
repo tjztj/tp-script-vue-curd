@@ -208,6 +208,8 @@ class FieldStep
                 $stepsArr=json_decode($stepsJson,true);
             }else if(!is_array($stepsJson)){
                 throw new \think\Exception('步骤参数错误');
+            }else{
+                $stepsArr=$stepsJson;
             }
             $nowStep=end($stepsArr);
             if($nowStep['step']!==$this->getStep()){
@@ -218,5 +220,44 @@ class FieldStep
             $stepsArr=[$stepData];
         }
         return json_encode($stepsArr);
+    }
+
+
+    /**
+     * 修正 步骤的值
+     * @param string|array $stepsJson
+     * @return string
+     * @throws \think\Exception
+     */
+    public static function correctSteps($stepsJson):string{
+        if(is_string($stepsJson)){
+            $stepsArr=json_decode($stepsJson,true);
+        }else if(!is_array($stepsJson)){
+            throw new \think\Exception('步骤参数错误');
+        }else{
+            $stepsArr=$stepsJson;
+        }
+
+        $keyArrs=[];
+        foreach ($stepsArr as $k=>$v){
+            if(!in_array($v['step'],$keyArrs)){
+                $keyArrs[]=$v['step'];
+                $v['back']=0;
+            }else{
+                $findIndex=array_search($v['step'],$keyArrs);
+                $v['back']=count($keyArrs)-$findIndex-1;
+                if($v['back']<0){
+                    continue;
+                }else if($v['back']===0){
+                    //已存在且步骤紧挨，代表步骤并没有改变
+                    unset($stepsArr[$k]);
+                    continue;
+                }
+                $keyArrs=array_slice($keyArrs,0,$findIndex+1);
+            }
+            $stepsArr[$k]=$v;
+        }
+
+        return json_encode(array_values($stepsArr));
     }
 }
