@@ -38,7 +38,7 @@
 <div class="foot">
     <a-divider dashed style="margin-top: 0"></a-divider>
     <div class="btns">
-        <a-button type="primary" @click="onSubmit" :loading="loading"><check-outlined v-show="!loading"></check-outlined> <span>{{form.id?'确定修改':'执行添加'}}</span></a-button>
+        <a-button type="primary" @click="onSubmit" :loading="loading"><check-outlined v-show="!loading"></check-outlined> <span>{{form.id?'{$isStepNext?"提交":"确定修改"}':'执行添加'}}</span></a-button>
     </div>
 </div>
 </div>

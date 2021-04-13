@@ -131,6 +131,7 @@
                 @change="handleTableChange"
                 @on-delete="deleteRow"
                 @open-edit="openEdit"
+                @open-next="openNext"
                 @open-show="openShow"
                 @open-child-list="openChildList">
         <!--    配合actionWidth使用-->

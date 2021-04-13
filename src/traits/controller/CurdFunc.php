@@ -151,7 +151,7 @@ trait CurdFunc
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('edit'),
-            'stepNext'=>$this->request->param('step-next/d')===1?1:0,
+            'isStepNext'=>$this->getSaveStepNext(),
             'stepInfo'=>$stepInfo?$stepInfo->toArray():null,
         ];
     }

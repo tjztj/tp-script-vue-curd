@@ -112,7 +112,8 @@
             @change="handleTableChange"
             @open-show="openShow"
             @on-delete="deleteRow"
-            @open-edit="openEdit">
+            @open-edit="openEdit"
+            @open-next="openNext">
             {block name="tableSlot"}{/block}
         </curd-table>
     </div>

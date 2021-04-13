@@ -31,6 +31,31 @@ define(['vueAdmin'], function (va) {
 
 
 
+    function getStepNextOpenConfig(row,offset){
+        if(!row.nextStepInfo){
+            console.error('未发现下一步',row)
+            return;
+        }
+        let title=vueData.title;
+        title+=' [ '+row.nextStepInfo.title+' ]';
+        let url=row.nextStepInfo.config.listBtnUrl;
+        if(url.indexOf('?')>-1){
+            url+='&id='+row.id;
+        }else{
+            url+='?id='+row.id;
+        }
+        const config={
+            title:title,
+            area:[row.nextStepInfo.config.listBtnOpenWidth, row.nextStepInfo.config.listBtnOpenHeight],
+            content: url,
+        };
+        if(row.nextStepInfo.config.listBtnOpenHeight!=='100vh'){
+            config.offset='auto'
+        }
+        return config;
+    }
+
+
 
     actions.index=function(){
         const warnIcon=(Vue.openBlock(), Vue.createBlock("svg", {
@@ -189,6 +214,10 @@ define(['vueAdmin'], function (va) {
                         offset:'rt',
                         content: vueData.editUrl+'?id='+row.id,
                     }).end();
+                },
+                openNext(row){
+                    console.log(1)
+                    this.openBox(getStepNextOpenConfig(row,'rt')).end();
                 },
                 openShow(row){
                     this.openBox({
@@ -475,6 +504,9 @@ define(['vueAdmin'], function (va) {
                 },
                 openEdit(row){
                     this.open(row)
+                },
+                openNext(row){
+                    this.openBox(getStepNextOpenConfig(row,'lt')).end();
                 },
                 open(row){
                     this.openBox({

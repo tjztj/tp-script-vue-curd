@@ -21,6 +21,12 @@ class FieldStep
     private $auth;//用来判断是否有编辑当前步骤的权限
     public array $config=[//一些其他配置，如颜色
         'color'=>null,
+        'listBtnText'=>'',//如果有值，列表中将显示,
+        'listBtnUrl'=>'',//地址
+        'listBtnColor'=>null,
+        'listBtnWidth'=>0,
+        'listBtnOpenWidth'=>'45vw',
+        'listBtnOpenHeight'=>'100vh',
     ];
 
     public function __construct(string $step,StepCheck $checkFunc,$titleOrCinfig=null)

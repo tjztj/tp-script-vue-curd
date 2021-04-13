@@ -510,17 +510,17 @@ define(requires, function ( axios,Qs) {
         })
 
         /*** 年选择器 ***/
-        app.component('AYearPicker',{data(){return{yearOpen:false,}},props:['value'],methods:{handleOpenChange(status){this.yearOpen=status},handlePanelChange(value){this.$emit('update:value',value.format('YYYY'));this.handleOpenChange(false)},clearYear(){this.$emit('update:value','')},},template:`<a-date-picker v-model:value="value" mode="year" format="YYYY" value-format="YYYY" placeholder="请选择年份" style="width: 100%" :open="yearOpen" @open-change="handleOpenChange" @panel-change="handlePanelChange" @change="clearYear"></a-date-picker>`,})
+        app.component('AYearPicker',{data(){return{yearOpen:false,}},props:['value'],methods:{handleOpenChange(status){this.yearOpen=status},handlePanelChange(value){this.$emit('update:value',value.format('YYYY'));this.handleOpenChange(false)},clearYear(){this.$emit('update:value','')},},template:`<a-date-picker v-model:value="value"mode="year"format="YYYY"value-format="YYYY"placeholder="请选择年份"style="width: 100%":open="yearOpen"@open-change="handleOpenChange"@panel-change="handlePanelChange"@change="clearYear"></a-date-picker>`,})
 
 
         /*** 周选择器 ***/
-        app.component('WeekSelect',{props:['value','placeholder'],setup(props){let momentVal=null;let isOpen=Vue.ref(false);let format=()=>{if(isOpen.value){return parseTime(props.value,' {y}年')}let week=getLastWeek(props.value);return getMonthWeek(props.value)+'（'+week[0]+' ~ '+week[1]+'）'};if(props.value){if(/^\d+$/g.test(props.value.toString())){momentVal=parseTime(props.value,'{y}-{m}-{d}');props.value=momentVal}else{momentVal=props.value}momentVal=moment(momentVal);momentVal.format=format}return{momentVal:Vue.ref(momentVal),isOpen:isOpen,format}},watch:{value(val){if(!val){this.momentVal=Vue.ref(null);return}let momentVal=moment(val);momentVal.format=this.format;this.momentVal=Vue.ref(momentVal)},},methods:{weekChange(date){this.$emit('update:value',date.weekday(0).format('YYYY-MM-DD'));date.format=()=>{return this.format()}},openWeekChange(status){this.isOpen=status}},template:`<div><a-week-picker v-model:value="momentVal" type="date" :placeholder="placeholder||'请选择周'" style="width: 100%;" @change="weekChange" @open-change="openWeekChange"></a-week-picker></div>`,});
+        app.component('WeekSelect',{props:['value','placeholder'],setup(props,ctx){let momentVal=null;let isOpen=Vue.ref(false);let format=()=>{if(isOpen.value){return parseTime(props.value,' {y}年')}let week=getLastWeek(props.value);return getMonthWeek(props.value)+'（'+week[0]+' ~ '+week[1]+'）'};if(props.value){if(/^\d+$/g.test(props.value.toString())){momentVal=parseTime(props.value,'{y}-{m}-{d}');props.value=momentVal}else{momentVal=props.value}momentVal=moment(momentVal);momentVal.format=format}return{momentVal:Vue.ref(momentVal),isOpen:isOpen,format}},watch:{value(val){if(!val){this.momentVal=Vue.ref(null);return}let momentVal=moment(val);momentVal.format=this.format;this.momentVal=Vue.ref(momentVal)},},methods:{weekChange(date){this.$emit('update:value',date.weekday(0).format('YYYY-MM-DD'));date.format=()=>{return this.format()}},openWeekChange(status){this.isOpen=status}},template:`<div><a-week-picker v-model:value="momentVal"type="date":placeholder="placeholder||'请选择周'"style="width: 100%;"@change="weekChange"@open-change="openWeekChange"></a-week-picker></div>`,});
 
 
         app.component('FieldGroupItem',{
             name:'fieldGroupItem',
             props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol','fieldHideList'],
-            setup(props){
+            setup(props,ctx){
                 return {
                     formVal:Vue.ref(props.form),
                     validateStatus:Vue.ref({}),
@@ -703,7 +703,10 @@ define(requires, function ( axios,Qs) {
                     };
                 },
                 triggerShows(fieldName){
-                    return !this.currentFieldHideList[fieldName];
+                    if(!this.currentFieldHideList[fieldName]){
+                        return true;
+                    }
+                    return false;
                 },
                 async validateListForm() {
                     //外部调用
@@ -713,7 +716,7 @@ define(requires, function ( axios,Qs) {
                             for (let i in this.form[field.name]){
                                 if (this.$refs['listFieldForm' + i]) {
                                     isNotErr=await new Promise(resolve => {
-                                        this.$refs['listFieldForm' + i].validate().then(()=>{
+                                        this.$refs['listFieldForm' + i].validate().then(res=>{
                                             resolve(true);
                                         }).catch(error => {
                                             if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
@@ -869,7 +872,8 @@ define(requires, function ( axios,Qs) {
                     actionW+=32;
                 }
                 const oldActionW=actionW;
-                const getActionWidthByProps=function (propActionWidth,oldActionW){
+                const getActionWidthByProps=function (propActionWidth,oldActionW,stepWidth){
+                    stepWidth=stepWidth||0;
                     //自定义操作栏长度
                     if(propActionWidth){
                         if(typeof propActionWidth==='function'){
@@ -878,7 +882,7 @@ define(requires, function ( axios,Qs) {
                             oldActionW+=propActionWidth;
                         }
                     }
-                    return oldActionW;
+                    return oldActionW+stepWidth;
                 }
                 //可prop动态设置宽度
                 const newActionW=Vue.ref(getActionWidthByProps(props.actionWidth,oldActionW));
@@ -958,6 +962,17 @@ define(requires, function ( axios,Qs) {
             watch: {
                 actionWidth(val){
                     this.actionW=this.getActionWidthByProps(val,this.oldActionW);
+                },
+                data(data){
+                    let stepWidth=0;
+                    data.forEach(record=>{
+                        if(record.nextStepInfo.config.listBtnText){
+                            if(record.nextStepInfo.config.listBtnWidth&&stepWidth<record.nextStepInfo.config.listBtnWidth){
+                                stepWidth=record.nextStepInfo.config.listBtnWidth;
+                            }
+                        }
+                    })
+                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,stepWidth);
                 }
             },
             methods:{
@@ -970,11 +985,17 @@ define(requires, function ( axios,Qs) {
                 openShow(row){
                     this.$emit('openShow',row)
                 },
+                openNext(row){
+                    this.$emit('openNext',row)
+                },
                 openChildList(row,modelInfo){
                     this.$emit('openChildList',row,modelInfo)
                 },
                 onDelete(row){
                     this.$emit('onDelete',row)
+                },
+                stepBtnShow(record){
+                    return this.fieldStepConfig.enable&&record.stepNextCanEdit&&record.nextStepInfo;
                 }
             },
             template:`<div :id="id">
@@ -1048,7 +1069,7 @@ define(requires, function ( axios,Qs) {
                                           
                                         <template v-if="canEdit!==false&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0&&record.stepCanEdit))">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openEdit(record)">修改</a>
+                                            <a @click="openEdit(record)">修改<template v-if="fieldStepConfig.enable&&record.stepInfo&&record.stepInfo.config.listBtnText">{{record.stepInfo.config.listBtnText}}</template></a>
                                         </template>
                                        
                                         <template v-for="vo in childs">
@@ -1056,6 +1077,15 @@ define(requires, function ( axios,Qs) {
                                             <a v-if="vo.listBtn.show" @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
                                         </template>
                                     </slot>
+                                    <template v-if="stepBtnShow(record)">
+                                         <slot name="step-next-btn" :record="record">
+                                            <template v-if="record.nextStepInfo.config.listBtnText">
+                                                <a-divider type="vertical"></a-divider>
+                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}">{{record.nextStepInfo.config.listBtnText}}</a>
+                                            </template>
+                                         </slot>
+                                    </template>
+                                    
                                      <slot name="do-after" :record="record">
                                      
                                     </slot>
