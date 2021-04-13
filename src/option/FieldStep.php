@@ -24,6 +24,7 @@ class FieldStep
         'listBtnText'=>'',//如果有值，列表中将显示,
         'listBtnUrl'=>'',//地址
         'listBtnColor'=>null,
+        'listBtnClass'=>'',
         'listBtnWidth'=>0,
         'listBtnOpenWidth'=>'45vw',
         'listBtnOpenHeight'=>'100vh',

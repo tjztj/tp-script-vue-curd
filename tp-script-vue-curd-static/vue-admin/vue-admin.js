@@ -1081,7 +1081,7 @@ define(requires, function ( axios,Qs) {
                                          <slot name="step-next-btn" :record="record">
                                             <template v-if="record.nextStepInfo.config.listBtnText">
                                                 <a-divider type="vertical"></a-divider>
-                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}">{{record.nextStepInfo.config.listBtnText}}</a>
+                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}" :class="record.nextStepInfo.config.listBtnClass">{{record.nextStepInfo.config.listBtnText}}</a>
                                             </template>
                                          </slot>
                                     </template>

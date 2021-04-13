@@ -604,6 +604,9 @@ body{
 .yellow{
     color: #d89614;
 }
+a.red:hover,a.yellow:hover{
+    opacity: .75;
+}
 /****************************************************************/
 .curd-show-field-box .img-box:after{
     content: ' ';
