@@ -19,6 +19,7 @@ class FieldStep
     private StepCheck $checkFunc;
     private StepCheck $fieldCheckFunc;
     private $auth;//用来判断是否有编辑当前步骤的权限
+    private $saveBefore;
     public array $config=[//一些其他配置，如颜色
         'color'=>null,
         'listBtnText'=>'',//如果有值，列表中将显示,
@@ -150,7 +151,72 @@ class FieldStep
         $auth=$this->auth;
         return $auth($info,$baseInfo,$fields);
     }
-    
 
 
+    /**
+     * 设置步骤保存前执行
+     * @param $saveBefore
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function saveBefore($saveBefore): self
+    {
+        if(is_callable($saveBefore)){
+            $this->saveBefore=$saveBefore;
+        }else if(is_bool($saveBefore)){
+            $this->saveBefore=fn()=>$saveBefore;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+        return $this;
+    }
+
+    /**
+     * 步骤保存前执行
+     * @param $saveData
+     * @param VueCurlModel|null $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @return void
+     */
+    public function doSaveBefore($saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null): void
+    {
+        if(!isset($this->saveBefore)||is_null($this->saveBefore)){
+            return;
+        }
+        $func=$this->saveBefore;
+        $func($saveData,$info,$baseInfo,$fields);
+    }
+
+
+
+    /**
+     * 将当前步骤追加到原先的 json 中
+     * @param null|array|string $stepsJson
+     * @return string
+     * @throws \think\Exception
+     */
+    public function getNewStepJson($stepsJson):string{
+        $stepData=[
+            'step'=>$this->getStep(),
+            'time'=>time(),
+            'user'=>staticTpScriptVueCurdGetLoginData()['id'],
+            'back'=>'0',//后退步数
+        ];
+        if($stepsJson){
+            if(is_string($stepsJson)){
+                $stepsArr=json_decode($stepsJson,true);
+            }else if(!is_array($stepsJson)){
+                throw new \think\Exception('步骤参数错误');
+            }
+            $nowStep=end($stepsArr);
+            if($nowStep['step']!==$this->getStep()){
+                //新的步骤
+                $stepsArr[]=$stepData;
+            }
+        }else{
+            $stepsArr=[$stepData];
+        }
+        return json_encode($stepsArr);
+    }
 }

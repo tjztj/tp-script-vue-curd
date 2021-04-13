@@ -37,6 +37,8 @@ class RegionField extends ModelField
     protected string $pField = '';//父字段名
     protected string $cField = '';//子字段名
 
+    protected $nullVal=0;//字段在数据库中为空时的值
+
 
 
     public function __construct($otherConfig)
@@ -135,13 +137,6 @@ class RegionField extends ModelField
         return $this;
     }
 
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 0;
-    }
 
 
     private function getSystemRegionPidBySetSave($val, $data)

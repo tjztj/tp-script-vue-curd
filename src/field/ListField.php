@@ -25,6 +25,7 @@ class ListField extends ModelField
     protected bool $listShow=false;
     protected bool $canExcelImport=false;//不能使用excel导入数据
     protected FieldCollection $fields;//字段集合
+    protected $nullVal='null';//字段在数据库中为空时的值
 
 
     public function readOnly(bool $readOnly = null)
@@ -135,13 +136,6 @@ class ListField extends ModelField
         return $this;
     }
 
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 'null';
-    }
 
     /**
      * 模板导入备注

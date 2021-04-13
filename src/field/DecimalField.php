@@ -26,6 +26,7 @@ class DecimalField extends ModelField
     protected int $listColumnWidth=110;//设置默认值
     protected string $defaultFilterClass=BetweenFilter::class;
     protected int $precision=2;//数值精度
+    protected $nullVal=0;//字段在数据库中为空时的值
 
 
     /**最小值
@@ -95,13 +96,6 @@ class DecimalField extends ModelField
         return $this;
     }
 
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 0;
-    }
 
     /**
      * 模板导入备注

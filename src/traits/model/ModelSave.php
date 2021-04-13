@@ -46,23 +46,9 @@ trait ModelSave
             if(!$saveStepInfo){
                 throw new \think\Exception('未能获取到当前步骤信息');
             }
-            $stepData=[
-                'step'=>$saveStepInfo->getStep(),
-                'time'=>time(),
-                'user'=>staticTpScriptVueCurdGetLoginData()['id'],
-                'back'=>'0',//后退步数
-            ];
-            if($beforeInfo[static::getStepField()]){
-                $stepsArr=is_string($beforeInfo[static::getStepField()])?json_decode($beforeInfo[static::getStepField()],true):$beforeInfo[static::getStepField()];
-                $nowStep=end($stepsArr);
-                if($nowStep['step']!==$saveStepInfo->getStep()){
-                    //新的步骤
-                    $stepsArr[]=$stepData;
-                }
-            }else{
-                $stepsArr=[$stepData];
-            }
-            $data[static::getStepField()]=json_encode($stepsArr);
+            $saveStepInfo->doSaveBefore($data,null,$baseInfo,$fields);
+            //如果已经在doSaveBefore中设置了，就不再设置
+            isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson($beforeInfo[static::getStepField()]);
         }
 
         unset( $data['create_time']

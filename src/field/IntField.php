@@ -26,6 +26,7 @@ class IntField extends ModelField
     protected int $max = 9999999999;//最大值
     protected int $listColumnWidth=85;//设置默认值
     protected string $defaultFilterClass=BetweenFilter::class;
+    protected $nullVal=0;//字段在数据库中为空时的值
 
 
     /**最小值
@@ -79,13 +80,6 @@ class IntField extends ModelField
         return $this;
     }
 
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 0;
-    }
 
     /**
      * 模板导入时备注

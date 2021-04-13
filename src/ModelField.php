@@ -43,6 +43,7 @@ abstract class ModelField
     protected bool $editColon=true;//是否显示label后面的冒号
     protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule=null;//数据验证
+    protected $nullVal='';//字段在数据库中为空时的值
     public const REQUIRED=true;//开启必填验证
 
 
@@ -370,7 +371,17 @@ abstract class ModelField
      * @return string
      */
     protected function nullVal(){
-        return '';
+        return $this->nullVal;
+    }
+
+    /**
+     * 设置字段在数据库中为空时的值
+     * @param $nullVal
+     * @return $this
+     */
+    public function setNullVal($nullVal):self{
+        $this->nullVal=$nullVal;
+        return $this;
     }
 
     /**

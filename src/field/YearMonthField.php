@@ -20,6 +20,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
 class YearMonthField extends ModelField
 {
     protected string $defaultFilterClass=YearMonthFilter::class;
+    protected $nullVal=0;//字段在数据库中为空时的值
 
 
     /**
@@ -40,14 +41,6 @@ class YearMonthField extends ModelField
             $this->defaultCheckRequired('');
         }
         return $this;
-    }
-
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 0;
     }
 
     /**

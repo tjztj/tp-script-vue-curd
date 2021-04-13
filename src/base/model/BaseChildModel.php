@@ -70,14 +70,9 @@ abstract class BaseChildModel extends VueCurlModel
             if(!$saveStepInfo){
                 throw new \think\Exception('未能获取到当前步骤信息');
             }
-            $data[static::getStepField()]=json_encode([
-                [
-                    'step'=>$saveStepInfo->getStep(),
-                    'time'=>time(),
-                    'user'=>staticTpScriptVueCurdGetLoginData()['id'],
-                    'back'=>'0',//后退步数
-                ]
-            ]);
+            $saveStepInfo->doSaveBefore($data,null,$baseInfo,$fields);
+            //如果已经在doSaveBefore中设置了，就不再设置
+            isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson(null);
         }
 
 

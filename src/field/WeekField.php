@@ -24,6 +24,7 @@ class WeekField extends ModelField
     use NumHideFields;
     protected int $listColumnWidth = 330;//设置默认值
     protected string $defaultFilterClass = WeekFilter::class;
+    protected $nullVal=0;//字段在数据库中为空时的值
 
 
     /**
@@ -53,13 +54,6 @@ class WeekField extends ModelField
         return $this;
     }
 
-    /**
-     * 字段为空时的值
-     * @return int
-     */
-    public function nullVal(){
-        return 0;
-    }
 
     /**
      * 显示时要处理的数据
