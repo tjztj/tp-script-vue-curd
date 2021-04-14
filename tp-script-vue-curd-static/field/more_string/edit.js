@@ -69,7 +69,7 @@ define([], function () {
                                             <div class="more-string-auto-complete-input">
                                                 <a-auto-complete v-model:value="val[key]" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :options="autoCompleteOptions[key]" :default-open="field.beginGetOptions" @search="onAutoCompleteSearchMoreString($event,key)"/>
                                             </div>
-                                            <div class="more-string-auto-complete-rm" @click="removeMoreString(field,key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
+                                            <div class="more-string-auto-complete-rm" @click="removeMoreString(key)"><close-outlined class="remove-inputs-box-item-icon"></close-outlined></div>
                                         </div>
                                     </div>
                                     <div class="r">
@@ -79,7 +79,7 @@ define([], function () {
                             </template>
                             <template v-else>
                                 <a-input v-model:value="val[key]" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly">
-                                <template v-if="!field.readOnly" #addonAfter><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(field,key)"></close-outlined></template>
+                                <template v-if="!field.readOnly" #addonAfter><close-outlined class="remove-inputs-box-item-icon" @click="removeMoreString(key)"></close-outlined></template>
                                 </a-input>
                             </template>
                             
