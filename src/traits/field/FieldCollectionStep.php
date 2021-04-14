@@ -258,9 +258,7 @@ trait FieldCollectionStep
             if(empty($v['back'])){
                 $stepVals[]=$v['step'];
             }else{
-                for($i=0;$i<$v['back'];$i++){
-                    unset($stepVals[count($stepVals)-1]);
-                }
+                $stepVals=array_slice($stepVals,0,count($stepVals)-$v['back']);
             }
         }
         if(empty($stepVals)){

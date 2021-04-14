@@ -107,7 +107,7 @@ trait CurdChild{
             }
 
             $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
-            $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
+            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
 
             $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;

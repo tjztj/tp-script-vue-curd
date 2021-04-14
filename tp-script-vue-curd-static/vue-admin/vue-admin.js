@@ -839,7 +839,7 @@ define(requires, function ( axios,Qs) {
 
                 if(props.fieldStepConfig&&props.fieldStepConfig.enable&&props.fieldStepConfig.listShow===true){
                     columns.push({
-                        title:'步骤',
+                        title:'当前步骤',
                         ellipsis:true,
                         dataIndex: "stepInfo",
                         slots: { customRender: 'step-info' },
@@ -1045,10 +1045,21 @@ define(requires, function ( axios,Qs) {
                             
                                 <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
-                                        <a-tooltip v-if="stepInfo">
-                                            <template #title>{{ stepInfo.title }}</template>
-                                            <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
-                                        </a-tooltip>
+                                        <div style="display: flex;width: 100%">
+                                            <div style="overflow: hidden;text-overflow: ellipsis;">
+                                                <a-tooltip v-if="stepInfo" placement="leftTop">
+                                                    <template #title>{{ stepInfo.title }}</template>
+                                                    <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
+                                                </a-tooltip>
+                                            </div>
+                                            <div style="flex: 1">
+                                                <template v-for="item in stepInfo.tags"><a-tag v-if="item.text" :color="item.color">{{item.text}}</a-tag></template>
+                                                <a-popover v-if="stepInfo.remark" trigger="click">
+                                                      <template #content>{{stepInfo.remark}}</template>
+                                                      <a style="color:#bfbfbf" onmouseover="this.style.color='#595959'" onmouseout="this.style.color='#bfbfbf'">查看</a>
+                                                </a-popover>
+                                            </div>
+                                        </div>
                                     </slot>
                                 </template>
                                <template #create-time="{ text: create_time }">

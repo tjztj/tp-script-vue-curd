@@ -51,8 +51,10 @@ trait ModelStep
 
         $stepValues=[];
         foreach ($oldSteps as $v){
-            if(empty($v['back'])&&!in_array($v['step'],$stepValues)){
+            if(empty($v['back'])){
                 $stepValues[]=$v['step'];
+            }else{
+                $stepValues=array_slice($stepValues,0,count($stepValues)-$v['back']);
             }
         }
 

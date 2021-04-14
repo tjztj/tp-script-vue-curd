@@ -31,6 +31,14 @@ class FieldStep
         'listBtnOpenHeight'=>'100vh',
     ];
 
+    /**
+     * 列表步骤中显示的标签
+     * @var FieldStepTag[]
+     */
+    private array $tags=[];
+    private string $remark='';//将在列表步骤中显示的备注
+    private $listRowDo;
+
     public function __construct(string $step,StepCheck $checkFunc,$titleOrCinfig=null)
     {
         $this->step=$step;
@@ -57,11 +65,18 @@ class FieldStep
     }
 
     public function toArray():array{
+        $tags=[];
+        foreach ($this->getTages() as $v){
+            $tags[]=$v->toArray();
+        }
+
         return [
             'step'=>$this->getStep(),
             'title'=>$this->getTitle(),
             'fieldName'=>$this->getFieldName(),
             'config'=>$this->config,
+            'tags'=>$tags,
+            'remark'=>$this->getRemark(),
         ];
     }
 
@@ -260,4 +275,71 @@ class FieldStep
 
         return json_encode(array_values($stepsArr));
     }
+
+
+    /**
+     * 获取设置的标签
+     * @return FieldStepTag[]
+     */
+    public function getTages():array{
+        return $this->tags;
+    }
+
+    /**
+     * 设置标签
+     * @param FieldStepTag[] $param
+     * @return $this
+     */
+    public function setTags(array $param):self{
+        $this->tags=$param;
+        return $this;
+    }
+
+
+    /**
+     * 获取设置的备注信息
+     * @return string
+     */
+    public function getRemark():string{
+        return $this->remark;
+    }
+
+    /**
+     * 设置备注信息
+     * @param $remark
+     * @return $this
+     */
+    public function setRemark($remark):self{
+        $this->remark=$remark;
+        return $this;
+    }
+
+
+    /**
+     * 列表数据设置执行
+     * @param VueCurlModel $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @return $this
+     */
+    public function listRowDo(VueCurlModel $info,BaseModel $baseInfo=null,FieldCollection $fields=null):self{
+        if(!isset($this->listRowDo)||is_null($this->listRowDo)){
+            return $this;
+        }
+        $func=$this->listRowDo;
+        $func($info,$baseInfo,$fields,$this);
+        return $this;
+    }
+
+    /**
+     * 列表数据每条会执行此处设置的方法
+     * 方法的参数  VueCurlModel $info,BaseModel $baseInfo=null,FieldCollection $fields=null,FieldStep $self
+     * @param callable $func
+     * @return $this
+     */
+    public function setListRowDo(callable $func):self{
+        $this->listRowDo=$func;
+        return $this;
+    }
+
 }

@@ -78,7 +78,7 @@ trait Curd
                 }
 
                 $stepInfo=$this->fields->getCurrentStepInfo($info);
-                $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
+                $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,null,$this->fields)->toArray():null;
 
                 $nextStepInfo=$this->fields->getNextStepInfo($info);
                 $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
