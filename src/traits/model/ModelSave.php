@@ -47,7 +47,7 @@ trait ModelSave
             if(!$saveStepInfo){
                 throw new \think\Exception('未能获取到当前步骤信息');
             }
-            $saveStepInfo->doSaveBefore($data,null,$baseInfo,$fields);
+            $saveStepInfo->doSaveBefore($data,$beforeInfo,$baseInfo,$fields);
             //如果已经在doSaveBefore中设置了，就不再设置
             isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson($beforeInfo[static::getStepField()]);
         }
