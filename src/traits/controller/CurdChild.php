@@ -107,9 +107,15 @@ trait CurdChild{
             }
 
             $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
+            if($stepInfo){
+                $stepInfo=clone $stepInfo;
+            }
             $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
 
             $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
+            if($nextStepInfo){
+                $nextStepInfo=clone $nextStepInfo;
+            }
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
             $info->stepNextCanEdit=$info->nextStepInfo?$nextStepInfo->authCheck($info,$baseInfo,$this->fields->getFilterStepFields($nextStepInfo,true,$info)):false;
 
