@@ -854,3 +854,26 @@ a.red:hover,a.yellow:hover{
     padding-left: 4px;
 }
 /****************************************************************/
+.curd-table-row-step-div{
+    display: flex;
+}
+.curd-table-row-step-title{
+    overflow: hidden;text-overflow: ellipsis;
+}
+.curd-table-row-step-other{
+    flex: 1
+}
+.curd-table-row-step-other-more{
+    color:#bfbfbf!important;
+    margin-left: 2px;
+}
+.curd-table-row-step-other-more:hover{
+    color:#595959!important;
+}
+.curd-table-row-step-other .ant-tag:first-child{
+    margin-left: 2px;
+}
+.curd-table-row-step-other .ant-tag+.curd-table-row-step-other-more{
+    margin-left: 0;
+}
+/****************************************************************/

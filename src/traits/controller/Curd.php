@@ -78,15 +78,11 @@ trait Curd
                 }
 
                 $stepInfo=$this->fields->getCurrentStepInfo($info);
-                if($stepInfo){
-                    $stepInfo=clone $stepInfo;
-                }
+                $stepInfo === null ||$stepInfo=clone $stepInfo;
                 $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,null,$this->fields)->toArray():null;
 
                 $nextStepInfo=$this->fields->getNextStepInfo($info);
-                if($nextStepInfo){
-                    $nextStepInfo=clone $nextStepInfo;
-                }
+                $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
                 $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
                 $info->stepNextCanEdit=$info->nextStepInfo?$nextStepInfo->authCheck($info,null,$this->fields->getFilterStepFields($nextStepInfo,true,$info)):false;
 

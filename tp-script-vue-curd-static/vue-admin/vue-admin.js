@@ -1045,18 +1045,18 @@ define(requires, function ( axios,Qs) {
                             
                                 <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
-                                        <div style="display: flex;width: 100%">
-                                            <div style="overflow: hidden;text-overflow: ellipsis;">
+                                        <div class="curd-table-row-step-div">
+                                            <div class="curd-table-row-step-title">
                                                 <a-tooltip v-if="stepInfo" placement="leftTop">
                                                     <template #title>{{ stepInfo.title }}</template>
                                                     <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
                                                 </a-tooltip>
                                             </div>
-                                            <div style="flex: 1">
+                                            <div class="curd-table-row-step-other">
                                                 <template v-for="item in stepInfo.tags"><a-tag v-if="item.text" :color="item.color">{{item.text}}</a-tag></template>
                                                 <a-popover v-if="stepInfo.remark" trigger="click">
                                                       <template #content>{{stepInfo.remark}}</template>
-                                                      <a style="color:#bfbfbf" onmouseover="this.style.color='#595959'" onmouseout="this.style.color='#bfbfbf'">查看</a>
+                                                      <a class="curd-table-row-step-other-more">查看</a>
                                                 </a-popover>
                                             </div>
                                         </div>
