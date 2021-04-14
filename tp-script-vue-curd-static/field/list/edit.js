@@ -6,9 +6,8 @@ define([], function () {
             if (props.value&&props.value!=='null') {
                 let lists = JSON.parse(props.value);
                 for (let n in lists) {
-                    const guid=window.guid();
-                    currentFieldHideList[guid]={};
-                    listFieldObjs[guid]=lists[n];
+                    currentFieldHideList[n]={};
+                    listFieldObjs[n]=lists[n];
                 }
             } else {
                 const guid=window.guid();
