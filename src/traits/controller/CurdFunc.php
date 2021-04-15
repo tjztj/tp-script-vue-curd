@@ -121,7 +121,7 @@ trait CurdFunc
      */
     protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
-            $fields=$this->getSaveStepNext()
+            $fields=$this->getSaveStepNext()||empty($data->id)
                 ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
                 :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
 
