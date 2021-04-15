@@ -306,10 +306,10 @@ abstract class ModelField
      * 自定义其他属性
      * @param $name
      * @param null $value
-     * @return $this
+     * @return $this|mixed
      * @throws \think\Exception
      */
-    public function other($name, $value=null): self
+    public function other($name, $value=null)
     {
         if(method_exists($this,$name)){
             throw new \think\Exception('[ '.$name.' ]方法在'.(self::class).'中已存在，请直接调用，或更换属性名称');
