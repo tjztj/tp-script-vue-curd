@@ -814,7 +814,7 @@ define(requires, function ( axios,Qs) {
                             // title:item.title,
                             slots:{title:customTitle},
                             ellipsis:true,
-                            sorter: true,
+                            sorter: item.listSort,
                         };
                         if(fieldComponents['VueCurdIndex'+item.type]){
                             listFieldComponents[item.name]=item;
