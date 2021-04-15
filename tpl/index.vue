@@ -43,6 +43,7 @@
     <div class="ant-pro-table-list-toolbar" v-if="showTableTool">
         <div class="ant-pro-table-list-toolbar-container">
             <div class="ant-pro-table-list-toolbar-left">
+              {block name="toolTitleLeft"}{/block}
                 <div class="ant-pro-table-list-toolbar-title">{$title}</div>
                 <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
                     <div class="ant-space-item">

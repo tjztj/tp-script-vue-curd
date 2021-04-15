@@ -1,9 +1,16 @@
 define([], function () {
     return {
         props: ['config'],
-        data() {
+        setup(props,ctx){
+            let val='';
+            if(props.config.activeValue){
+                val=props.config.activeValue;
+                if(typeof val==='number'){
+                    val=val.toString();
+                }
+            }
             return {
-                inputValue: '',
+                inputValue:Vue.ref(val)
             }
         },
         computed:{

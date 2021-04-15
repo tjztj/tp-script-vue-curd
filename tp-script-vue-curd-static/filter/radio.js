@@ -2,9 +2,21 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
+            let val=props.config.activeValue||'';
+            if(props.config.isMore){
+                if(typeof val==='number'){
+                    val=val.toString();
+                }
+                if(val===''){
+                    val=[];
+                }else if(typeof val==='string'){
+                    val=props.config.activeValue.split(',')
+                }
+            }
+
 
             return {
-                value:Vue.ref(props.config.isMore?[]:'')
+                value:Vue.ref(val)
             }
         },
         methods: {

@@ -1,12 +1,12 @@
 define([],function(){
     return {
         props:['config'],
-        data(){
-          return {
-              start:'',
-              end:'',
-              separator:'',
-          }
+        setup(props,ctx){
+            return {
+                start:Vue.ref(props.config.activeValue?props.config.activeValue.start:''),
+                end:Vue.ref(props.config.activeValue?props.config.activeValue.end:''),
+                separator:'',
+            }
         },
         computed:{
             inputCheck(){

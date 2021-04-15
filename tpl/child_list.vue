@@ -44,6 +44,7 @@
 <div class="week-box">
     <div class="week-tool-box">
         <div class="week-title">
+          {block name="toolTitleLeft"}{/block}
             详细列表
             <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
                 <a-divider type="vertical"></a-divider>

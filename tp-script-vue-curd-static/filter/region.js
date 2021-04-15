@@ -1,9 +1,9 @@
 define([],function(){
     return {
         props:['config'],
-        data(){
+        setup(props,ctx){
             return {
-                regionValue:'',
+                regionValue:Vue.ref(props.config.activeValue||'')
             }
         },
         mounted() {

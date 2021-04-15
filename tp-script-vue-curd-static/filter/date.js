@@ -1,9 +1,13 @@
 define([],function(){
     return {
         props:['config'],
-        data(){
+        setup(props,ctx){
+            const range=Vue.ref([]);
+            if(props.config.activeValue){
+                range.value=[moment(props.config.activeValue.start),moment(props.config.activeValue.end)]
+            }
             return {
-                range:[],
+                range
             }
         },
         computed:{
