@@ -63,7 +63,7 @@ class StepCheck
     public function whenEmptyCheckSetByStep(string $step){
         if(!isset($this->check)||is_null($this->check)){
             $this->check=function(VueCurlModel $old=null)use($step){
-                if(!$old||empty($data->id)){
+                if(!$old||empty($old->id)){
                     return false;
                 }
                 return eqEndStep($step,$old);
