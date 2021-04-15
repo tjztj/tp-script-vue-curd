@@ -1273,7 +1273,8 @@ define(requires, function ( axios,Qs) {
                                     <template #overlay>
                                         <a-menu id="filter-menu-box">
                                             <template v-for="(vo,key) in filterSource">
-                                                <div v-if="modelTitles[key]" class="filter-select-show-item-title">
+                                            <template v-if="!filterValues||!filterValues[vo.name]">
+                                            <div v-if="modelTitles[key]" class="filter-select-show-item-title">
                                                     {{modelTitles[key]}}
                                                 </div>
                                                 <div class="filter-select-show-item-box">
@@ -1287,6 +1288,7 @@ define(requires, function ( axios,Qs) {
                                                         </a>
                                                     </a-menu-item>
                                                 </div>
+                                            </template>
                                             </template>
                                         </a-menu>
                                     </template>
