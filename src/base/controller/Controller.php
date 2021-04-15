@@ -118,7 +118,7 @@ trait Controller
         // 数据修改钩子，方便之类处理（之类重写此方法）
     }
 
-    protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel $data):void
+    protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel &$data):void
     {
         //（添加/编辑页面）生成解析数据前，处理数据（控制字段显示与否），$data为空代表是新增
     }

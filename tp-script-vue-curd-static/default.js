@@ -319,10 +319,10 @@ define(['vueAdmin'], function (va) {
 
         vueData.fields.forEach(function(field){
             fieldObjs[field.name]=field;
-            form[field.name]=vueData.info?vueData.info[field.name]:'';
+            form[field.name]=vueData.info&&typeof vueData.info[field.name]!=='undefined'?vueData.info[field.name]:'';
         })
 
-        if(vueData.info){
+        if(vueData.info&&vueData.info.id){
             form.id=vueData.info.id;
         }
         return {
