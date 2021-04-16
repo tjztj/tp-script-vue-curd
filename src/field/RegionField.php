@@ -169,8 +169,29 @@ class RegionField extends ModelField
     {
         $name = $this->name();
         if (isset($dataBaseData[$name])) {
-            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : self::getRegionName($dataBaseData[$name]);
+            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : ($this->getTreeToList($dataBaseData[$name])??self::getRegionName($dataBaseData[$name]));
         }
+    }
+
+
+    /**
+     * 获取当前选项的列表
+     * @return array
+     */
+    public function getTreeToList(){
+        static $list=[];
+        $func=function($tree)use(&$list,&$func){
+            foreach ($tree as $v){
+                $list[$v['id']]=$v;
+                if(!empty($v['children'])){
+                    $func($v['children']);
+                }
+            }
+        };
+        if(empty($list)){
+            $func($this->regionTree);
+        }
+        return $list;
     }
 
 
