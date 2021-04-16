@@ -204,7 +204,9 @@ body{
 .body .ant-pagination.ant-table-pagination{
     margin: 16px;
 }
-
+.ant-pro-table-list-toolbar .ant-pro-table-list-toolbar-right .ant-space-align-center .ant-space-item:nth-last-child(1) .ant-divider{
+    display: none;
+}
 
 /**** ant btn 样式 ***/
 
