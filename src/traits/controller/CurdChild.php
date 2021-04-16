@@ -274,7 +274,7 @@ trait CurdChild{
                 $this->errorAndCode($e->getMessage(),$e->getCode());
             }
             $this->model->commit();
-            $this->success((empty($data['id'])?'添加':'修改').'成功',[
+            $this->success((empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功',[
                 'data'=>$data,
                 'info'=>$savedInfo,
                 'baseInfo'=>$baseInfo
