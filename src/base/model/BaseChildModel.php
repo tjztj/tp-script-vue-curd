@@ -102,6 +102,20 @@ abstract class BaseChildModel extends VueCurlModel
         return $this->doDel($ids);
     }
 
+    final protected function delCheckRowAuth(\think\Collection $list,array $ids): void
+    {
+        $parents=[];
+        self::parentModelClassPath()::where('id','in',$list->column(self::parentField()))->select()->each(function(BaseModel $v)use(&$parents){
+            $parents[$v->id]=$v;
+        });
+        $fields=$this->fields();
+        $list->each(function(self $v)use($fields,$parents,$ids){
+            if($v->checkRowAuth($fields,$parents[$v[self::parentField()]],'del')===false){
+                throw new \think\Exception('您不能删除第'.(array_search($v->id,$ids)+1).'条数据');
+            }
+        });
+    }
+
 
     protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,BaseModel $baseInfo,?VueCurlModel $beforeInfo):void{} //执行doSaveData前（钩子）
     protected function doSaveDataAfter(array $saveData,int $id,BaseModel $baseInfo,?VueCurlModel $beforeInfo):array{return $saveData;} //执行doSaveData后（钩子）

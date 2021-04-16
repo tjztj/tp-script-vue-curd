@@ -87,6 +87,16 @@ abstract class BaseModel extends VueCurlModel
         return $this->doDel($ids);
     }
 
+    final protected function delCheckRowAuth(\think\Collection $list,array $ids): void
+    {
+        $fields=$this->fields();
+        $list->each(function(self $v)use($fields,$ids){
+            if($v->checkRowAuth($fields,null,'del')===false){
+                throw new \think\Exception('您不能删除第'.(array_search($v->id,$ids)+1).'条数据');
+            }
+        });
+    }
+
 
 
     protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,?VueCurlModel $beforeInfo):void{} //执行doSaveData前（钩子）

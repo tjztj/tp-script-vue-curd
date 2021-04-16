@@ -1076,9 +1076,9 @@ define(requires, function ( axios,Qs) {
                                    
                                     </slot>
                                     <slot name="do" :record="record">
-                                        <a @click="openShow(record)">详情</a>
+                                        <a v-if="!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true" @click="openShow(record)">详情</a>
                                           
-                                        <template v-if="canEdit!==false&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0&&record.stepCanEdit))">
+                                        <template v-if="canEdit!==false&&(!record.__auth||typeof record.__auth.edit==='undefined'||record.__auth.edit===true)&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0&&record.stepCanEdit))">
                                             <a-divider type="vertical"></a-divider>
                                             <a @click="openEdit(record)">修改<template v-if="fieldStepConfig.enable&&record.stepInfo&&record.stepInfo.config.listBtnText">{{record.stepInfo.config.listBtnText}}</template></a>
                                         </template>
@@ -1100,7 +1100,7 @@ define(requires, function ( axios,Qs) {
                                      <slot name="do-after" :record="record">
                                      
                                     </slot>
-                                    <template v-if="canDel">
+                                    <template v-if="canDel&&(!record.__auth||typeof record.__auth.del==='undefined'||record.__auth.del===true)">
                                             <a-divider type="vertical"></a-divider>
                                             <a-popconfirm
                                                 placement="left"

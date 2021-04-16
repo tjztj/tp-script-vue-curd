@@ -81,6 +81,10 @@ trait CurdFunc
         }
         $fields=$this->fields->filterShowStepFields($data,$baseInfo)->filterHideFieldsByShow($data)->rendGroup();
 
+        if($data->checkRowAuth($fields,$baseInfo,'show')===false){
+            return $this->errorAndCode('您不能查看当前数据信息');
+        }
+
 
         $info=$data->toArray();
         return $this->doShow(static::getTitle(),$info,$fields);
@@ -139,6 +143,11 @@ trait CurdFunc
             $info=null;
         }
 
+
+
+        if($data&&!empty($data->id)&&!$data->checkRowAuth($fields,$baseModel,'edit')){
+            return $this->error('您不能修改当前数据信息');
+        }
 
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){
             return $this->error('您不能进行此操作');

@@ -31,6 +31,10 @@ trait ModelSave
      */
     public function saveInfo(array $postData,FieldCollection $fields,BaseModel $baseInfo=null,VueCurlModel $beforeInfo): self
     {
+        if($beforeInfo&&!empty($beforeInfo->id)&&!$beforeInfo->checkRowAuth($fields,$baseInfo,'edit')){
+            throw new \think\Exception('您不能修改当前数据信息');
+        }
+
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 

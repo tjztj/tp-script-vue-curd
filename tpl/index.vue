@@ -51,13 +51,13 @@
                     </div>
                     <a-popconfirm
                         placement="left"
-                        :title="'您确定要删除勾选的这'+rowSelection.selectedRowKeys.length+'条数据吗？'"
+                        :title="'您确定要删除勾选的这'+delSelectedIds.length+'条数据吗？'"
                         @confirm="delSelectedRows"
                     >
                         <div class="ant-space-item">
                             <a-button type="danger">
                                 <del-outlined></del-outlined>
-                                <span> 批量删除 ({{rowSelection.selectedRowKeys.length}}条数据)</span>
+                                <span> 批量删除 ({{delSelectedIds.length}}条数据)</span>
                             </a-button>
                         </div>
                     </a-popconfirm>

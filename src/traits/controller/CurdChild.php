@@ -113,26 +113,27 @@ trait CurdChild{
             $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
             $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit=$info->nextStepInfo?$nextStepInfo->authCheck($info,$baseInfo,$this->fields->getFilterStepFields($nextStepInfo,true,$info)):false;
+            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info));
 
             $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
 
-            $info->stepCanEdit=$stepInfo?$stepInfo->authCheck($info,$baseInfo,$stepFields):false;
+            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
 
             return $info;
         };
 
         $option=new FunControllerIndexData();
         if($this->indexPageOption->pageSize>0){
-            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)->map($doSteps)->toArray();
+            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)
+                ->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo))->toArray();
             $option->data=$pageData['data'];
             $option->currentPage=$pageData['current_page'];
             $option->lastPage=$pageData['last_page'];
             $option->perPage=$pageData['per_page'];
             $option->total=$pageData['total'];
         }else{
-            $option->data=$model->select()->map($doSteps)->toArray();
+            $option->data=$model->select()->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo))->toArray();
         }
         foreach ($option->data as $k=>$v){
             $this->fields->doShowData($option->data[$k]);

@@ -8,6 +8,7 @@ use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\BaseController;
 use tpScriptVueCurd\base\controller\BaseHaveChildController;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\traits\model\InfoAuth;
 use tpScriptVueCurd\traits\model\ModelBaseField;
 use tpScriptVueCurd\traits\model\ModelDelTraits;
 use tpScriptVueCurd\traits\model\ModelSave;
@@ -20,7 +21,7 @@ use tpScriptVueCurd\traits\model\ModelStep;
  */
 abstract class VueCurlModel extends TimeModel
 {
-    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep;
+    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep,InfoAuth;
 
 
     abstract public function fields():FieldCollection;

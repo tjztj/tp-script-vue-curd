@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use think\Collection;
 use think\db\Query;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\option\FieldNumHideField;
@@ -518,4 +519,6 @@ class FieldCollection extends Collection
         }
         return $new;
     }
+
+
 }

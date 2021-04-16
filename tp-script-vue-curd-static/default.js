@@ -75,6 +75,7 @@ define(['vueAdmin'], function (va) {
             })
         ]));
 
+        const infos={};
         return {
             data(){
                 let rowSelecteds=Vue.ref([]);
@@ -124,6 +125,19 @@ define(['vueAdmin'], function (va) {
             },
             computed:{
                 ...getThisActionOhterComputeds(),
+                delSelectedIds(){
+                    const ids=[];
+                    this.rowSelection.selectedRowKeys.forEach(id=>{
+                        if(typeof infos[id]==='undefined'){
+                            return;
+                        }
+                        const record=infos[id];
+                        if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
+                            ids.push(id)
+                        }
+                    })
+                    return ids;
+                }
             },
             watch:{
                 ...getThisActionOhterWatchs(),
@@ -171,22 +185,10 @@ define(['vueAdmin'], function (va) {
                     this.$get(VUE_CURD.CONTROLLER+'/index',filter).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
-                        this.data = data.data.data.map( item=>{
-                            // for (let name in item){
-                            //     if(this.fieldObjs[name]){
-                            //         switch (this.fieldObjs[name].type){
-                            //             case 'WeekField':
-                            //                 if(item[name]){
-                            //                     let week=getLastWeek(item[name])
-                            //                     let weekStr=week[0]+' ~ '+week[1];
-                            //                     item[name]=getMonthWeek(item[name])+'（'+weekStr+'）';
-                            //                 }
-                            //                 break;
-                            //         }
-                            //     }
-                            // }
-                            return item;
-                        });
+                        data.data.data.forEach(item=>{
+                            infos[item.id]=item;
+                        })
+                        this.data = data.data.data;
                         this.onDataLoad();//触发钩子
                         this.loading = false;
                         //列表加载完成
@@ -228,7 +230,7 @@ define(['vueAdmin'], function (va) {
                 },
                 delSelectedRows(e,delChilds){
                     this.loading = true;
-                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys,delChilds:delChilds?1:0}).then(res=>{
+                    this.$post(vueData.delUrl,{ids:this.delSelectedIds,delChilds:delChilds?1:0}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                         this.rowSelection.selectedRowKeys=[];
@@ -440,6 +442,7 @@ define(['vueAdmin'], function (va) {
             sortOrder: '',
             showSizeChanger:vueData.indexPageOption.canGetRequestOption,
         }
+        const infos={};
         return {
             data(){
                 return {
@@ -466,6 +469,21 @@ define(['vueAdmin'], function (va) {
                 this.pageIsInit();
                 this.fetch();
             },
+            computed: {
+                delSelectedIds(){
+                    const ids=[];
+                    this.rowSelection.selectedRowKeys.forEach(id=>{
+                        if(typeof infos[id]==='undefined'){
+                            return;
+                        }
+                        const record=infos[id];
+                        if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
+                            ids.push(id)
+                        }
+                    })
+                    return ids;
+                }
+            },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
                     if(!pagination.pageSize){
@@ -487,6 +505,9 @@ define(['vueAdmin'], function (va) {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.data = data.data.data
+                        data.data.data.forEach(item=>{
+                            infos[item.id]=item;
+                        })
                         this.onDataLoad();//触发钩子
                         this.tableLoading = false;
                         //列表加载完成
@@ -527,7 +548,7 @@ define(['vueAdmin'], function (va) {
                 },
                 delSelectedRows(){
                     this.tableLoading = true;
-                    this.$post(vueData.delUrl,{ids:this.rowSelection.selectedRowKeys}).then(res=>{
+                    this.$post(vueData.delUrl,{ids:this.delSelectedIds}).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                         rowSelecteds.value=[];

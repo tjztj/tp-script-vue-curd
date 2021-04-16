@@ -20,6 +20,7 @@ trait ModelDelTraits
      * @return \think\Collection
      */
     abstract public function del(array $ids):\think\Collection;
+    abstract protected function delCheckRowAuth(\think\Collection $list,array $ids):void;
     protected function onDelBefore(Collection $delList): void{}//删除前钩子，子类重写
     protected function onDelAfter(Collection $delList): void{}//删除后钩子，子类重写
 
@@ -42,6 +43,7 @@ trait ModelDelTraits
      */
     protected function doDel($ids):\think\Collection{
         $list=$this->where('id','in',array_unique($ids))->select();
+        $this->delCheckRowAuth($list,$ids);
         $this->onDelBefore($list);
         foreach ($list as $result){$result->delete();}
         $this->onDelAfter($list);
