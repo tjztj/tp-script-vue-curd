@@ -1225,6 +1225,17 @@ define(requires, function ( axios,Qs) {
                     return {
                         filterData,childFilterData
                     }
+                },
+                moreShowItems(items){
+                    if(!items){
+                        return [];
+                    }
+                    if(!this.filterValues){
+                        return items;
+                    }
+                    return items.filter(vo=>{
+                        return !this.filterValues[vo.name];
+                    })
                 }
             },
             template:`<div class="curd-filter-box">
@@ -1273,12 +1284,10 @@ define(requires, function ( axios,Qs) {
                                     <template #overlay>
                                         <a-menu id="filter-menu-box">
                                             <template v-for="(vo,key) in filterSource">
-                                            <template v-if="!filterValues||!filterValues[vo.name]">
-                                            <div v-if="modelTitles[key]" class="filter-select-show-item-title">
-                                                    {{modelTitles[key]}}
-                                                </div>
+                                            <template v-if="moreShowItems(vo).length>0">
+                                                <div v-if="modelTitles[key]" class="filter-select-show-item-title">{{modelTitles[key]}}</div>
                                                 <div class="filter-select-show-item-box">
-                                                    <a-menu-item v-for="item in vo">
+                                                    <a-menu-item v-for="item in moreShowItems(vo)">
                                                         <a href="javascript:;"
                                                            class="filter-select-show-item"
                                                            :class="{checked:item.show}"
