@@ -17,6 +17,7 @@
             VERSION: "{$vueCurdVersion|default='1.0.0'}",
         };
     </script>
+    <script>window.vueData={$vue_data_json|raw};</script>
 </head>
 <body>
 <div id="app-loading">
@@ -71,7 +72,6 @@
     </div>
 </div>
 
-<script>window.vueData={$vue_data_json|raw};</script>
 <script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js?3.0.3" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?moment/moment.min.js" charset="utf-8"></script>
 <script>
