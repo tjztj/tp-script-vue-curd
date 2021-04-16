@@ -169,7 +169,7 @@ class RegionField extends ModelField
     {
         $name = $this->name();
         if (isset($dataBaseData[$name])) {
-            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : ($this->getTreeToList($dataBaseData[$name])??self::getRegionName($dataBaseData[$name]));
+            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : ($this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]));
         }
     }
 
@@ -182,7 +182,7 @@ class RegionField extends ModelField
         static $list=[];
         $func=function($tree)use(&$list,&$func){
             foreach ($tree as $v){
-                $list[$v['id']]=$v;
+                $list[$v['value']]=$v;
                 if(!empty($v['children'])){
                     $func($v['children']);
                 }
