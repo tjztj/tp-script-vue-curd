@@ -973,7 +973,7 @@ define(requires, function ( axios,Qs) {
                             if(record.nextStepInfo.config.listBtnWidth){
                                 stepWidth=record.nextStepInfo.config.listBtnWidth;
                             }else if(record.nextStepInfo.config.listBtnText){
-                                stepWidth=38+(v.listBtn.text.split('').length*9);
+                                stepWidth=38+(record.nextStepInfo.config.listBtnText.split('').length*9);
                             }
                         }
 
