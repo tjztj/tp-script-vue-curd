@@ -266,7 +266,7 @@ trait CurdChild{
                     }
 
 
-                    $fields=$this->model->fields()->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//隐藏地区
+                    $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//隐藏地区
 
                     $savedInfo=$this->model->saveInfo($data,$fields,$baseInfo,$info);
                     $this->editAfter($savedInfo);
