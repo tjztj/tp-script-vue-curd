@@ -949,7 +949,7 @@ define(requires, function ( axios,Qs) {
             },
             methods:{
                 getActionWidthByProps(){
-                    let btnWidth=0;
+                    let btnWidth=0,defW=0;
                     this.data.forEach(record=>{
                         let stepWidth=0;
                         if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
@@ -992,10 +992,19 @@ define(requires, function ( axios,Qs) {
                         if(btnW>btnWidth){
                             btnWidth=btnW;
                         }
+
+                        if(typeof this.actionWidth==='function'){
+                            const newdefW=this.actionWidth(record);
+                            if(newdefW>defW){
+                                defW=newdefW;
+                            }
+                        }else{
+                            defW=this.actionWidth;
+                        }
                     })
 
 
-                    this.actionW=32+btnWidth+(typeof this.actionWidth==='function'?this.actionWidth():this.actionWidth);
+                    this.actionW=32+btnWidth+defW;
                 },
                 handleTableChange(pagination, filters, sorter){
                     this.$emit('change',pagination, filters, sorter,this.data)

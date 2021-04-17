@@ -111,7 +111,7 @@ trait BaseHaveChildController
                 'filterData'=>json_decode($this->request->param($name.'filterData','',null)),
                 'title'=>$childControllerClass::getTitle(),
                 'filterConfig'=>$filterFields->getFilterShowData(),
-                'listUrl'=>url(str_replace('\\','.',parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index')->build(),
+                'listUrl'=>url(str_replace(['\\','._'],['.','.'],parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index')->build(),
             ];
             $filterComponents += $filterFields->getFilterComponents();
         }
