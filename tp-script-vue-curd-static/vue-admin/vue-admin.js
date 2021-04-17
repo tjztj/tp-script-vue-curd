@@ -865,9 +865,8 @@ define(requires, function ( axios,Qs) {
                     actionW+=32;
                 }
                 const oldActionW=actionW;
-                const getActionWidthByProps=function (propActionWidth,oldActionW,stepWidth,childWidth){
-                    stepWidth=stepWidth||0;
-                    childWidth=childWidth||0;
+                const getActionWidthByProps=function (propActionWidth,oldActionW,btnWidth){
+                    btnWidth=btnWidth||0;
                     //自定义操作栏长度
                     if(propActionWidth){
                         if(typeof propActionWidth==='function'){
@@ -876,7 +875,7 @@ define(requires, function ( axios,Qs) {
                             oldActionW+=propActionWidth;
                         }
                     }
-                    return oldActionW+stepWidth+childWidth;
+                    return oldActionW+btnWidth;
                 }
                 //可prop动态设置宽度
                 const newActionW=Vue.ref(getActionWidthByProps(props.actionWidth,oldActionW));
@@ -967,35 +966,33 @@ define(requires, function ( axios,Qs) {
                     this.actionW=this.getActionWidthByProps(val,this.oldActionW);
                 },
                 data(data){
-                    let stepWidth=0,childWidth=0;
+                    let btnWidth=0;
                     data.forEach(record=>{
+                        let stepWidth=0;
                         if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
-                            let w=0;
                             if(record.nextStepInfo.config.listBtnWidth){
-                                w=record.nextStepInfo.config.listBtnWidth;
+                                stepWidth=record.nextStepInfo.config.listBtnWidth;
                             }else if(record.nextStepInfo.config.listBtnText){
-                                w=38+(v.listBtn.text.split('').length*9);
-                            }
-                            if(w&&stepWidth<w){
-                                stepWidth=w;
+                                stepWidth=38+(v.listBtn.text.split('').length*9);
                             }
                         }
 
 
                         let childW=0;
-                        if(!record.childBtns){
-                            return childW;
-                        }
-                        for(let childName in record.childBtns){
-                            if(record.childBtns[childName].show){
-                                childW+=38+(record.childBtns[childName].text.split('').length*9);
+                        if(record.childBtns){
+                            for(let childName in record.childBtns){
+                                if(record.childBtns[childName].show){
+                                    childW+=38+(record.childBtns[childName].text.split('').length*9);
+                                }
                             }
                         }
-                        if(childW>0&&childW>childWidth){
-                            childWidth=childW;
+
+                        const btnW=stepWidth+childW;
+                        if(btnW>btnWidth){
+                            btnWidth=btnW;
                         }
                     })
-                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,stepWidth,childWidth);
+                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,btnWidth);
                 }
             },
             methods:{
