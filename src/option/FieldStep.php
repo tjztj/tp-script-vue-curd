@@ -20,6 +20,7 @@ class FieldStep
     private StepCheck $fieldCheckFunc;
     private $auth;//用来判断是否有编辑当前步骤的权限
     private $saveBefore;
+    private $authCheckAndCheckBefore;
     public array $config=[//一些其他配置，如颜色
         'color'=>null,
         'listBtnText'=>'',//如果有值，列表中将显示,
@@ -138,14 +139,28 @@ class FieldStep
 
     /**
      * 用来判断是否有编辑当前步骤的权限
-     * @param bool|callable $auth
+     * @param bool|callable|null $auth  默认执行authCheck前，执行beforeCheck（这样只能执行下一步，不能编辑当前步骤）
+     *                                  beforeCheck=true            绿灯到authCheck
+     *                                  beforeCheck=false           authCheck 返回false
+     *                                  beforeCheck=function(){}    自定义
+     * @param bool|callable $checkBefore
      * @return $this
      */
-    public function auth($auth):self{
+    public function auth($auth,$checkBefore=null):self{
         if(is_callable($auth)){
             $this->auth=$auth;
         }else if(is_bool($auth)){
-            $this->auth=fn()=>$auth;
+            $this->auth= static fn()=>$auth;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+
+        if(is_callable($checkBefore)){
+            $this->authCheckAndCheckBefore=$checkBefore;
+        }else if(is_bool($checkBefore)){
+            $this->authCheckAndCheckBefore= static fn()=>$checkBefore;
+        }else if(is_null($checkBefore)){
+            $this->authCheckAndCheckBefore=fn(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$baseInfo);
         }else{
             throw new \think\Exception('参数错误');
         }
@@ -160,7 +175,8 @@ class FieldStep
      * @return bool
      */
     public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
-        if(!$this->getCheckFunc()->beforeCheck($info,$baseInfo)){
+        $authCheckAndCheckBefore=$this->authCheckAndCheckBefore;
+        if(!$authCheckAndCheckBefore($info,$baseInfo,$fields)){
             return false;
         }
         if(!isset($this->auth)){
