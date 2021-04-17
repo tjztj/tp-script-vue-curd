@@ -101,7 +101,7 @@ trait Curd
             if($this->indexPageOption->pageSize>0){
                 $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)
                     ->map($doSteps)
-                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields))
+                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))
                     ->toArray();
                 $option->data=$pageData['data'];
                 $option->currentPage=$pageData['current_page'];
@@ -109,7 +109,7 @@ trait Curd
                 $option->perPage=$pageData['per_page'];
                 $option->total=$pageData['total'];
             }else{
-                $option->data=$model->select()->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields))->toArray();
+                $option->data=$model->select()->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))->toArray();
             }
 
             foreach ($option->data as $k=>$v){

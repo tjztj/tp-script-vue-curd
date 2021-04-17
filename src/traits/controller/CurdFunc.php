@@ -171,10 +171,8 @@ trait CurdFunc
             if(!$data->checkRowAuth($fields,$baseModel,'edit')){
                 return $this->error('不能修改当前数据信息');
             }
-        }else{
-            if(!$data->checkRowAuth($fields,$baseModel,'add')){
-                return $this->error('不能添加此栏目信息');
-            }
+        }else if($data?!$data->checkRowAuth($fields,$baseModel,'add'):!$this->model->checkRowAuth($fields,$baseModel,'add')){
+            return $this->error('不能添加此栏目信息');
         }
 
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){
