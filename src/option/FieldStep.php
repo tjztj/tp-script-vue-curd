@@ -160,6 +160,9 @@ class FieldStep
      * @return bool
      */
     public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
+        if(!$this->getCheckFunc()->beforeCheck($info,$baseInfo)){
+            return false;
+        }
         if(!isset($this->auth)){
             return true;
         }
