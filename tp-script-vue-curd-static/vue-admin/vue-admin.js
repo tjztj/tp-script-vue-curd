@@ -998,7 +998,7 @@ define(requires, function ( axios,Qs) {
                             if(newdefW>defW){
                                 defW=newdefW;
                             }
-                        }else{
+                        }else if(this.actionWidth){
                             defW=this.actionWidth;
                         }
                     })
