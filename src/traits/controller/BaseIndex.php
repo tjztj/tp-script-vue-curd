@@ -18,6 +18,7 @@ use tpScriptVueCurd\option\FunControllerIndexPage;
  * @property Request $request
  * @property FunControllerIndexPage $indexPageOption
  * @property FieldCollection $fields
+ * @property VueCurlModel $model
  * @package tpScriptVueCurd\traits\controller
  */
 trait BaseIndex
