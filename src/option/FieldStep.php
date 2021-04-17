@@ -143,10 +143,10 @@ class FieldStep
      *                                  beforeCheck=true            绿灯到authCheck 可以编辑当前步骤
      *                                  beforeCheck=false           authCheck 返回false
      *                                  beforeCheck=function(){}    自定义
-     * @param bool|callable $checkBefore
+     * @param bool|callable $beforeCheckFunc
      * @return $this
      */
-    public function auth($auth,$checkBefore=null):self{
+    public function auth($auth,$beforeCheckFunc=null):self{
         if(is_callable($auth)){
             $this->auth=$auth;
         }else if(is_bool($auth)){
@@ -155,11 +155,11 @@ class FieldStep
             throw new \think\Exception('参数错误');
         }
 
-        if(is_callable($checkBefore)){
-            $this->authCheckAndCheckBefore=$checkBefore;
-        }else if(is_bool($checkBefore)){
-            $this->authCheckAndCheckBefore= static fn()=>$checkBefore;
-        }else if(is_null($checkBefore)){
+        if(is_callable($beforeCheckFunc)){
+            $this->authCheckAndCheckBefore=$beforeCheckFunc;
+        }else if(is_bool($beforeCheckFunc)){
+            $this->authCheckAndCheckBefore= static fn()=>$beforeCheckFunc;
+        }else if(is_null($beforeCheckFunc)){
             $this->authCheckAndCheckBefore=fn(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$baseInfo);
         }else{
             throw new \think\Exception('参数错误');
