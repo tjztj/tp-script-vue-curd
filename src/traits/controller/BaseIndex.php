@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\traits\controller;
 
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
@@ -92,12 +93,27 @@ trait BaseIndex
             };
 
 
+            $childListBtn=function(VueCurlModel $info){
+                if($this->type()!=='base_have_child'){
+                    return $info;
+                }
+                $childBtns=[];
+                foreach (static::childControllerClassPathList() as $childControllerClass){
+                    /* @var $childControllerClass BaseChildController|string */
+                    $childBtns[class_basename($childControllerClass::modelClassPath())]=$childControllerClass::baseListBtnText($info);
+                }
+                $info->childBtns=$childBtns;
+                return $info;
+            };
+
+
 
             $option=new FunControllerIndexData();
             if($this->indexPageOption->pageSize>0){
                 $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)
                     ->map($doSteps)
                     ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))
+                    ->map($childListBtn)
                     ->toArray();
                 $option->data=$pageData['data'];
                 $option->currentPage=$pageData['current_page'];
@@ -105,7 +121,11 @@ trait BaseIndex
                 $option->perPage=$pageData['per_page'];
                 $option->total=$pageData['total'];
             }else{
-                $option->data=$model->select()->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))->toArray();
+                $option->data=$model->select()
+                    ->map($doSteps)
+                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))
+                    ->map($childListBtn)
+                    ->toArray();
             }
 
             foreach ($option->data as $k=>$v){

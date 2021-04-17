@@ -857,14 +857,7 @@ define(requires, function ( axios,Qs) {
                 columnsCount++;
 
                 let actionW=props.actionDefWidth||70;
-                if(props.childs){
-                    props.childs.forEach(v=>{
-                        if(v.listBtn.show){
-                            actionW+=38+(v.listBtn.text.split('').length*9);
-                        }
 
-                    })
-                }
                 if(props.canEdit!==false){
                     actionW+=40;
                 }
@@ -872,8 +865,9 @@ define(requires, function ( axios,Qs) {
                     actionW+=32;
                 }
                 const oldActionW=actionW;
-                const getActionWidthByProps=function (propActionWidth,oldActionW,stepWidth){
+                const getActionWidthByProps=function (propActionWidth,oldActionW,stepWidth,childWidth){
                     stepWidth=stepWidth||0;
+                    childWidth=childWidth||0;
                     //自定义操作栏长度
                     if(propActionWidth){
                         if(typeof propActionWidth==='function'){
@@ -882,7 +876,7 @@ define(requires, function ( axios,Qs) {
                             oldActionW+=propActionWidth;
                         }
                     }
-                    return oldActionW+stepWidth;
+                    return oldActionW+stepWidth+childWidth;
                 }
                 //可prop动态设置宽度
                 const newActionW=Vue.ref(getActionWidthByProps(props.actionWidth,oldActionW));
@@ -945,6 +939,14 @@ define(requires, function ( axios,Qs) {
                 onresize();
                 window.onresize=onresize;
 
+
+                let childsObjs={};
+                if(props.childs){
+                    props.childs.forEach(v=>{
+                        childsObjs[v.name]=v;
+                    })
+                }
+
                 return {
                     oldActionW,
                     actionW:newActionW,
@@ -957,6 +959,7 @@ define(requires, function ( axios,Qs) {
                     id,
                     listFieldComponents,
                     fieldObjs,
+                    childsObjs,
                 }
             },
             watch: {
@@ -964,7 +967,7 @@ define(requires, function ( axios,Qs) {
                     this.actionW=this.getActionWidthByProps(val,this.oldActionW);
                 },
                 data(data){
-                    let stepWidth=0;
+                    let stepWidth=0,childWidth=0;
                     data.forEach(record=>{
                         if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
                             let w=0;
@@ -977,8 +980,22 @@ define(requires, function ( axios,Qs) {
                                 stepWidth=w;
                             }
                         }
+
+
+                        let childW=0;
+                        if(!record.childBtns){
+                            return childW;
+                        }
+                        for(let childName in record.childBtns){
+                            if(record.childBtns[childName].show){
+                                childW+=38+(record.childBtns[childName].text.split('').length*9);
+                            }
+                        }
+                        if(childW>0&&childW>childWidth){
+                            childWidth=childW;
+                        }
                     })
-                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,stepWidth);
+                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,stepWidth,childWidth);
                 }
             },
             methods:{
@@ -1002,7 +1019,7 @@ define(requires, function ( axios,Qs) {
                 },
                 stepBtnShow(record){
                     return this.fieldStepConfig.enable&&record.stepNextCanEdit&&record.nextStepInfo;
-                }
+                },
             },
             template:`<div :id="id">
                         <a-table
@@ -1101,9 +1118,13 @@ define(requires, function ( axios,Qs) {
                                     </template>
                                     
                                     <slot name="child-btns" :record="record">
-                                        <template v-for="vo in childs">
-                                            <a-divider type="vertical" v-if="vo.listBtn.show"></a-divider>
-                                            <a v-if="vo.listBtn.show" @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
+                                        <template v-if="record.childBtns">
+                                        <template v-for="(vo,kk) in record.childBtns">
+                                        <template v-if="vo.show">
+                                            <a-divider type="vertical"></a-divider>
+                                            <a @click="openChildList(record,childsObjs[kk])" :style="{color: vo.color}">{{vo.text}}</a>
+                                        </template>
+                                        </template>
                                         </template>
                                     </slot>
                                     

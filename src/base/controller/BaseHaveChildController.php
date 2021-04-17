@@ -103,10 +103,11 @@ trait BaseHaveChildController
             $childModel=new $childModelClass;
             $name=class_basename($childModelClass);
             $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField());
+
+
             $fetch['childs'][]=[
                 'class'=>$childModelClass,
                 'name'=>$name,
-                'listBtn'=>$childControllerClass::baseListBtnText(),
                 'filterData'=>json_decode($this->request->param($name.'filterData','',null)),
                 'title'=>$childControllerClass::getTitle(),
                 'filterConfig'=>$filterFields->getFilterShowData(),
