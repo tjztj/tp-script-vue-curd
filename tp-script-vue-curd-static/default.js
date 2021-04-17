@@ -302,7 +302,7 @@ define(['vueAdmin'], function (va) {
                         }
                     }).trigger();
                 },
-                actionWidth(){
+                actionWidth(row){
                     return this.actionDefWidth
                 },
                 onDataLoad(){
