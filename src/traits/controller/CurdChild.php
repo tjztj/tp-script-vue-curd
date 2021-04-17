@@ -48,6 +48,7 @@ trait CurdChild{
 
         $info=$this->baseModel->find($base_id);
         $info||$this->errorAndCode('未找到相关信息');
+        $baseInfo=$info;
         $info=$info->toArray();
         $this->baseFields->doShowData($info);//有些数据不允许直接展示
 
@@ -76,7 +77,7 @@ trait CurdChild{
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
                 'stepAdd'=>$this->getAuthAdd(),
-                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$info,'add')
+                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
