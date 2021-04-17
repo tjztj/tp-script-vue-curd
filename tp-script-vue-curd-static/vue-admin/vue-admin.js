@@ -856,14 +856,14 @@ define(requires, function ( axios,Qs) {
                 })
                 columnsCount++;
 
-                let actionW=props.actionDefWidth||70;
+                let actionW=props.actionDefWidth||0;
 
-                if(props.canEdit!==false){
-                    actionW+=40;
-                }
-                if(props.canDel){
-                    actionW+=32;
-                }
+                // if(props.canEdit!==false){
+                //     actionW+=40;
+                // }
+                // if(props.canDel){
+                //     actionW+=32;
+                // }
                 const oldActionW=actionW;
                 const getActionWidthByProps=function (propActionWidth,oldActionW,btnWidth){
                     btnWidth=btnWidth||0;
@@ -875,7 +875,7 @@ define(requires, function ( axios,Qs) {
                             oldActionW+=propActionWidth;
                         }
                     }
-                    return oldActionW+btnWidth;
+                    return 32+oldActionW+btnWidth;
                 }
                 //可prop动态设置宽度
                 const newActionW=Vue.ref(getActionWidthByProps(props.actionWidth,oldActionW));
@@ -973,7 +973,7 @@ define(requires, function ( axios,Qs) {
                             if(record.nextStepInfo.config.listBtnWidth){
                                 stepWidth=record.nextStepInfo.config.listBtnWidth;
                             }else if(record.nextStepInfo.config.listBtnText){
-                                stepWidth=38+(record.nextStepInfo.config.listBtnText.split('').length*9);
+                                stepWidth=this.getTextWidthByBtn(record.nextStepInfo.config.listBtnText);
                             }
                         }
 
@@ -982,12 +982,30 @@ define(requires, function ( axios,Qs) {
                         if(record.childBtns){
                             for(let childName in record.childBtns){
                                 if(record.childBtns[childName].show){
-                                    childW+=38+(record.childBtns[childName].text.split('').length*9);
+                                    childW+=this.getTextWidthByBtn(record.childBtns[childName].text);
                                 }
                             }
                         }
 
-                        const btnW=stepWidth+childW;
+
+                        let showW=0;
+                        if(this.isCanShowInfo(record)){
+                            showW=this.getTextWidthByBtn(this.showBtnText(record))
+                        }
+
+
+                        let editW=0;
+                        if(this.isCanEdit(record)){
+                            editW=this.getTextWidthByBtn(this.editBtnText(record))
+                        }
+
+                        let delW=0;
+                        if(this.isCanDel(record)){
+                            delW=31;
+                        }
+
+
+                        const btnW=stepWidth+childW+showW+editW+delW-14;//要删掉一个间隔
                         if(btnW>btnWidth){
                             btnWidth=btnW;
                         }
@@ -1017,6 +1035,29 @@ define(requires, function ( axios,Qs) {
                 stepBtnShow(record){
                     return this.fieldStepConfig.enable&&record.stepNextCanEdit&&record.nextStepInfo;
                 },
+                getTextWidthByBtn(text){
+                    text=text||'';
+                    return 17+(text.split('').length*14);
+                },
+                showBtnText(row){
+                    return '详情'
+                },
+                editBtnText(row){
+                    let editText='修改';
+                    if(this.fieldStepConfig.enable&&row.stepInfo&&row.stepInfo.config.listBtnText){
+                        editText+=row.stepInfo.config.listBtnText;
+                    }
+                    return editText;
+                },
+                isCanShowInfo(row){
+                    return !row.__auth||typeof row.__auth.show==='undefined'||row.__auth.show===true;
+                },
+                isCanEdit(row){
+                    return this.canEdit!==false&&(!row.__auth||typeof row.__auth.edit==='undefined'||row.__auth.edit===true)&&(!this.fieldStepConfig.enable||(row.stepFields&&record.stepFields.length>0&&row.stepCanEdit))
+                },
+                isCanDel(row){
+                    return this.canDel&&(!row.__auth||typeof row.__auth.del==='undefined'||row.__auth.del===true)
+                }
             },
             template:`<div :id="id">
                         <a-table
@@ -1063,7 +1104,7 @@ define(requires, function ( axios,Qs) {
                                 </slot>
                               </template>
                             
-                                <template #step-info="{ text: stepInfo }">
+                               <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
                                             <div class="curd-table-row-step-title">
@@ -1097,11 +1138,11 @@ define(requires, function ( axios,Qs) {
                                     </slot>
                                     
                                     <slot name="do" :record="record">
-                                        <a v-if="!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true" @click="openShow(record)">详情</a>
+                                        <a v-if="isCanShowInfo(record)" @click="openShow(record)">详情</a>
                                           
-                                        <template v-if="canEdit!==false&&(!record.__auth||typeof record.__auth.edit==='undefined'||record.__auth.edit===true)&&(!fieldStepConfig.enable||(record.stepFields&&record.stepFields.length>0&&record.stepCanEdit))">
+                                        <template v-if="isCanEdit(record)">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openEdit(record)">修改<template v-if="fieldStepConfig.enable&&record.stepInfo&&record.stepInfo.config.listBtnText">{{record.stepInfo.config.listBtnText}}</template></a>
+                                            <a @click="openEdit(record)">{{editBtnText(record)}}</a>
                                         </template>
                                     </slot>
                                     
@@ -1130,7 +1171,7 @@ define(requires, function ( axios,Qs) {
                                      
                                     </slot>
                                     
-                                    <template v-if="canDel&&(!record.__auth||typeof record.__auth.del==='undefined'||record.__auth.del===true)">
+                                    <template v-if="isCanDel(record)">
                                             <a-divider type="vertical"></a-divider>
                                             <a-popconfirm
                                                 placement="left"
