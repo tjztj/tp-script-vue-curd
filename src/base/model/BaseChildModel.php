@@ -60,6 +60,10 @@ abstract class BaseChildModel extends VueCurlModel
 
         $fields=$fields->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
 
+        if(!$this->checkRowAuth($fields,$baseInfo,'add')){
+            throw new \think\Exception('不能添加此栏目信息');
+        }
+
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 

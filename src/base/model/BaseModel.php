@@ -33,8 +33,12 @@ abstract class BaseModel extends VueCurlModel
         #########################################################################################
 
         //验证表是否能执行此操作
-        if(!is_subclass_of($this,BaseModel::class)) {
+        if(!is_subclass_of($this, __CLASS__)) {
             throw new \think\Exception('当前model不能执行此操作');
+        }
+
+        if(!$this->checkRowAuth($fields,null,'add')){
+            throw new \think\Exception('不能添加此栏目信息');
         }
 
         //为了防止在doSaveData中被删除，在这里先获取了

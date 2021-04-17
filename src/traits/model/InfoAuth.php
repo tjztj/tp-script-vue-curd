@@ -29,7 +29,7 @@ trait InfoAuth
      * @param array|string[] $types
      * @return $this
      */
-    public function rowSetAuth(FieldCollection $field,BaseModel $baseInfo=null,array $types=['show','edit','del']): self
+    public function rowSetAuth(FieldCollection $field,BaseModel $baseInfo=null,array $types=['show','edit','del','add']): self
     {
         $authCheck=$this->authCheck();
 
@@ -46,6 +46,10 @@ trait InfoAuth
         if(in_array('del', $types, true) &&isset($authCheck->del)&&$authCheck->del){
             $func=$authCheck->del;
             $arr['del']=(!isset($arr['del'])||$arr['del'])&&$func($field,$this,$baseInfo);
+        }
+        if(in_array('add', $types, true) &&isset($authCheck->add)&&$authCheck->add){
+            $func=$authCheck->add;
+            $arr['add']=(!isset($arr['add'])||$arr['add'])&&$func($field,$this,$baseInfo);
         }
 
         if(empty($arr)){

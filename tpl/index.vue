@@ -45,7 +45,7 @@
             <div class="ant-pro-table-list-toolbar-left">
               {block name="toolTitleLeft"}{/block}
                 <div class="ant-pro-table-list-toolbar-title">{$title}</div>
-                <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
+                <template v-if="canDel&&delSelectedIds.length>0">
                     <div class="ant-space-item">
                         <a-divider type="vertical"></a-divider>
                     </div>
@@ -68,7 +68,7 @@
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
                     {block name="toolBtnLeft"}{/block}
 
-                    <template v-if="auth.add&&auth.stepAdd">
+                    <template v-if="auth.add&&auth.stepAdd&&auth.rowAuthAdd">
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">
                                 <plus-outlined></plus-outlined>

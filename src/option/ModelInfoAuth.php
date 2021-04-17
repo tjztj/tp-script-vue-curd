@@ -17,6 +17,12 @@ class ModelInfoAuth
 
 
     /**
+     * 添加权限判断（为了方便与其他写在一起）
+     * @var callable $add
+     */
+    public $add;
+
+    /**
      * 编辑权限判断
      * @var callable $edit
      */

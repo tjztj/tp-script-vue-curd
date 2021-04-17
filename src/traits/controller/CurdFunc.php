@@ -40,9 +40,11 @@ trait CurdFunc
     }
 
 
+
     /**
-     *是否能添加
+     * 步骤--是否能添加
      * @return bool
+     * @throws \think\Exception
      */
     protected function getAuthAdd():bool{
         if(!$this->fields->stepIsEnable()){
@@ -56,6 +58,26 @@ trait CurdFunc
             return false;
         }
     }
+
+    /**
+     * 获取添加时的字段信息
+     * @return FieldCollection
+     * @throws \think\Exception
+     */
+    protected function getRowAuthAddFields(): FieldCollection
+    {
+        if(!$this->fields->stepIsEnable()){
+            return clone $this->fields;
+        }
+        $stepInfo=$this->fields->getNextStepInfo();
+        if($stepInfo){
+            $fields=$this->fields->getFilterStepFields($stepInfo,true);
+            $fields->saveStepInfo=$stepInfo;
+            return $fields;
+        }
+        return new FieldCollection();
+    }
+
 
     /**
      * #title 详细页面
@@ -145,8 +167,14 @@ trait CurdFunc
 
 
 
-        if($data&&!empty($data->id)&&!$data->checkRowAuth($fields,$baseModel,'edit')){
-            return $this->error('您不能修改当前数据信息');
+        if($data&&!empty($data->id)){
+            if(!$data->checkRowAuth($fields,$baseModel,'edit')){
+                return $this->error('不能修改当前数据信息');
+            }
+        }else{
+            if(!$data->checkRowAuth($fields,$baseModel,'add')){
+                return $this->error('不能添加此栏目信息');
+            }
         }
 
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){

@@ -46,7 +46,7 @@
         <div class="week-title">
           {block name="toolTitleLeft"}{/block}
             详细列表
-            <template v-if="canDel&&rowSelection.selectedRowKeys.length>0">
+            <template v-if="canDel&&delSelectedIds.length>0">
                 <a-divider type="vertical"></a-divider>
                 <a-popconfirm
                     placement="left"
@@ -63,7 +63,7 @@
         </div>
         <div class="title-right">
             {block name="toolBtnLeft"}{/block}
-            <template v-if="auth.add&&auth.stepAdd">
+            <template v-if="auth.add&&auth.stepAdd&&auth.rowAuthAdd">
                 <a-button type="primary" @click="openAdd">
                     <plus-outlined></plus-outlined>
                     <span> 添加</span>
