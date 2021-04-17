@@ -302,8 +302,8 @@ define(['vueAdmin'], function (va) {
                         }
                     }).trigger();
                 },
-                actionWidth(width){
-                    return width
+                actionWidth(){
+                    return this.actionDefWidth
                 },
                 onDataLoad(){
                     //数据获取完成钩子

@@ -856,29 +856,9 @@ define(requires, function ( axios,Qs) {
                 })
                 columnsCount++;
 
-                let actionW=props.actionDefWidth||0;
 
-                // if(props.canEdit!==false){
-                //     actionW+=40;
-                // }
-                // if(props.canDel){
-                //     actionW+=32;
-                // }
-                const oldActionW=actionW;
-                const getActionWidthByProps=function (propActionWidth,oldActionW,btnWidth){
-                    btnWidth=btnWidth||0;
-                    //自定义操作栏长度
-                    if(propActionWidth){
-                        if(typeof propActionWidth==='function'){
-                            oldActionW=propActionWidth(oldActionW)
-                        }else{
-                            oldActionW+=propActionWidth;
-                        }
-                    }
-                    return 32+oldActionW+btnWidth;
-                }
                 //可prop动态设置宽度
-                const newActionW=Vue.ref(getActionWidthByProps(props.actionWidth,oldActionW));
+                const newActionW=Vue.ref(props.actionDefWidth||0);
                 columns.push({
                     title:'操作',
                     slots: { customRender: 'action' },
@@ -947,9 +927,7 @@ define(requires, function ( axios,Qs) {
                 }
 
                 return {
-                    oldActionW,
                     actionW:newActionW,
-                    getActionWidthByProps,
                     columns:Vue.ref(columns),
                     isGroup,
                     titleItems,
@@ -963,11 +941,16 @@ define(requires, function ( axios,Qs) {
             },
             watch: {
                 actionWidth(val){
-                    this.actionW=this.getActionWidthByProps(val,this.oldActionW);
+                    this.getActionWidthByProps()
                 },
                 data(data){
+                    this.getActionWidthByProps()
+                }
+            },
+            methods:{
+                getActionWidthByProps(){
                     let btnWidth=0;
-                    data.forEach(record=>{
+                    this.data.forEach(record=>{
                         let stepWidth=0;
                         if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
                             if(record.nextStepInfo.config.listBtnWidth){
@@ -1010,10 +993,10 @@ define(requires, function ( axios,Qs) {
                             btnWidth=btnW;
                         }
                     })
-                    this.actionW=this.getActionWidthByProps(this.actionWidth,this.oldActionW,btnWidth);
-                }
-            },
-            methods:{
+
+
+                    this.actionW=32+btnWidth+(typeof this.actionWidth==='function'?this.actionWidth():this.actionWidth);
+                },
                 handleTableChange(pagination, filters, sorter){
                     this.$emit('change',pagination, filters, sorter,this.data)
                 },
