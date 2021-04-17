@@ -140,7 +140,7 @@ class FieldStep
     /**
      * 用来判断是否有编辑当前步骤的权限
      * @param bool|callable|null $auth  默认执行authCheck前，执行beforeCheck（这样只能执行下一步，不能编辑当前步骤）
-     *                                  beforeCheck=true            绿灯到authCheck
+     *                                  beforeCheck=true            绿灯到authCheck 可以编辑当前步骤
      *                                  beforeCheck=false           authCheck 返回false
      *                                  beforeCheck=function(){}    自定义
      * @param bool|callable $checkBefore
