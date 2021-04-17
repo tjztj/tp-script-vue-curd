@@ -967,8 +967,14 @@ define(requires, function ( axios,Qs) {
                     let stepWidth=0;
                     data.forEach(record=>{
                         if(this.stepBtnShow(record)&&record.nextStepInfo.config.listBtnText){
-                            if(record.nextStepInfo.config.listBtnWidth&&stepWidth<record.nextStepInfo.config.listBtnWidth){
-                                stepWidth=record.nextStepInfo.config.listBtnWidth;
+                            let w=0;
+                            if(record.nextStepInfo.config.listBtnWidth){
+                                w=record.nextStepInfo.config.listBtnWidth;
+                            }else if(record.nextStepInfo.config.listBtnText){
+                                w=38+(v.listBtn.text.split('').length*9);
+                            }
+                            if(w&&stepWidth<w){
+                                stepWidth=w;
                             }
                         }
                     })
@@ -1075,6 +1081,7 @@ define(requires, function ( axios,Qs) {
                                     <slot name="do-before" :record="record">
                                    
                                     </slot>
+                                    
                                     <slot name="do" :record="record">
                                         <a v-if="!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true" @click="openShow(record)">详情</a>
                                           
@@ -1082,12 +1089,8 @@ define(requires, function ( axios,Qs) {
                                             <a-divider type="vertical"></a-divider>
                                             <a @click="openEdit(record)">修改<template v-if="fieldStepConfig.enable&&record.stepInfo&&record.stepInfo.config.listBtnText">{{record.stepInfo.config.listBtnText}}</template></a>
                                         </template>
-                                       
-                                        <template v-for="vo in childs">
-                                            <a-divider type="vertical" v-if="vo.listBtn.show"></a-divider>
-                                            <a v-if="vo.listBtn.show" @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
-                                        </template>
                                     </slot>
+                                    
                                     <template v-if="stepBtnShow(record)">
                                          <slot name="step-next-btn" :record="record">
                                             <template v-if="record.nextStepInfo.config.listBtnText">
@@ -1097,9 +1100,18 @@ define(requires, function ( axios,Qs) {
                                          </slot>
                                     </template>
                                     
-                                     <slot name="do-after" :record="record">
+                                    <slot name="child-btns" :record="record">
+                                        <template v-for="vo in childs">
+                                            <a-divider type="vertical" v-if="vo.listBtn.show"></a-divider>
+                                            <a v-if="vo.listBtn.show" @click="openChildList(record,vo)" :style="{color: vo.listBtn.color}">{{vo.listBtn.text}}</a>
+                                        </template>
+                                    </slot>
+                                    
+                                    
+                                    <slot name="do-after" :record="record">
                                      
                                     </slot>
+                                    
                                     <template v-if="canDel&&(!record.__auth||typeof record.__auth.del==='undefined'||record.__auth.del===true)">
                                             <a-divider type="vertical"></a-divider>
                                             <a-popconfirm
