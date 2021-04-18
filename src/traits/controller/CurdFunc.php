@@ -176,7 +176,7 @@ trait CurdFunc
         }
 
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){
-            return $this->error('您不能进行此操作');
+            return $this->error('您不能进行此操作-05');
         }
 
         $fieldArr=array_values($fields->rendGroup()->toArray());

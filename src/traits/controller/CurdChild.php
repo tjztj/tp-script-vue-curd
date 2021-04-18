@@ -243,7 +243,7 @@ trait CurdChild{
 
                     //步骤权限验证
                     if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck(null,$baseInfo,$this->fields)===false){
-                        return $this->error('您不能进行此操作');
+                        return $this->error('您不能进行此操作-03');
                     }
 
                     $savedInfo=$this->model->addInfo($data,$baseInfo,$this->fields);
@@ -262,7 +262,7 @@ trait CurdChild{
 
                     //步骤权限验证
                     if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($info,$baseInfo,$this->fields)===false){
-                        return $this->error('您不能进行此操作');
+                        return $this->error('您不能进行此操作-04');
                     }
 
 
