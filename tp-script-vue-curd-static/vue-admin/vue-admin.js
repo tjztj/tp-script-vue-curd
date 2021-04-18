@@ -851,7 +851,7 @@ define(requires, function ( axios,Qs) {
                     ellipsis:true,
                     dataIndex: "create_time",
                     slots: { customRender: 'create-time' },
-                    width:15,
+                    width:154,
                     sorter: true,
                 })
                 columnsCount++;
