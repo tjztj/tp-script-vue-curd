@@ -1025,7 +1025,7 @@ define(requires, function ( axios,Qs) {
                     this.$emit('onDelete',row)
                 },
                 stepBtnShow(record){
-                    return this.fieldStepConfig.enable&&record.stepNextCanEdit&&record.nextStepInfo;
+                    return this.fieldStepConfig&&this.fieldStepConfig.enable&&record.stepNextCanEdit&&record.nextStepInfo;
                 },
                 getTextWidthByBtn(text){
                     text=text||'';
@@ -1036,7 +1036,7 @@ define(requires, function ( axios,Qs) {
                 },
                 editBtnText(row){
                     let editText='修改';
-                    if(this.fieldStepConfig.enable&&row.stepInfo&&row.stepInfo.config.listBtnText){
+                    if(this.fieldStepConfig&&this.fieldStepConfig.enable&&row.stepInfo&&row.stepInfo.config.listBtnText){
                         editText+=row.stepInfo.config.listBtnText;
                     }
                     return editText;
@@ -1045,7 +1045,7 @@ define(requires, function ( axios,Qs) {
                     return !row.__auth||typeof row.__auth.show==='undefined'||row.__auth.show===true;
                 },
                 isCanEdit(row){
-                    return this.canEdit!==false&&(!row.__auth||typeof row.__auth.edit==='undefined'||row.__auth.edit===true)&&(!this.fieldStepConfig.enable||(row.stepFields&&row.stepFields.length>0&&row.stepCanEdit))
+                    return this.canEdit!==false&&(!row.__auth||typeof row.__auth.edit==='undefined'||row.__auth.edit===true)&&(!this.fieldStepConfig&&this.fieldStepConfig.enable||(row.stepFields&&row.stepFields.length>0&&row.stepCanEdit))
                 },
                 isCanDel(row){
                     return this.canDel&&(!row.__auth||typeof row.__auth.del==='undefined'||row.__auth.del===true)
