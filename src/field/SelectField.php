@@ -3,8 +3,10 @@
 
 namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\filter\SelectFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\ModelFilter;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -24,6 +26,10 @@ class SelectField extends ModelField
 
     protected bool $multiple=false;//是否可多选
     protected string $defaultFilterClass=SelectFilter::class;
+//    private ?ModelFilter $oldFilter=null;
+
+
+    protected bool $beginGetOptions=false;////如果为远程搜索，在开始时，如果值为空，先获取所有选项
 
 
     //[
@@ -37,6 +43,43 @@ class SelectField extends ModelField
     //   ]
     //]
 
+
+
+    /**
+     * 要搜索的url,如果不需要url也能搜索的话，建议使用select
+     * @var string
+     */
+    protected string $url='';
+
+
+    /**要搜索的url
+     * @param string|null $url
+     * @return $this|int
+     */
+    public function url(string $url = null)
+    {
+//        if($url===''){
+//            if(isset($this->oldFilter)&&$this->oldFilter){
+//                $this->filter($this->oldFilter);
+//                $this->oldFilter=null;
+//            }
+//        }elseif (!is_null($url)){
+//            //暂时不能搜索
+//            $this->oldFilter=$this->filter();
+//            $this->filter(new EmptyFilter());
+//        }
+
+        return $this->doAttr('url', $url);
+    }
+
+    /**在开始时，如果值为空，先获取所有选项
+     * @param bool|null $beginGetOptions
+     * @return $this|bool
+     */
+    public function beginGetOptions(bool $beginGetOptions = null)
+    {
+        return $this->doAttr('beginGetOptions', $beginGetOptions);
+    }
 
     /**
      * 是否可多选

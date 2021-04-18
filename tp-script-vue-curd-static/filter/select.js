@@ -10,13 +10,16 @@ define([], function () {
                 }
             }
             return {
-                inputValue:Vue.ref(val)
+                inputValue:Vue.ref(val),
+                fetching: Vue.ref(false),
+                lastFetchId:Vue.ref(0),
+                list:Vue.ref([]),
             }
         },
         computed:{
             groupItems(){
                 let items={};
-                this.config.items.forEach(v=>{
+                (this.config.url===''?this.config.items:this.list).forEach(v=>{
                     v.group=v.group||'';
                     if(!items[v.group]){
                         items[v.group]=[];
@@ -33,6 +36,15 @@ define([], function () {
                 }
                 return false;
             },
+            notFoundContent(){
+                if(this.config.url===''){
+                    return '找不到相关信息'
+                }
+                if(this.fetching){
+                    return undefined;
+                }
+                return null;
+            },
         },
         methods: {
             search(value) {
@@ -43,6 +55,24 @@ define([], function () {
             },
             filterOption(input, option) {
                 return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+            },
+            getList(value){
+                if(this.config.url===''){
+                    return;
+                }
+                this.lastFetchId += 1;
+                const fetchId = this.lastFetchId;
+                this.list=[];
+                this.fetching=true;
+                this.$get(this.field.url,{search:value}).then(res=>{
+                    if (fetchId !== this.lastFetchId) {
+                        // for fetch callback order
+                        return;
+                    }
+                    this.list=res;
+                    this.fetching=false;
+                })
+
             }
         },
         template: `<div>
@@ -53,7 +83,15 @@ define([], function () {
                                       allow-clear
                                       show-search 
                                       size="small"
-                                      :filter-option="filterOption">
+                                      :filter-option="config.url===''?filterOption:false"
+                                      :not-found-content="notFoundContent"
+                                      @search="getList"
+                                      >
+                                      
+                                      <template v-if="fetching" #not-found-content>
+                                          <a-spin size="small" />
+                                      </template>
+                                      
                                       <template v-if="haveGroup">
                                          <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
                                          <template v-for="(items,key) in groupItems">

@@ -1,6 +1,11 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
+        data:{
+            fetching:false,
+            lastFetchId:0,
+            list:[],
+        },
         computed:{
             val:{
                 get(){
@@ -28,7 +33,7 @@ define([],function(){
             },
             groupItems(){
                 let items={};
-                this.field.items.forEach(v=>{
+                (this.field.url===''?this.field.items:this.list).forEach(v=>{
                     v.group=v.group||'';
                     if(!items[v.group]){
                         items[v.group]=[];
@@ -45,6 +50,38 @@ define([],function(){
                 }
                 return false;
             },
+            notFoundContent(){
+                if(this.field.url===''){
+                    return '找不到相关信息'
+                }
+                if(this.fetching){
+                    return undefined;
+                }
+                return null;
+            },
+        },
+        methods:{
+            '$get'(url, params){
+                if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
+                return service({url, method: 'get',params,headers:{'X-REQUESTED-WITH':'xmlhttprequest'}})
+            },
+            getList(value){
+                if(this.field.url===''){
+                    return;
+                }
+                this.lastFetchId += 1;
+                const fetchId = this.lastFetchId;
+                this.list=[];
+                this.fetching=true;
+                this.$get(this.field.url,{search:value}).then(res=>{
+                    if (fetchId !== this.lastFetchId) {
+                        // for fetch callback order
+                        return;
+                    }
+                    this.list=res;
+                    this.fetching=false;
+                })
+            },
         },
         template:`<div class="field-box">
                     <div class="l">
@@ -52,9 +89,16 @@ define([],function(){
                                   :default-value="val"
                                   v-model:value="val"
                                   :placeholder="field.placeholder||'请选择'+field.title"
-                                   :disabled="field.readOnly"
-                                  show-search>
+                                  :disabled="field.readOnly"
+                                  show-search
                                   
+                                  :filter-option="field.url===''?filterOption:false"
+                                  :not-found-content="notFoundContent"
+                                  @search="getList"
+                                  >
+                                  <template v-if="fetching" #not-found-content>
+                                      <a-spin size="small" />
+                                  </template>
                                   <template v-if="haveGroup">
                                          <template v-for="(items,key) in groupItems">
                                             <template v-if="key">
