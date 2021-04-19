@@ -44,21 +44,26 @@ class FieldNumHideFieldCollection extends Collection
      */
     private function checkAccordWithFieds($value,bool $isAccordWith):self{
         return $this->filter(function(FieldNumHideField $v)use($value,$isAccordWith){
-            $start=$v->getStart();
-            $end=$v->getEnd();
-            if($value===''||is_null($value)||(is_null($start)&&is_null($end))){
-                return $isAccordWith;
-            }
-            if(is_null($start)){
-                //无限小
-                return $value<=$end?$isAccordWith:!$isAccordWith;
-            }
-            if(is_null($end)){
-                //无限大
-                return $value>=$start?$isAccordWith:!$isAccordWith;
-            }
-            return $value>=$start&&$value<=$end?$isAccordWith:!$isAccordWith;
+            return self::checkValueInBetween($value,$v,$isAccordWith);
         });
+    }
+
+
+    public static function checkValueInBetween($value,FieldNumHideField $v,bool $isAccordWith):bool{
+        $start=$v->getStart();
+        $end=$v->getEnd();
+        if($value===''||is_null($value)||(is_null($start)&&is_null($end))){
+            return $isAccordWith;
+        }
+        if(is_null($start)){
+            //无限小
+            return $value<=$end?$isAccordWith:!$isAccordWith;
+        }
+        if(is_null($end)){
+            //无限大
+            return $value>=$start?$isAccordWith:!$isAccordWith;
+        }
+        return $value>=$start&&$value<=$end?$isAccordWith:!$isAccordWith;
     }
 
 }

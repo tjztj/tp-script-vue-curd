@@ -353,18 +353,22 @@ class FieldCollection extends Collection
                 //有值才显示
                 if(!is_null($vValue)&&$vValue!==''){
                     //当是反转时，隐藏变为现实，显示变为隐藏，但不会对defHideAboutFields执行
-                    $hideVal=!$reversalHideFields;
 
-                    $hideFields->getAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName,$hideVal){
-                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName,$hideVal){
-                            $changeFieldHideList($f->name(),$vName,$hideVal);
+                    $allFields=[];
+                    $hideFArr=[];
+                    $hideFields->each(function(FieldNumHideField $v)use($vValue,&$allFields,&$hideFArr){
+                        $isHide=FieldNumHideFieldCollection::checkValueInBetween($vValue,$v,true);
+                        $v->getFields()->each(function(ModelField $f)use(&$allFields,&$hideFArr,$isHide){
+                            in_array($f->name(),$allFields,true)||$allFields[]=$f->name();
+                            if($isHide){
+                                in_array($f->name(),$hideFArr,true)||$hideFArr[]=$f->name();
+                            }
                         });
                     });
-                    $hideFields->getNotAccordWithFieds($vValue)->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName,$hideVal){
-                        $v->getFields()->each(function($f)use($changeFieldHideList,$vName,$hideVal){
-                            $changeFieldHideList($f->name(),$vName,!$hideVal);
-                        });
-                    });
+
+                    foreach ($allFields as $v){
+                        $changeFieldHideList($v,$vName,$reversalHideFields!==in_array($v,$hideFArr));
+                    }
                 }else if(method_exists($field,'defHideAboutFields')&&$field->defHideAboutFields()){ //默认隐藏所有
                     $hideFields->each(function(FieldNumHideField $v)use($changeFieldHideList,$vName){
                         $v->getFields()->each(function($f)use($changeFieldHideList,$vName){
