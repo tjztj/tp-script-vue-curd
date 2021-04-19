@@ -40,7 +40,12 @@ trait BaseIndex
         $baseInfo=null;
         if(is_null($baseInfo)&&isset($this->baseModel)&&!is_null($this->baseModel)){
             $baseId=$this->request->param('base_id/d',0);
-            $baseId||$baseInfo=$this->baseModel->find($baseId);
+            if($baseId){
+                $baseInfo=$this->baseModel->find($baseId);
+                if(!$baseInfo){
+                    return $this->error('未能获取到相关父表信息');
+                }
+            }
         }
 
         if($this->request->isAjax()){
