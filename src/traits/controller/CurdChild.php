@@ -292,7 +292,7 @@ trait CurdChild{
             $base_id=$this->request->param('base_id/d',0);
             $base_id||$this->errorAndCode('缺少必要参数');
             $info=null;
-            $baseInfo=null;
+            $baseInfo=$this->baseModel->find($base_id);
         }
 
         $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
