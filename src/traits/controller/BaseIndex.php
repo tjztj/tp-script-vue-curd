@@ -8,6 +8,7 @@ use think\db\Query;
 use think\Request;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\model\BaseChildModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\option\FunControllerIndexData;
@@ -19,7 +20,7 @@ use tpScriptVueCurd\option\FunControllerIndexPage;
  * @property Request $request
  * @property FunControllerIndexPage $indexPageOption
  * @property FieldCollection $fields
- * @property VueCurlModel $model
+ * @property BaseChildModel|BaseModel $model
  * @package tpScriptVueCurd\traits\controller
  */
 trait BaseIndex
@@ -35,10 +36,19 @@ trait BaseIndex
      * @throws \think\db\exception\ModelNotFoundException
      */
     function index(){
-        if($this->request->isAjax()){
+        //是否有父表
+        $baseInfo=null;
+        if(is_null($baseInfo)&&isset($this->baseModel)&&!is_null($this->baseModel)){
+            $baseId=$this->request->param('base_id/d',0);
+            $baseId||$baseInfo=$this->baseModel->find($baseId);
+        }
 
+        if($this->request->isAjax()){
             $model=$this->model
-                ->where(function (Query $query){
+                ->where(function (Query $query)use($baseInfo){
+                    if($baseInfo){
+                        $query->where($this->model::parentField(),$baseInfo->id);
+                    }
                     $this->indexListWhere($query);
                 })
                 ->where($this->fields->getFilterWhere())
@@ -69,24 +79,24 @@ trait BaseIndex
 
 
 
-            $doSteps=function(VueCurlModel $info){
+            $doSteps=function(VueCurlModel $info)use($baseInfo){
                 if(!$this->fields->stepIsEnable()){
                     return $info;
                 }
 
-                $stepInfo=$this->fields->getCurrentStepInfo($info);
+                $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
                 $stepInfo === null ||$stepInfo=clone $stepInfo;
-                $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,null,$this->fields)->toArray():null;
+                $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
 
-                $nextStepInfo=$this->fields->getNextStepInfo($info);
+                $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
                 $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
                 $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-                $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, null, $this->fields->getFilterStepFields($nextStepInfo, true, $info));
+                $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$baseInfo));
 
 
-                $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info):FieldCollection::make();
+                $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
                 $info->stepFields=$stepFields->column('name');
-                $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, null, $stepFields);
+                $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
 
 
                 return $info;
@@ -112,7 +122,7 @@ trait BaseIndex
             if($this->indexPageOption->pageSize>0){
                 $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)
                     ->map($doSteps)
-                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))
+                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']))
                     ->map($childListBtn)
                     ->toArray();
                 $option->data=$pageData['data'];
@@ -123,7 +133,7 @@ trait BaseIndex
             }else{
                 $option->data=$model->select()
                     ->map($doSteps)
-                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,null,['show','edit','del']))
+                    ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']))
                     ->map($childListBtn)
                     ->toArray();
             }
@@ -141,13 +151,6 @@ trait BaseIndex
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
 
 
-
-        //是否有父表
-        $baseInfo=null;
-        if(is_null($baseInfo)&&isset($this->baseModel)&&!is_null($this->baseModel)){
-            $baseId=$this->request->param('base_id/d',0);
-            $baseId||$baseInfo=$this->baseModel->find($baseId);
-        }
 
 
         $data=$this->indexFetch([
@@ -176,7 +179,7 @@ trait BaseIndex
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
                 'stepAdd'=>$this->getAuthAdd($baseInfo),
-                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),null,'add')
+                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
             ],
             'baseInfo'=>$baseInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
