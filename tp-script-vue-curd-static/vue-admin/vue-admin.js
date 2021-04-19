@@ -579,6 +579,8 @@ define(requires, function ( axios,Qs) {
                                     if(field.type==='DateField'||field.type==='MonthField'||field.type==='WeekField'){
                                         if(!/^\d+$/.test(checkVal.toString())||checkVal<10000){
                                             inputVal=moment(checkVal).unix()
+                                        }else if(field.type==='RegionField'){
+                                            inputVal=checkVal[checkVal.length-1];
                                         }
                                     }
                                 }
