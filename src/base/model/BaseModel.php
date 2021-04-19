@@ -68,7 +68,7 @@ abstract class BaseModel extends VueCurlModel
             $data[static::getUpdateLoginUserField()]=staticTpScriptVueCurdGetLoginData()['id'];
         }
         //onAddBefore请用doSaveDataAfter
-        $info=self::create($data);
+        $info=static::create($data);
         $this->onAddAfter($info,$data);
 
         return $info;
