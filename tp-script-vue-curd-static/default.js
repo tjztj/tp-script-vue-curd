@@ -26,6 +26,15 @@ define(['vueAdmin'], function (va) {
     function getThisActionOhterComputeds(){
         return window.thisAction.computed||{};
     }
+    function getThisActionOhterSetup(props,ctx){
+        let setup={},setupType=typeof window.thisAction.setup;
+        if(setupType==='function'){
+            setup=window.thisAction.setup(props,ctx)
+        }else if(setupType==='object'){
+            setup=window.thisAction.setup;
+        }
+        return setup;
+    }
     ////--------------////
 
 
@@ -77,6 +86,9 @@ define(['vueAdmin'], function (va) {
 
         const infos={};
         return {
+            setup(props,ctx){
+                return getThisActionOhterSetup(props,ctx);
+            },
             data(){
                 let rowSelecteds=Vue.ref([]);
                 const pagination={
