@@ -157,6 +157,11 @@ trait BaseIndex
 
 
 
+        $filterData=json_decode($this->request->param('filter_data','',null));
+        if($baseInfo){
+            $filterData||$filterData=[];
+            $filterData['base_id']=$baseInfo->id;
+        }
 
         $data=$this->indexFetch([
             'model'=>static::modelClassPath(),
@@ -172,7 +177,7 @@ trait BaseIndex
             'title'=>static::getTitle(),
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$this->fields->getFilterShowData(),
-            'filter_data'=>json_decode($this->request->param('filter_data','',null)),
+            'filter_data'=>$filterData,
             'showFilter'=>$this->request->param('show_filter/d',1)===1,
             'showTableTool'=>$showTableTool,
             'canEdit'=>$showTableTool,
