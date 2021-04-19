@@ -52,9 +52,9 @@ trait CurdFunc
         if(!$this->fields->stepIsEnable()){
             return true;
         }
-        $stepInfo=$this->fields->getNextStepInfo();
+        $stepInfo=$this->fields->getNextStepInfo(null,$baseInfo);
         if($stepInfo){
-            $fields=$this->fields->getFilterStepFields($stepInfo,true);
+            $fields=$this->fields->getFilterStepFields($stepInfo,true,null,$baseInfo);
             return $fields->count()>0&&$stepInfo->authCheck(null,$baseInfo,$fields);
         }else{
             return false;
