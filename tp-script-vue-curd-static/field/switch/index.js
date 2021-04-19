@@ -16,15 +16,17 @@ define(['qs'], function (Qs) {
                         //不能修改
                         return;
                     }
+
+                    const value=val ? this.field.items[1].value : this.field.items[0].value;
                     this.loading = true;
                     this.$post(this.field.indexChangeUrl, {
                         id: this.record.record.id,
-                        [this.field.name]: val ? this.field.items[1].value : this.field.items[0].value
+                        [this.field.name]: value
                     }).then(res => {
                         if (res.msg) {
                             antd.message.success(res.msg);
                         }
-                        this.$emit('refresh-table');
+                        this.record.record[this.field.name]=value;
                     }).finally(() => {
                         this.loading = false
                     })
