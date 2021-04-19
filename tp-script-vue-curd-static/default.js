@@ -176,9 +176,13 @@ define(['vueAdmin'], function (va) {
                             })
                             filter.childFilterData=allFilterChildValues;
                         }
-
                     }
 
+
+
+                    if(vueData.baseInfo&&vueData.baseInfo.id){
+                        filter.base_id=vueData.baseInfo.id;
+                    }
 
 
 
