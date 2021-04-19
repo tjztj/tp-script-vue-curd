@@ -162,8 +162,8 @@ trait BaseIndex
             'editUrl'=>url('edit')->build(),
             'showUrl'=>url('show')->build(),
             'delUrl'=>url('del')->build(),
-            'downExcelTplUrl'=>url('downExcelTpl')->build(),
-            'importExcelTplUrl'=>url('importExcelTpl')->build(),
+            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseInfo?$baseInfo->id:0])->build(),
+            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseInfo?$baseInfo->id:0])->build(),
             'title'=>static::getTitle(),
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$this->fields->getFilterShowData(),
