@@ -41,19 +41,21 @@ trait CurdFunc
 
 
 
+
     /**
      * 步骤--是否能添加
+     * @param BaseModel|null $baseInfo
      * @return bool
      * @throws \think\Exception
      */
-    protected function getAuthAdd():bool{
+    protected function getAuthAdd(BaseModel $baseInfo=null):bool{
         if(!$this->fields->stepIsEnable()){
             return true;
         }
         $stepInfo=$this->fields->getNextStepInfo();
         if($stepInfo){
             $fields=$this->fields->getFilterStepFields($stepInfo,true);
-            return $fields->count()>0&&$stepInfo->authCheck(null,null,$fields);
+            return $fields->count()>0&&$stepInfo->authCheck(null,$baseInfo,$fields);
         }else{
             return false;
         }

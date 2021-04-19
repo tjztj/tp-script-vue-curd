@@ -142,6 +142,14 @@ trait BaseIndex
 
 
 
+        //是否有父表
+        $baseInfo=null;
+        if(is_null($baseInfo)&&isset($this->baseModel)&&!is_null($this->baseModel)){
+            $baseId=$this->request->param('base_id/d',0);
+            $baseId||$baseInfo=$this->baseModel->find($baseId);
+        }
+
+
         $data=$this->indexFetch([
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
@@ -167,9 +175,10 @@ trait BaseIndex
                 'del'=>true,
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
-                'stepAdd'=>$this->getAuthAdd(),
+                'stepAdd'=>$this->getAuthAdd($baseInfo),
                 'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),null,'add')
             ],
+            'baseInfo'=>$baseInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),

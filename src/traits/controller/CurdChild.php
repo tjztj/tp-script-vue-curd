@@ -76,7 +76,7 @@ trait CurdChild{
                 'del'=>true,
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
-                'stepAdd'=>$this->getAuthAdd(),
+                'stepAdd'=>$this->getAuthAdd($baseInfo),
                 'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
