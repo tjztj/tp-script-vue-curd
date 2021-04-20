@@ -9,6 +9,7 @@ use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 
@@ -133,16 +134,23 @@ trait CurdChild{
 
         $option=new FunControllerIndexData();
         if($this->indexPageOption->pageSize>0){
-            $pageData=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize)
-                ->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']))->toArray();
-            $option->data=$pageData['data'];
-            $option->currentPage=$pageData['current_page'];
-            $option->lastPage=$pageData['last_page'];
-            $option->perPage=$pageData['per_page'];
-            $option->total=$pageData['total'];
+            $list=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize);
+            $option->currentPage=$list->currentPage();
+            $option->lastPage=$list->lastPage();
+            $option->perPage=$list->listRows();
+            $option->total=$list->total();
+            $list=$list->getCollection();
         }else{
-            $option->data=$model->select()->map($doSteps)->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']))->toArray();
+            $list=$model->select();
         }
+
+        $list->map($doSteps)
+            ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']));
+
+        //字段钩子
+        FieldDo::doIndex($this->fields,$list,$baseInfo);
+
+        $option->data=$list->toArray();
         foreach ($option->data as $k=>$v){
             $this->fields->doShowData($option->data[$k]);
         }

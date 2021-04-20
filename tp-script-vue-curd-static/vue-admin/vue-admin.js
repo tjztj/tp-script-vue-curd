@@ -1144,7 +1144,7 @@ define(requires, function ( axios,Qs) {
                                          <slot name="step-next-btn" :record="record">
                                             <template v-if="record.nextStepInfo.config.listBtnText">
                                                 <a-divider type="vertical"></a-divider>
-                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}" :class="record.nextStepInfo.config.listBtnClass">{{record.nextStepInfo.config.listBtnText}}</a>
+                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}" :class="record.nextStepInfo.config.listBtnClass" class="open-step-a-class">{{record.nextStepInfo.config.listBtnText}}</a>
                                             </template>
                                          </slot>
                                     </template>
@@ -1154,7 +1154,7 @@ define(requires, function ( axios,Qs) {
                                         <template v-for="(vo,kk) in record.childBtns">
                                         <template v-if="vo.show">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openChildList(record,childsObjs[kk])" :style="{color: vo.color}">{{vo.text}}</a>
+                                            <a @click="openChildList(record,childsObjs[kk])" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
                                         </template>
                                         </template>
                                         </template>

@@ -235,7 +235,6 @@ define(['vueAdmin'], function (va) {
                     }).end();
                 },
                 openNext(row){
-                    console.log(1)
                     this.openBox(getStepNextOpenConfig(row,'rt')).end();
                 },
                 openShow(row){

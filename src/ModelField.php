@@ -5,6 +5,7 @@ namespace tpScriptVueCurd;
 
 
 use tpScriptVueCurd\filter\EmptyFilter;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
@@ -45,6 +46,7 @@ abstract class ModelField
     protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule=null;//数据验证
     protected $nullVal='';//字段在数据库中为空时的值
+    protected FieldDo $fieldDo;//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
     public const REQUIRED=true;//开启必填验证
 
 
@@ -580,6 +582,25 @@ abstract class ModelField
         }
         $this->group($group);
         return $this;
+    }
+
+
+    /**
+     * 设置字段钩子
+     * @param FieldDo $fieldDo
+     * @return $this
+     */
+    public function setFieldDo(FieldDo $fieldDo):self{
+        $this->fieldDo=$fieldDo;
+        return $this;
+    }
+
+    /**获取字段钩子
+     * @return FieldDo|null
+     */
+    public function getFieldDo(): ?FieldDo
+    {
+        return $this->fieldDo??null;
     }
 
 }

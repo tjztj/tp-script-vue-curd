@@ -895,4 +895,7 @@ a.red:hover,a.yellow:hover{
 .curd-table-row-step-other .ant-tag+.curd-table-row-step-other-more{
     margin-left: 0;
 }
+.open-child-a-class:hover,.open-step-a-class:hover{
+    opacity: .78;
+}
 /****************************************************************/

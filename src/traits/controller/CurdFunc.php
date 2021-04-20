@@ -11,6 +11,7 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use think\Request;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldDo;
 
 /**
  * Trait CurdFunc
@@ -108,6 +109,9 @@ trait CurdFunc
         if($data->checkRowAuth($fields,$baseInfo,'show')===false){
             return $this->errorAndCode('您不能查看当前数据信息');
         }
+
+        //字段钩子
+        FieldDo::doShow($fields,$data,$baseInfo);
 
 
         $info=$data->toArray();
