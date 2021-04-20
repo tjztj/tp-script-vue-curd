@@ -737,12 +737,19 @@ define(requires, function ( axios,Qs) {
                     }
                     return isNotErr;
                 },
+                fieldLabel(field){
+                    if(field.editLabelCol&&(field.editLabelCol.span===0||field.editLabelCol.span==='0')){
+                        field.editColon=false;
+                        return '';
+                    }
+                    return field.title;
+                },
             },
             template:`
                         <div>
                             <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
-                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="field.title" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
+                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
                                     <component 
                                         :is="'VueCurdEdit'+field.type" 
                                         :field="field" 
