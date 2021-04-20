@@ -605,7 +605,11 @@ abstract class ModelField
         if(isset($this->fieldDo)){
             return $this->fieldDo;
         }
-        return $initFieldDo?new FieldDo():null;
+        if($initFieldDo===false){
+            return null;
+        }
+        $this->setFieldDo(new FieldDo());
+        return $this->fieldDo;
     }
 
 }
