@@ -340,10 +340,11 @@ abstract class ModelField
         foreach (get_class_vars(static::class) as $k=>$v){
             if(method_exists($this,$k)){
                 $data[$k]=$this->$k();
+            }elseif (!isset($this->$k)){
+                continue;
             }else{
                 $data[$k]=$this->$k;
             }
-
             if(is_object($data[$k])&&method_exists($data[$k],'toArray')){
                 $data[$k]=$data[$k]->toArray();
             }
@@ -596,11 +597,15 @@ abstract class ModelField
     }
 
     /**获取字段钩子
+     * @param bool $initFieldDo 如果没有值是否初始化
      * @return FieldDo|null
      */
-    public function getFieldDo(): ?FieldDo
+    public function getFieldDo(bool $initFieldDo=false): ?FieldDo
     {
-        return $this->fieldDo??null;
+        if(isset($this->fieldDo)){
+            return $this->fieldDo;
+        }
+        return $initFieldDo?new FieldDo():null;
     }
 
 }
