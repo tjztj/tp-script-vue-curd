@@ -297,7 +297,7 @@ define(['vueAdmin'], function (va) {
                     this.loading = true;
                     const where=this.getWhere();
                     where.id=id;
-                    where.pageSize=1;
+                    where.page=1;
                     this.$get(this.indexUrl,where).then(data => {
                         if(!data.data.data[0]){
                             this.loading = false;
@@ -630,7 +630,7 @@ define(['vueAdmin'], function (va) {
                     this.loading = true;
                     const where=this.getWhere();
                     where.id=id;
-                    where.pageSize=1;
+                    where.page=1;
                     this.$get(this.indexUrl,where).then(data => {
                         if(!data.data.data[0]){
                             this.loading = false;
