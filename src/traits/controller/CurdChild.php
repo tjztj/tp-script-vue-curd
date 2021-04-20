@@ -97,6 +97,12 @@ trait CurdChild{
     private function getChildList(int $base_id):FunControllerIndexData{
         $model=$this->model
             ->where($this->model::parentField(),$base_id)
+            ->where(function($query){
+                $id=$this->request->param('id/d');
+                if($id){
+                    $query->where('id',$id);
+                }
+            })
             ->where(function (Query $query){$this->indexListWhere($query);})
             ->where($this->fields->getFilterWhere())
             ->order($this->getListOrder());

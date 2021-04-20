@@ -54,6 +54,10 @@ trait BaseIndex
                     if($baseInfo){
                         $query->where($this->model::parentField(),$baseInfo->id);
                     }
+                    $id=$this->request->param('id/d');
+                    if($id){
+                        $query->where('id',$id);
+                    }
                     $this->indexListWhere($query);
                 })
                 ->where($this->fields->getFilterWhere())

@@ -127,6 +127,7 @@ define(['vueAdmin'], function (va) {
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
+                    indexUrl:VUE_CURD.CONTROLLER+'/index',
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -170,6 +171,18 @@ define(['vueAdmin'], function (va) {
                 },
                 fetch() {
                     this.loading = true;
+                    this.$get(this.indexUrl,this.getWhere()).then(data => {
+                        this.pagination.current=data.data.current_page;
+                        this.pagination.total = data.data.total;
+                        data.data.data.forEach(item=>{
+                            infos[item.id]=item;
+                        })
+                        this.data = data.data.data;
+                        this.loading = false;
+                        this.refreshTableTirgger();
+                    });
+                },
+                getWhere(){
                     const filter=JSON.parse(JSON.stringify(this.myFilters));
                     if(this.showFilter){
                         const filterData=this.$refs['filter'].getFilterData();
@@ -189,31 +202,19 @@ define(['vueAdmin'], function (va) {
                             filter.childFilterData=allFilterChildValues;
                         }
                     }
-
-
-
                     if(vueData.baseInfo&&vueData.baseInfo.id){
                         filter.base_id=vueData.baseInfo.id;
                     }
-
-
-
-                    this.$get(VUE_CURD.CONTROLLER+'/index',filter).then(data => {
-                        this.pagination.current=data.data.current_page;
-                        this.pagination.total = data.data.total;
-                        data.data.data.forEach(item=>{
-                            infos[item.id]=item;
+                    return filter;
+                },
+                refreshTableTirgger(){
+                    this.onDataLoad();//触发钩子
+                    //列表加载完成
+                    if(window.onListFetch){
+                        Vue.nextTick(()=>{
+                            window.onListFetch(this.data);
                         })
-                        this.data = data.data.data;
-                        this.onDataLoad();//触发钩子
-                        this.loading = false;
-                        //列表加载完成
-                        if(window.onListFetch){
-                            Vue.nextTick(function(){
-                                window.onListFetch(this.data);
-                            })
-                        }
-                    });
+                    }
                 },
                 openAdd(){
                     this.openBox({
@@ -291,6 +292,35 @@ define(['vueAdmin'], function (va) {
                 },
                 refreshTable(){
                     this.fetch();
+                },
+                refreshId(id){
+                    this.loading = true;
+                    const where=this.getWhere();
+                    where.id=id;
+                    where.pageSize=1;
+                    this.$get(this.indexUrl,where).then(data => {
+                        if(!data.data.data[0]){
+                            this.loading = false;
+                            return;
+                        }
+                        //为了触发watch
+                        let rows=[],isChange=false;
+                        for(let i in this.data){
+                            if(this.data[i].id==id){
+                                rows.push(data.data.data[0])
+                                isChange=true;
+                            }else{
+                                rows.push(this.data[i])
+                            }
+                        }
+                        if(isChange===false){
+                            this.loading = false;
+                            return;
+                        }
+                        this.data=rows;
+                        this.loading = false;
+                        this.refreshTableTirgger();
+                    });
                 },
                 doFilter(){
                     this.pagination.current = 1;
@@ -371,7 +401,11 @@ define(['vueAdmin'], function (va) {
                         this.loading=true;
                         this.$post(window.location.href,this.form).then(async res=>{
                             parentWindow.antd.message.success(res.msg);
-                            window.listVue.refreshTable();
+                            if(this.form&&this.form.id){
+                                window.listVue.refreshId(this.form.id);
+                            }else{
+                                window.listVue.refreshTable();
+                            }
                             if(!option.notClose){
                                 this.close();
                             }else{
@@ -479,6 +513,7 @@ define(['vueAdmin'], function (va) {
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
+                    indexUrl:window.location.href,
                 }
             },
             mounted() {
@@ -512,29 +547,36 @@ define(['vueAdmin'], function (va) {
                 },
                 fetch() {
                     this.tableLoading = true;
-                    this.$get(window.location.href,{
-                        pageSize: this.pagination.pageSize,
-                        page:this.pagination.current,
-                        sortField:this.pagination.sortField,
-                        sortOrder:this.pagination.sortOrder,
-                    }).then(data => {
+                    this.$get(this.indexUrl,this.getWhere()).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.data = data.data.data
                         data.data.data.forEach(item=>{
                             infos[item.id]=item;
                         })
-                        this.onDataLoad();//触发钩子
                         this.tableLoading = false;
                         //列表加载完成
-                        if(window.onListFetch){
-                            Vue.nextTick(function(){
-                                window.onListFetch(this.data);
-                            })
-                        }
+                        this.refreshTableTirgger();//触发钩子
                     }).catch(err=>{
                         this.tableLoading = false;
                     });
+                },
+                getWhere(){
+                    return {
+                        pageSize: this.pagination.pageSize,
+                        page:this.pagination.current,
+                        sortField:this.pagination.sortField,
+                        sortOrder:this.pagination.sortOrder,
+                    };
+                },
+                refreshTableTirgger(){
+                    this.onDataLoad();//触发钩子
+                    //列表加载完成
+                    if(window.onListFetch){
+                        Vue.nextTick(()=>{
+                            window.onListFetch(this.data);
+                        })
+                    }
                 },
                 openAdd(){
                     this.open()
@@ -583,6 +625,35 @@ define(['vueAdmin'], function (va) {
                 },
                 refreshTable(){
                     this.fetch();
+                },
+                refreshId(id){
+                    this.loading = true;
+                    const where=this.getWhere();
+                    where.id=id;
+                    where.pageSize=1;
+                    this.$get(this.indexUrl,where).then(data => {
+                        if(!data.data.data[0]){
+                            this.loading = false;
+                            return;
+                        }
+                        //为了触发watch
+                        let rows=[],isChange=false;
+                        for(let i in this.data){
+                            if(this.data[i].id==id){
+                                rows.push(data.data.data[0])
+                                isChange=true;
+                            }else{
+                                rows.push(this.data[i])
+                            }
+                        }
+                        if(isChange===false){
+                            this.loading = false;
+                            return;
+                        }
+                        this.data=rows;
+                        this.loading = false;
+                        this.refreshTableTirgger();
+                    });
                 },
                 downExcelTpl(){
                     window.open(vueData.downExcelTplUrl);
