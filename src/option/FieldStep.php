@@ -21,15 +21,9 @@ class FieldStep
     private $auth;//用来判断是否有编辑当前步骤的权限
     private $saveBefore;
     private $authCheckAndCheckBefore;
+    //FieldStepBaseConfig
     public array $config=[//一些其他配置，如颜色
-        'color'=>null,
-        'listBtnText'=>'',//如果有值，列表中将显示,
-        'listBtnUrl'=>'',//地址
-        'listBtnColor'=>null,
-        'listBtnClass'=>'',
-        'listBtnWidth'=>0,
-        'listBtnOpenWidth'=>'45vw',
-        'listBtnOpenHeight'=>'100vh',
+        //FieldStepBaseConfig
     ];
 
     /**
@@ -40,24 +34,38 @@ class FieldStep
     private string $remark='';//将在列表步骤中显示的备注
     private $listRowDo;
 
+    /**
+     * FieldStep constructor.
+     * @param string $step
+     * @param StepCheck $checkFunc
+     * @param null|FieldStepBaseConfig|array|string $titleOrCinfig
+     */
     public function __construct(string $step,StepCheck $checkFunc,$titleOrCinfig=null)
     {
         $this->step=$step;
         $this->checkFunc=$checkFunc;
-        if(!$titleOrCinfig){
-            return;
+        if(is_object($titleOrCinfig)){
+            $stepConfig=$titleOrCinfig;
+        }else{
+            $config=[];
+            if($titleOrCinfig){
+                if(is_string($titleOrCinfig)){
+                    $config['title']=$titleOrCinfig;
+                }else{
+                    $config=$titleOrCinfig;
+                }
+            }
+            $stepConfig=new FieldStepBaseConfig($config);
         }
-        if(is_string($titleOrCinfig)){
-            $this->title=$titleOrCinfig;
-            return;
+        if($stepConfig->title!==''){
+            $this->title=$stepConfig->title;
         }
 
-        if(isset($titleOrCinfig['title'])){
-            $this->title=$titleOrCinfig['title'];
-        }
-
-        $this->config=vueCurdMergeArrays($this->config,$titleOrCinfig);
+        $this->config=vueCurdMergeArrays($this->config,$stepConfig->toArray());
     }
+
+
+
 
 
     public static function make(string $step,StepCheck $check,$titleOrCinfig=null):self{
