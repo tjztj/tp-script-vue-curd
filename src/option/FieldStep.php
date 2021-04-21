@@ -260,7 +260,7 @@ class FieldStep
      * @param VueCurlModel|null $before
      * @return void
      */
-    public function doSaveAfter(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
+    public function doSaveAfter(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
     {
         if(!isset($this->saveAfter)||is_null($this->saveAfter)){
             return;

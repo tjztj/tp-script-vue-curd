@@ -49,7 +49,7 @@ abstract class FieldStepBase
         )->saveBefore(
             fn(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$baseInfo,$fields)
         )->saveAfter(
-            fn(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
+            fn(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
         );
 
         foreach ($fields as $v){
@@ -163,7 +163,7 @@ abstract class FieldStepBase
      * @param FieldCollection|null $fields
      * @param array $saveData
      */
-    public function saveAfter(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]):void{
+    public function saveAfter(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]):void{
 
     }
 
