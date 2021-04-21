@@ -71,7 +71,8 @@ abstract class BaseChildModel extends VueCurlModel
 
 
         //没有设置当前步骤， excel导入不分步骤
-        if(!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable()){
+        $haveDoStep=!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable();
+        if($haveDoStep){
             if(!$saveStepInfo){
                 throw new \think\Exception('未能获取到当前步骤信息');
             }
@@ -98,6 +99,9 @@ abstract class BaseChildModel extends VueCurlModel
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
         $this->onAddAfter($info,$data,$baseInfo);
+        if($haveDoStep&&$saveStepInfo){
+            $saveStepInfo->doSaveAfter(null,$info,$baseInfo,$fields,$data);
+        }
         return $info;
     }
 

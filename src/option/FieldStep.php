@@ -20,6 +20,7 @@ class FieldStep
     private StepCheck $fieldCheckFunc;
     private $auth;//用来判断是否有编辑当前步骤的权限
     private $saveBefore;
+    private $saveAfter;
     private $authCheckAndCheckBefore;
     //FieldStepBaseConfig
     public array $config=[//一些其他配置，如颜色
@@ -228,6 +229,44 @@ class FieldStep
         }
         $func=$this->saveBefore;
         $func($saveData,$info,$baseInfo,$fields);
+    }
+
+
+
+    /**
+     * 设置步骤保存后执行
+     * @param $saveAfter
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function saveAfter($saveAfter): self
+    {
+        if(is_callable($saveAfter)){
+            $this->saveAfter=$saveAfter;
+        }else if(is_bool($saveAfter)){
+            $this->saveAfter=fn()=>$saveAfter;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+        return $this;
+    }
+
+    /**
+     * 步骤保存后执行
+     * @param $saveData
+     * @param VueCurlModel|null $new
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @param VueCurlModel|null $before
+     * @return void
+     */
+    public function doSaveAfter(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
+    {
+        if(!isset($this->saveAfter)||is_null($this->saveAfter)){
+            return;
+        }
+        $func=$this->saveAfter;
+        $func($before,$new,$baseInfo,$fields,$saveData);
     }
 
 

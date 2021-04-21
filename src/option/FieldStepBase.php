@@ -47,7 +47,9 @@ abstract class FieldStepBase
         )->setListRowDo(
             fn(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $baseInfo, $fields,$step)
         )->saveBefore(
-            fn(&$saveData,VueCurlModel $info)=> $this->saveBefore($saveData, $info)
+            fn(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$baseInfo,$fields)
+        )->saveAfter(
+            fn(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
         );
 
         foreach ($fields as $v){
@@ -144,12 +146,26 @@ abstract class FieldStepBase
     /**
      * 数据保存前会执行（子类重写）
      * @param $saveData
-     * @param VueCurlModel $info
+     * @param VueCurlModel|null $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
      */
-    public function saveBefore(&$saveData,VueCurlModel $info):void{
+    public function saveBefore(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):void{
 
     }
 
+
+    /**
+     * 数据保存后会执行（子类重写）
+     * @param VueCurlModel|null $before
+     * @param VueCurlModel|null $new
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @param array $saveData
+     */
+    public function saveAfter(VueCurlModel $before=null,VueCurlModel $new=null,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]):void{
+
+    }
 
 
     final public function getFields(): FieldCollection

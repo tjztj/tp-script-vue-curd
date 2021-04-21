@@ -47,7 +47,8 @@ trait ModelSave
         $data['id']=$postData['id'];
 
         //没有设置当前步骤
-        if(!isset($data[static::getStepField()])&&$fields->stepIsEnable()){
+        $haveDoStep=!isset($data[static::getStepField()])&&$fields->stepIsEnable();
+        if($haveDoStep){
             if(!$saveStepInfo){
                 throw new \think\Exception('未能获取到当前步骤信息');
             }
@@ -89,6 +90,9 @@ trait ModelSave
         //onEditBefore请用doSaveDataAfter
         $info=self::update($data);
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
+        if($haveDoStep&&$saveStepInfo){
+            $saveStepInfo->doSaveAfter($baseInfo,$info,$baseInfo,$fields,$data);
+        }
         return $info;
     }
 
