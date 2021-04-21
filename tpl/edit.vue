@@ -29,6 +29,7 @@
                     :group-field-items="groupFieldItems"
                     v-model:field-hide-list="fieldHideList"
                     v-model:form="form"
+                    @submit="onSubmit($event)"
                     :ref="'fieldGroup'+groupTitle"></field-group-item>
             </template>
         </template>
