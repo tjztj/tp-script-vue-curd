@@ -397,7 +397,9 @@ define(['vueAdmin'], function (va) {
                                 }
                             }
                         }
-                        this.loading=true;
+                        if(option.showLoading!==false){
+                            this.loading=true;
+                        }
                         this.$post(window.location.href,this.form).then(async res=>{
                             parentWindow.antd.message.success(res.msg);
                             if(this.form&&this.form.id){
@@ -417,7 +419,12 @@ define(['vueAdmin'], function (va) {
                                 option.success(res)
                             }
                         }).finally(()=>{
-                            this.loading=false;
+                            if(option.showLoading!==false){
+                                this.loading=false;
+                            }
+                            if(option.finally){
+                                option.finally()
+                            }
                         })
                     }).catch(error => {
                         if(error.errorFields&&error.errorFields[0]&&error.errorFields[0].errors&&error.errorFields[0].errors[0]){
