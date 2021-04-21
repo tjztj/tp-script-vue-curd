@@ -38,6 +38,7 @@ class FieldStepBaseConfig
             'listBtnWidth'=>$this->listBtnWidth,
             'listBtnOpenWidth'=>$this->listBtnOpenWidth,
             'listBtnOpenHeight'=>$this->listBtnOpenHeight,
+            'title'=>$this->title,
         ];
     }
 
