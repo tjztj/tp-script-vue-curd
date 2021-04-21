@@ -24,6 +24,12 @@ abstract class FieldStepBase
     protected FieldCollection $fields;
     protected FieldStep $step;
 
+
+    /**
+     * FieldStepBase constructor.
+     * @param ModelField[] $fields
+     * @throws \think\Exception
+     */
     public function __construct(array $fields)
     {
         $config=new FieldStepBaseConfig();
@@ -43,6 +49,10 @@ abstract class FieldStepBase
         )->saveBefore(
             fn(&$saveData,VueCurlModel $info)=> $this->saveBefore($saveData, $info)
         );
+
+        foreach ($fields as $v){
+            $v->steps($this->step);
+        }
 
         $this->fields = FieldCollection::make($fields);
     }
