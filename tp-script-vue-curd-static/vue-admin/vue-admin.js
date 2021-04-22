@@ -539,6 +539,86 @@ define(requires, function ( axios,Qs) {
             watch:{
                 formVal:{
                     handler(formVal){
+                        const checkFieldWhereSelf=function(fieldWhere){
+                            if(typeof formVal[fieldWhere.field.name]==='undefined'){
+                                return false;
+                            }
+                            const val=formVal[fieldWhere.field.name];
+
+                            if(fieldWhere.type==='in'){
+                                for(let i in fieldWhere.valueData){
+                                    if(fieldWhere.valueData[i]==val){
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                            if(fieldWhere.valueData[0]===null){
+                                return val<=fieldWhere.valueData[1];
+                            }
+                            if(fieldWhere.valueData[1]===null){
+                                return val>=fieldWhere.valueData[0];
+                            }
+                            return val<=fieldWhere.valueData[1]&&val>=fieldWhere.valueData[0];
+                        };
+                        const checkFieldWhere=function(fieldWhere){
+                            let check=checkFieldWhereSelf(fieldWhere);
+
+                            if(check){
+                                for(let i in fieldWhere.ands){
+                                    if(checkFieldWhere(fieldWhere.ands[i])===false){
+                                        check=false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(check){
+                                return true;
+                            }
+                            for(let i in fieldWhere.ors){
+                                if(checkFieldWhere(fieldWhere.ors[i])){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        };
+                        this.groupFieldItems.forEach(field=>{
+                            if(!field.items||field.items.length===0){
+                                return;
+                            }
+                            field.items.forEach(v=>{
+                                if(!v.showItemBy){
+                                    delete v.showItem;
+                                    return;
+                                }
+                                if(checkFieldWhere(v.showItemBy)){
+                                    v.showItem=true;
+                                }else{
+                                    if(formVal[field.name]!==undefined&&formVal[field.name]!==''){
+                                        if(field.type==='CheckboxField'||(field.type==='SelectField'&&field.multiple)){
+                                            let newVals=[];
+                                            formVal[field.name].toString().split(',').forEach(val=>{
+                                                if(val!==v.value.toString()){
+                                                    newVals.push(val);
+                                                }
+                                            })
+                                            const newVal=newVals.join(',');
+                                            if(newVal!==formVal[field.name]){
+                                                formVal[field.name]=this.formVal[field.name]=newVal;
+                                            }
+                                        }else if(formVal[field.name].toString()===v.value.toString()){
+                                            formVal[field.name]=this.formVal[field.name]='';
+                                        }
+                                    }
+
+                                    v.showItem=false;
+                                }
+                            });
+
+                        });
+
+
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
                         function arrHave(arr,val){
                             if(typeof arr==='string'){
                                 arr=arr?arr.split(','):[]

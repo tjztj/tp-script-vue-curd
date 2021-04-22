@@ -29,6 +29,9 @@ define([],function(){
             groupItems(){
                 let items={};
                 this.field.items.forEach(v=>{
+                    if(v.showItem===false||v.hide){
+                        return;
+                    }
                     v.group=v.group||'';
                     if(!items[v.group]){
                         items[v.group]=[];
@@ -69,7 +72,7 @@ define([],function(){
                                    </template>
                                    <template v-else>
                                         <template v-for="optionItem in field.items">
-                                            <a-select-option :value="optionItem.value" v-if="!optionItem.hide"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                            <a-select-option :value="optionItem.value" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                         </template>
                                     </template>
                         </a-select>

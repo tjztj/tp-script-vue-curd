@@ -118,6 +118,31 @@ class FieldCollection extends Collection
         }
 
 
+        //隐藏的选项不能被选中
+       $this->each(function(ModelField $v){
+            if(!method_exists($v,'items')||empty($v->items)){
+                return;
+            }
+            foreach ($v->items as $key=>$val){
+                if(empty($val['showItemBy'])){
+                    continue;
+                }
+                if(!$val['showItemBy']->check($data)){
+                    if(isset($data[$v->name()])&&$data[$v->name()]!==''){
+                        if($v->getType()==='CheckboxField'||($v->getType()==='SelectField'&&$v->multiple())){
+                            $valArr=is_array($data[$v->name()])?$data[$v->name()]:explode(',',$data[$v->name()]);
+                            $data[$v->name()]=implode(',',array_filter($valArr,fn($vv)=>$vv!=(string)$val['value']));
+                        }else if((string)$data[$v->name()]===(string)$val['value']){
+                            $data[$v->name()]='';
+                        }
+                    }
+
+                    unset($v->items[$key]);
+                }
+            }
+        });
+
+
         $notNullNames=null;
         if($this->getSaveHideFieldSetNull()){
             //隐藏的字符串要设置为空

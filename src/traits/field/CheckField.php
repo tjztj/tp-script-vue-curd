@@ -33,6 +33,9 @@ trait CheckField
         if(is_null($items)){
             return $this->items;
         }
+        //hideFields,选中此项时隐藏相关字段
+        //hideItemBy,使用 FieldWhere。满足条件时显示此选项
+        //[ 'value'=>'','text|title'=>'','hide'=>false,'hideFields'=>[field1,field2],'showItemBy'=>FieldWhere]
         $this->items=$this->getItemsByItems($items);
         $this->itemsKey=create_guid();
         return $this;
@@ -176,6 +179,16 @@ trait CheckField
             }
         }
         return false;
+    }
+
+    function toArray():array{
+        $data=parent::toArray();
+        foreach ($this->items as $k=>$v){
+            if(isset($v['showItemBy'])&&is_object($v['showItemBy'])){
+                $data['items'][$k]['showItemBy']=$v['showItemBy']->toArray();
+            }
+        }
+        return $data;
     }
 
 }
