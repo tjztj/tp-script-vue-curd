@@ -183,10 +183,12 @@ trait CheckField
 
     function toArray():array{
         $data=parent::toArray();
-        if($this->objWellToArr){
-            foreach ($this->items as $k=>$v){
-                if(isset($v['showItemBy'])&&is_object($v['showItemBy'])){
+        foreach ($this->items as $k=>$v){
+            if(isset($v['showItemBy'])&&is_object($v['showItemBy'])){
+                if($this->objWellToArr){
                     $data['items'][$k]['showItemBy']=$v['showItemBy']->toArray();
+                }else{
+                    unset($data['items'][$k]['showItemBy']);
                 }
             }
         }

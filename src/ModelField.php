@@ -346,8 +346,12 @@ abstract class ModelField
             }else{
                 $data[$k]=$this->$k;
             }
-            if($this->objWellToArr&&is_object($data[$k])&&method_exists($data[$k],'toArray')){
-                $data[$k]=$data[$k]->toArray();
+            if(is_object($data[$k])&&method_exists($data[$k],'toArray')){
+                if($this->objWellToArr){
+                    $data[$k]=$data[$k]->toArray();
+                }else{
+                    unset($data[$k]);
+                }
             }
         }
         return $data;
