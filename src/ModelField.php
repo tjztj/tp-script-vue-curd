@@ -48,6 +48,7 @@ abstract class ModelField
     protected $nullVal='';//字段在数据库中为空时的值
     protected FieldDo $fieldDo;//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
     public const REQUIRED=true;//开启必填验证
+    public bool $objWellToArr=true;
 
 
     public function __construct(){
@@ -345,7 +346,7 @@ abstract class ModelField
             }else{
                 $data[$k]=$this->$k;
             }
-            if(is_object($data[$k])&&method_exists($data[$k],'toArray')){
+            if($this->objWellToArr&&is_object($data[$k])&&method_exists($data[$k],'toArray')){
                 $data[$k]=$data[$k]->toArray();
             }
         }

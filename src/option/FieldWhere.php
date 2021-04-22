@@ -68,9 +68,11 @@ class FieldWhere
         return $this;
     }
 
-    public function toArray(){
+    public function toArray():array{
+        $field=clone $this->field;
+        $field->objWellToArr=false;
         $arr=[
-            'field'=>$this->field->toArray(),
+            'field'=>$field->toArray(),
             'valueData'=>$this->valueData,
             'type'=>$this->type,
         ];
