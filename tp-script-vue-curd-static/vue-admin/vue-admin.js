@@ -579,8 +579,13 @@ define(requires, function ( axios,Qs) {
                                     if(field.type==='DateField'||field.type==='MonthField'||field.type==='WeekField'){
                                         if(!/^\d+$/.test(checkVal.toString())||checkVal<10000){
                                             inputVal=moment(checkVal).unix()
-                                        }else if(field.type==='RegionField'){
-                                            inputVal=checkVal[checkVal.length-1];
+                                        }
+                                    }else if(field.type==='RegionField'){
+                                        if(checkVal){
+                                            const regionKeys=Object.keys(checkVal);
+                                            inputVal=regionKeys.length?checkVal[regionKeys[regionKeys.length-1]]:0;
+                                        }else{
+                                            inputVal=0;
                                         }
                                     }
                                 }
