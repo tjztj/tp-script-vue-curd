@@ -574,19 +574,15 @@ define(requires, function ( axios,Qs) {
                             if(field.hideFields){
                                 let allFields=[],hideFileds=[],inputVal='';
                                 if(checkVal!==''){
-                                    inputVal=checkVal;
+                                    inputVal=checkVal||'';
                                     //如果是时间格式
                                     if(field.type==='DateField'||field.type==='MonthField'||field.type==='WeekField'){
                                         if(!/^\d+$/.test(checkVal.toString())||checkVal<10000){
                                             inputVal=moment(checkVal).unix()
                                         }
-                                    }else if(field.type==='RegionField'){
-                                        if(checkVal){
-                                            const regionKeys=Object.keys(checkVal);
-                                            inputVal=regionKeys.length?checkVal[regionKeys[regionKeys.length-1]]:0;
-                                        }else{
-                                            inputVal=0;
-                                        }
+                                    }else if(field.type==='RegionField'&&typeof checkVal!=='number'&&typeof checkVal!=='string'){
+                                        const regionKeys=Object.keys(checkVal);
+                                        inputVal=regionKeys.length?checkVal[regionKeys[regionKeys.length-1]]:0;
                                     }
                                 }
 
