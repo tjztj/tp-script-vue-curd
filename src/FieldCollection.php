@@ -129,7 +129,7 @@ class FieldCollection extends Collection
                 if(empty($val['showItemBy'])){
                     continue;
                 }
-                if(!$val['showItemBy']->check($data)){
+                if(!$val['showItemBy']->check($data,true)){
                     if(isset($data[$v->name()])&&$data[$v->name()]!==''){
                         if($v->getType()==='CheckboxField'||($v->getType()==='SelectField'&&$v->multiple())){
                             $valArr=is_array($data[$v->name()])?$data[$v->name()]:explode(',',$data[$v->name()]);

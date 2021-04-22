@@ -103,10 +103,10 @@ class FieldWhere
             $saveDatas[$this->field->name()]=$this->field->getSave();
         }
 
-        if(!isset($saveDatas[$this->field])||is_null($saveDatas[$this->field])){
+        if(!isset($saveDatas[$this->field->name()])||is_null($saveDatas[$this->field->name()])){
             return false;
         }
-        $val=$saveDatas[$this->field];
+        $val=$saveDatas[$this->field->name()];
 
         if(is_array($val)){
             if($this->field->getType()==='RegionField'){
