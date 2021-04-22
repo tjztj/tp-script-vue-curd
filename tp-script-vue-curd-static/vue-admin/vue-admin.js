@@ -540,10 +540,16 @@ define(requires, function ( axios,Qs) {
                 formVal:{
                     handler(formVal){
                         const checkFieldWhereSelf=function(fieldWhere){
-                            if(typeof formVal[fieldWhere.field.name]==='undefined'){
+                            if(typeof formVal[fieldWhere.field.name]==='undefined'||formVal[fieldWhere.field.name]===null){
                                 return false;
                             }
-                            const val=formVal[fieldWhere.field.name];
+                            let val=formVal[fieldWhere.field.name];
+                            if(typeof val==='object'){
+                                if(fieldWhere.field.type==='RegionField'){
+                                    const regionKeys=Object.keys(val);
+                                    val=regionKeys.length?val[regionKeys[regionKeys.length-1]]:0;
+                                }
+                            }
 
                             if(fieldWhere.type==='in'){
                                 for(let i in fieldWhere.valueData){

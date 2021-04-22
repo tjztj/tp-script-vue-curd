@@ -58,12 +58,14 @@ class FieldWhere
     }
 
 
-    public function and(self $where){
+    public function and(self $where):self{
         $this->ands[]=$where;
+        return $this;
     }
 
-    public function or(self $where){
-        $this->or();
+    public function or(self $where):self{
+        $this->ors[]=$where;
+        return $this;
     }
 
     public function toArray(){
@@ -87,11 +89,30 @@ class FieldWhere
     }
 
 
-    public function checkSelf($saveDatas):bool{
-        if(!isset($saveDatas[$field])){
+    private function checkSelf($saveDatas,bool $isSourceData):bool{
+        if($isSourceData){
+            if($this->field->required()){
+                $field=clone $this->field;
+                $field->required(false);
+            }else{
+                $field= $this->field;
+            }
+            $field->setSave($saveDatas);
+            $saveDatas[$this->field->name()]=$this->field->getSave();
+        }
+
+        if(!isset($saveDatas[$this->field])||is_null($saveDatas[$this->field])){
             return false;
         }
-        $val=$saveDatas[$field];
+        $val=$saveDatas[$this->field];
+
+        if(is_array($val)){
+            if($this->field->getType()==='RegionField'){
+                $val=end($val);
+            }else{
+                throw new \think\Exception('配置错误');
+            }
+        }
 
         if($this->type===self::TYPE_IN){
             return in_array($val,$this->valueData);
@@ -110,15 +131,17 @@ class FieldWhere
 
     /**
      * 验证数据是否符合条件
-     * @param $saveDatas
+     * @param array $saveDatas
+     * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
      * @return bool
+     * @throws \think\Exception
      */
-    public function check($saveDatas):bool{
-        $check=$this->checkSelf($saveDatas);
+    public function check(array $saveDatas,bool $isSourceData):bool{
+        $check=$this->checkSelf($saveDatas,$isSourceData);
 
         if($check){
             foreach ($this->ands as $v){
-                if($v->checkSelf($saveDatas)===false){
+                if($v->check($saveDatas,$isSourceData)===false){
                     $check=false;
                     break;
                 }
@@ -130,7 +153,7 @@ class FieldWhere
         }
 
         foreach ($this->ors as $v){
-            if($v->checkSelf($saveDatas)){
+            if($v->check($saveDatas,$isSourceData)){
                 return true;
             }
         }

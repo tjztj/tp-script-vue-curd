@@ -119,11 +119,13 @@ class FieldCollection extends Collection
 
 
         //隐藏的选项不能被选中
-       $this->each(function(ModelField $v){
-            if(!method_exists($v,'items')||empty($v->items)){
+       $this->each(function(ModelField $v)use($data){
+            if(!method_exists($v,'items')||empty($v->items())){
                 return;
             }
-            foreach ($v->items as $key=>$val){
+            $items=[];
+            foreach ($v->items() as $key=>$val){
+                $items[$key]=$val;
                 if(empty($val['showItemBy'])){
                     continue;
                 }
@@ -136,10 +138,10 @@ class FieldCollection extends Collection
                             $data[$v->name()]='';
                         }
                     }
-
-                    unset($v->items[$key]);
+                    unset($items[$key]);
                 }
             }
+           $v->items($items);
         });
 
 
