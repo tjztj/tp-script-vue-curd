@@ -62,7 +62,11 @@ class DateField extends ModelField
     {
         $name=$this->name();
         if(isset($dataBaseData[$name])){
-            $dataBaseData[$name]=empty($dataBaseData[$name])?'':\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d',$dataBaseData[$name]);
+            if(empty($dataBaseData[$name])){
+                $dataBaseData[$name]='';
+            }else if(is_numeric($dataBaseData[$name])&&strlen($dataBaseData[$name])===10){
+                $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d',$dataBaseData[$name]);
+            }
         }
     }
 
