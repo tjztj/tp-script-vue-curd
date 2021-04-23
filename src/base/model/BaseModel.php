@@ -20,13 +20,14 @@ abstract class BaseModel extends VueCurlModel
 
     /**
      * 添加基本事项
-     * @param array $oldData
+     * @param array $postData
      * @param FieldCollection $fields
      * @param bool $isExcelDo 是否excel操作
+     * @param array $returnSaveData
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $postData,FieldCollection $fields,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,FieldCollection $fields,bool $isExcelDo=false,array &$returnSaveData=[]):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -74,6 +75,8 @@ abstract class BaseModel extends VueCurlModel
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,null,$fields,$data);
         }
+
+        $returnSaveData=$data;
         return $info;
     }
 

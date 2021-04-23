@@ -44,6 +44,8 @@ trait Curd
             $data=$this->request->post();
             $this->model->startTrans();
             $savedInfo=null;
+            $old=null;
+            $returnSaveData=[];
             try{
                 if(empty($data['id'])){
                     $this->addBefore($data);
@@ -52,11 +54,11 @@ trait Curd
                     $this->fields->saveStepInfo=$stepInfo;
 
                     //步骤权限验证
-                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck(null,null,$this->fields)===false){
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($old,null,$this->fields)===false){
                         return $this->error('您不能进行此操作-01');
                     }
 
-                    $savedInfo=$this->model->addInfo($data,$this->fields);
+                    $savedInfo=$this->model->addInfo($data,$this->fields,false,$returnSaveData);
                     $this->addAfter($savedInfo);
                 }else{
                     $old=$this->model->find($data['id']);
@@ -74,7 +76,7 @@ trait Curd
                         return $this->error('您不能进行此操作-02');
                     }
 
-                    $savedInfo=$this->model->saveInfo($data,$this->fields,null,$old);
+                    $savedInfo=$this->model->saveInfo($data,$this->fields,null,$old,$returnSaveData);
                     $this->editAfter($savedInfo);
                 }
             }catch (\Exception $e){
@@ -82,7 +84,12 @@ trait Curd
                 $this->errorAndCode($e->getMessage());
             }
             $this->model->commit();
-            $this->success((empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功',[
+
+            //提交后
+            $msg=(empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功';
+            $this->editCommitAfter($msg,$old,$savedInfo,null,$returnSaveData);
+
+            $this->success($msg,[
                 'data'=>$data,
                 'info'=>$savedInfo,
             ]);

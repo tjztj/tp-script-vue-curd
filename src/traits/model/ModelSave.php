@@ -22,14 +22,15 @@ trait ModelSave
 
     /**
      * 修改数据
-     * @param array $postData           要保存的数据
+     * @param array $postData 要保存的数据
      * @param FieldCollection $fields
      * @param BaseModel|null $baseInfo
      * @param VueCurlModel $beforeInfo
+     * @param array $returnSaveData
      * @return $this
      * @throws \think\Exception
      */
-    public function saveInfo(array $postData,FieldCollection $fields,BaseModel $baseInfo=null,VueCurlModel $beforeInfo): self
+    public function saveInfo(array $postData,FieldCollection $fields,BaseModel $baseInfo=null,VueCurlModel $beforeInfo,array &$returnSaveData=[]): self
     {
         if($beforeInfo&&!empty($beforeInfo->id)&&!$beforeInfo->checkRowAuth($fields,$baseInfo,'edit')){
             throw new \think\Exception('您不能修改当前数据信息');
@@ -93,6 +94,8 @@ trait ModelSave
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($baseInfo,$info,$baseInfo,$fields,$data);
         }
+
+        $returnSaveData=$data;
         return $info;
     }
 

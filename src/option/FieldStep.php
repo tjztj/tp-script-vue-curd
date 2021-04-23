@@ -21,6 +21,7 @@ class FieldStep
     private $auth;//用来判断是否有编辑当前步骤的权限
     private $saveBefore;
     private $saveAfter;
+    private $saveAfterCommited;
     private $authCheckAndCheckBefore;
     //FieldStepBaseConfig
     public array $config=[//一些其他配置，如颜色
@@ -164,6 +165,12 @@ class FieldStep
             throw new \think\Exception('参数错误');
         }
 
+        $this->setAuthCheckAndCheckBefore($beforeCheckFunc);
+        return $this;
+    }
+
+    private function setAuthCheckAndCheckBefore($beforeCheckFunc): void
+    {
         if(is_callable($beforeCheckFunc)){
             $this->authCheckAndCheckBefore=$beforeCheckFunc;
         }else if(is_bool($beforeCheckFunc)){
@@ -173,7 +180,6 @@ class FieldStep
         }else{
             throw new \think\Exception('参数错误');
         }
-        return $this;
     }
 
     /**
@@ -184,6 +190,9 @@ class FieldStep
      * @return bool
      */
     public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
+        if(!isset($this->authCheckAndCheckBefore)||is_null($this->authCheckAndCheckBefore)){
+            $this->setAuthCheckAndCheckBefore(null);
+        }
         $authCheckAndCheckBefore=$this->authCheckAndCheckBefore;
         if(!$authCheckAndCheckBefore($info,$baseInfo,$fields)){
             return false;
@@ -269,6 +278,42 @@ class FieldStep
         $func($before,$new,$baseInfo,$fields,$saveData);
     }
 
+
+    /**
+     * 设置步骤保存后执行(Commit后)
+     * @param $saveAfterCommited
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function saveAfterCommited($saveAfterCommited): self
+    {
+        if(is_callable($saveAfterCommited)){
+            $this->saveAfterCommited=$saveAfterCommited;
+        }else if(is_bool($saveAfterCommited)){
+            $this->saveAfterCommited=fn()=>$saveAfterCommited;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+        return $this;
+    }
+
+    /**
+     * 步骤保存后执行(Commit后)
+     * @param $saveData
+     * @param VueCurlModel|null $new
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @param VueCurlModel|null $before
+     * @return void
+     */
+    public function doSaveAfterCommited(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
+    {
+        if(!isset($this->saveAfterCommited)||is_null($this->saveAfterCommited)){
+            return;
+        }
+        $func=$this->saveAfterCommited;
+        $func($before,$new,$baseInfo,$fields,$saveData);
+    }
 
 
     /**

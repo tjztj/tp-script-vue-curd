@@ -239,6 +239,8 @@ trait CurdChild{
             $this->model->startTrans();
             $savedInfo=null;
             $baseInfo=null;
+            $info=null;
+            $returnSaveData=[];
             try{
                 if(empty($data['id'])){
                     if(empty($data[$this->model::parentField()])){
@@ -252,15 +254,15 @@ trait CurdChild{
                     $this->addBefore($data,$baseInfo);
 
                     //步骤字段
-                    $this->fields=$this->fields->filterNextStepFields(null,$baseInfo,$stepInfo);
+                    $this->fields=$this->fields->filterNextStepFields($info,$baseInfo,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
 
                     //步骤权限验证
-                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck(null,$baseInfo,$this->fields)===false){
+                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($info,$baseInfo,$this->fields)===false){
                         return $this->error('您不能进行此操作-03');
                     }
 
-                    $savedInfo=$this->model->addInfo($data,$baseInfo,$this->fields);
+                    $savedInfo=$this->model->addInfo($data,$baseInfo,$this->fields,false,$returnSaveData);
                     $this->addAfter($savedInfo);
                 }else{
                     $info=$this->model->find($data['id']);
@@ -282,7 +284,7 @@ trait CurdChild{
 
                     $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//隐藏地区
 
-                    $savedInfo=$this->model->saveInfo($data,$fields,$baseInfo,$info);
+                    $savedInfo=$this->model->saveInfo($data,$fields,$baseInfo,$info,$returnSaveData);
                     $this->editAfter($savedInfo);
                 }
             }catch (\Exception $e){
@@ -290,7 +292,13 @@ trait CurdChild{
                 $this->errorAndCode($e->getMessage(),$e->getCode());
             }
             $this->model->commit();
-            $this->success((empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功',[
+
+
+            //提交后
+            $msg=(empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功';
+            $this->editCommitAfter($msg,$info,$savedInfo,$baseInfo,$returnSaveData);
+
+            $this->success($msg,[
                 'data'=>$data,
                 'info'=>$savedInfo,
                 'baseInfo'=>$baseInfo

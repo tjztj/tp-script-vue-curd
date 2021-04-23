@@ -199,6 +199,29 @@ trait CurdFunc
 
 
     /**
+     * 添加/编辑 已经Commit 后执行
+     * @param $msg
+     * @param $old
+     * @param $savedInfo
+     * @param $baseInfo
+     * @param $returnSaveData
+     */
+    public function editCommitAfter(&$msg,$old,$savedInfo,$baseInfo,$returnSaveData): void
+    {
+        if(isset($this->fields->saveStepInfo)&&!is_null($this->fields->saveStepInfo)&&$this->fields->stepIsEnable()){
+            $this->model->startTrans();
+            try{
+                $this->fields->saveStepInfo->doSaveAfterCommited($old,$savedInfo,$baseInfo,$this->fields,$returnSaveData);
+            }catch (\Exception $e){
+                $this->model->rollback();
+                $msg.='，但：'.$e->getMessage();
+            }
+            $this->model->commit();
+        }
+    }
+
+
+    /**
      * 删除时
      * @param VueCurlModel $model
      * @param array $ids

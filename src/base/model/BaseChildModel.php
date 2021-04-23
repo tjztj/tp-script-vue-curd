@@ -52,7 +52,7 @@ abstract class BaseChildModel extends VueCurlModel
      * @return $this
      * @throws \think\Exception
      */
-    public function addInfo(array $postData,BaseModel $baseInfo,FieldCollection $fields,bool $isExcelDo=false):self{
+    public function addInfo(array $postData,BaseModel $baseInfo,FieldCollection $fields,bool $isExcelDo=false,array &$returnSaveData=[]):self{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -102,6 +102,8 @@ abstract class BaseChildModel extends VueCurlModel
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,$baseInfo,$fields,$data);
         }
+
+        $returnSaveData=$data;
         return $info;
     }
 
