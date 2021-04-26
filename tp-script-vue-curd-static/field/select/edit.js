@@ -1,6 +1,14 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
+        setup(props,ctx){
+            const filterOption = (input, option) => {
+                return option.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+            };
+            return {
+                filterOption
+            }
+        },
         computed:{
             val:{
                 get(){
@@ -56,6 +64,7 @@ define([],function(){
                                   v-model:value="val"
                                   :placeholder="field.placeholder||'请选择'+field.title"
                                    :disabled="field.readOnly"
+                                   :filter-option="filterOption"
                                   show-search>
                                   
                                   <template v-if="haveGroup">
@@ -72,7 +81,7 @@ define([],function(){
                                    </template>
                                    <template v-else>
                                         <template v-for="optionItem in field.items">
-                                            <a-select-option :value="optionItem.value" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                            <a-select-option :value="optionItem.value" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}--------{{optionItem.value}}</span></a-select-option>
                                         </template>
                                     </template>
                         </a-select>
