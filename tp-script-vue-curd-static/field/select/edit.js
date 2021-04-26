@@ -81,7 +81,7 @@ define([],function(){
                                    </template>
                                    <template v-else>
                                         <template v-for="optionItem in field.items">
-                                            <a-select-option :value="optionItem.value" :key="optionItem.value" :label="item.text" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                            <a-select-option :value="optionItem.value" :key="optionItem.value" :label="optionItem.text" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                         </template>
                                     </template>
                         </a-select>
