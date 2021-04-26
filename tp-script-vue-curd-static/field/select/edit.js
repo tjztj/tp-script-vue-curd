@@ -71,17 +71,17 @@ define([],function(){
                                          <template v-for="(items,key) in groupItems">
                                             <template v-if="key">
                                                  <a-select-opt-group :label="key">
-                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value" :key="optionItem.value" :label="item.text" :title="optionItem.text"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                                  </a-select-opt-group>
                                             </template>
                                              <template v-else>
-                                                <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                <a-select-option v-for="optionItem in items" :value="optionItem.value" :key="optionItem.value" :label="item.text" :title="optionItem.text"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                              </template>
                                          </template>
                                    </template>
                                    <template v-else>
                                         <template v-for="optionItem in field.items">
-                                            <a-select-option :value="optionItem.value" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                            <a-select-option :value="optionItem.value" :key="optionItem.value" :label="item.text" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                         </template>
                                     </template>
                         </a-select>
