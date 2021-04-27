@@ -78,6 +78,7 @@ define(requires, function ( axios,Qs) {
                             box.layui.layer.close(index);
                         }
                         if (body.length > 0) {
+                            body.attr('layer-index',index);
                             body.on('closeIframe', function () {
                                 layero.close();
                             })
