@@ -64,7 +64,8 @@ class DateField extends ModelField
         if(isset($dataBaseData[$name])){
             if(empty($dataBaseData[$name])){
                 $dataBaseData[$name]='';
-            }else if(is_numeric($dataBaseData[$name])&&strlen($dataBaseData[$name])===10){
+            }else if(is_numeric($dataBaseData[$name])){
+                //有些时间戳小于10位
                 $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d',$dataBaseData[$name]);
             }
         }
