@@ -29,25 +29,34 @@ class FieldDo
      */
     protected $showInfoDo;
 
+    /**
+     * 数据保存前
+     * @var callable $saveBeforeDo
+     */
+    protected $saveBeforeDo;
 
+    /**
+     * 数据保存后
+     * @var callable $saveAfterDo
+     */
+    protected $saveAfterDo;
+
+
+    /**
+     * 编辑时执行
+     * @var callable $editShowDo
+     */
+    protected $editShowDo;
+
+
+
+    ##################################################################################################################
 
     public function setIndexRowDo(callable $func): self
     {
         $this->indexRowDo=$func;
         return $this;
     }
-    public function setIndexListDo(callable $func): self
-    {
-        $this->indexListDo=$func;
-        return $this;
-    }
-    public function setShowInfoDo(callable $func): self
-    {
-        $this->showInfoDo=$func;
-        return $this;
-    }
-
-
     /**
      * @param VueCurlModel|BaseModel|BaseChildModel $row
      * @param BaseModel|null $base
@@ -60,27 +69,6 @@ class FieldDo
         $func($row,$base,$field);
         return $this;
     }
-    public function doIndexListDo(Collection $list,VueCurlModel $row,?BaseModel $base,ModelField $field): self
-    {
-        $func=$this->indexListDo?? static function(){};
-        $func($list,$row,$base,$field);
-        return $this;
-    }
-
-    /**
-     * @param VueCurlModel|BaseModel|BaseChildModel $info
-     * @param BaseModel|null $base
-     * @param ModelField $field
-     * @return $this
-     */
-    public function doShowInfoDo(VueCurlModel $info,?BaseModel $base,ModelField $field): self
-    {
-        $func=$this->showInfoDo?? static function(){};
-        $func($info,$base,$field);
-        return $this;
-    }
-
-
     /**
      * 列表获取到后执行 方便函数
      * @param FieldCollection $field
@@ -111,6 +99,41 @@ class FieldDo
     }
 
 
+    ##################################################################################################################
+
+
+    public function setIndexListDo(callable $func): self
+    {
+        $this->indexListDo=$func;
+        return $this;
+    }
+    public function doIndexListDo(Collection $list,VueCurlModel $row,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->indexListDo?? static function(){};
+        $func($list,$row,$base,$field);
+        return $this;
+    }
+
+    ##################################################################################################################
+
+    public function setShowInfoDo(callable $func): self
+    {
+        $this->showInfoDo=$func;
+        return $this;
+    }
+    /**
+     * @param VueCurlModel|BaseModel|BaseChildModel $info
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doShowInfoDo(VueCurlModel $info,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->showInfoDo?? static function(){};
+        $func($info,$base,$field);
+        return $this;
+    }
+
     /**
      * 详情页字段钩子 方便函数
      * @param FieldCollection $field
@@ -126,5 +149,127 @@ class FieldDo
             $fieldDo->doShowInfoDo($info,$base,$field);
         });
     }
+
+    ##################################################################################################################
+    public function setSaveBeforeDo(callable $func): self
+    {
+        $this->saveBeforeDo=$func;
+        return $this;
+    }
+
+    /**
+     * 数据保存前字段钩子
+     * @param array $postData   提交上来的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $before
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doSaveBeforeDo(array $postData,?VueCurlModel $before,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->saveBeforeDo?? static function(){};
+        $func($postData,$before,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 数据保存前字段钩子 方便函数
+     * @param FieldCollection $field
+     * @param array $postData   提交上来的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $info
+     * @param BaseModel|null $base
+     */
+    public static function doSaveBefore(FieldCollection $field,array $postData,?VueCurlModel $info,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$info,$postData){
+            $fieldDo=$field->getFieldDo();
+            if(!$fieldDo){
+                return;
+            }
+            $fieldDo->doSaveBeforeDo($postData,$info,$base,$field);
+        });
+    }
+
+    ##################################################################################################################
+
+
+    public function setSaveAfterDo(callable $func): self
+    {
+        $this->saveAfterDo=$func;
+        return $this;
+    }
+
+    /**
+     * 数据保存后字段钩子
+     * @param array $saveData   保存的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $before
+     * @param VueCurlModel|BaseModel|BaseChildModel $after
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doSaveAfterDo(array $saveData,?VueCurlModel $before,VueCurlModel $after,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->saveAfterDo?? static function(){};
+        $func($saveData,$before,$after,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 数据保存后字段钩子 方便函数
+     * @param FieldCollection $field
+     * @param array $saveData   保存的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $before
+     * @param VueCurlModel|BaseModel|BaseChildModel $after
+     * @param BaseModel|null $base
+     */
+    public static function doSaveAfter(FieldCollection $field,array $saveData,?VueCurlModel $before,VueCurlModel $after,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$before,$after,$saveData){
+            $fieldDo=$field->getFieldDo();
+            if(!$fieldDo){
+                return;
+            }
+            $fieldDo->doSaveAfterDo($saveData,$before,$after,$base,$field);
+        });
+    }
+
+    ##################################################################################################################
+    public function setEditShowDo(callable $func): self
+    {
+        $this->editShowDo=$func;
+        return $this;
+    }
+
+    /**
+     * 数据编辑显示字段钩子
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $info
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doEditShowDo(?VueCurlModel $info,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->editShowDo?? static function(){};
+        $func($info,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 数据编辑显示字段钩子 方便函数
+     * @param FieldCollection $field
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $info
+     * @param BaseModel|null $base
+     */
+    public static function doEditShow(FieldCollection $field,?VueCurlModel $info,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$info){
+            $fieldDo=$field->getFieldDo();
+            if(!$fieldDo){
+                return;
+            }
+            $fieldDo->doEditShowDo($info,$base,$field);
+        });
+    }
+
+
+    ##################################################################################################################
 
 }

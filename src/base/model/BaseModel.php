@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\base\model;
 use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\tool\ErrorCode;
 
@@ -41,6 +42,7 @@ abstract class BaseModel extends VueCurlModel
         if(!$this->checkRowAuth($fields,null,'add')){
             throw new \think\Exception('不能添加此栏目信息');
         }
+        FieldDo::doSaveBefore($fields,$postData,null,null);
 
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
@@ -71,6 +73,8 @@ abstract class BaseModel extends VueCurlModel
         }
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
+
+        FieldDo::doSaveAfter($fields,$data,null,$info,null);
         $this->onAddAfter($info,$data);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,null,$fields,$data);

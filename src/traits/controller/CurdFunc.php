@@ -153,21 +153,22 @@ trait CurdFunc
      */
     protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
-            $fields=$this->getSaveStepNext()||empty($data->id)
+            $info=$data->toArray();
+            $fields=empty($data->id)||$this->getSaveStepNext()
                 ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
                 :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
 
             $fields->saveStepInfo=$stepInfo;
 
-
-            $info=$data->toArray();
             //只处理地区
             $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()])&&$v->canEdit()===false)->doShowData($info);
+            FieldDo::doEditShow($fields,$data,$baseModel);
             //原信息
             $info['sourceData']=$data;
         }else{
             $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
             $fields->saveStepInfo=$stepInfo;
+            FieldDo::doEditShow($fields,$data,$baseModel);
             $info=null;
         }
 

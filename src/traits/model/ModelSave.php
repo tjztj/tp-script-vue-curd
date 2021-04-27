@@ -9,6 +9,7 @@ use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 
 /**
@@ -35,6 +36,7 @@ trait ModelSave
         if($beforeInfo&&!empty($beforeInfo->id)&&!$beforeInfo->checkRowAuth($fields,$baseInfo,'edit')){
             throw new \think\Exception('您不能修改当前数据信息');
         }
+        FieldDo::doSaveBefore($fields,$postData,$beforeInfo,$baseInfo);
 
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
@@ -90,6 +92,8 @@ trait ModelSave
 
         //onEditBefore请用doSaveDataAfter
         $info=self::update($data);
+
+        FieldDo::doSaveAfter($fields,$data,$beforeInfo,$info,$baseInfo);
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($baseInfo,$info,$baseInfo,$fields,$data);

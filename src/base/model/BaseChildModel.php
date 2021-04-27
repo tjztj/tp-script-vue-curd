@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\base\model;
 
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 
 /**
@@ -58,6 +59,7 @@ abstract class BaseChildModel extends VueCurlModel
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
         #########################################################################################
 
+        FieldDo::doSaveBefore($fields,$postData,null,$baseInfo);
         $fields=$fields->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
 
         if(!$this->checkRowAuth($fields,$baseInfo,'add')){
@@ -98,6 +100,8 @@ abstract class BaseChildModel extends VueCurlModel
         }
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
+
+        FieldDo::doSaveAfter($fields,$data,null,$info,$baseInfo);
         $this->onAddAfter($info,$data,$baseInfo);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,$baseInfo,$fields,$data);
