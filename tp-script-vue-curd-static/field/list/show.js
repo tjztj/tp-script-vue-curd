@@ -2,9 +2,6 @@ define([],function(){
     return {
         props:['info','field'],
         methods:{
-            showImages(imgs, start){
-                window.top.showImages(imgs, start);
-            },
         },
         template:`<div>
                     <div class="list-field-box">

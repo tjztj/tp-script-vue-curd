@@ -28,6 +28,11 @@ class ListField extends ModelField
     protected $nullVal='null';//字段在数据库中为空时的值
 
 
+    public function __construct(){
+        parent::__construct();
+    }
+
+
     public function readOnly(bool $readOnly = null)
     {
         if(!is_null($readOnly)){
@@ -39,19 +44,6 @@ class ListField extends ModelField
             });
         }
         return parent::readOnly($readOnly);
-    }
-
-
-    /**
-     * 是否在后台列表中显示出来
-     * @param bool|null $listShow
-     * @return $this|bool
-     */
-    public function listShow(bool $listShow=null){
-        if($listShow===true){
-            throw new \think\Exception('字段类型[ListField]不能设置listShow为true');
-        }
-        return $this->doAttr('listShow',$listShow);
     }
 
 
@@ -94,9 +86,14 @@ class ListField extends ModelField
             }else{
                 $list=[];
             }
+
+            $dataBaseData[$this->name().'ShowComponentUrl']=$this->fields->getComponents('show');
             $dataBaseData[$this->name().'List']=$list;
         }
     }
+
+
+
 
     /**
      * 设置保存的值
@@ -151,7 +148,7 @@ class ListField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,''),
+            new Index($type,'/tp-script-vue-curd-static.php?field/list/index.js'),
             new Show($type,'/tp-script-vue-curd-static.php?field/list/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/list/edit.js')
         );

@@ -675,10 +675,14 @@ a.red:hover,a.yellow:hover{
 
 }
 .curd-show-field-box .list-field-item{
-    background-image: linear-gradient(to left, rgb(246, 251, 255), #fbf9ff);
-    border: 1px solid #e6f7ff;
+    background-image: linear-gradient(to left, #fff, #fcfcff);
+    border: 1px solid #bfbfbf;
     border-radius: 2px;
     transition: all .5s;
+    box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.08)
+}
+.curd-show-field-box .list-field-item>.list-field-item-row:nth-child(odd){
+    background-image: linear-gradient(to right, #fff, #fcfcff);
 }
 .field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item{
     background-image: linear-gradient(to left, #fefffa, #fffcf9);
@@ -694,13 +698,13 @@ a.red:hover,a.yellow:hover{
     padding: 9px 18px;
 }
 .curd-show-field-box .list-field-item>div+div{
-    border-top: 1px solid #e6f7ff;
+    border-top: 1px solid #d2d7ef;
 }
 .field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item>div+div{
     border-top: 1px solid #ffe7ba;
 }
 .curd-show-field-box .list-field-item+.list-field-item{
-    margin-top: 12px;
+    margin-top: 24px;
 }
 .curd-show-field-box .list-field-item-row{
     display: flex;
