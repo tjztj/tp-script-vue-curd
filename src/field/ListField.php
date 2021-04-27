@@ -28,11 +28,6 @@ class ListField extends ModelField
     protected $nullVal='null';//字段在数据库中为空时的值
 
 
-    public function __construct(){
-        parent::__construct();
-    }
-
-
     public function readOnly(bool $readOnly = null)
     {
         if(!is_null($readOnly)){
