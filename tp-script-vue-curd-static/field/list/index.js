@@ -1,5 +1,7 @@
-const styleId='history-edit-field-style';
-const style = `
+
+define(['/tp-script-vue-curd-static.php?field/list/show.js'],function(listShow){
+    const styleId='list-index-field-style';
+    const style = `
 <style id="${styleId}">
 .curd-list-show-field-box .list-field-item{
 border: 1px solid #d9d9d9;
@@ -52,7 +54,7 @@ padding: 6px;
 </style>
 `;
 
-define(['/tp-script-vue-curd-static.php?field/list/show.js'],function(listShow){
+
     return {
         components:{
             listShow
