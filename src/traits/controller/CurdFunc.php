@@ -113,6 +113,12 @@ trait CurdFunc
         //字段钩子
         FieldDo::doShow($fields,$data,$baseInfo);
 
+        //控制器钩子
+        if($this->model instanceof BaseChildModel){
+            $this->showBefore($data,$baseInfo,$fields);
+        }else{
+            $this->showBefore($data,$fields);
+        }
 
         $info=$data->toArray();
         return $this->doShow(static::getTitle(),$info,$fields);
@@ -129,6 +135,8 @@ trait CurdFunc
         $this->assign('thisAction','show');//使用它的js
 
         $fields=$fields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
+
+
         $fields->doShowData($info);
         $fieldArr=array_values($fields->toArray());
 

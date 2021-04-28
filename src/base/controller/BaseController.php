@@ -64,4 +64,8 @@ trait BaseController
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
     }
+
+    protected function showBefore(VueCurlModel $info,FieldCollection &$field){
+        //数据显示前
+    }
 }
