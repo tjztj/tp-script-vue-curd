@@ -351,7 +351,14 @@ class Excel
 
 
                 //可能有图片上传了
-                isset($data[$_row][$cellName])||$data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getFormattedValue());
+                if(!$data[$_row][$cellName]){
+                    try{
+                        $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getFormattedValue());
+                    }catch (\Exception $e){
+                        $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getCalculatedValue());
+                    }
+                }
+
 
                 if (!empty($data[$_row][$cellName])) {
                     if(is_string($data[$_row][$cellName])){
