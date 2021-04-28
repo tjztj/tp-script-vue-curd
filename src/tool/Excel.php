@@ -355,7 +355,11 @@ class Excel
                     try{
                         $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getFormattedValue());
                     }catch (\Exception $e){
-                        $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getCalculatedValue());
+                        try{
+                            $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getFormattedValue());
+                        }catch (\Exception $e){
+                            $data[$_row][$cellName] = trim($currSheet->getCell($cellId)->getValue());
+                        }
                     }
                 }
 
