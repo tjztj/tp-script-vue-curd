@@ -181,10 +181,16 @@
             .replace(/(\w)([A-Z])/g,"$1_$2")
             .toLowerCase()+'.js'
     }
+    const siteVersion='{$siteVersion|default=\'1.0.0\'}';
+    const version='{$version|default=\'\'}';
     //可以自定义js版本号
-    if('{$version|default=\'\'}'!==''&&jsPath.indexOf('tp-script-vue-curd-static.php')===-1){
+    if(version!==''&&jsPath.indexOf('tp-script-vue-curd-static.php')===-1){
         require.config({
-            urlArgs: "?v={$version|default=\'1.0.0\'}",
+            urlArgs: "?v="+version+'&site_v='+siteVersion,
+        });
+    }else{
+        require.config({
+            urlArgs: "?site_v="+siteVersion,
         });
     }
     require([jsPath], function (objs) {
