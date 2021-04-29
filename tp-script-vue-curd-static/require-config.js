@@ -1,6 +1,12 @@
 window.BASE_URL = document.scripts[document.scripts.length - 1].src.substring(0, document.scripts[document.scripts.length - 1].src.lastIndexOf("/") + 1);
 require.config({
-    urlArgs: "?v=" + window.VUE_CURD.VERSION,
+    urlArgs: function(key,url){
+        //可以自定义js版本号
+        if(window.VUE_CURD.SITE_VERSION!==''&&url.indexOf('tp-script-vue-curd-static.php')===-1){
+            return '?site_version='+window.VUE_CURD.SITE_VERSION;
+        }
+        return "?v=" + window.VUE_CURD.VERSION
+    },
     baseUrl: window.BASE_URL,
     waitSeconds:0,
     map: {
