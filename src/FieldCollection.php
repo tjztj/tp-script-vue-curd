@@ -326,6 +326,38 @@ class FieldCollection extends Collection
      * @return $this
      */
     private function filterHideFieldsByData(array $data,$isSourceData=true):self{
+        $fieldHideList=$this->getFiledHideListByData($data,$isSourceData);
+        if(empty($fieldHideList)){
+            return $this;
+        }
+        return $this->filter(function(ModelField $v)use($fieldHideList){
+            /*** 过滤掉【hideFields】不显示的字段 ***/
+            $name=$v->name();
+            if(!isset($fieldHideList[$name])){
+                //没有设置代表无限制
+                return true;
+            }
+            return false;
+        });
+    }
+
+
+    /**
+     * 获取显示中将会隐藏的字段信息
+     * @param VueCurlModel $info
+     * @return array
+     */
+    public function getFiledHideList(VueCurlModel $info):array{
+        return $this->getFiledHideListByData($info->toArray(),true);
+    }
+
+    /**
+     * 获取将会隐藏的字段信息
+     * @param array $data
+     * @param bool $isSourceData
+     * @return array
+     */
+    private function getFiledHideListByData(array $data,$isSourceData=true):array{
         $arrHave= static function($arr, $val){
             if(is_string($arr)){
                 $arr=explode(',',$arr);
@@ -481,17 +513,11 @@ class FieldCollection extends Collection
             //-------------------------
         };
 
-        return $this->each(function(ModelField $v)use(&$fieldHideList,$data,&$checkHideField){
+        $this->each(function(ModelField $v)use(&$fieldHideList,$data,&$checkHideField){
             $checkHideField($v,isset($fieldHideList[$v->name()])?null:($data[$v->name()]??null));
-        })->filter(function(ModelField $v)use($fieldHideList){
-            /*** 过滤掉【hideFields】不显示的字段 ***/
-            $name=$v->name();
-            if(!isset($fieldHideList[$name])){
-                //没有设置代表无限制
-                return true;
-            }
-            return false;
         });
+
+        return $fieldHideList;
     }
 
 

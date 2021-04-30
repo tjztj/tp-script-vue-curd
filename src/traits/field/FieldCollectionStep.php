@@ -77,18 +77,32 @@ trait FieldCollectionStep
      * @throws \think\Exception
      */
     public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,VueCurlModel $old=null,BaseModel $baseInfo=null){
-        return $this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$baseInfo){
+        $hideFields=$old?$this->getFiledHideList($old):[];
+        $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$baseInfo){
             return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$baseInfo){
-                if($val->getStep()!==$fieldStep->getStep()){
-                    return false;
-                }
-                $check=$val->getFieldCheckFunc();
-                if(!$check){
-                    //不需要再验证
-                    return true;
-                }
-                return $isNextStep?$check->beforeCheck($old,$baseInfo,$v):$check->check($old,$baseInfo,$v);
-            })->count()>0;
+                    if($val->getStep()!==$fieldStep->getStep()){
+                        return false;
+                    }
+                    $check=$val->getFieldCheckFunc();
+                    if(!$check){
+                        //不需要再验证
+                        return true;
+                    }
+                    return $isNextStep?$check->beforeCheck($old,$baseInfo,$v):$check->check($old,$baseInfo,$v);
+                })->count()>0;
+        });
+
+
+        if(empty($hideFields)){
+            return $fields;
+        }
+
+        $names=$fields->column('name');
+        return $fields->filter(function(ModelField $v)use($hideFields,$names){
+            if(!isset($hideFields[$v->name()])){
+                return true;
+            }
+            return !empty(array_intersect($hideFields[$v->name()],$names));
         });
     }
 
