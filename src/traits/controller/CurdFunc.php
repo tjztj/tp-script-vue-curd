@@ -167,8 +167,8 @@ trait CurdFunc
 
             $fields->saveStepInfo=$stepInfo;
 
-            $info=$data->toArray();
             FieldDo::doEditShow($fields,$data,$baseModel);
+            $info=$data->toArray();
             //只处理地区
             $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()])&&$v->canEdit()===false)->doShowData($info);
             //原信息
