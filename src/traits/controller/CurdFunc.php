@@ -161,7 +161,6 @@ trait CurdFunc
      */
     protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
-            $info=$data->toArray();
             $fields=empty($data->id)||$this->getSaveStepNext()
                 ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
                 :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
@@ -171,6 +170,7 @@ trait CurdFunc
             //只处理地区
             $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()])&&$v->canEdit()===false)->doShowData($info);
             FieldDo::doEditShow($fields,$data,$baseModel);
+            $info=$data->toArray();
             //原信息
             $info['sourceData']=$data;
         }else{
