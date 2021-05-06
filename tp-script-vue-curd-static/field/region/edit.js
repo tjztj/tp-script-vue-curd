@@ -25,6 +25,7 @@ define([],function(){
                                 regions[parseInt(vo.id)]=vo;
                                 regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
                                 textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.id)];
+                                level_3=true;
                             })
                         }
                     })
@@ -40,44 +41,57 @@ define([],function(){
             }
         },
         computed:{
+            showSelected(){
+                return this.form.id&&this.thisfield.canEdit===false;
+            },
             modelVal:{
                 get(){
-                    if(this.field.canEdit===false||typeof this.value==='undefined'||typeof this.value==='object'){
-                        if(typeof this.value==='string'||typeof this.value==='number'){
-                            if(this.value&&!/^\d+$/.test(this.value.toString())){
-                                let str='';
-                                if(this.field.pField&&this.form[this.field.pField]){
-                                    str+=this.form[this.field.pField];
-                                }
-                                str+='/'+(this.field.cField?this.form[[this.field.cField]]:this.value);
-                                if(textValues[str]){
-                                    this.$emit('update:value', textValues[str]);
-                                    return textValues[str]
-                                }
-                            }
-                        }
+                    if(this.showSelected||typeof this.value==='undefined'||typeof this.value==='object'){
                         return this.value;
                     }
-                    if(this.value&&(typeof this.value==='string'||typeof this.value==='number')){
-                        const vals=this.value.toString().split(',').map(v=>parseInt(v));
-                        return regionValues[vals[vals.length-1]];
+                    if(typeof this.value==='string'||typeof this.value==='number'){
+                        if(this.value){
+                            const vals=this.getDefValue();
+                            if(vals){
+                                this.$emit('update:value', vals);
+                                return vals;
+                            }
+                        }
                     }
                     return [];
                 },
                 set(val){
                     this.$emit('update:value',val);
-                }
+                },
             }
         },
         methods:{
             onRegionChange(){
                 this.$emit('update:validateStatus','success');
             },
+            getDefValue(){
+                if(/^\d+$/.test(this.value.toString())){
+                    const vals=this.value.toString().split(',').map(v=>parseInt(v));
+                    return regionValues[vals[vals.length-1]];
+                }else{
+                    let str='';
+                    if(this.field.pField&&this.form[this.field.pField]){
+                        str+=this.form[this.field.pField];
+                    }
+                    str+='/'+(this.field.cField?this.form[[this.field.cField]]:this.value);
+                    return textValues[str];
+                }
+            },
         },
         template:`<div class="field-box">
                    <template v-if="form.id&&field.canEdit===false">
                         <div class="l">
-                            <span v-if="form[field.pField]">{{form[field.pField]}}/</span>{{form[[field.cField]]}}
+                            <template v-if="field.cField">
+                                <span v-if="field.pField&&form[field.pField]">{{form[field.pField]}}/</span>{{form[field.cField]}}
+                            </template>
+                            <template v-else>
+                                {{value}}
+                            </template>
                         </div>
                     </template>
                     <template v-else>
