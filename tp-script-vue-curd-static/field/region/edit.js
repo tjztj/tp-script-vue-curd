@@ -25,7 +25,6 @@ define([],function(){
                                 regions[parseInt(vo.id)]=vo;
                                 regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
                                 textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.id)];
-                                level_3=true;
                             })
                         }
                     })
