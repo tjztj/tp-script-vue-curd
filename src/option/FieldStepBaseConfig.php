@@ -16,6 +16,9 @@ class FieldStepBaseConfig
     public string $listBtnOpenWidth='45vw';
     public string $listBtnOpenHeight='100vh';
     public string $title='';
+    public string $listBtnTextEdit='';//编辑时显示文字
+    public string $titleEdit='';//编辑时显示文字
+    public ?string $listBtnColorEdit=null;
 
 
     public function __construct(array $config=[]){
@@ -39,6 +42,9 @@ class FieldStepBaseConfig
             'listBtnOpenWidth'=>$this->listBtnOpenWidth,
             'listBtnOpenHeight'=>$this->listBtnOpenHeight,
             'title'=>$this->title,
+            'listBtnTextEdit'=>$this->listBtnTextEdit,
+            'titleEdit'=>$this->titleEdit,
+            'listBtnColorEdit'=>$this->listBtnColorEdit,
         ];
     }
 

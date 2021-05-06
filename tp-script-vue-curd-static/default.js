@@ -231,7 +231,11 @@ define(['vueAdmin'], function (va) {
                 },
                 openEdit(row){
                     if(row.stepInfo&&row.stepInfo.title){
-                        this.openBox(getStepOpenConfig(row,row.stepInfo)).end();
+                        const config=getStepOpenConfig(row,row.stepInfo);
+                        if(row.stepInfo.config.titleEdit!==''){
+                            config.title=row.stepInfo.config.titleEdit;
+                        }
+                        this.openBox(config).end();
                     }else{
                         this.openBox({
                             title:'修改 '+vueData.title,
@@ -612,7 +616,11 @@ define(['vueAdmin'], function (va) {
                 },
                 openEdit(row){
                     if(row.stepInfo&&row.stepInfo.title){
-                        this.openBox(getStepOpenConfig(row,row.stepInfo)).end();
+                        const config=getStepOpenConfig(row,row.stepInfo);
+                        if(row.stepInfo.config.titleEdit!==''){
+                            config.title=row.stepInfo.config.titleEdit;
+                        }
+                        this.openBox(config).end();
                     }else{
                         this.open(row)
                     }

@@ -1134,9 +1134,18 @@ define(requires, function ( axios,Qs) {
                 editBtnText(row){
                     let editText='修改';
                     if(this.fieldStepConfig&&this.fieldStepConfig.enable&&row.stepInfo&&row.stepInfo.config.listBtnText){
+                        if(row.stepInfo.config.listBtnTextEdit!==''){
+                            return row.stepInfo.config.listBtnTextEdit;
+                        }
                         editText+=row.stepInfo.config.listBtnText;
                     }
                     return editText;
+                },
+                editBtnClor(row){
+                    if(this.fieldStepConfig&&this.fieldStepConfig.enable&&row.stepInfo&&row.stepInfo.config.listBtnText){
+                        return row.stepInfo.config.listBtnColorEdit;
+                    }
+                    return null;
                 },
                 isCanShowInfo(row){
                     return !row.__auth||typeof row.__auth.show==='undefined'||row.__auth.show===true;
@@ -1231,7 +1240,7 @@ define(requires, function ( axios,Qs) {
                                           
                                         <template v-if="isCanEdit(record)">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openEdit(record)">{{editBtnText(record)}}</a>
+                                            <a @click="openEdit(record)" :style="{color: editBtnClor(record)}">{{editBtnText(record)}}</a>
                                         </template>
                                     </slot>
                                     
