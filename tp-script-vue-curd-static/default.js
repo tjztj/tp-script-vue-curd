@@ -40,14 +40,10 @@ define(['vueAdmin'], function (va) {
 
 
 
-    function getStepNextOpenConfig(row,offset){
-        if(!row.nextStepInfo){
-            console.error('未发现下一步',row)
-            return;
-        }
+    function getStepOpenConfig(row,stepInfo){
         let title=vueData.title;
-        title+=' [ '+row.nextStepInfo.title+' ]';
-        let url=row.nextStepInfo.config.listBtnUrl;
+        title+=' [ '+stepInfo.title+' ]';
+        let url=stepInfo.config.listBtnUrl;
         if(url.indexOf('?')>-1){
             url+='&id='+row.id;
         }else{
@@ -55,12 +51,22 @@ define(['vueAdmin'], function (va) {
         }
         const config={
             title:title,
-            area:[row.nextStepInfo.config.listBtnOpenWidth, row.nextStepInfo.config.listBtnOpenHeight],
+            area:[stepInfo.config.listBtnOpenWidth, stepInfo.config.listBtnOpenHeight],
             content: url,
         };
-        if(row.nextStepInfo.config.listBtnOpenHeight!=='100vh'){
+        if(stepInfo.config.listBtnOpenHeight!=='100vh'){
             config.offset='auto'
         }
+        return config;
+    }
+
+    function getStepNextOpenConfig(row,offset){
+        if(!row.nextStepInfo){
+            console.error('未发现下一步',row)
+            return;
+        }
+        const config=getStepOpenConfig(row,row.nextStepInfo);
+        config.offset=config.offset||offset;
         return config;
     }
 
@@ -224,15 +230,15 @@ define(['vueAdmin'], function (va) {
                     }).end();
                 },
                 openEdit(row){
-                    let title='修改 '+vueData.title;
                     if(row.stepInfo&&row.stepInfo.title){
-                        title+=' [ '+row.stepInfo.title+' ]';
+                        this.openBox(getStepOpenConfig(row,row.stepInfo)).end();
+                    }else{
+                        this.openBox({
+                            title:'修改 '+vueData.title,
+                            offset:'rt',
+                            content: vueData.editUrl+'?id='+row.id,
+                        }).end();
                     }
-                    this.openBox({
-                        title:title,
-                        offset:'rt',
-                        content: vueData.editUrl+'?id='+row.id,
-                    }).end();
                 },
                 openNext(row){
                     this.openBox(getStepNextOpenConfig(row,'rt')).end();
@@ -605,7 +611,11 @@ define(['vueAdmin'], function (va) {
                     this.open()
                 },
                 openEdit(row){
-                    this.open(row)
+                    if(row.stepInfo&&row.stepInfo.title){
+                        this.openBox(getStepOpenConfig(row,row.stepInfo)).end();
+                    }else{
+                        this.open(row)
+                    }
                 },
                 openNext(row){
                     this.openBox(getStepNextOpenConfig(row,'lt')).end();

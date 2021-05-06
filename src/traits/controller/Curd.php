@@ -66,10 +66,20 @@ trait Curd
                     $this->editBefore($data,$old);
 
                     //步骤
-                    $this->fields=$this->getSaveStepNext()
-                        ?$this->fields->filterNextStepFields($old,null,$stepInfo)
-                        :$this->fields->filterCurrentStepFields($old,null,$stepInfo);
+                    $isNext=$this->autoGetSaveStepIsNext($this->fields,$old,null);
+                    if(is_null($isNext)){
+                        return $this->error('数据不满足当前步骤');
+                    }
+                    if($isNext){
+                        $this->fields=$this->fields->filterNextStepFields($old,null,$stepInfo);
+                    }else{
+                        $this->fields=$this->fields->filterCurrentStepFields($old,null,$stepInfo);
+                        if(!$this->checkEditUrl($this->fields,$stepInfo)){
+                            return $this->error('您不能进行此操作-06');
+                        }
+                    }
                     $this->fields->saveStepInfo=$stepInfo;
+
 
                     //步骤权限验证
                     if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($old,null,$this->fields)===false){

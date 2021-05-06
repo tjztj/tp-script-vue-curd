@@ -76,7 +76,7 @@ trait FieldCollectionStep
      * @return \tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,VueCurlModel $old=null,BaseModel $baseInfo=null){
+    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,VueCurlModel $old=null,BaseModel $baseInfo=null):self{
         $hideFields=$old?$this->getFiledHideList($old):[];
         $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$baseInfo){
             return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$baseInfo){
@@ -161,11 +161,11 @@ trait FieldCollectionStep
      * 根据数据信息，过滤下一个步骤满足的字段
      * @param VueCurlModel|null $old
      * @param BaseModel|null $oldBaseInfo
-     * @param null $stepInfo
+     * @param FieldStep|null $stepInfo
      * @return $this|\tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function filterNextStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null){
+    public function filterNextStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
         if(!$this->stepIsEnable()){
             //未启用，不过滤
             return $this;
@@ -190,11 +190,11 @@ trait FieldCollectionStep
      * 根据数据信息，过滤当前步骤满足的字段
      * @param VueCurlModel|null $old
      * @param BaseModel|null $oldBaseInfo
-     * @param null $stepInfo
+     * @param FieldStep|null $stepInfo
      * @return $this|\tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function filterCurrentStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null){
+    public function filterCurrentStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
         if(!$this->stepIsEnable()){
             //未启用，不过滤
             return $this;

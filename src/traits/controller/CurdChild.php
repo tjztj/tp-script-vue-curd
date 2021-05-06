@@ -271,9 +271,18 @@ trait CurdChild{
                     $this->editBefore($data,$info,$baseInfo);
 
                     //步骤
-                    $this->fields=$this->getSaveStepNext()
-                        ?$this->fields->filterNextStepFields($info,$baseInfo,$stepInfo)
-                        :$this->fields->filterCurrentStepFields($info,$baseInfo,$stepInfo);
+                    $isNext=$this->autoGetSaveStepIsNext($this->fields,$info,$baseInfo);
+                    if(is_null($isNext)){
+                        return $this->error('数据不满足当前步骤');
+                    }
+                    if($isNext){
+                        $this->fields=$this->fields->filterNextStepFields($info,$baseInfo,$stepInfo);
+                    }else{
+                        $this->fields=$this->fields->filterCurrentStepFields($info,$baseInfo,$stepInfo);
+                        if(!$this->checkEditUrl($this->fields,$stepInfo)){
+                            return $this->error('您不能进行此操作-06');
+                        }
+                    }
                     $this->fields->saveStepInfo=$stepInfo;
 
                     //步骤权限验证

@@ -12,6 +12,7 @@ use tpScriptVueCurd\FieldCollection;
 use think\Request;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
+use tpScriptVueCurd\option\FieldStep;
 
 /**
  * Trait CurdFunc
@@ -25,6 +26,7 @@ trait CurdFunc
 {
 
     public string $fetchPath;
+    protected bool $autoStepNext=false;
 
 
     private bool $saveStepNext;//编辑的时候，是否是下一步
@@ -57,9 +59,8 @@ trait CurdFunc
         if($stepInfo){
             $fields=$this->fields->getFilterStepFields($stepInfo,true,null,$baseInfo);
             return $fields->count()>0&&$stepInfo->authCheck(null,$baseInfo,$fields);
-        }else{
-            return false;
         }
+        return false;
     }
 
     /**
@@ -161,9 +162,20 @@ trait CurdFunc
      */
     protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
-            $fields=empty($data->id)||$this->getSaveStepNext()
-                ?$fields->filterNextStepFields($data,$baseModel,$stepInfo)
-                :$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
+            $isNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
+            if(is_null($isNext)){
+                return $this->error('数据不满足当前步骤');
+            }
+            if($isNext){
+                $fields=$fields->filterNextStepFields($data,$baseModel,$stepInfo);
+                $isStepNext=true;
+            }else{
+                $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
+                if(!$this->checkEditUrl($fields,$stepInfo)){
+                    return $this->error('您不能进行此操作-06');
+                }
+                $isStepNext=false;
+            }
 
             $fields->saveStepInfo=$stepInfo;
 
@@ -178,6 +190,7 @@ trait CurdFunc
             $fields->saveStepInfo=$stepInfo;
             FieldDo::doEditShow($fields,$data,$baseModel);
             $info=null;
+            $isStepNext=true;
         }
 
 
@@ -201,7 +214,7 @@ trait CurdFunc
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('edit'),
-            'isStepNext'=>$this->getSaveStepNext(),
+            'isStepNext'=>$isStepNext,
             'stepInfo'=>$stepInfo?$stepInfo->toArray():null,
         ];
     }
@@ -306,5 +319,84 @@ trait CurdFunc
             $order='id DESC';
         }
         return $order;
+    }
+
+
+    /**
+     * 自动判断是否下一步
+     * @param FieldCollection $fields
+     * @param VueCurlModel|null $info
+     * @param BaseModel|null $base
+     * @return bool|null
+     * @throws \think\Exception
+     */
+    protected function autoGetSaveStepIsNext(FieldCollection $fields,?VueCurlModel $info,?BaseModel $base):?bool{
+        if(!$fields->stepIsEnable()){
+            //未启用
+            return false;
+        }
+
+        $defNext=is_null($info)||empty($info->id)||$this->getSaveStepNext();
+
+        if($this->autoStepNext===false){
+            return $defNext;
+        }
+
+        $nextFields=(clone $fields)->filterNextStepFields($info,$base,$nextStepInfo);
+
+        if($defNext){
+            return $nextFields->isEmpty()||$nextStepInfo->authCheck($info,$base,$nextFields)===false?null:true;
+        }
+
+        $currFields=(clone $fields)->filterCurrentStepFields($info,$base,$curStepInfo);
+
+        if(is_null($nextStepInfo)||$nextFields->isEmpty()){
+            return $currFields->isEmpty()||$curStepInfo->authCheck($info,$base,$currFields)===false?null:false;
+        }
+
+        if(is_null($curStepInfo)||$currFields->isEmpty()){
+            return true;
+        }
+
+        if($nextStepInfo->authCheck($info,$base,$nextFields)){
+            if($curStepInfo->authCheck($info,$base,$currFields)){
+                throw new \think\Exception('['.$nextStepInfo->getStep().']同时满足修改与下一步，理念冲突');
+            }
+            return true;
+        }
+        if($curStepInfo->authCheck($info,$base,$currFields)){
+            return false;
+        }
+        return null;
+    }
+
+
+    /**
+     * 判断当前地址是否能对上
+     * @param FieldCollection $fields
+     * @param FieldStep|null $stepInfo
+     * @return bool
+     */
+    protected function checkEditUrl(FieldCollection $fields,?FieldStep $stepInfo):bool{
+        if($stepInfo&&!$fields->isEmpty()){
+            if(!empty($stepInfo->config['listBtnUrl'])){
+                if(stripos($this->request->url(),$stepInfo->config['listBtnUrl'])!==0){
+                    return false;
+                }
+            }else if(url('edit')->build()!==$this->request->baseUrl()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 自动判断下一步，并执行
+     * @return mixed
+     */
+    protected function stepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->autoStepNext=true;
+        return $this->edit();
     }
 }
