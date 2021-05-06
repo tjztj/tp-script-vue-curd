@@ -384,6 +384,23 @@ define(['vueAdmin'], function (va) {
                     fieldHideList:{},
                 }
             },
+            computed:{
+                showGroup(){
+                    if(!this.haveGroup){
+                        return false;
+                    }
+                    let showGroupNum=0;
+                    for(let i in this.groupFields){
+                        if(this.checkShowGroup(this.groupFields[i])){
+                            if(showGroupNum>0){
+                                return true;
+                            }
+                            showGroupNum++;
+                        }
+                    }
+                    return false;
+                }
+            },
             methods:{
                 onSubmit(option){
                     //我想要子组件可以不关闭当前窗口提交（就是自定义的字段可以新增数据后继续编辑）

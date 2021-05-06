@@ -7,7 +7,7 @@
 <a-spin :spinning="loading">
     <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm">
         <template v-for="(groupFieldItems,groupTitle) in groupFields">
-            <template v-if="haveGroup">
+            <template v-if="showGroup">
                 <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
                     <div class="legend-box">
                         <legend>{{groupTitle}}</legend>
