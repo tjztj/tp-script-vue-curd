@@ -725,11 +725,11 @@ define(requires, function ( axios,Qs) {
                                                         if(field.multiple){
                                                             have=arrHave(checkVal,item.value);
                                                         }else{
-                                                            have=checkVal===item.value
+                                                            have=checkVal.toString()===item.value.toString();
                                                         }
                                                         break;
                                                     default:
-                                                        have=checkVal===item.value;
+                                                        have=checkVal.toString()===item.value.toString();
                                                 }
                                                 //have 是否符合条件，符合条件就隐藏
                                                 // changeFieldHideList(hideField.name,field.name,have)
