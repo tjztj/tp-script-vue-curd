@@ -1,5 +1,5 @@
 define([],function(){
-    let regions={},regionValues={};
+    let regions={},regionValues={},textValues={};
     return {
         props:['field','value','validateStatus','form'],
         setup(props,ctx){
@@ -8,6 +8,7 @@ define([],function(){
             props.field.regionTree.forEach(v=>{
                 regions[parseInt(v.id)]=v;
                 regionValues[parseInt(v.id)]=[parseInt(v.id)];
+                textValues['/'+v.name]=regionValues[parseInt(v.id)];
                 if(v.children){
                     if(v.children.length>1){
                         justOne=false;
@@ -15,6 +16,7 @@ define([],function(){
                     v.children.forEach(val=>{
                         regions[parseInt(val.id)]=val;
                         regionValues[parseInt(val.id)]=[parseInt(v.id),parseInt(val.id)];
+                        textValues[v.name+'/'+val.name]=regionValues[parseInt(val.id)];
                         if(val.children){
                             if(val.children.length>1){
                                 justOne=false;
@@ -22,6 +24,7 @@ define([],function(){
                             val.children.forEach(vo=>{
                                 regions[parseInt(vo.id)]=vo;
                                 regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
+                                textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.id)];
                                 level_3=true;
                             })
                         }
@@ -41,6 +44,19 @@ define([],function(){
             modelVal:{
                 get(){
                     if(this.field.canEdit===false||typeof this.value==='undefined'||typeof this.value==='object'){
+                        if(typeof this.value==='string'||typeof this.value==='number'){
+                            if(this.value&&!/^\d+$/.test(this.value.toString())){
+                                let str='';
+                                if(this.field.pField&&this.form[this.field.pField]){
+                                    str+=this.form[this.field.pField];
+                                }
+                                str+='/'+(this.field.cField?this.form[[this.field.cField]]:this.value);
+                                if(textValues[str]){
+                                    this.$emit('update:value', textValues[str]);
+                                    return textValues[str]
+                                }
+                            }
+                        }
                         return this.value;
                     }
                     if(this.value&&(typeof this.value==='string'||typeof this.value==='number')){

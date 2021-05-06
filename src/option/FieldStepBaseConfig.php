@@ -18,7 +18,7 @@ class FieldStepBaseConfig
     public string $title='';
     public string $listBtnTextEdit='';//编辑时显示文字
     public string $titleEdit='';//编辑时显示文字
-    public ?string $listBtnColorEdit=null;
+    public ?string $listBtnColorEdit=null;//编辑时的标题
 
 
     public function __construct(array $config=[]){
