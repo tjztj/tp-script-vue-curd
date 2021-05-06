@@ -574,6 +574,7 @@ class FieldCollection extends Collection
         }else{
             $new->items = $new->convertToArray(array_filter($new->items));
         }
+        $new->items=array_values($new->items);
         return $new;
     }
 

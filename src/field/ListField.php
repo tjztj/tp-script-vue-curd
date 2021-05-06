@@ -64,6 +64,8 @@ class ListField extends ModelField
     public function doShowData(array &$dataBaseData): void
     {
         parent::doShowData($dataBaseData);
+
+        $this->fields=$this->fields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
         if(isset($dataBaseData[$this->name()])){
             if(is_null($this->fields)){
                 throw new \think\Exception('未设置字段'.$this->name().'的fields');
