@@ -42,7 +42,7 @@ define([],function(){
         },
         computed:{
             showSelected(){
-                return this.form.id&&this.thisfield.canEdit===false;
+                return this.form.id&&this.field.canEdit===false;
             },
             modelVal:{
                 get(){
