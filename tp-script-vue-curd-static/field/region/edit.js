@@ -1,5 +1,6 @@
 define([],function(){
     let regions={},regionValues={},textValues={};
+    let level=1;
     return {
         props:['field','value','validateStatus','form'],
         setup(props,ctx){
@@ -14,6 +15,9 @@ define([],function(){
                         justOne=false;
                     }
                     v.children.forEach(val=>{
+                        if(level===1){
+                            level=2;
+                        }
                         regions[parseInt(val.id)]=val;
                         regionValues[parseInt(val.id)]=[parseInt(v.id),parseInt(val.id)];
                         textValues[v.name+'/'+val.name]=regionValues[parseInt(val.id)];
@@ -22,6 +26,9 @@ define([],function(){
                                 justOne=false;
                             }
                             val.children.forEach(vo=>{
+                                if(level!==3){
+                                    level=3;
+                                }
                                 regions[parseInt(vo.id)]=vo;
                                 regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
                                 textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.id)];
@@ -75,7 +82,7 @@ define([],function(){
                     return regionValues[vals[vals.length-1]];
                 }else{
                     let str='';
-                    if(this.field.pField&&this.form[this.field.pField]){
+                    if(level>1&&this.field.pField&&this.form[this.field.pField]){
                         str+=this.form[this.field.pField];
                     }
                     str+='/'+(this.field.cField?this.form[[this.field.cField]]:this.value);
@@ -84,7 +91,7 @@ define([],function(){
             },
         },
         template:`<div class="field-box">
-                   <template v-if="form.id&&field.canEdit===false">
+                   <template v-if="showSelected">
                         <div class="l">
                             <template v-if="field.cField">
                                 <span v-if="field.pField&&form[field.pField]">{{form[field.pField]}}/</span>{{form[field.cField]}}
