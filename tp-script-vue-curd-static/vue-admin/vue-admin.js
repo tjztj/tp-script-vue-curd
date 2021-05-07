@@ -662,9 +662,9 @@ define(requires, function ( axios,Qs) {
 
 
                         const checkHideField=(field,checkVal)=>{
-                            if(field.selfHide){
+                            if(field.hideSelf){
                                 const aboutFields=[];
-                                const hide=checkFieldWhere(field.selfHide,aboutFields);
+                                const hide=checkFieldWhere(field.hideSelf,aboutFields);
                                 console.log(hide);
                                 aboutFields.forEach(f=>{
                                     changeFieldHideList(field.name,f.name,hide);

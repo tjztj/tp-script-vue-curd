@@ -390,10 +390,10 @@ class FieldCollection extends Collection
 
 
         $checkHideField=function(ModelField $field,$checkVal)use($arrHave,&$data,&$changeFieldHideList,$isSourceData,&$checkHideField,&$fieldHideList){
-            $selfHide=$field->selfHide();
-            if($selfHide){
+            $hideSelf=$field->hideSelf();
+            if($hideSelf){
                 $aboutFields=[];
-                $hide=$selfHide->check($data,$isSourceData,$aboutFields);
+                $hide=$hideSelf->check($data,$isSourceData,$aboutFields);
                 foreach ($aboutFields as $v){
                     $changeFieldHideList($field->name(),$v->name(),$hide);
                 }

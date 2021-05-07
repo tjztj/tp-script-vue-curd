@@ -48,7 +48,7 @@ abstract class ModelField
     protected $validateRule=null;//数据验证
     protected $nullVal='';//字段在数据库中为空时的值
     protected FieldDo $fieldDo;//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
-    protected ?FieldWhere $selfHide=null;//编辑时是否隐藏本字段
+    protected ?FieldWhere $hideSelf=null;//编辑时是否隐藏本字段
     public const REQUIRED=true;//开启必填验证
     public bool $objWellToArr=true;
 
@@ -309,11 +309,11 @@ abstract class ModelField
 
     /**
      * 隐藏本字段条件
-     * @param FieldWhere|null $selfHide
+     * @param FieldWhere|null $hideSelf
      * @return $this|FieldWhere
      */
-    public function selfHide(FieldWhere $selfHide=null){
-        return $this->doAttr('selfHide',$selfHide);
+    public function hideSelf(FieldWhere $hideSelf=null){
+        return $this->doAttr('hideSelf',$hideSelf);
     }
     
 
