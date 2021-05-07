@@ -40,7 +40,10 @@ class FieldWhere
         if($type===self::TYPE_IN){
             $this->valueData=(array)$valueData;
         }else{
-            if(!isset($valueData[0])||!isset($valueData[1])){
+            $valueData=(array)$valueData;
+            $valueData=array_values($valueData);
+
+            if(count($valueData)!==2){
                 throw new \think\Exception('FieldWhere 参数错误');
             }
             if(is_null($valueData[0])&&is_null($valueData[1])){

@@ -18,7 +18,6 @@ define([],function(){
                             if(fileList.length===0){
                                 show.value=false;
                             }
-                            console.log(fileList);
                         }
                         ImgObj.src= fileList[i];
                     }
