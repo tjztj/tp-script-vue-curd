@@ -568,11 +568,14 @@ define(requires, function ( axios,Qs) {
                             }
                             return val<=fieldWhere.valueData[1]&&val>=fieldWhere.valueData[0];
                         };
-                        const checkFieldWhere=function(fieldWhere){
+                        const checkFieldWhere=function(fieldWhere,fields){
                             let check=checkFieldWhereSelf(fieldWhere);
+                            fields=fields||[];//保存相关字段
+                            fields.push(fieldWhere.field);
 
                             if(check){
                                 for(let i in fieldWhere.ands){
+                                    fields.push(fieldWhere.ands[i].field);
                                     if(checkFieldWhere(fieldWhere.ands[i])===false){
                                         check=false;
                                         break;
@@ -583,6 +586,7 @@ define(requires, function ( axios,Qs) {
                                 return true;
                             }
                             for(let i in fieldWhere.ors){
+                                fields.push(fieldWhere.ors[i].field);
                                 if(checkFieldWhere(fieldWhere.ors[i])){
                                     return true;
                                 }
@@ -656,7 +660,18 @@ define(requires, function ( axios,Qs) {
                         }
 
 
+
                         const checkHideField=(field,checkVal)=>{
+                            if(field.selfHide){
+                                const aboutFields=[];
+                                const hide=checkFieldWhere(field.selfHide,aboutFields);
+                                console.log(hide);
+                                aboutFields.forEach(f=>{
+                                    changeFieldHideList(field.name,f.name,hide);
+                                })
+                            }
+
+
                             let reversalHideFields=!!field.reversalHideFields,oldHideFields=Object.keys(this.currentFieldHideList);
                             if(field.hideFields){
                                 let allFields=[],hideFileds=[],inputVal='';
