@@ -413,7 +413,7 @@ class FieldCollection extends Collection
                 $vValue=$checkVal;
                 if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
                     $fieldCopy=clone $field;
-                    $vValue=$fieldCopy->setSave($data)->getSave();
+                    $vValue=$fieldCopy->required(false)->setSave($data)->getSave();
                 }
                 //有值才显示
                 if(!is_null($vValue)&&$vValue!==''){
@@ -445,7 +445,7 @@ class FieldCollection extends Collection
                 $vValue=$checkVal;
                 if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
                     $fieldCopy=clone $field;
-                    $vValue=$fieldCopy->setSave($data)->getSave();
+                    $vValue=$fieldCopy->required(false)->setSave($data)->getSave();
                 }
 
 
