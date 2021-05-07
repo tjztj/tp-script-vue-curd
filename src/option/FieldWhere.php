@@ -12,10 +12,17 @@ class FieldWhere
     public const TYPE_BETWEEN='between';
     public const TYPE_FIND_IN_SET='find_in_set';
 
+    //别名
+    public const IN=self::TYPE_IN;
+    public const BETWEEN=self::TYPE_BETWEEN;
+    public const FIND_IN_SET=self::TYPE_FIND_IN_SET;
+
+
 
     private ModelField $field;
     private array $valueData;
     private string $type;
+    private bool $isNot=false;
 
     /**
      * 其他并且条件
@@ -34,11 +41,14 @@ class FieldWhere
      * @param ModelField $field
      * @param array|string|int|float $valueData
      * @param string $type
+     * @param bool $isNot  是否非，反转
+     * @throws \think\Exception
      */
-    public function __construct(ModelField $field,$valueData,$type=self::TYPE_IN)
+    public function __construct(ModelField $field, $valueData, string $type=self::TYPE_IN, bool $isNot=false)
     {
         $this->field=$field;
         $this->type=$type;
+        $this->isNot=$isNot;
         if($type===self::TYPE_IN){
             $this->valueData=(array)$valueData;
         }else if($type===self::TYPE_FIND_IN_SET){
@@ -63,8 +73,10 @@ class FieldWhere
         }
     }
 
-    public static function make(ModelField $field,$valueData,$type=self::TYPE_IN):self{
-        return new self($field,$valueData,$type);
+    public static function make($field,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
+        if(!is_array($field)){
+            return new self($field,$valueData,$type,$isNot);
+        }
     }
 
 
@@ -85,6 +97,7 @@ class FieldWhere
             'field'=>$field->toArray(),
             'valueData'=>$this->valueData,
             'type'=>$this->type,
+            'isNot'=>$this->isNot,
         ];
         $ands=[];
         foreach ($this->ands as $v){
@@ -126,6 +139,10 @@ class FieldWhere
             }
         }
 
+        return $this->checkVal($val)!==$this->isNot;
+    }
+
+    private function checkVal($val):bool{
         if($this->type===self::TYPE_IN){
             return in_array($val,$this->valueData);
         }

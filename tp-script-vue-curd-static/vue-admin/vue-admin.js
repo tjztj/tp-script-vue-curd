@@ -540,18 +540,7 @@ define(requires, function ( axios,Qs) {
             watch:{
                 formVal:{
                     handler(formVal){
-                        const checkFieldWhereSelf=function(fieldWhere){
-                            if(typeof formVal[fieldWhere.field.name]==='undefined'||formVal[fieldWhere.field.name]===null){
-                                return false;
-                            }
-                            let val=formVal[fieldWhere.field.name];
-                            if(typeof val==='object'){
-                                if(fieldWhere.field.type==='RegionField'){
-                                    const regionKeys=Object.keys(val);
-                                    val=regionKeys.length?val[regionKeys[regionKeys.length-1]]:0;
-                                }
-                            }
-
+                        const checkVal=function(fieldWhere,val){
                             if(fieldWhere.type==='in'){
                                 for(let i in fieldWhere.valueData){
                                     if(fieldWhere.valueData[i]==val){
@@ -579,6 +568,19 @@ define(requires, function ( axios,Qs) {
                                 return val>=fieldWhere.valueData[0];
                             }
                             return val<=fieldWhere.valueData[1]&&val>=fieldWhere.valueData[0];
+                        }
+                        const checkFieldWhereSelf=function(fieldWhere){
+                            if(typeof formVal[fieldWhere.field.name]==='undefined'||formVal[fieldWhere.field.name]===null){
+                                return false;
+                            }
+                            let val=formVal[fieldWhere.field.name];
+                            if(typeof val==='object'){
+                                if(fieldWhere.field.type==='RegionField'){
+                                    const regionKeys=Object.keys(val);
+                                    val=regionKeys.length?val[regionKeys[regionKeys.length-1]]:0;
+                                }
+                            }
+                            return checkVal(fieldWhere,val)!==fieldWhere.isNot;
                         };
                         const checkFieldWhere=function(fieldWhere,fields){
                             let check=checkFieldWhereSelf(fieldWhere);
