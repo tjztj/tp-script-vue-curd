@@ -61,6 +61,7 @@ define([],function(){
                         <a-upload
                             multiple
                             :action="field.url"
+                            :accept="field.accept"
                             list-type="picture"
                             :file-list="fileList"
                             :remove="handleRemove"

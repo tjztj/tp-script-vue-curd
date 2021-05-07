@@ -21,6 +21,7 @@ class FilesField extends ModelField
 
     protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
     protected bool $canExcelImport=false;//不能使用excel导入数据
+    protected string $accept='';//上传文件类型
 
 
     /**最小值
@@ -34,6 +35,15 @@ class FilesField extends ModelField
         }
         $this->url=$url;
         return $this;
+    }
+
+    /**
+     * 文件上传类型
+     * @param string|null $accept
+     * @return $this|string
+     */
+    public function accept(string $accept=null){
+        return $this->doAttr('accept',$accept);
     }
 
 
