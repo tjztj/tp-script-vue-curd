@@ -165,7 +165,7 @@ class FieldDo
      * @param ModelField $field
      * @return $this
      */
-    public function doSaveBeforeDo(array $postData,?VueCurlModel $before,?BaseModel $base,ModelField $field): self
+    public function doSaveBeforeDo(array &$postData,?VueCurlModel $before,?BaseModel $base,ModelField $field): self
     {
         $func=$this->saveBeforeDo?? static function(){};
         $func($postData,$before,$base,$field);
@@ -179,8 +179,8 @@ class FieldDo
      * @param VueCurlModel|BaseModel|BaseChildModel|null $info
      * @param BaseModel|null $base
      */
-    public static function doSaveBefore(FieldCollection $field,array $postData,?VueCurlModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info,$postData){
+    public static function doSaveBefore(FieldCollection $field,array &$postData,?VueCurlModel $info,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$info,&$postData){
             $fieldDo=$field->getFieldDo();
             if(!$fieldDo){
                 return;
