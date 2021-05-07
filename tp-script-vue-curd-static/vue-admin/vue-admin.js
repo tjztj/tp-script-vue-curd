@@ -582,14 +582,10 @@ define(requires, function ( axios,Qs) {
                             }
                             return checkVal(fieldWhere,val)!==fieldWhere.isNot;
                         };
-                        const checkFieldWhere=function(fieldWhere,fields){
+                        const checkFieldWhere=function(fieldWhere){
                             let check=checkFieldWhereSelf(fieldWhere);
-                            fields=fields||[];//保存相关字段
-                            fields.push(fieldWhere.field);
-
                             if(check){
                                 for(let i in fieldWhere.ands){
-                                    fields.push(fieldWhere.ands[i].field);
                                     if(checkFieldWhere(fieldWhere.ands[i])===false){
                                         check=false;
                                         break;
@@ -600,12 +596,22 @@ define(requires, function ( axios,Qs) {
                                 return true;
                             }
                             for(let i in fieldWhere.ors){
-                                fields.push(fieldWhere.ors[i].field);
                                 if(checkFieldWhere(fieldWhere.ors[i])){
                                     return true;
                                 }
                             }
                             return false;
+                        };
+                        const getWhereFields=function(fieldWhere){
+                            const fields=[];
+                            fields.push(fieldWhere.field.name);
+                            for(let i in fieldWhere.ands){
+                                fields.push(...getWhereFields(fieldWhere.ands[i]));
+                            }
+                            for(let i in fieldWhere.ors){
+                                fields.push(...getWhereFields(fieldWhere.ors[i]));
+                            }
+                            return fields;
                         };
                         this.groupFieldItems.forEach(field=>{
                             if(!field.items||field.items.length===0){
@@ -677,13 +683,8 @@ define(requires, function ( axios,Qs) {
 
                         const checkHideField=(field,checkVal)=>{
                             if(field.hideSelf){
-                                const aboutFields=[];
-                                const hide=checkFieldWhere(field.hideSelf,aboutFields);
-                                aboutFields.forEach(f=>{
-                                    changeFieldHideList(field.name,f.name,hide);
-                                })
+                                changeFieldHideList(field.name,getWhereFields(field.hideSelf).join(','),checkFieldWhere(field.hideSelf));
                             }
-
 
                             let reversalHideFields=!!field.reversalHideFields,oldHideFields=Object.keys(this.currentFieldHideList);
                             if(field.hideFields){

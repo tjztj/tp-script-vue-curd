@@ -165,17 +165,14 @@ class FieldWhere
      * 验证数据是否符合条件
      * @param array $saveDatas
      * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
-     * @param ModelField[] $fields 相关的字段保存
      * @return bool
      * @throws \think\Exception
      */
-    public function check(array $saveDatas,bool $isSourceData,array &$fields=[]):bool{
+    public function check(array $saveDatas,bool $isSourceData):bool{
         $check=$this->checkSelf($saveDatas,$isSourceData);
-        $fields[]=$this->field;
 
         if($check){
             foreach ($this->ands as $v){
-                $fields[]=$v->field;
                 if($v->check($saveDatas,$isSourceData)===false){
                     $check=false;
                     break;
@@ -188,12 +185,23 @@ class FieldWhere
         }
 
         foreach ($this->ors as $v){
-            $fields[]=$v->field;
             if($v->check($saveDatas,$isSourceData)){
                 return true;
             }
         }
         return false;
+    }
+
+    public function getAboutFields():array{
+        $fields=[];
+        $fields[] = $this->field->name();
+        foreach ($this->ands as $v){
+            array_push($fields,...$v->getAboutFields());
+        }
+        foreach ($this->ors as $v){
+            array_push($fields,...$v->getAboutFields());
+        }
+        return $fields;
     }
 
 }
