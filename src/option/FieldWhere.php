@@ -10,6 +10,8 @@ class FieldWhere
 {
     const TYPE_IN='in';
     const TYPE_BETWEEN='between';
+    const TYPE_FIND_IN_SET='find_in_set';
+
 
     private ModelField $field;
     private array $valueData;
@@ -39,12 +41,17 @@ class FieldWhere
         $this->type=$type;
         if($type===self::TYPE_IN){
             $this->valueData=(array)$valueData;
+        }else if($type===self::TYPE_FIND_IN_SET){
+            if($valueData===''||is_array($valueData)||is_null($valueData)){
+                throw new \think\Exception('FieldWhere 参数错误-001');
+            }
+            $this->valueData=[(string)$valueData];
         }else{
             $valueData=(array)$valueData;
             $valueData=array_values($valueData);
 
             if(count($valueData)!==2){
-                throw new \think\Exception('FieldWhere 参数错误');
+                throw new \think\Exception('FieldWhere 参数错误-002');
             }
             if(is_null($valueData[0])&&is_null($valueData[1])){
                 throw new \think\Exception('FieldWhere 参数格式不正确-001');
@@ -121,6 +128,9 @@ class FieldWhere
 
         if($this->type===self::TYPE_IN){
             return in_array($val,$this->valueData);
+        }
+        if($this->type===self::TYPE_FIND_IN_SET){
+            return in_array($this->valueData[0],is_array($val)?$val:explode(',',$val));
         }
         if(is_null($this->valueData[0])){
             return $val<=$this->valueData[1];

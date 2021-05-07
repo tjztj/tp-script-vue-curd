@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd\traits\field;
 
 
-use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 
 trait HideFields
 {

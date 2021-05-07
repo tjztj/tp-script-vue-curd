@@ -560,6 +560,18 @@ define(requires, function ( axios,Qs) {
                                 }
                                 return false;
                             }
+                            if(fieldWhere.type==='find_in_set'){
+                                if(val==='')val=[];
+                                const valArr=typeof val==='object'?val:val.toString().split(',');
+                                for(let i in valArr){
+                                    if(fieldWhere.valueData[0]==valArr[i]){
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+
+
                             if(fieldWhere.valueData[0]===null){
                                 return val<=fieldWhere.valueData[1];
                             }
