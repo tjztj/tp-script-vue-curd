@@ -1,8 +1,13 @@
 <?php
-
 const VUE_CURD_STATIC_PATH='..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tp-script-vue-curd-static';
 
-if(empty($_SERVER['QUERY_STRING'])){
+$otherPre='/tp-script-vue-curd-static.php/';
+if( stripos($_SERVER['REQUEST_URI'],$otherPre)===0){
+    $param=mb_substr($_SERVER['REQUEST_URI'], strlen($otherPre), null, 'utf-8');
+}else{
+    $param=$_SERVER['QUERY_STRING']??'';
+}
+if(empty($param)){
     header("HTTP/1.1 404 Not Found");
     header("Status: 404 Not Found");
     echo '未获取到文件名';
@@ -12,7 +17,7 @@ if(empty($_SERVER['QUERY_STRING'])){
 
 $dirs=array_map(function($v){
     return trim($v,'&');
-},array_filter(explode('/',$_SERVER['QUERY_STRING'])));
+},array_filter(explode('/',$param)));
 $lastDir=end($dirs);
 $endIndex1=strpos($lastDir,'?');
 $endIndex2=strpos($lastDir,'&');

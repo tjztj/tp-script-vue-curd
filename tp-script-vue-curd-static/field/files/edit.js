@@ -61,7 +61,7 @@ define([],function(){
                         <a-upload
                             multiple
                             :action="field.url"
-                            list-type="text"
+                            list-type="picture"
                             :file-list="fileList"
                             :remove="handleRemove"
                             :disabled="field.readOnly"
