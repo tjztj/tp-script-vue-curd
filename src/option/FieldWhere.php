@@ -8,9 +8,9 @@ use tpScriptVueCurd\ModelField;
 
 class FieldWhere
 {
-    const TYPE_IN='in';
-    const TYPE_BETWEEN='between';
-    const TYPE_FIND_IN_SET='find_in_set';
+    public const TYPE_IN='in';
+    public const TYPE_BETWEEN='between';
+    public const TYPE_FIND_IN_SET='find_in_set';
 
 
     private ModelField $field;
