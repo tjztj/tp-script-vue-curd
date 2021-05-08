@@ -97,7 +97,7 @@ trait ModelSave
         FieldDo::doSaveAfter($fields,$data,$beforeInfo,$info,$baseInfo);
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
         if($haveDoStep&&$saveStepInfo){
-            $saveStepInfo->doSaveAfter($baseInfo,$info,$baseInfo,$fields,$data);
+            $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
         }
 
         $returnSaveData=$data;
