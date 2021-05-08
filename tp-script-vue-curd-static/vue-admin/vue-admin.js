@@ -1063,6 +1063,7 @@ define(requires, function ( axios,Qs) {
                     listFieldComponents,
                     fieldObjs,
                     childsObjs,
+                    showFooter:Vue.ref(true),
                 }
             },
             watch: {
@@ -1184,6 +1185,10 @@ define(requires, function ( axios,Qs) {
                 },
                 isCanDel(row){
                     return this.canDel&&(!row.__auth||typeof row.__auth.del==='undefined'||row.__auth.del===true)
+                },
+                hideShowFooter(){
+                    this.showFooter=false;
+                    return '';
                 }
             },
             template:`<div :id="id">
@@ -1219,8 +1224,7 @@ define(requires, function ( axios,Qs) {
                                     ></component>
                                 </slot>
                              </template>
-                             
-                              <template #default-value="record">
+                             <template #default-value="record">
                                 <slot :name="'f-'+record.column.dataIndex"
                                     :field="fieldObjs[record.column.dataIndex]" 
                                     :record="record">
@@ -1229,9 +1233,8 @@ define(requires, function ( axios,Qs) {
                                         {{record.text}}
                                     </a-tooltip>
                                 </slot>
-                              </template>
-                            
-                               <template #step-info="{ text: stepInfo }">
+                             </template>
+                             <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
                                             <div class="curd-table-row-step-title">
@@ -1249,17 +1252,17 @@ define(requires, function ( axios,Qs) {
                                             </div>
                                         </div>
                                     </slot>
-                                </template>
-                               <template #create-time="{ text: create_time }">
+                             </template>
+                             <template #create-time="{ text: create_time }">
                                     <slot name="f-create_time">
                                         <a-tooltip>
                                             <template #title>{{ create_time }}</template>
                                             {{ create_time }}
                                         </a-tooltip>
                                     </slot>
-                                </template>
+                             </template>
                                 
-                                <template #action="{ record }">
+                             <template #action="{ record }">
                                     <slot name="do-before" :record="record">
                                    
                                     </slot>
@@ -1307,8 +1310,10 @@ define(requires, function ( axios,Qs) {
                                               >
                                               <del-outlined class="pub-remove-icon"></del-outlined>
                                             </a-popconfirm>
-                                        </template>
-                                </template>
+                                    </template>
+                            </template>
+                                
+                             <template v-if="showFooter" #footer><slot name="footer" :columns="columns" :current-page-data="data">{{hideShowFooter()}}</slot></template>
                         </a-table>
                     </div>`,
         })
