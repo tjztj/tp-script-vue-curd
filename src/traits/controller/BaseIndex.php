@@ -139,6 +139,10 @@ trait BaseIndex
                 $list=$list->getCollection();
             }else{
                 $list=$model->select();
+                $option->total=$list->count();
+                $option->currentPage=1;
+                $option->lastPage=1;
+                $option->perPage=$option->total;
             }
 
             $list->map($doSteps)
