@@ -1052,18 +1052,6 @@ define(requires, function ( axios,Qs) {
                     })
                 }
 
-
-                setInterval(()=>{
-                    const foot=document.querySelector('#'+id+' .curd-table .ant-table .ant-table-content .ant-table-footer');
-                    if(foot){
-                        if(foot.innerHTML.replace(/\s+/g,'')!==''){
-                            foot.style.display='block';
-                        }else{
-                            foot.style.display='none';
-                        }
-                    }
-                },50)
-
                 return {
                     actionW:newActionW,
                     columns:Vue.ref(columns),
@@ -1320,7 +1308,7 @@ define(requires, function ( axios,Qs) {
                                     </template>
                             </template>
                                 
-                             <template #footer><slot name="footer" :columns="columns" :current-page-data="data"></slot></template>
+                            <template v-if="$slots.footer" #footer><slot name="footer" :columns="columns" :current-page-data="data"></slot></template>
                         </a-table>
                     </div>`,
         })
