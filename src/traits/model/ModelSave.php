@@ -91,7 +91,8 @@ trait ModelSave
         }
 
         //onEditBefore请用doSaveDataAfter
-        $info=self::update($data);
+        $info=clone $beforeInfo;
+        $info->save($data);
 
         FieldDo::doSaveAfter($fields,$data,$beforeInfo,$info,$baseInfo);
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
