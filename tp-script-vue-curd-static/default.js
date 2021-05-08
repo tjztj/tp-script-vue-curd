@@ -107,6 +107,7 @@ define(['vueAdmin'], function (va) {
                     listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
                     pagination: {...pagination},
                     loading: false,
+                    dataOther:{},
                     data: [],
                     myFilters:{
                         ...pagination,
@@ -180,6 +181,7 @@ define(['vueAdmin'], function (va) {
                     this.$get(this.indexUrl,this.getWhere()).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
+                        this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
                         data.data.data.forEach(item=>{
                             infos[item.id]=item;
                         })
@@ -529,6 +531,7 @@ define(['vueAdmin'], function (va) {
         return {
             data(){
                 return {
+                    dataOther:{},
                     data:vueData.list,
                     listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
                     info:vueData.info,
@@ -583,6 +586,7 @@ define(['vueAdmin'], function (va) {
                     this.$get(this.indexUrl,this.getWhere()).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
+                        this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
                         this.data = data.data.data
                         data.data.data.forEach(item=>{
                             infos[item.id]=item;

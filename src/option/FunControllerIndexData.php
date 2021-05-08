@@ -51,6 +51,13 @@ class FunControllerIndexData
     public ?Query $model=null;
 
 
+    /**
+     * 其他数据
+     * @var array
+     */
+    public array $other=[];
+
+
 
     public function toArray():array{
         return [
@@ -59,6 +66,7 @@ class FunControllerIndexData
             'last_page'=>$this->lastPage,
             'per_page'=>$this->perPage,
             'total'=>$this->total,
+            'other'=>$this->other,
         ];
     }
 }
