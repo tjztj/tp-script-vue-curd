@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\option;
 
 
+use think\db\Query;
 use tpScriptVueCurd\base\model\VueCurlModel;
 
 class FunControllerIndexData
@@ -45,9 +46,9 @@ class FunControllerIndexData
 
     /**
      * 有where条件与排序的model
-     * @var VueCurlModel|null
+     * @var Query|null
      */
-    public ?VueCurlModel $model=null;
+    public ?Query $model=null;
 
 
 
