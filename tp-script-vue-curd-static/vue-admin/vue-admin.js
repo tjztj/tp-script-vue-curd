@@ -1052,6 +1052,18 @@ define(requires, function ( axios,Qs) {
                     })
                 }
 
+
+                setInterval(()=>{
+                    const foot=document.querySelector('#'+id+' .curd-table .ant-table .ant-table-content .ant-table-footer');
+                    if(foot){
+                        if(foot.innerHTML.replace(/\s+/g,'')!==''){
+                            foot.style.display='block';
+                        }else{
+                            foot.style.display='none';
+                        }
+                    }
+                },50)
+
                 return {
                     actionW:newActionW,
                     columns:Vue.ref(columns),
@@ -1063,7 +1075,6 @@ define(requires, function ( axios,Qs) {
                     listFieldComponents,
                     fieldObjs,
                     childsObjs,
-                    showFooter:Vue.ref(true),
                 }
             },
             watch: {
@@ -1186,10 +1197,6 @@ define(requires, function ( axios,Qs) {
                 isCanDel(row){
                     return this.canDel&&(!row.__auth||typeof row.__auth.del==='undefined'||row.__auth.del===true)
                 },
-                hideShowFooter(){
-                    this.showFooter=false;
-                    return '';
-                }
             },
             template:`<div :id="id">
                         <a-table
@@ -1313,7 +1320,7 @@ define(requires, function ( axios,Qs) {
                                     </template>
                             </template>
                                 
-                             <template v-if="showFooter" #footer><slot name="footer" :columns="columns" :current-page-data="data">{{hideShowFooter()}}</slot></template>
+                             <template #footer><slot name="footer" :columns="columns" :current-page-data="data"></slot></template>
                         </a-table>
                     </div>`,
         })
