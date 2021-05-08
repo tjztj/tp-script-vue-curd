@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd\option;
 
 
+use tpScriptVueCurd\base\model\VueCurlModel;
+
 class FunControllerIndexData
 {
 
@@ -39,6 +41,14 @@ class FunControllerIndexData
      * @var int
      */
     public int $total = 0;
+
+
+    /**
+     * 有where条件与排序的model
+     * @var VueCurlModel|null
+     */
+    public ?VueCurlModel $model=null;
+
 
 
     public function toArray():array{

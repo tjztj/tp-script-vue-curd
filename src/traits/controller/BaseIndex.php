@@ -129,6 +129,7 @@ trait BaseIndex
 
 
             $option=new FunControllerIndexData();
+            $option->model=clone $model;
             if($this->indexPageOption->pageSize>0){
                 $list=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize);
                 $option->currentPage=$list->currentPage();
