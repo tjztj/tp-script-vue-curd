@@ -106,7 +106,7 @@ trait CurdFunc
         if($this->model instanceof BaseChildModel){
             $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
         }
-        $fields=$this->fields->filterShowStepFields($data,$baseInfo)->filterHideFieldsByShow($data)->rendGroup();
+        $fields=$this->fields->filterHideFieldsByShow($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
 
         if($data->checkRowAuth($fields,$baseInfo,'show')===false){
             return $this->errorAndCode('您不能查看当前数据信息');

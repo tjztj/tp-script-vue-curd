@@ -101,7 +101,6 @@ class CheckboxField extends ModelField
         $excelFieldTpl->wrapText=true;
     }
 
-
     /**
      * EXCEL导入时，对数据的处理
      * @param array $save
@@ -111,17 +110,18 @@ class CheckboxField extends ModelField
         if(!isset($save[$name])){
             return;
         }
-
-        $items=$this->getItemsTextValues();
-        $save[$name]=[];
-        foreach (explode("\n",$save[$name]) as $v){
-            $v=trim($v);
-            if(empty($items[$v])){
+        $arr=explode("\n",$save[$name]);
+        $values=$this->getItemsTextValues();
+        foreach ($arr as $k=>$v){
+            if(isset($values[$v])){
+                $arr[$k]=$values[$v];
+            }else{
                 throw new \think\Exception($v.' 不在可选项中');
             }
-            $save[$name][]=$items[$v];
         }
+        $save[$name]=$arr;
     }
+
 
     public static function componentUrl(): FieldTpl
     {

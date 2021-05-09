@@ -78,9 +78,15 @@ class SwitchField extends ModelField
                 $this->save='';
             }else {
                 if(!isset($this->getItemsValueTexts()[$data[$name]])){
-                    throw new \think\Exception($data[$name].' 不在可选中');
+                    if(empty($data[$name])){
+                        $this->defaultCheckRequired('','请选择正确的选项');
+                        $this->save='';
+                    }else{
+                        throw new \think\Exception($data[$name].' 不在可选中');
+                    }
+                }else{
+                    $this->save=$data[$name];
                 }
-                $this->save=$data[$name];
             }
         }else{
             $this->defaultCheckRequired('');
@@ -121,6 +127,24 @@ class SwitchField extends ModelField
         $excelFieldTpl->explain=$str;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->width=40;
+    }
+
+    /**
+     * EXCEL导入时，对数据的处理
+     * @param array $save
+     */
+    public function excelSaveDoData(array &$save):void{
+        $name=$this->name();
+        if(!isset($save[$name])){
+            return;
+        }
+        $values=$this->getItemsTextValues();
+
+        if(!isset($values[$save[$name]])){
+            throw new \think\Exception($save[$name].' 不在可选中');
+        }else{
+            $save[$name]=$values[$save[$name]];
+        }
     }
 
 

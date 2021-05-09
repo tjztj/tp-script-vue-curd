@@ -116,7 +116,26 @@ class SelectField extends ModelField
         $excelFieldTpl->width=40;
         $excelFieldTpl->wrapText=true;
     }
-
+    /**
+     * EXCEL导入时，对数据的处理
+     * @param array $save
+     */
+    public function excelSaveDoData(array &$save):void{
+        $name=$this->name();
+        if(!isset($save[$name])){
+            return;
+        }
+        $arr=explode("\n",$save[$name]);
+        $values=$this->getItemsTextValues();
+        foreach ($arr as $k=>$v){
+            if(isset($values[$v])){
+                $arr[$k]=$values[$v];
+            }else{
+                throw new \think\Exception($v.' 不在可选项中');
+            }
+        }
+        $save[$name]=$arr;
+    }
 
 
     public static function componentUrl(): FieldTpl

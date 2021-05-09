@@ -115,7 +115,7 @@ class FieldWhere
 
 
     private function checkSelf($saveDatas,bool $isSourceData):bool{
-        if($isSourceData){
+        if(!$isSourceData){
             if($this->field->required()){
                 $field=clone $this->field;
                 $field->required(false);
@@ -123,7 +123,7 @@ class FieldWhere
                 $field= $this->field;
             }
             $field->setSave($saveDatas);
-            $saveDatas[$this->field->name()]=$this->field->getSave();
+            $saveDatas[$this->field->name()]=$field->getSave();
         }
 
         if(!isset($saveDatas[$this->field->name()])||is_null($saveDatas[$this->field->name()])){

@@ -19,6 +19,7 @@ class FieldStepBaseConfig
     public string $listBtnTextEdit='';//编辑时显示文字
     public string $titleEdit='';//编辑时显示文字
     public ?string $listBtnColorEdit=null;//编辑时的标题
+    public array $other=[];
 
 
     public function __construct(array $config=[]){
@@ -45,6 +46,7 @@ class FieldStepBaseConfig
             'listBtnTextEdit'=>$this->listBtnTextEdit,
             'titleEdit'=>$this->titleEdit,
             'listBtnColorEdit'=>$this->listBtnColorEdit,
+            'other'=>$this->other,
         ];
     }
 
