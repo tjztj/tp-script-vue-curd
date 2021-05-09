@@ -27,6 +27,7 @@ trait CurdFunc
 
     public string $fetchPath;
     protected bool $autoStepNext=false;
+    protected bool $dontShowTpl=false;
 
 
     private bool $saveStepNext;//编辑的时候，是否是下一步
@@ -262,6 +263,10 @@ trait CurdFunc
      * @return mixed
      */
     protected function showTpl($file,$data){
+        if($this->dontShowTpl){
+            return $this->success($data);
+        }
+
         if(isset($this->fetchPath)&&$this->fetchPath!==''){
             return $this->fetch($this->fetchPath,$data);
         }
