@@ -12,7 +12,6 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    console.log(this.value);
                     const nullValue=typeof this.field.nullVal==='string'||typeof this.field.nullVal==='number'?this.field.nullVal.toString():null;
 
                     if(this.field.multiple){

@@ -9,6 +9,7 @@ use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\PasswordField;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
 use tpScriptVueCurd\traits\field\FieldCollectionStep;
@@ -276,13 +277,12 @@ class FieldCollection extends Collection
     }
 
 
-
     /**
-     * 生成查询条件
-     * @param null|string|array $myFilter 传入参数和自己获取两种方法(json或数组或空)
-     * @return array|\Closure
+     * 获取查询数据条件
+     * @param array|null $myFilter
+     * @return array
      */
-    public function getFilterWhere(array $myFilter=null){
+    private function getFilterWhereData(array $myFilter=null):array{
         if(is_null($myFilter)){
             $myFilter=input('filterData',null,null);
             if(empty($myFilter)){
@@ -299,9 +299,26 @@ class FieldCollection extends Collection
         if(empty($myFilter)){
             return [];
         }
+        return $myFilter;
+    }
 
-
+    /**
+     * 生成查询条件
+     * @param null|string|array $myFilter 传入参数和自己获取两种方法(json或数组或空)
+     * @return array|\Closure
+     */
+    public function getFilterWhere(array $myFilter=null){
         return function(Query $query)use($myFilter){
+            $myFilter=$this->getFilterWhereData($myFilter);
+
+            FieldDo::doIndexFilterBefore($this,$query,$myFilter);
+
+
+            if(empty($myFilter)){
+                return;
+            }
+
+
             if(isset($myFilter['id'])){
                 //可以使用ID查找
                 $query->where('id','in',is_array($myFilter['id'])?$myFilter['id']:explode(',',$myFilter['id']));

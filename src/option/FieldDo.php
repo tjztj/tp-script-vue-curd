@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\option;
 
 
 use think\Collection;
+use think\db\Query;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
@@ -23,6 +24,13 @@ class FieldDo
      * @var callable $indexListDo
      */
     protected $indexListDo;
+
+    /**
+     * 列表条件筛选前会执行
+     * @var callable $indexFilterBeforeDo
+     */
+    protected $indexFilterBeforeDo;
+
     /**
      * show 页面会执行
      * @var callable $showInfoDo
@@ -47,6 +55,7 @@ class FieldDo
      * @var callable $editShowDo
      */
     protected $editShowDo;
+
 
 
 
@@ -109,6 +118,31 @@ class FieldDo
         $func($list,$row,$base,$field);
         return $this;
     }
+
+
+    ##################################################################################################################
+
+
+    public function setIndexFilterBeforeDo(callable $func): self
+    {
+        $this->indexListDo=$func;
+        return $this;
+    }
+    public function doIndexFilterBeforeDo(ModelField $field,Query $query,array $filterData): self
+    {
+        $func=$this->indexFilterBeforeDo?? static function(){};
+        $func($field,$query,$filterData);
+        return $this;
+    }
+    public static function doIndexFilterBefore(FieldCollection $field,Query $query,array $filterData):void{
+        $field->each(static function(ModelField $field)use($query,$filterData){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doIndexFilterBeforeDo($field,$query,$filterData);
+            }
+        });
+    }
+
+
 
     ##################################################################################################################
 
