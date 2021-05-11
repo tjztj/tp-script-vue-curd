@@ -12,19 +12,22 @@ define([],function(){
         computed:{
             val:{
                 get(){
+                    console.log(this.value);
+                    const nullValue=typeof this.field.nullVal==='string'||typeof this.field.nullVal==='number'?this.field.nullVal.toString():null;
+
                     if(this.field.multiple){
                         if(this.value===''){
                             return [];
                         }
-                        if(typeof this.value==='number'){
+                        if(typeof this.value==='number'&&(nullValue===null||this.value.toString()!==nullValue)){
                             return this.value.toString();
                         }
-                        if(typeof this.value==='string'){
+                        if(typeof this.value==='string'&&(nullValue===null||this.value!==nullValue)){
                             return this.value.split(',');
                         }
                         return [];
                     }
-                    return typeof this.value==='undefined'||this.value===''?undefined:this.value.toString();
+                    return typeof this.value==='undefined'||this.value===''||(nullValue!==null&&this.value.toString()===nullValue)?undefined:this.value.toString();
                 },
                 set(val){
                     if(val===undefined){
