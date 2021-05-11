@@ -79,21 +79,17 @@ class FieldDo
 
         $list->each(static function(VueCurlModel $row)use($field,$base){
             $field->each(static function(ModelField $field)use($base,$row){
-                $fieldDo=$field->getFieldDo();
-                if(!$fieldDo){
-                    return;
+                foreach ($field->getFieldDoList() as $fieldDo){
+                    $fieldDo->doIndexRowDo($row,$base,$field);
                 }
-                $fieldDo->doIndexRowDo($row,$base,$field);
             });
         });
         //另外再遍历，为了方便前面那个遍历后得到的东西在下面使用
         $list->each(static function(VueCurlModel $row)use($field,$base,$list){
             $field->each(static function(ModelField $field)use($base,$row,$list){
-                $fieldDo=$field->getFieldDo();
-                if(!$fieldDo){
-                    return;
+                foreach ($field->getFieldDoList() as $fieldDo){
+                    $fieldDo->doIndexListDo($list,$row,$base,$field);
                 }
-                $fieldDo->doIndexListDo($list,$row,$base,$field);
             });
         });
     }
@@ -142,11 +138,9 @@ class FieldDo
      */
     public static function doShow(FieldCollection $field,VueCurlModel $info,?BaseModel $base):void{
         $field->each(static function(ModelField $field)use($base,$info){
-            $fieldDo=$field->getFieldDo();
-            if(!$fieldDo){
-                return;
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doShowInfoDo($info,$base,$field);
             }
-            $fieldDo->doShowInfoDo($info,$base,$field);
         });
     }
 
@@ -181,11 +175,9 @@ class FieldDo
      */
     public static function doSaveBefore(FieldCollection $field,array &$postData,?VueCurlModel $info,?BaseModel $base):void{
         $field->each(static function(ModelField $field)use($base,$info,&$postData){
-            $fieldDo=$field->getFieldDo();
-            if(!$fieldDo){
-                return;
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doSaveBeforeDo($postData,$info,$base,$field);
             }
-            $fieldDo->doSaveBeforeDo($postData,$info,$base,$field);
         });
     }
 
@@ -224,11 +216,9 @@ class FieldDo
      */
     public static function doSaveAfter(FieldCollection $field,array $saveData,?VueCurlModel $before,VueCurlModel $after,?BaseModel $base):void{
         $field->each(static function(ModelField $field)use($base,$before,$after,$saveData){
-            $fieldDo=$field->getFieldDo();
-            if(!$fieldDo){
-                return;
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doSaveAfterDo($saveData,$before,$after,$base,$field);
             }
-            $fieldDo->doSaveAfterDo($saveData,$before,$after,$base,$field);
         });
     }
 
@@ -261,11 +251,9 @@ class FieldDo
      */
     public static function doEditShow(FieldCollection $field,?VueCurlModel $info,?BaseModel $base):void{
         $field->each(static function(ModelField $field)use($base,$info){
-            $fieldDo=$field->getFieldDo();
-            if(!$fieldDo){
-                return;
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doEditShowDo($info,$base,$field);
             }
-            $fieldDo->doEditShowDo($info,$base,$field);
         });
     }
 

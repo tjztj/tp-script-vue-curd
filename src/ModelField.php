@@ -47,7 +47,10 @@ abstract class ModelField
     protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule=null;//数据验证
     protected $nullVal='';//字段在数据库中为空时的值
-    protected FieldDo $fieldDo;//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
+    /**
+     * @var FieldDo[] $fieldDoList
+     */
+    protected array $fieldDoList=[];//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
     protected ?FieldWhere $hideSelf=null;//编辑时是否隐藏本字段
     public const REQUIRED=true;//开启必填验证
     public bool $objWellToArr=true;
@@ -603,31 +606,28 @@ abstract class ModelField
     }
 
 
-
     /**
-     * 设置字段钩子
-     * @param FieldDo $fieldDo
-     * @return $this
+     * 如果传入有值，返回$this；如果传入无值，会在fieldDoList中新建一个并返回新建的FieldDo
+     * @param FieldDo|null $fieldDo
+     * @return $this|FieldDo
      */
-    public function setFieldDo(FieldDo $fieldDo):self{
-        $this->fieldDo=$fieldDo;
-        return $this;
+    public function pushFieldDo(FieldDo $fieldDo=null){
+        if(!is_null($fieldDo)){
+            $this->fieldDoList[]=$fieldDo;
+            return $this;
+        }
+        $fieldDo=new FieldDo;
+        $this->fieldDoList[]=$fieldDo;
+        return $fieldDo;
     }
 
-    /**获取字段钩子
-     * @param bool $initFieldDo 如果没有值是否初始化
-     * @return FieldDo|null
+
+    /**
+     * 获取FieldDo列表
+     * @return FieldDo[]
      */
-    public function getFieldDo(bool $initFieldDo=false): ?FieldDo
-    {
-        if(isset($this->fieldDo)){
-            return $this->fieldDo;
-        }
-        if($initFieldDo===false){
-            return null;
-        }
-        $this->setFieldDo(new FieldDo());
-        return $this->fieldDo;
+    public function getFieldDoList():array{
+        return $this->fieldDoList;
     }
 
 }
