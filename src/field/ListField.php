@@ -100,27 +100,30 @@ class ListField extends ModelField
     {
         if(isset($data[$this->name()])){
             $list=[];
-            if(is_array($data[$this->name()])){
-                foreach ($data[$this->name()] as $k=>$v){
-                    $fieldsObj=clone $this->fields;
-                    $fieldsObj->setSave($v);
-                    $list[]=$fieldsObj->getSave();
-                }
-                $this->save=json_encode($list);
-            }else{
+            if(!is_array($data[$this->name()])){
+                $arr=[];
                 if($data[$this->name()]!==''){
                     //如果是正确的json
-                    $list=json_decode($data[$this->name()],true);
-                    if(empty($list)){
-                        $list=json_decode(htmlspecialchars_decode($data[$this->name()]),true);
-                        empty($list)||$data[$this->name()]=htmlspecialchars_decode($data[$this->name()]);
+                    $arr=json_decode($data[$this->name()],true);
+                    if(empty($arr)){
+                        $arr=json_decode(htmlspecialchars_decode($data[$this->name()]),true);
+                        empty($arr)||$data[$this->name()]=htmlspecialchars_decode($data[$this->name()]);
                     }
-                }
-                $this->save=$data[$this->name()];
+                };
+                $list=$arr?:[];
+            }else{
+                $list=$data[$this->name()];
+            }
+            foreach ($list as $k=>$v){
+                $fieldsObj=clone $this->fields;
+                $fieldsObj->setSave($v);
+                $list[$k]=$fieldsObj->getSave();
             }
             if(empty($list)){
                 $this->save='null';
                 $this->defaultCheckRequired('');
+            }else{
+                $this->save=json_encode($list);
             }
         }else{
             $this->save='null';
