@@ -46,9 +46,11 @@ trait Curd
             $savedInfo=null;
             $old=null;
             $returnSaveData=[];
+            $isNext=false;
             try{
                 if(empty($data['id'])){
                     $this->addBefore($data);
+                    $isNext=true;
                     //步骤字段
                     $this->fields=$this->fields->filterNextStepFields(null,null,$stepInfo);
                     $this->fields->saveStepInfo=$stepInfo;
@@ -96,7 +98,7 @@ trait Curd
             $this->model->commit();
 
             //提交后
-            $msg=(empty($data['id'])?'添加':($this->getSaveStepNext()?'提交':'修改')).'成功';
+            $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
             $this->editCommitAfter($msg,$old,$savedInfo,null,$returnSaveData);
 
             $this->success($msg,[
