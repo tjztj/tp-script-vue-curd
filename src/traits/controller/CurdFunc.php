@@ -191,7 +191,7 @@ trait CurdFunc
         if($data){
             $info=$data->toArray();
             //只处理地区
-            $fields->filter(fn(ModelField $v)=> (in_array($v->name(), [$data::getRegionField(), $data::getRegionPidField()]) && $v->canEdit() === false) ||is_subclass_of($v,FilesField::class))->doShowData($info);
+            $fields->filter(fn(ModelField $v)=> (in_array($v->name(), [$data::getRegionField(), $data::getRegionPidField()]) && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
             //原信息
             $info['sourceData']=$data;
         }else{

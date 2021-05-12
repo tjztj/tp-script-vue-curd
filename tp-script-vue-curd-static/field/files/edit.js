@@ -5,11 +5,19 @@ define([],function(){
             let fileList=Vue.ref([]),id='upload-class-'+window.guid();
             if(props.value){
                 let imgList=props.value.split('|'),fid=0;
+
+                function getUrlTitle(url) {
+                    if(!vueData||!vueData.info||!vueData.info[props.field.name+'InfoArr']||!vueData.info[props.field.name+'InfoArr'][url]||!vueData.info[props.field.name+'InfoArr'][url].original_name){
+                        let arr=url.split('/');
+                        return arr[arr.length-1];
+                    }
+                    return vueData.info[props.field.name+'InfoArr'][url].original_name
+                }
                 fileList.value=imgList.map(function(v){
                     fid--;
                     return {
                         uid:fid,
-                        name:v.substring(v.lastIndexOf("/")+1,v.length),
+                        name:getUrlTitle(v),
                         status: 'done',
                         url:v,
                     };
