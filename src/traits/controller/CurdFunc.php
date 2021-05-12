@@ -177,22 +177,27 @@ trait CurdFunc
                 }
                 $isStepNext=false;
             }
-
             $fields->saveStepInfo=$stepInfo;
+        }else{
+            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
+            $fields->saveStepInfo=$stepInfo;
+            $isStepNext=true;
+        }
+        FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
 
-            FieldDo::doEditShow($fields,$data,$baseModel);
+
+        //data可能在上面改变为有值
+        if($data){
             $info=$data->toArray();
             //只处理地区
             $fields->filter(fn(ModelField $v)=>in_array($v->name(),[$data::getRegionField(),$data::getRegionPidField()])&&$v->canEdit()===false)->doShowData($info);
             //原信息
             $info['sourceData']=$data;
         }else{
-            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
-            $fields->saveStepInfo=$stepInfo;
-            FieldDo::doEditShow($fields,$data,$baseModel);
             $info=null;
-            $isStepNext=true;
         }
+
+
 
 
 

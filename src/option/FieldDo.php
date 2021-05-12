@@ -125,7 +125,7 @@ class FieldDo
 
     public function setIndexFilterBeforeDo(callable $func): self
     {
-        $this->indexListDo=$func;
+        $this->indexFilterBeforeDo=$func;
         return $this;
     }
     public function doIndexFilterBeforeDo(ModelField $field,Query $query,array $filterData): self
@@ -270,10 +270,10 @@ class FieldDo
      * @param ModelField $field
      * @return $this
      */
-    public function doEditShowDo(?VueCurlModel $info,?BaseModel $base,ModelField $field): self
+    public function doEditShowDo(?VueCurlModel &$info,?BaseModel $base,ModelField $field,$isStepNext): self
     {
         $func=$this->editShowDo?? static function(){};
-        $func($info,$base,$field);
+        $func($info,$base,$field,$isStepNext);
         return $this;
     }
 
@@ -283,10 +283,10 @@ class FieldDo
      * @param VueCurlModel|BaseModel|BaseChildModel|null $info
      * @param BaseModel|null $base
      */
-    public static function doEditShow(FieldCollection $field,?VueCurlModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info){
+    public static function doEditShow(FieldCollection $field,?VueCurlModel &$info,?BaseModel $base,bool $isStepNext):void{
+        $field->each(static function(ModelField $field)use($base,&$info,$isStepNext){
             foreach ($field->getFieldDoList() as $fieldDo){
-                $fieldDo->doEditShowDo($info,$base,$field);
+                $fieldDo->doEditShowDo($info,$base,$field,$isStepNext);
             }
         });
     }
