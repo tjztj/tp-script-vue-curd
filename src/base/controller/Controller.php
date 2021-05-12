@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\base\controller;
 use think\App;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\middleware\FieldMiddleware;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Vue;
@@ -26,6 +27,8 @@ use tpScriptVueCurd\traits\Func;
  */
 trait Controller
 {
+    protected $middleware = [FieldMiddleware::class];
+
     use Func,Vue,CurdFunc,Excel{
         Vue::initialize as vueInitialize;
     }
