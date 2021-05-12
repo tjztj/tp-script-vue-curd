@@ -28,6 +28,7 @@ abstract class ModelField
     protected string $title='';//标题
     protected string $ext='';//后缀
     protected string $placeholder='';//输入提示
+    protected string $editExplain='';//字段编辑时下方的说明
     protected bool $listShow=false;//是否在列表中显示
     protected int $listColumnWidth=0;//指定列宽（0，不指定）
     protected bool $listSort=true;//列表中时候可排序
@@ -155,6 +156,14 @@ abstract class ModelField
      */
     public function placeholder(string $placeholder=null){
         return $this->doAttr('placeholder',$placeholder);
+    }
+
+    /**字段编辑时下方的说明
+     * @param string|null $editExplain
+     * @return $this|string
+     */
+    public function editExplain(string $editExplain=null){
+        return $this->doAttr('editExplain',$editExplain);
     }
 
 

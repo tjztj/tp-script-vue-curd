@@ -117,7 +117,7 @@ class FilesField extends ModelField
             return;
         }
         $func=$this->fileInfoOn;
-        $func($fileInfos);
+        $func($fileInfos,$this);
     }
 
 

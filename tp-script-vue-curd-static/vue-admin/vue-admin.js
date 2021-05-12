@@ -879,6 +879,7 @@ define(requires, function ( axios,Qs) {
                                         :group-field-items="groupFieldItems"
                                         @submit="$emit('submit',$event)"
                                     ></component>
+                                    <div v-if="field.editExplain" style="color: #bfbfbf"></div>
                                 </a-form-item>
                                 </transition>
                             </div>
