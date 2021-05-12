@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\traits\controller;
 
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use think\db\Query;
@@ -159,7 +160,8 @@ trait CurdChild{
         foreach ($option->data as $k=>$v){
             $this->fields->doShowData($option->data[$k]);
         }
-
+        
+        FilesField::setShowFileInfos();
         return $option;
     }
 

@@ -11,8 +11,6 @@ class FieldMiddleware
     public function handle($request, \Closure $next)
     {
         $return = $next($request);
-
-        FilesField::setFileInfos();
         return $return;
     }
 }

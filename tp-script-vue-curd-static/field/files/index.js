@@ -9,8 +9,11 @@ define([],function(){
         },
         methods:{
             getUrlTitle(url) {
-                let arr=url.split('/');
-                return arr[arr.length-1];
+                if(!this.record.record[this.field.name+'InfoArr']||!this.record.record[this.field.name+'InfoArr'][url]||!this.record.record[this.field.name+'InfoArr'][url].original_name){
+                    let arr=url.split('/');
+                    return arr[arr.length-1];
+                }
+                return this.record.record[this.field.name+'InfoArr'][url].original_name
             }
         },
         template:`

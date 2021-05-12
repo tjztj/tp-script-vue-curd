@@ -90,7 +90,7 @@ class FilesField extends ModelField
             ];
             foreach ($dataBaseData[$this->name().'Arr'] as $v){
                 isset(self::$doShowFields[$this->guid()]['infos'][$v])||self::$doShowFields[$this->guid()]['infos'][$v]=[];
-                $dataBaseData[$this->name().'InfoArr']=&self::$doShowFields[$this->guid()][$v]['infos'];
+                $dataBaseData[$this->name().'InfoArr'][$v]=&self::$doShowFields[$this->guid()]['infos'][$v];
             }
 
 
@@ -131,7 +131,7 @@ class FilesField extends ModelField
         );
     }
 
-    public static function setFileInfos():void{
+    public static function setShowFileInfos():void{
         $urls=[];
         foreach (self::$doShowFields as $guid=>$obj){
             array_push($urls,...$obj['urls']);

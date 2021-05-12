@@ -10,6 +10,7 @@ use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
@@ -155,7 +156,8 @@ trait BaseIndex
             foreach ($option->data as $k=>$v){
                 $this->fields->doShowData($option->data[$k]);
             }
-
+            
+            FilesField::setShowFileInfos();
             $this->indexData($option);
 
             return $this->success($option->toArray());

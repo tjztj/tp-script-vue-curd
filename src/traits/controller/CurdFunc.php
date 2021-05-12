@@ -8,6 +8,7 @@ use think\helper\Str;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\FieldCollection;
 use think\Request;
 use tpScriptVueCurd\ModelField;
@@ -268,6 +269,7 @@ trait CurdFunc
      * @return mixed
      */
     protected function showTpl($file,$data){
+        FilesField::setShowFileInfos();
         if($this->dontShowTpl){
             return $this->success($data);
         }
