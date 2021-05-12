@@ -160,8 +160,7 @@ trait CurdChild{
         foreach ($option->data as $k=>$v){
             $this->fields->doShowData($option->data[$k]);
         }
-        
-        FilesField::setShowFileInfos();
+
         return $option;
     }
 

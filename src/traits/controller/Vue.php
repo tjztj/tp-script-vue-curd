@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\traits\controller;
 use think\App;
 use think\exception\HttpResponseException;
 use think\Request;
+use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\middleware\FieldMiddleware;
 
 /**
@@ -112,6 +113,7 @@ trait Vue
      */
     public function success($msgOrData = '', $data = '', $url = null, $wait = 3, array $header = [])
     {
+        FilesField::setShowFileInfos();
         if(is_string($msgOrData)){
             $this->parentSuccess($msgOrData,$data,$url,$wait,$header);
         }

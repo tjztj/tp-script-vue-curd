@@ -157,7 +157,7 @@ trait BaseIndex
                 $this->fields->doShowData($option->data[$k]);
             }
             
-            FilesField::setShowFileInfos();
+
             $this->indexData($option);
 
             return $this->success($option->toArray());
