@@ -45,7 +45,8 @@ function vueCurdMergeArrays(array $old,array $new):array{
  * @param array|string|\tpScriptVueCurd\base\model\VueCurlModel $stepOrInfo
  * @return array|null
  */
-function endStep($stepOrInfo){
+function endStep($stepOrInfo): ?array
+{
     if(empty($stepOrInfo)){
         return null;
     }
@@ -71,7 +72,8 @@ function endStep($stepOrInfo){
  * @param  array|string|\tpScriptVueCurd\base\model\VueCurlModel $stepOrInfo
  * @return bool
  */
-function eqEndStep($step,$stepOrInfo){
+function eqEndStep($step,$stepOrInfo): bool
+{
     if($step instanceof \tpScriptVueCurd\option\FieldStep){
         $step=$step->getStep();
     }
@@ -83,7 +85,7 @@ function eqEndStep($step,$stepOrInfo){
 }
 
 if (!function_exists('create_guid')) {
-    function create_guid()
+    function create_guid(): string
     {
         $charid = strtoupper(md5(uniqid(mt_rand(), true)));
         $hyphen = chr(45);// "-"

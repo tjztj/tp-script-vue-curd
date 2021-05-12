@@ -21,6 +21,7 @@ abstract class ModelField
 {
     use Func;
 
+    protected string $guid='';
     protected string $name='';//字段名
     protected array $tag=[];//标签
     protected string $group='';//分组
@@ -57,6 +58,7 @@ abstract class ModelField
 
 
     public function __construct(){
+        $this->guid=create_guid();
         $this->type=class_basename(static::class);
         if($this->defaultFilterClass){
             $this->filter(new $this->defaultFilterClass($this));
@@ -628,6 +630,11 @@ abstract class ModelField
      */
     public function getFieldDoList():array{
         return $this->fieldDoList;
+    }
+
+    public function guid(): string
+    {
+        return $this->guid;
     }
 
 }

@@ -44,10 +44,22 @@ if (!function_exists('tpScriptVueCurdGetHtmlTitle')) {
 if (!function_exists('tpScriptVueCurdUploadDefaultUrl')) {
     /**
      * 文件上传默认url
+     * url需返回 [code=1,msg=>'',data=>[id=1,original_name=>'',url=>'']]
      * @return string
      */
     function tpScriptVueCurdUploadDefaultUrl():string{
         return '/admin/ajax/upload';
+    }
+}
+
+if (!function_exists('tpScriptVueCurdGetFileInfosByUrls')) {
+    /**
+     * 文件上传默认url
+     * @param array $urls
+     * @return array 返回的数据需为 [ [id=>1,url=>'',original_name=>''],[id=>2,url=>'',original_name=>''] ]
+     */
+    function tpScriptVueCurdGetFileInfosByUrls(array $urls):array{
+        return [];
     }
 }
 

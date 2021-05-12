@@ -23,6 +23,15 @@ class FilesField extends ModelField
     protected bool $canExcelImport=false;//不能使用excel导入数据
     protected string $accept='';//上传文件类型
 
+    /**
+     * @var callable $fileInfoOn
+     */
+    private $fileInfoOn;
+
+
+
+    private static array $doShowFields=[];
+
 
     /**最小值
      * @param string|null $url
@@ -73,6 +82,18 @@ class FilesField extends ModelField
         if(isset($dataBaseData[$this->name()])){
             $dataBaseData[$this->name()]=trim($dataBaseData[$this->name()]);
             $dataBaseData[$this->name().'Arr']=$dataBaseData[$this->name()]?explode('|',$dataBaseData[$this->name()]):[];
+            $dataBaseData[$this->name().'InfoArr']=[];
+            self::$doShowFields[$this->guid()]=[
+                'field'=>$this,
+                'urls'=>$dataBaseData[$this->name().'Arr'],
+                'infos'=>[]
+            ];
+            foreach ($dataBaseData[$this->name().'Arr'] as $v){
+                isset(self::$doShowFields[$this->guid()]['infos'][$v])||self::$doShowFields[$this->guid()]['infos'][$v]=[];
+                $dataBaseData[$this->name().'InfoArr']=&self::$doShowFields[$this->guid()][$v]['infos'];
+            }
+
+
         }
     }
 
@@ -87,6 +108,19 @@ class FilesField extends ModelField
     }
 
 
+    /**
+     * 可截断显示，如果有的话
+     * @param $fileInfos
+     */
+    public function onFileInfo(&$fileInfos):void{
+        if(!isset($this->fileInfoOn)||is_null($this->fileInfoOn)){
+            return;
+        }
+        $func=$this->fileInfoOn;
+        $func($fileInfos);
+    }
+
+
     public static function componentUrl(): FieldTpl
     {
         $type=class_basename(static::class);
@@ -96,5 +130,34 @@ class FilesField extends ModelField
             new Edit($type,'/tp-script-vue-curd-static.php?field/files/edit.js')
         );
     }
+
+    public static function setFileInfos():void{
+        $urls=[];
+        foreach (self::$doShowFields as $guid=>$obj){
+            array_push($urls,...$obj['urls']);
+        }
+        if(empty($urls)){
+            return;
+        }
+
+        $infos=[];
+        foreach (tpScriptVueCurdGetFileInfosByUrls($urls) as $v){
+            $infos[$v['url']]=$v;
+        }
+
+
+        foreach (self::$doShowFields as $guid=>$obj){
+            $list=[];
+            foreach ($obj['urls'] as $v){
+                $list[$v]=$infos[$v]??['id'=>$v,'url'=>$v,'original_name'=>''];
+            }
+            $obj['field']->onFileInfo($list);
+            foreach ($obj['infos'] as $url=>$info){
+                self::$doShowFields[$guid]['infos'][$url]=$list[$url];
+            }
+        }
+
+    }
+
 
 }
