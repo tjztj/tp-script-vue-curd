@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\traits\controller;
 use think\App;
 use think\exception\HttpResponseException;
 use think\Request;
+use tpScriptVueCurd\middleware\FieldMiddleware;
 
 /**
  * Trait Vue
@@ -32,6 +33,8 @@ trait Vue
      */
     public function initialize()
     {
+        isset($this->middleware)||$this->middleware=[];
+        $this->middleware[]=FieldMiddleware::class;
         parent::initialize();
         if ($this->checkIsVueAction()) {
             $this->app->view->config(['view_suffix' => 'vue']);
