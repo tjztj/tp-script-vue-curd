@@ -268,6 +268,7 @@ class FieldDo
      * @param VueCurlModel|BaseModel|BaseChildModel|null $info
      * @param BaseModel|null $base
      * @param ModelField $field
+     * @param $isStepNext
      * @return $this
      */
     public function doEditShowDo(?VueCurlModel &$info,?BaseModel $base,ModelField $field,$isStepNext): self
@@ -282,6 +283,7 @@ class FieldDo
      * @param FieldCollection $field
      * @param VueCurlModel|BaseModel|BaseChildModel|null $info
      * @param BaseModel|null $base
+     * @param bool $isStepNext
      */
     public static function doEditShow(FieldCollection $field,?VueCurlModel &$info,?BaseModel $base,bool $isStepNext):void{
         $field->each(static function(ModelField $field)use($base,&$info,$isStepNext){
