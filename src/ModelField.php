@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd;
 
 
+use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
@@ -337,8 +338,28 @@ abstract class ModelField
      * @param FieldWhere|null $hideSelf
      * @return $this|FieldWhere
      */
-    public function hideSelf(FieldWhere $hideSelf=null){
-        return $this->doAttr('hideSelf',$hideSelf);
+//    public function hideSelf(FieldWhere $hideSelf=null){
+//        return $this->doAttr('hideSelf',$hideSelf);
+//    }
+    /**
+     * 隐藏本字段条件，不能修改，修改请使用pushHideSelfWhere
+     * @return FieldWhere|null
+     */
+    public function hideSelf():?FieldWhere{
+        return $this->hideSelf??null;
+    }
+
+    /**
+     * 新增隐藏本字段条件
+     * @param FieldWhere $where
+     * @return $this
+     */
+    public function pushSelfHideWhere(FieldWhere $where):self{
+        if(!$this->hideSelf()){
+            $this->hideSelf=FieldWhere::make(StringField::init('__InitializationFieldWhereField__'),'__InitializationFieldWhereField__[这个条件是初始化条件，不用管]');
+        }
+        $this->hideSelf->or($where);
+        return $this;
     }
     
 
