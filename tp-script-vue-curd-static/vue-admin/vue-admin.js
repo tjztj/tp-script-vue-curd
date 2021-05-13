@@ -984,6 +984,7 @@ define(requires, function ( axios,Qs) {
                         fixed:props.fieldStepConfig.listFixed?props.fieldStepConfig.listFixed:false,
                     };
                     if(props.fieldStepConfig.listFixed){
+                        stepCol.width=180;
                         columns.push(createTimeCol)
                         columnsCount++;
                         columns.push(stepCol)
