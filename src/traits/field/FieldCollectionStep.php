@@ -20,6 +20,7 @@ trait FieldCollectionStep
         //【dataStepHistory：根据数据存储的步骤字段来显示哪些步骤】
         //【可以自定义一个函数，参数是要显示的对象function($fields,$info,$baseInfo):void】
         'showSortSteps'=>'dataStepHistory',
+        'listFixed'=>'',//列表中，列是否浮动，'left'/'right'
     ];
 
 

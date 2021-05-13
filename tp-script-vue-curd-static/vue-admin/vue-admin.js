@@ -942,6 +942,7 @@ define(requires, function ( axios,Qs) {
                             slots:{title:customTitle},
                             ellipsis:true,
                             sorter: item.listSort,
+                            fixed:item.listFixed?item.listFixed:false,
                         };
                         if(fieldComponents['VueCurdIndex'+item.type]){
                             listFieldComponents[item.name]=item;
@@ -970,6 +971,7 @@ define(requires, function ( axios,Qs) {
                         ellipsis:true,
                         dataIndex: "stepInfo",
                         slots: { customRender: 'step-info' },
+                        fixed:props.fieldStepConfig.listFixed?props.fieldStepConfig.listFixed:false,
                     })
                     columnsCount++;
                 }

@@ -32,6 +32,7 @@ abstract class ModelField
     protected bool $listShow=false;//是否在列表中显示
     protected int $listColumnWidth=0;//指定列宽（0，不指定）
     protected bool $listSort=true;//列表中时候可排序
+    public string $listFixed='';//列表中，列是否浮动，'left'/'right'
     protected bool $required=false;//字段是否必填
     protected bool $readOnly=false;//找到是否只读
     protected bool $editShow=true;//字段在添加修改时是否显示
@@ -175,6 +176,16 @@ abstract class ModelField
     public function listShow(bool $listShow=null){
         return $this->doAttr('listShow',$listShow);
     }
+
+    /**列表中，列是否浮动，'left'/'right'
+     * @param string|null $listFixed
+     * @return $this|string
+     */
+    public function listFixed(string $listFixed=null){
+        return $this->doAttr('listFixed',$listFixed);
+    }
+
+
 
     /**
      * 列宽度

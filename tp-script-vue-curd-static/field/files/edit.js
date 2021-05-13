@@ -23,9 +23,15 @@ define([],function(){
                     };
                 })
             }
+            const acceptTexts={};
+            for(let i in  props.field.acceptTexts ){
+                acceptTexts[i.toString().toLowerCase()]=props.field.acceptTexts[i];
+            }
+
             return {
                 fileList,
-                id
+                id,
+                acceptTexts
             }
         },
         methods:{
@@ -66,7 +72,8 @@ define([],function(){
                 let arr=this.field.accept.split(',');
                 let returns=[];
                 for(let i in arr){
-                    let fileText=this.field.acceptTexts[arr[i]]?(this.field.acceptTexts[arr[i]]+'文件'):arr[i];
+                    arr[i]=arr[i].toLowerCase();
+                    let fileText=this.acceptTexts[arr[i]]?(this.acceptTexts[arr[i]]+'文件'):arr[i];
                     if(!returns.includes(fileText)){
                         returns.push(fileText);
                     }
