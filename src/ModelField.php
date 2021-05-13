@@ -354,7 +354,7 @@ abstract class ModelField
      * @param FieldWhere $where
      * @return $this
      */
-    public function pushSelfHideWhere(FieldWhere $where):self{
+    public function pushHideSelfWhere(FieldWhere $where):self{
         if(!$this->hideSelf()){
             $this->hideSelf=FieldWhere::make(StringField::init('__InitializationFieldWhereField__'),'__InitializationFieldWhereField__[这个条件是初始化条件，不用管]');
         }
