@@ -74,9 +74,7 @@ class FieldWhere
     }
 
     public static function make($field,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
-        if(!is_array($field)){
-            return new self($field,$valueData,$type,$isNot);
-        }
+        return new self($field,$valueData,$type,$isNot);
     }
 
 

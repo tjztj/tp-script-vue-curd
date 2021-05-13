@@ -97,6 +97,12 @@ trait FieldCollectionStep
         if(empty($hideFields)){
             return $fields;
         }
+        foreach ($hideFields as $k=>$v){
+            foreach ($v as $val){
+                $arr=explode(',',$val);
+                $arr<=1||array_push($hideFields[$k],...$arr);
+            }
+        }
 
         $names=$fields->column('name');
         return $fields->filter(function(ModelField $v)use($hideFields,$names){
