@@ -6,7 +6,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?2.1.3" media="all">
+    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?2.1.6" media="all">
     <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css?v={$vueCurdVersion}" media="all">
     <script>
         window.VUE_CURD={
@@ -172,7 +172,7 @@
         }
     })
 </script>
-<script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js?2.1.3" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js?2.1.6" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-2.3.6/require.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdVersion}" charset="utf-8"></script>
 <script>
