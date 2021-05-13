@@ -965,25 +965,40 @@ define(requires, function ( axios,Qs) {
                     columns=columns[0].children;
                 }
 
-                if(props.fieldStepConfig&&props.fieldStepConfig.enable&&props.fieldStepConfig.listShow===true){
-                    columns.push({
-                        title:'当前步骤',
-                        ellipsis:true,
-                        dataIndex: "stepInfo",
-                        slots: { customRender: 'step-info' },
-                        fixed:props.fieldStepConfig.listFixed?props.fieldStepConfig.listFixed:false,
-                    })
-                    columnsCount++;
-                }
-                columns.push({
+
+                const createTimeCol={
                     title:'创建时间',
                     ellipsis:true,
                     dataIndex: "create_time",
                     slots: { customRender: 'create-time' },
                     width:154,
                     sorter: true,
-                })
-                columnsCount++;
+                };
+
+                if(props.fieldStepConfig&&props.fieldStepConfig.enable&&props.fieldStepConfig.listShow===true){
+                    const stepCol={
+                        title:'当前步骤',
+                        ellipsis:true,
+                        dataIndex: "stepInfo",
+                        slots: { customRender: 'step-info' },
+                        fixed:props.fieldStepConfig.listFixed?props.fieldStepConfig.listFixed:false,
+                    };
+                    if(props.fieldStepConfig.listFixed){
+                        columns.push(createTimeCol)
+                        columnsCount++;
+                        columns.push(stepCol)
+                        columnsCount++;
+                    }else{
+                        columns.push(stepCol)
+                        columnsCount++;
+                        columns.push(createTimeCol)
+                        columnsCount++;
+                    }
+                }else{
+                    columns.push(createTimeCol)
+                    columnsCount++;
+                }
+
 
 
                 //可prop动态设置宽度
