@@ -135,14 +135,14 @@ class FieldDo
         $this->indexShowDo=$func;
         return $this;
     }
-    public function doIndexShowDo(ModelField $field,?BaseModel &$baseModel,Controller $controller): self
+    public function doIndexShowDo(ModelField $field,?BaseModel &$baseModel,$controller): self
     {
         $func=$this->indexShowDo?? static function(){};
         $func($field,$baseModel,$controller);
         return $this;
     }
 
-    public static function doIndexShow(FieldCollection $field,?BaseModel &$baseModel,Controller $controller):void{
+    public static function doIndexShow(FieldCollection $field,?BaseModel &$baseModel,$controller):void{
         $field->each(static function(ModelField $field)use(&$baseModel,$controller){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doIndexShowDo($field,$baseModel,$controller);
