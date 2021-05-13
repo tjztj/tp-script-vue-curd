@@ -51,6 +51,9 @@ trait CurdChild{
         $info=$this->baseModel->find($base_id);
         $info||$this->errorAndCode('未找到相关信息');
         $baseInfo=$info;
+
+        FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+
         $info=$info->toArray();
         $this->baseFields->doShowData($info);//有些数据不允许直接展示
 

@@ -163,8 +163,12 @@ trait BaseIndex
             return $this->success($option->toArray());
         }
 
+
+        FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+
         $listColumns=array_values($this->fields->listShowItems()->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
+
 
 
 

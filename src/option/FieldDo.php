@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\option;
 
 use think\Collection;
 use think\db\Query;
+use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
@@ -24,6 +25,12 @@ class FieldDo
      * @var callable $indexListDo
      */
     protected $indexListDo;
+
+    /**
+     * index页面显示前
+     * @var callable $indexShowDo
+     */
+    protected $indexShowDo;
 
     /**
      * 列表条件筛选前会执行
@@ -121,6 +128,31 @@ class FieldDo
 
 
     ##################################################################################################################
+
+
+    public function setIndexShowDo(callable $func): self
+    {
+        $this->indexShowDo=$func;
+        return $this;
+    }
+    public function doIndexShowDo(ModelField $field,?BaseModel &$baseModel,Controller $controller): self
+    {
+        $func=$this->indexShowDo?? static function(){};
+        $func($field,$baseModel,$controller);
+        return $this;
+    }
+
+    public static function doIndexShow(FieldCollection $field,?BaseModel &$baseModel,Controller $controller):void{
+        $field->each(static function(ModelField $field)use(&$baseModel,$controller){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doIndexShowDo($field,$baseModel,$controller);
+            }
+        });
+    }
+
+
+    ##################################################################################################################
+
 
 
     public function setIndexFilterBeforeDo(callable $func): self
