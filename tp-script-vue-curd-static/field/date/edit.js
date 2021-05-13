@@ -23,6 +23,24 @@ define([],function(){
                 },
             },
         },
+        methods:{
+            disabledDate(val){
+                if (!val) {
+                    return false;
+                }
+                val.set('hours', 0)
+                val.set('minutes', 0)
+                val.set('seconds', 0)
+                let values=val.unix()
+                if(this.field.min!==null&&values<this.field.min){
+                    return true;
+                }
+                if(this.field.max!==null&&values>this.field.max){
+                    return true;
+                }
+                return false;
+            }
+        },
         template:`<div class="field-box">
                     <div class="l">
                         <a-date-picker
@@ -30,6 +48,7 @@ define([],function(){
                             type="date"
                             :placeholder="field.placeholder||'请选择日期'"
                              :disabled="field.readOnly"
+                               :disabled-date="disabledDate"
                             style="width: 100%;"
                         />
                     </div>

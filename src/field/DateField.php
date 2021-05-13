@@ -24,7 +24,43 @@ class DateField extends ModelField
     protected int $listColumnWidth=108;//设置默认值
     protected string $defaultFilterClass=DateFilter::class;
     protected $nullVal=0;//字段在数据库中为空时的值
+    protected ?int $max=null;
+    protected ?int $min=null;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->max=time();
+    }
+
+
+    /**最小值
+     * @param int|null $min
+     * @return $this|int
+     */
+    public function min(int $min = null)
+    {
+        return $this->doAttr('min', $min);
+    }
+
+    /**最大值
+     * @param int|null $max
+     * @return $this|int
+     */
+    public function max(int $max = null)
+    {
+        return $this->doAttr('max', $max);
+    }
+
+    public function minNull(){
+        $this->min=null;
+        return $this;
+    }
+
+    public function maxNull(){
+        $this->max=null;
+        return $this;
+    }
 
 
     /**
@@ -41,6 +77,14 @@ class DateField extends ModelField
                 $this->save=is_numeric($data[$name])?$data[$name]:\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name]);
                 if($this->save===false){
                     throw new \think\Exception('不是正确的日期格式');
+                }
+                if($this->save!==0){
+                    if($this->min!==null&&$this->min>$this->save){
+                        throw new \think\Exception('日期不能小于'.date('Y-m-d',$this->min));
+                    }
+                    if($this->max!==null&&$this->max<$this->save){
+                        throw new \think\Exception('日期不能大于'.date('Y-m-d',$this->max));
+                    }
                 }
             }else{
                 $this->save=0;
