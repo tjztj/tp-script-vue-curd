@@ -49,6 +49,8 @@ trait ModelSave
 
         $data['id']=$postData['id'];
 
+        FieldDo::doSaveBeforeChecked($fields,$data,$beforeInfo,$baseInfo);
+
         //没有设置当前步骤
         $haveDoStep=!isset($data[static::getStepField()])&&$fields->stepIsEnable();
         if($haveDoStep){

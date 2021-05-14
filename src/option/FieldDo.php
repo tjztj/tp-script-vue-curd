@@ -51,6 +51,12 @@ class FieldDo
     protected $saveBeforeDo;
 
     /**
+     * 数据保存前（且已验证）
+     * @var callable $saveBeforeCheckedDo
+     */
+    protected $saveBeforeCheckedDo;
+
+    /**
      * 数据保存后
      * @var callable $saveAfterDo
      */
@@ -243,6 +249,45 @@ class FieldDo
         $field->each(static function(ModelField $field)use($base,$info,&$postData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doSaveBeforeDo($postData,$info,$base,$field);
+            }
+        });
+    }
+
+
+
+    ##################################################################################################################
+    public function setSaveBeforeCheckedDo(callable $func): self
+    {
+        $this->saveBeforeCheckedDo=$func;
+        return $this;
+    }
+
+    /**
+     * 数据保存前字段钩子
+     * @param array $postData   提交上来的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $before
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doSaveBeforeCheckedDo(array &$saveData,?VueCurlModel $before,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->saveBeforeCheckedDo?? static function(){};
+        $func($saveData,$before,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 数据保存前字段钩子 方便函数
+     * @param FieldCollection $field
+     * @param array $postData   提交上来的数据
+     * @param VueCurlModel|BaseModel|BaseChildModel|null $info
+     * @param BaseModel|null $base
+     */
+    public static function doSaveBeforeChecked(FieldCollection $field,array &$saveData,?VueCurlModel $info,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$info,&$saveData){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doSaveBeforeCheckedDo($saveData,$info,$base,$field);
             }
         });
     }

@@ -71,6 +71,8 @@ abstract class BaseChildModel extends VueCurlModel
 
         $data=$this->doSaveData($postData,$fields,$isExcelDo,$baseInfo);
 
+        FieldDo::doSaveBeforeChecked($fields,$data,null,$baseInfo);
+
 
         //没有设置当前步骤， excel导入不分步骤
         $haveDoStep=!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable();
