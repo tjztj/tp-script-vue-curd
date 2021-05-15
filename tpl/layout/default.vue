@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?2.1.6" media="all">
-    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css?v={$vueCurdVersion}" media="all">
+    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css?v={$vueCurdDebug?time():$vueCurdVersion}" media="all">
     <script>
         window.VUE_CURD={
             GUID: "{$guid}",
@@ -16,6 +16,7 @@
             MODULE:'{$vueCurdModule}',
             VERSION: "{$vueCurdVersion|default='1.0.0'}",
             SITE_VERSION:'{$version|default=\'\'}',
+            DEBUG:'{$vueCurdDebug?1:0}'==='1'
         };
     </script>
     <script>window.vueData={$vue_data_json|raw};</script>
@@ -174,7 +175,7 @@
 </script>
 <script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js?2.1.6" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?require-2.3.6/require.js" charset="utf-8"></script>
-<script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdVersion}" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?require-config.js?v={$vueCurdDebug?time():$vueCurdVersion}" charset="utf-8"></script>
 <script>
     let jsPath='{$jsPath|default=""}';
     if(jsPath===''){

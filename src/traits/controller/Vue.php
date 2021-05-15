@@ -47,6 +47,7 @@ trait Vue
         $this->assign('vueCurdModule',$this->app->http->getName());
         $this->assign('guid',$this->guid);
         $this->assign('loginUrl',tpScriptVueCurdGetLoginUrl());
+        $this->assign('vueCurdDebug',static::debug());
     }
 
 
@@ -245,5 +246,13 @@ trait Vue
             }
         }
         return $def;
+    }
+
+    /**
+     * 是否js与css调试，子类重写
+     * @return bool
+     */
+    public static function debug():bool{
+        return false;
     }
 }
