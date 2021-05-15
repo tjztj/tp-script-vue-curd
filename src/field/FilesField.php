@@ -77,7 +77,11 @@ class FilesField extends ModelField
      * @return $this|string
      */
     public function accept(string $accept=null){
-        return $this->doAttr('accept',$accept);
+        if(is_null($accept)){
+            return $this->accept;
+        }
+        $this->accept=str_replace(' ','',$accept);
+        return $this;
     }
 
     public function acceptTexts(string $acceptTexts=null){
