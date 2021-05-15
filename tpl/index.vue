@@ -134,7 +134,8 @@
                 @open-edit="openEdit"
                 @open-next="openNext"
                 @open-show="openShow"
-                @open-child-list="openChildList">
+                @open-child-list="openChildList"
+                ref="indexcurdtable">
         <!--    配合actionWidth使用-->
         {block name="tableSlot"}{/block}
 
