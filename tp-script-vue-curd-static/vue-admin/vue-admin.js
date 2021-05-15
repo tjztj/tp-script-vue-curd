@@ -1219,7 +1219,7 @@ define(requires, function ( axios,Qs) {
                             :row-selection="rowSelection"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
-                                <slot :name="key" :field="item">
+                                <slot :name="key" :field="item" :columns="columns">
                                     <div style="white-space:normal;line-height: 1.14">
                                         <span>{{item.title}}</span>
                                         <span v-if="item.ext" style="color: #bfbfbf">（{{item.ext}}）</span>
@@ -1254,7 +1254,7 @@ define(requires, function ( axios,Qs) {
                                 </slot>
                              </template>
                              
-                             <template #custom-title-step-info><slot name="custom-title-step-info">当前步骤</slot></template>
+                             <template #custom-title-step-info><slot name="custom-title-step-info" :columns="columns">当前步骤</slot></template>
                              <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
@@ -1277,7 +1277,7 @@ define(requires, function ( axios,Qs) {
                              
                              
                              
-                             <template #custom-title-create_time><slot name="custom-title-create_time">创建时间</slot></template>
+                             <template #custom-title-create_time><slot name="custom-title-create_time" :columns="columns">创建时间</slot></template>
                              <template #create-time="{ text: create_time }">
                                     <slot name="f-create_time">
                                         <a-tooltip>
@@ -1289,7 +1289,7 @@ define(requires, function ( axios,Qs) {
                              
                              
                               
-                             <template #custom-title-action><slot name="custom-title-action">操作</slot></template>
+                             <template #custom-title-action><slot name="custom-title-action" :columns="columns">操作</slot></template>
                              <template #action="{ record }">
                                     <slot name="do-before" :record="record">
                                    
