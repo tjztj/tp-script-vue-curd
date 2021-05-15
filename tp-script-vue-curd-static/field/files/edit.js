@@ -144,7 +144,7 @@ define([],function(){
                             <a-divider type="vertical" style="background-color: #bfbfbf" v-if="index>0"></a-divider>
                             {{item}}
                             </span>
-                            <b style="color: #bfbfbf;padding:0 4px">」</b>文件不符合上传要求
+                            <b style="color: #bfbfbf;padding:0 4px">」</b>文件不符合上传要求，将不会上传
                         </div>
                         <div v-if="field.accept" style="color: #bfbfbf;font-size: 12px">上传文件需为：{{getAcceptText()}}</div>
                     </div>

@@ -934,7 +934,7 @@ define(requires, function ( axios,Qs) {
                     let column={title:groupTtitle,children:[]};
                     listColumns[groupTtitle].forEach(function(item){
                         fieldObjs[item.name]=item;
-                        let customTitle='customTitle-'+item.name;
+                        let customTitle='custom-title-'+item.name;
                         titleItems[customTitle]=item;
                         let col={
                             dataIndex:item.name,
@@ -967,20 +967,20 @@ define(requires, function ( axios,Qs) {
 
 
                 const createTimeCol={
-                    title:'创建时间',
+                    // title:'创建时间',
                     ellipsis:true,
                     dataIndex: "create_time",
-                    slots: { customRender: 'create-time' },
+                    slots: { customRender: 'create-time' , title:'custom-title-create_time'},
                     width:154,
                     sorter: true,
                 };
 
                 if(props.fieldStepConfig&&props.fieldStepConfig.enable&&props.fieldStepConfig.listShow===true){
                     const stepCol={
-                        title:'当前步骤',
+                        // title:'当前步骤',
                         ellipsis:true,
                         dataIndex: "stepInfo",
-                        slots: { customRender: 'step-info' },
+                        slots: { customRender: 'step-info' ,title:'custom-title-step-info'},
                         fixed:props.fieldStepConfig.listFixed?props.fieldStepConfig.listFixed:false,
                     };
                     if(props.fieldStepConfig.listFixed){
@@ -1005,8 +1005,8 @@ define(requires, function ( axios,Qs) {
                 //可prop动态设置宽度
                 const newActionW=Vue.ref(props.actionDefWidth||0);
                 columns.push({
-                    title:'操作',
-                    slots: { customRender: 'action' },
+                    // title:'操作',
+                    slots: { customRender: 'action' ,title:'custom-title-action'},
                     width:newActionW,
                     fixed: 'right',
                 })
@@ -1203,7 +1203,7 @@ define(requires, function ( axios,Qs) {
                 },
                 isCanDel(row){
                     return this.canDel&&(!row.__auth||typeof row.__auth.del==='undefined'||row.__auth.del===true)
-                },
+                }
             },
             template:`<div :id="id">
                         <a-table
@@ -1219,12 +1219,14 @@ define(requires, function ( axios,Qs) {
                             :row-selection="rowSelection"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
-                                <div style="white-space:normal;line-height: 1.14">
-                                <span>{{item.title}}</span>
-                                <span v-if="item.ext" style="color: #bfbfbf">（{{item.ext}}）</span>
-                                </div>
+                                <slot :name="key" :field="item">
+                                    <div style="white-space:normal;line-height: 1.14">
+                                        <span>{{item.title}}</span>
+                                        <span v-if="item.ext" style="color: #bfbfbf">（{{item.ext}}）</span>
+                                    </div>
+                                </slot>
+                                
                             </template>
-                            
                             
                              <template #['field-component-'+item.name]="record" v-for="item in listFieldComponents">
                                  <slot :name="'f-'+item.name"
@@ -1238,6 +1240,9 @@ define(requires, function ( axios,Qs) {
                                     ></component>
                                 </slot>
                              </template>
+               
+                             
+                             
                              <template #default-value="record">
                                 <slot :name="'f-'+record.column.dataIndex"
                                     :field="fieldObjs[record.column.dataIndex]" 
@@ -1248,6 +1253,8 @@ define(requires, function ( axios,Qs) {
                                     </a-tooltip>
                                 </slot>
                              </template>
+                             
+                             <template #custom-title-step-info><slot name="custom-title-step-info">当前步骤</slot></template>
                              <template #step-info="{ text: stepInfo }">
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
@@ -1267,6 +1274,10 @@ define(requires, function ( axios,Qs) {
                                         </div>
                                     </slot>
                              </template>
+                             
+                             
+                             
+                             <template #custom-title-create_time><slot name="custom-title-create_time">创建时间</slot></template>
                              <template #create-time="{ text: create_time }">
                                     <slot name="f-create_time">
                                         <a-tooltip>
@@ -1275,7 +1286,10 @@ define(requires, function ( axios,Qs) {
                                         </a-tooltip>
                                     </slot>
                              </template>
-                                
+                             
+                             
+                              
+                             <template #custom-title-action><slot name="custom-title-action">操作</slot></template>
                              <template #action="{ record }">
                                     <slot name="do-before" :record="record">
                                    
