@@ -72,7 +72,7 @@ define([],function(){
                                   <template v-if="haveGroup">
                                          <template v-for="(items,key) in groupItems">
                                             <template v-if="key">
-                                                 <a-select-opt-group :label="key">
+                                                 <a-select-opt-group :label="key" :key="key">
                                                      <a-select-option v-for="optionItem in items" :value="optionItem.value" :key="optionItem.value" :label="optionItem.text" :title="optionItem.text"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                                  </a-select-opt-group>
                                             </template>
