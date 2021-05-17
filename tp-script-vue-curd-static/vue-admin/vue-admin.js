@@ -520,7 +520,7 @@ define(requires, function ( axios,Qs) {
 
         app.component('FieldGroupItem',{
             name:'fieldGroupItem',
-            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol','fieldHideList'],
+            props:['groupFieldItems','form','listFieldLabelCol','listFieldWrapperCol','fieldHideList','info'],
             setup(props,ctx){
                 return {
                     formVal:Vue.ref(props.form),
@@ -570,10 +570,18 @@ define(requires, function ( axios,Qs) {
                             return val<=fieldWhere.valueData[1]&&val>=fieldWhere.valueData[0];
                         }
                         const checkFieldWhereSelf=function(fieldWhere){
-                            if(typeof formVal[fieldWhere.field.name]==='undefined'||formVal[fieldWhere.field.name]===null){
+                            let val=null;
+                            if(typeof formVal[fieldWhere.field.name]==='undefined'){
+                                if(!this.info||typeof this.info[fieldWhere.field.name]==='undefined'){
+                                    return false;
+                                }
+                                val=this.info[fieldWhere.field.name];
+                            }else {
+                                val=formVal[fieldWhere.field.name];
+                            }
+                            if(val===null){
                                 return false;
                             }
-                            let val=formVal[fieldWhere.field.name];
                             if(typeof val==='object'){
                                 if(fieldWhere.field.type==='RegionField'){
                                     const regionKeys=Object.keys(val);

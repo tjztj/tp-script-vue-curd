@@ -393,6 +393,7 @@ define(['vueAdmin'], function (va) {
                     labelCol: { span: 4 },
                     wrapperCol: { span: 18 },
                     form:form,
+                    info:vueData.info||{},
                     fieldHideList:{},
                 }
             },

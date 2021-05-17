@@ -218,7 +218,7 @@ trait ExcelHaveChild
         static $baseIds=[];
 
         //父表字段的值一样将会视作同一条父数据
-        $baseIdsKey=serialize($this->parentExcelFields()->setSave($mainData,true)->getSave());
+        $baseIdsKey=serialize($this->parentExcelFields()->setSave($mainData,null,true)->getSave());
         if(!isset($baseIds[$baseIdsKey])){
             $baseInfo=$this->parentExcelExcelSave($mainData);
             $baseIds[$baseIdsKey]=$baseInfo->id;

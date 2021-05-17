@@ -96,16 +96,15 @@ class FieldCollection extends Collection
     }
 
 
-
-
     /**
      * 设置保存的值
      * @param array $data
-     * @param bool $isExcelDo  是否EXCEL添加
+     * @param VueCurlModel|null $old 原数据
+     * @param bool $isExcelDo 是否EXCEL添加
      * @return $this
      * @throws \think\Exception
      */
-    public function setSave(array $data,bool $isExcelDo=false): self
+    public function setSave(array $data,?VueCurlModel $old,bool $isExcelDo=false): self
     {
         if($isExcelDo){
             //先处理一遍数据
@@ -120,7 +119,7 @@ class FieldCollection extends Collection
 
 
         //隐藏的选项不能被选中
-       $this->each(function(ModelField $v)use($data){
+       $this->each(function(ModelField $v)use($data,$old){
             if(!method_exists($v,'items')||empty($v->items())){
                 return;
             }
@@ -130,7 +129,7 @@ class FieldCollection extends Collection
                 if(empty($val['showItemBy'])){
                     continue;
                 }
-                if(!$val['showItemBy']->check($data,true)){
+                if(!$val['showItemBy']->check($data,true,$old)){
                     if(isset($data[$v->name()])&&$data[$v->name()]!==''){
                         if($v->getType()==='CheckboxField'||($v->getType()==='SelectField'&&$v->multiple())){
                             $valArr=is_array($data[$v->name()])?$data[$v->name()]:explode(',',$data[$v->name()]);
@@ -149,10 +148,10 @@ class FieldCollection extends Collection
         $notNullNames=null;
         if($this->getSaveHideFieldSetNull()){
             //隐藏的字符串要设置为空
-            $notNullNames=$this->filterHideFieldsByData($data,false)->column('name');
+            $notNullNames=$this->filterHideFieldsByData($data,$old,false)->column('name');
             $fields=$this;
         }else{
-            $fields=$this->filterHideFieldsByData($data,false);
+            $fields=$this->filterHideFieldsByData($data,$old,false);
         }
         $fields->each(function(ModelField $v)use($data,$notNullNames){
             try{
@@ -244,7 +243,7 @@ class FieldCollection extends Collection
      * @return $this
      */
     public function filterHideFieldsByShow(VueCurlModel $sourceData):self{
-        return $this->filterHideFieldsByData($sourceData->toArray(),true);
+        return $this->filterHideFieldsByData($sourceData->toArray(),$sourceData,true);
     }
 
 
@@ -337,13 +336,16 @@ class FieldCollection extends Collection
     }
 
 
+
     /**
      * 过滤掉【hideFields】不显示的字段
-     * @param array $data  用户提交上来的数据
+     * @param array $data       用户提交上来的数据
+     * @param VueCurlModel|null $old        原数据
+     * @param bool $isSourceData
      * @return $this
      */
-    private function filterHideFieldsByData(array $data,$isSourceData=true):self{
-        $fieldHideList=$this->getFiledHideListByData($data,$isSourceData);
+    private function filterHideFieldsByData(array $data, ?VueCurlModel $old, bool $isSourceData=true):self{
+        $fieldHideList=$this->getFiledHideListByData($data,$old,$isSourceData);
         if(empty($fieldHideList)){
             return $this;
         }
@@ -365,16 +367,17 @@ class FieldCollection extends Collection
      * @return array
      */
     public function getFiledHideList(VueCurlModel $info):array{
-        return $this->getFiledHideListByData($info->toArray(),true);
+        return $this->getFiledHideListByData($info->toArray(),$info,true);
     }
 
     /**
      * 获取将会隐藏的字段信息
      * @param array $data
+     * @param VueCurlModel|null $old 原数据
      * @param bool $isSourceData
      * @return array
      */
-    private function getFiledHideListByData(array $data,$isSourceData=true):array{
+    private function getFiledHideListByData(array $data, ?VueCurlModel $old, bool $isSourceData=true):array{
         $arrHave= static function($arr, $val){
             if(is_string($arr)){
                 $arr=explode(',',$arr);
@@ -406,10 +409,10 @@ class FieldCollection extends Collection
         };
 
 
-        $checkHideField=function(ModelField $field,$checkVal)use($arrHave,&$data,&$changeFieldHideList,$isSourceData,&$checkHideField,&$fieldHideList){
+        $checkHideField=function(ModelField $field,$checkVal)use($arrHave,&$data,&$changeFieldHideList,$isSourceData,&$checkHideField,&$fieldHideList,$old){
             $hideSelf=$field->hideSelf();
             if($hideSelf){
-                $changeFieldHideList($field->name(),implode(',',$hideSelf->getAboutFields()),$hideSelf->check($data,$isSourceData));
+                $changeFieldHideList($field->name(),implode(',',$hideSelf->getAboutFields()),$hideSelf->check($data,$isSourceData,$old));
             }
 
 

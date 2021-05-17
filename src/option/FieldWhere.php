@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\option;
 
 
+use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\ModelField;
 
 class FieldWhere
@@ -112,7 +113,7 @@ class FieldWhere
     }
 
 
-    private function checkSelf($saveDatas,bool $isSourceData):bool{
+    private function checkSelf($saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
         if(!$isSourceData){
             if($this->field->required()){
                 $field=clone $this->field;
@@ -123,11 +124,18 @@ class FieldWhere
             $field->setSave($saveDatas);
             $saveDatas[$this->field->name()]=$field->getSave();
         }
+        if(!isset($saveDatas[$this->field->name()])){
+            if(!$info||!isset($info[$this->field->name()])){
+                return false;
+            }
+            $val=$info[$this->field->name()];
+        }else{
+            $val=$saveDatas[$this->field->name()];
+        }
 
-        if(!isset($saveDatas[$this->field->name()])||is_null($saveDatas[$this->field->name()])){
+        if(is_null($val)){
             return false;
         }
-        $val=$saveDatas[$this->field->name()];
 
         if(is_array($val)){
             if($this->field->getType()==='RegionField'){
@@ -163,15 +171,16 @@ class FieldWhere
      * 验证数据是否符合条件
      * @param array $saveDatas
      * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
+     * @param VueCurlModel|null $info  原数据
      * @return bool
      * @throws \think\Exception
      */
-    public function check(array $saveDatas,bool $isSourceData):bool{
-        $check=$this->checkSelf($saveDatas,$isSourceData);
+    public function check(array $saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
+        $check=$this->checkSelf($saveDatas,$isSourceData,$info);
 
         if($check){
             foreach ($this->ands as $v){
-                if($v->check($saveDatas,$isSourceData)===false){
+                if($v->check($saveDatas,$isSourceData,$info)===false){
                     $check=false;
                     break;
                 }
@@ -183,7 +192,7 @@ class FieldWhere
         }
 
         foreach ($this->ors as $v){
-            if($v->check($saveDatas,$isSourceData)){
+            if($v->check($saveDatas,$isSourceData,$info)){
                 return true;
             }
         }
