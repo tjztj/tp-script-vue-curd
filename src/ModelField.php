@@ -447,9 +447,9 @@ abstract class ModelField
 
     /**
      * 字段为空时的值
-     * @return string
+     * @return mixed
      */
-    protected function nullVal(){
+    public function nullVal(){
         return $this->nullVal;
     }
 
