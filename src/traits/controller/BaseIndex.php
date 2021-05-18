@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use think\Collection;
 use think\db\Query;
 use think\Request;
 use tpScriptVueCurd\base\controller\BaseChildController;
@@ -24,6 +25,7 @@ use tpScriptVueCurd\option\FunControllerIndexPage;
  * @property FunControllerIndexPage $indexPageOption
  * @property FieldCollection $fields
  * @property BaseChildModel|BaseModel $model
+ * @property BaseModel $baseModel
  * @package tpScriptVueCurd\traits\controller
  */
 trait BaseIndex
@@ -91,42 +93,7 @@ trait BaseIndex
 
 
 
-            $doSteps=function(VueCurlModel $info)use($baseInfo){
-                if(!$this->fields->stepIsEnable()){
-                    return $info;
-                }
 
-                $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
-                $stepInfo === null ||$stepInfo=clone $stepInfo;
-                $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
-
-                $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
-                $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
-                $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-                $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$baseInfo));
-
-
-                $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
-                $info->stepFields=$stepFields->column('name');
-                $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
-
-
-                return $info;
-            };
-
-
-            $childListBtn=function(VueCurlModel $info){
-                if($this->type()!=='base_have_child'){
-                    return $info;
-                }
-                $childBtns=[];
-                foreach (static::childControllerClassPathList() as $childControllerClass){
-                    /* @var $childControllerClass BaseChildController|string */
-                    $childBtns[class_basename($childControllerClass::modelClassPath())]=$childControllerClass::baseListBtnText($info);
-                }
-                $info->childBtns=$childBtns;
-                return $info;
-            };
 
 
             $option=new FunControllerIndexData();
@@ -146,17 +113,78 @@ trait BaseIndex
                 $option->perPage=$option->total;
             }
 
+
+            if(is_null($baseInfo)&&isset($this->baseModel)&&!is_null($this->baseModel)&&!$list->isEmpty()){
+                $baseInfo=[];
+                foreach ($list as $v){
+                    $baseInfo[$v[$this->model::parentField()]]=null;
+                }
+                foreach ($this->baseModel->where('id','in',array_keys($baseInfo))->select() as $val){
+                    $baseInfo[$val->id]=$val;
+                }
+            }
+
+
+            $doSteps=function(VueCurlModel $info)use($baseInfo){
+                if(!$this->fields->stepIsEnable()){
+                    return $info;
+                }
+                if(is_array($baseInfo)){
+                    $baseInfo=$baseInfo[$info[$this->model::parentField()]]??null;
+                }
+
+
+                $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
+                $stepInfo === null ||$stepInfo=clone $stepInfo;
+                $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
+
+                $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
+                $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
+                $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
+                $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$baseInfo));
+
+
+                $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
+                $info->stepFields=$stepFields->column('name');
+                $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
+
+
+                return $info;
+            };
+
+            $childListBtn=function(VueCurlModel $info){
+                if($this->type()!=='base_have_child'){
+                    return $info;
+                }
+                $childBtns=[];
+                foreach (static::childControllerClassPathList() as $childControllerClass){
+                    /* @var $childControllerClass BaseChildController|string */
+                    $childBtns[class_basename($childControllerClass::modelClassPath())]=$childControllerClass::baseListBtnText($info);
+                }
+                $info->childBtns=$childBtns;
+                return $info;
+            };
+
             $list->map($doSteps)
-                ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']))
+                ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,is_array($baseInfo)?($baseInfo[$info[$this->model::parentField()]]??null):$baseInfo,['show','edit','del']))
                 ->map($childListBtn);
+
+
             //字段钩子
-            FieldDo::doIndex($this->fields,$list,$baseInfo);
+            if(is_array($baseInfo)){
+                foreach ($list as $v){
+                    FieldDo::doIndex($this->fields,\think\model\Collection::make([$v]),$baseInfo[$v[$this->model::parentField()]]??null);
+                }
+            }else{
+                FieldDo::doIndex($this->fields,$list,$baseInfo);
+            }
+
 
             $option->data=$list->toArray();
             foreach ($option->data as $k=>$v){
                 $this->fields->doShowData($option->data[$k]);
             }
-            
+
 
             $this->indexData($option);
 
