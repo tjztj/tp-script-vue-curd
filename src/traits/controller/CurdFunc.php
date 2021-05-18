@@ -185,7 +185,7 @@ trait CurdFunc
             $isStepNext=true;
         }
 
-        $sourceData=clone $data;//用来验证，防止被修改
+        $sourceData=$data?clone $data:null;//用来验证，防止被修改
         FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
 
 
