@@ -184,6 +184,8 @@ trait CurdFunc
             $fields->saveStepInfo=$stepInfo;
             $isStepNext=true;
         }
+
+        $sourceData=clone $data;//用来验证，防止被修改
         FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
 
 
@@ -210,7 +212,7 @@ trait CurdFunc
             return $this->error('不能添加此栏目信息');
         }
 
-        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($data,$baseModel,$fields)===false){
+        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($sourceData,$baseModel,$fields)===false){
             return $this->error('您不能进行此操作-05');
         }
 
