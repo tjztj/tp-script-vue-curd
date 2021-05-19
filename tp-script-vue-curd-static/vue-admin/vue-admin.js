@@ -573,14 +573,14 @@ define(requires, function ( axios,Qs) {
                             let val=null;
                             if(typeof formVal[fieldWhere.field.name]==='undefined'){
                                 if(!this.info||typeof this.info[fieldWhere.field.name]==='undefined'){
-                                    return false;
+                                    return !fieldWhere.isNot;
                                 }
                                 val=this.info[fieldWhere.field.name];
                             }else {
                                 val=formVal[fieldWhere.field.name];
                             }
                             if(val===null){
-                                return false;
+                                return !fieldWhere.isNot;
                             }
                             if(typeof val==='object'){
                                 if(fieldWhere.field.type==='RegionField'){
