@@ -13,10 +13,14 @@ class FieldWhere
     public const TYPE_BETWEEN='between';
     public const TYPE_FIND_IN_SET='find_in_set';
 
-    //别名
+        //别名
     public const IN=self::TYPE_IN;
     public const BETWEEN=self::TYPE_BETWEEN;
     public const FIND_IN_SET=self::TYPE_FIND_IN_SET;
+    public const NOT='__NOT__';
+    public const NOT_IN=self::NOT;
+    public const NOT_BETWEEN='__NOT_BETWEEN__';
+    public const NOT_FIND_IN_SET='__NOT_FIND_IN_SET__';
 
 
 
@@ -41,19 +45,27 @@ class FieldWhere
      * FieldWhere constructor.
      * @param ModelField $field
      * @param array|string|int|float $valueData
-     * @param string|bool $typeOrIsNot
-     * @param bool|string $isNotOrType  是否非，反转
+     * @param string $type
+     * @param bool $isNot  是否非，反转
      * @throws \think\Exception
      */
-    public function __construct(ModelField $field, $valueData,$typeOrIsNot=self::TYPE_IN,$isNotOrType=false)
+    public function __construct(ModelField $field, $valueData, string $type=self::TYPE_IN, bool $isNot=false)
     {
-        if(is_bool($typeOrIsNot)){
-            $isNot=$typeOrIsNot;
-            $type=is_string($isNotOrType)?$isNotOrType:self::TYPE_IN;
-        }else{
-            $type=$typeOrIsNot;
-            $isNot=is_bool($isNotOrType)?$isNotOrType:false;
+        switch ($type){
+            case self::NOT:
+                $type=self::TYPE_IN;
+                $isNot=!$isNot;
+                break;
+            case self::NOT_BETWEEN:
+                $type=self::TYPE_BETWEEN;
+                $isNot=!$isNot;
+                break;
+            case self::NOT_FIND_IN_SET:
+                $type=self::TYPE_FIND_IN_SET;
+                $isNot=!$isNot;
+                break;
         }
+
 
         $this->field=$field;
         $this->type=$type;
@@ -82,8 +94,8 @@ class FieldWhere
         }
     }
 
-    public static function make($field,$valueData=[],$typeOrIsNot=self::TYPE_IN,$isNotOrType=false):self{
-        return new self($field,$valueData,$typeOrIsNot,$isNotOrType);
+    public static function make($field,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
+        return new self($field,$valueData,$type,$isNot);
     }
 
 
