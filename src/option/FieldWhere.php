@@ -42,16 +42,17 @@ class FieldWhere
      * @param ModelField $field
      * @param array|string|int|float $valueData
      * @param string|bool $typeOrIsNot
-     * @param bool $isNot  是否非，反转
+     * @param bool|string $isNotOrType  是否非，反转
      * @throws \think\Exception
      */
-    public function __construct(ModelField $field, $valueData,$typeOrIsNot=self::TYPE_IN, bool $isNot=false)
+    public function __construct(ModelField $field, $valueData,$typeOrIsNot=self::TYPE_IN,$isNotOrType=false)
     {
         if(is_bool($typeOrIsNot)){
             $isNot=$typeOrIsNot;
-            $type=self::TYPE_IN;
+            $type=is_string($isNotOrType)?$isNotOrType:self::TYPE_IN;
         }else{
             $type=$typeOrIsNot;
+            $isNot=is_bool($isNotOrType)?$isNotOrType:false;
         }
 
         $this->field=$field;
@@ -81,8 +82,8 @@ class FieldWhere
         }
     }
 
-    public static function make($field,$valueData=[],$typeOrIsNot=self::TYPE_IN,bool $isNot=false):self{
-        return new self($field,$valueData,$typeOrIsNot,$isNot);
+    public static function make($field,$valueData=[],$typeOrIsNot=self::TYPE_IN,$isNotOrType=false):self{
+        return new self($field,$valueData,$typeOrIsNot,$isNotOrType);
     }
 
 
