@@ -154,7 +154,7 @@ class FieldWhere
         }
         if(!isset($saveDatas[$this->field->name()])){
             if(!$info||!isset($info[$this->field->name()])){
-                return !$this->isNot;
+                return $this->isNot;
             }
             $val=$info[$this->field->name()];
         }else{
@@ -162,7 +162,7 @@ class FieldWhere
         }
 
         if(is_null($val)){
-            return !$this->isNot;
+            return $this->isNot;
         }
 
         if(is_array($val)){
