@@ -570,6 +570,9 @@ define(requires, function ( axios,Qs) {
                             return val<=fieldWhere.valueData[1]&&val>=fieldWhere.valueData[0];
                         }
                         const checkFieldWhereSelf=(fieldWhere)=>{
+                            if(fieldWhere.field.name===fieldWhere.RETURN_FALSE_FIELD_NAME){
+                                return false;
+                            }
                             let val=null;
                             if(typeof formVal[fieldWhere.field.name]==='undefined'){
                                 if(!this.info||typeof this.info[fieldWhere.field.name]==='undefined'){

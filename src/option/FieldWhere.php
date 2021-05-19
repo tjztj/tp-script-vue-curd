@@ -24,6 +24,9 @@ class FieldWhere
 
 
 
+
+    public const RETURN_FALSE_FIELD_NAME='__InitializationFieldWhereField__';
+
     private ModelField $field;
     private array $valueData;
     private string $type;
@@ -117,6 +120,7 @@ class FieldWhere
             'valueData'=>$this->valueData,
             'type'=>$this->type,
             'isNot'=>$this->isNot,
+            'RETURN_FALSE_FIELD_NAME'=>self::RETURN_FALSE_FIELD_NAME
         ];
         $ands=[];
         foreach ($this->ands as $v){
@@ -134,6 +138,10 @@ class FieldWhere
 
 
     private function checkSelf($saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
+        if($this->field->name()===self::RETURN_FALSE_FIELD_NAME){
+            return false;
+        }
+
         if(!$isSourceData){
             if($this->field->required()){
                 $field=clone $this->field;
