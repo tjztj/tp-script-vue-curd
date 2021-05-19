@@ -38,6 +38,13 @@ class FieldDo
      */
     protected $indexFilterBeforeDo;
 
+
+    /**
+     * 在showInfoDo 之前执行
+     * @var callable $showInfoBeforeDo
+     */
+    protected $showInfoBeforeDo;
+
     /**
      * show 页面会执行
      * @var callable $showInfoDo
@@ -180,6 +187,41 @@ class FieldDo
         });
     }
 
+
+
+    ##################################################################################################################
+
+    public function setShowInfoBeforeDo(callable $func): self
+    {
+        $this->showInfoBeforeDo=$func;
+        return $this;
+    }
+    /**
+     * @param VueCurlModel|BaseModel|BaseChildModel $info
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doShowInfoBeforeDo(VueCurlModel $info,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->showInfoBeforeDo?? static function(){};
+        $func($info,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 详情页字段钩子 方便函数
+     * @param FieldCollection $field
+     * @param VueCurlModel $info
+     * @param BaseModel|null $base
+     */
+    public static function doShowBefore(FieldCollection $field,VueCurlModel $info,?BaseModel $base):void{
+        $field->each(static function(ModelField $field)use($base,$info){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doShowInfoBeforeDo($info,$base,$field);
+            }
+        });
+    }
 
 
     ##################################################################################################################

@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd;
 
 
+use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldDo;
@@ -676,6 +678,50 @@ abstract class ModelField
     public function guid(): string
     {
         return $this->guid;
+    }
+
+
+    /**
+     * 复制字段
+     * @param null|bool|string $newName  新的字段名，如果为null或false，表示使用老的字段名（不更改）。如果是true表示知道生成。如果是string，表示为新的字段名
+     * @param bool $saveSetOldName         是否 保存数据库时，使用的字段名称为老的字段的名称
+     * @return $this
+     */
+    public function cloneField($newName=null,bool $saveSetOldName=true):self{
+        $field=clone $this;
+        if($newName===false||is_null($newName)){
+            return $field;
+        }
+        if($newName===true){
+            $newName='__CLONE__'.$newName;
+        }
+
+        $oldName=$field->name();
+        $field->name($newName);
+
+        //克隆的字段在数据库中有克隆的字段的字段名
+        if(!$saveSetOldName){
+            return $field;
+        }
+
+        $field->pushFieldDo()
+            ->setEditShowDo(static function(...$params)use($oldName){
+                $params['field']->name($oldName);
+            })
+            ->setSaveBeforeDo(function(...$params)use($oldName){
+                $params['field']->name($oldName);
+            })->setShowInfoBeforeDo(function(&...$params)use($oldName){
+                if(isset($params['info'][$oldName])){
+                    $params['info'][$params['field']->name()]=$params['info'][$oldName];
+                }
+            })->setIndexRowDo(function(&...$params)use($oldName){
+                if(isset($params['row'][$oldName])){
+                    $params['row'][$params['field']->name()]=$params['info'][$oldName];
+                }
+            });
+
+        return $field;
+
     }
 
 }

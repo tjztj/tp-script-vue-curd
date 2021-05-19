@@ -107,6 +107,11 @@ trait CurdFunc
         if($this->model instanceof BaseChildModel){
             $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
         }
+
+        //字段钩子
+        FieldDo::doShowBefore($this->fields,$data,$baseInfo);
+
+
         $fields=$this->fields->filterHideFieldsByShow($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
 
         if($data->checkRowAuth($fields,$baseInfo,'show')===false){
