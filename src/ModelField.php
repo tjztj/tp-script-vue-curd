@@ -682,21 +682,19 @@ abstract class ModelField
 
 
     /**
-     * 复制字段
-     * @param null|bool|string $newName  新的字段名，如果为null或false，表示使用老的字段名（不更改）。如果是true表示知道生成。如果是string，表示为新的字段名
+     * 复制字段，且重新设置字段名
+     * @param null|bool|string $newName  新的字段名，如果为null自动生成生成。如果是string，表示为新的字段名
      * @param bool $saveSetOldName         是否 保存数据库时，使用的字段名称为老的字段的名称
      * @return $this
      */
-    public function cloneField($newName=null,bool $saveSetOldName=true):self{
+    public function cloneField(string $newName=null,bool $saveSetOldName=true):self{
         $field=clone $this;
-        if($newName===false||is_null($newName)){
-            return $field;
-        }
-        if($newName===true){
-            $newName='__CLONE__'.$newName;
-        }
 
         $oldName=$field->name();
+        if(is_null($newName)){
+            $newName='__CLONE__'.$oldName;
+        }
+
         $field->name($newName);
 
         //克隆的字段在数据库中有克隆的字段的字段名
@@ -705,18 +703,22 @@ abstract class ModelField
         }
 
         $field->pushFieldDo()
-            ->setEditShowDo(static function(...$params)use($oldName){
-                $params['field']->name($oldName);
-            })
-            ->setSaveBeforeDo(function(...$params)use($oldName){
-                $params['field']->name($oldName);
-            })->setShowInfoBeforeDo(function(&...$params)use($oldName){
-                if(isset($params['info'][$oldName])){
-                    $params['info'][$params['field']->name()]=$params['info'][$oldName];
+            ->setEditShowDo(function(?VueCurlModel &$info,?BaseModel $base,ModelField $field,$isStepNext)use($oldName){
+                if(isset($info[$oldName])){
+                    $info[$field->name()]=$info[$oldName];
                 }
-            })->setIndexRowDo(function(&...$params)use($oldName){
-                if(isset($params['row'][$oldName])){
-                    $params['row'][$params['field']->name()]=$params['info'][$oldName];
+            })
+            ->setSaveBeforeDo(function(array &$postData,?VueCurlModel $before,?BaseModel $base,ModelField $field)use($oldName){
+                if(isset($postData[$field->name()])){
+                    $postData[$oldName]=$postData[$field->name()];
+                }
+            })->setShowInfoBeforeDo(function(VueCurlModel $info,?BaseModel $base,ModelField $field)use($oldName){
+                if(isset($info[$oldName])){
+                    $info[$field->name()]=$info[$oldName];
+                }
+            })->setIndexRowDo(function(VueCurlModel $row,?BaseModel $base,ModelField $field)use($oldName){
+                if(isset($row[$oldName])){
+                    $row[$field->name()]=$row[$oldName];
                 }
             });
 
