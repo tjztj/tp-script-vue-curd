@@ -708,7 +708,7 @@ abstract class ModelField
                     $info[$field->name()]=$info[$oldName];
                 }
             })
-            ->setSaveBeforeDo(function(array &$postData,?VueCurlModel $before,?BaseModel $base,ModelField $field)use($oldName){
+            ->setSaveBeforeCheckedDo(function(array &$postData,?VueCurlModel $before,?BaseModel $base,ModelField $field)use($oldName){
                 if(isset($postData[$field->name()])){
                     $postData[$oldName]=$postData[$field->name()];
                 }

@@ -387,10 +387,10 @@ class FieldDo
      * @param VueCurlModel|BaseModel|BaseChildModel|null $info
      * @param BaseModel|null $base
      * @param ModelField $field
-     * @param $isStepNext
+     * @param bool $isStepNext
      * @return $this
      */
-    public function doEditShowDo(?VueCurlModel &$info,?BaseModel $base,ModelField $field,$isStepNext): self
+    public function doEditShowDo(?VueCurlModel &$info,?BaseModel $base,ModelField $field,bool $isStepNext): self
     {
         $func=$this->editShowDo?? static function(){};
         $func($info,$base,$field,$isStepNext);
