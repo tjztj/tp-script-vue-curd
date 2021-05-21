@@ -23,6 +23,7 @@ abstract class FieldStepBase
 
     protected FieldCollection $fields;
     protected FieldStep $step;
+    protected string $listDirectSubmit='';
 
 
     /**
@@ -50,7 +51,7 @@ abstract class FieldStepBase
             fn(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$baseInfo,$fields)
         )->saveAfter(
             fn(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
-        );
+        )->listDirectSubmit($this->listDirectSubmit);
 
         foreach ($fields as $v){
             $v->steps($this->step);

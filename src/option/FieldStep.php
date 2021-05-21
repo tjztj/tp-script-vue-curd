@@ -35,6 +35,7 @@ class FieldStep
     private array $tags=[];
     private string $remark='';//将在列表步骤中显示的备注
     private $listRowDo;
+    private string $listDirectSubmit='';//列表中直接提交，不经过编辑页面，按钮提示的字段。如果有，列表中直接提交
 
     /**
      * FieldStep constructor.
@@ -88,6 +89,7 @@ class FieldStep
             'config'=>$this->config,
             'tags'=>$tags,
             'remark'=>$this->getRemark(),
+            'listDirectSubmit'=>$this->listDirectSubmit(),
         ];
     }
 
@@ -453,4 +455,18 @@ class FieldStep
         return $this;
     }
 
+
+    /**
+     * 设置或获取 $listDirectSubmit
+     * @param string|null $listDirectSubmit
+     * @return $this|string
+     */
+    public function listDirectSubmit(string $listDirectSubmit=null){
+        if(is_null($listDirectSubmit)){
+            return $this->listDirectSubmit;
+        }else{
+            $this->listDirectSubmit=$listDirectSubmit;
+            return $this;
+        }
+    }
 }

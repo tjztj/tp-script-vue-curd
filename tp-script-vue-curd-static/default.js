@@ -3,6 +3,25 @@ define(['vueAdmin'], function (va) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    const warnIcon=function(color){
+        color=color||"#FF4343";
+        return (Vue.openBlock(), Vue.createBlock("svg", {
+            t: "1615779502296",
+            class: "icon anticon",
+            viewBox: "0 0 1024 1024",
+            version: "1.1",
+            xmlns: "http://www.w3.org/2000/svg",
+            "p-id": "2345",
+            width: "22",
+            height: "22"
+        }, [
+            Vue.createVNode("path", {
+                d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
+                fill: color,
+                "p-id": "2346"
+            })
+        ]))
+    };
 
 
 
@@ -70,25 +89,37 @@ define(['vueAdmin'], function (va) {
         return config;
     }
 
+    function getStepJustDo(row,that){
+        const modal = antd.Modal.confirm({
+            title: Vue.createVNode('b',{},'操作确认'),
+            content:row.nextStepInfo.listDirectSubmit,
+            icon:warnIcon('#faad14'),
+            onOk:()=> {
+                return new Promise((resolve, reject) => {
+                    let url=row.nextStepInfo.config.listBtnUrl;
+                    if(url.indexOf('?')>-1){
+                        url+='&id='+row.id;
+                    }else{
+                        url+='?id='+row.id;
+                    }
+                    that.$post(url,{id:row.id}).then(res=>{
+                        antd.message.success(res.msg);
+                        that.refreshTable();
+                        resolve();
+                    }).catch(()=>{
+                        reject()
+                    });
+                });
+            },
+            onCancel:()=> {
+                modal.destroy();
+            },
+        });
+    }
+
 
 
     actions.index=function(){
-        const warnIcon=(Vue.openBlock(), Vue.createBlock("svg", {
-            t: "1615779502296",
-            class: "icon anticon",
-            viewBox: "0 0 1024 1024",
-            version: "1.1",
-            xmlns: "http://www.w3.org/2000/svg",
-            "p-id": "2345",
-            width: "22",
-            height: "22"
-        }, [
-            Vue.createVNode("path", {
-                d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
-                fill: "#FF4343",
-                "p-id": "2346"
-            })
-        ]));
 
         const infos={};
         return {
@@ -247,7 +278,11 @@ define(['vueAdmin'], function (va) {
                     }
                 },
                 openNext(row){
-                    this.openBox(getStepNextOpenConfig(row,'rt')).end();
+                    if(row.nextStepInfo&&row.nextStepInfo.listDirectSubmit!==''){
+                        getStepJustDo(row,this)
+                    }else{
+                        this.openBox(getStepNextOpenConfig(row,'rt')).end();
+                    }
                 },
                 openShow(row){
                     this.openBox({
@@ -268,7 +303,7 @@ define(['vueAdmin'], function (va) {
                             antd.message.destroy();
                             const modal = antd.Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据？',
-                                icon:warnIcon,
+                                icon:warnIcon(),
                                 onOk:()=> {
                                     this.delSelectedRows(e,true)
                                 },
@@ -290,7 +325,7 @@ define(['vueAdmin'], function (va) {
                             antd.message.destroy();
                             const modal = antd.Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除本条数据及下面所有子数据？',
-                                icon:warnIcon,
+                                icon:warnIcon(),
                                 onOk:()=> {
                                     this.deleteRow(row,true)
                                 },
@@ -387,7 +422,7 @@ define(['vueAdmin'], function (va) {
             data() {
                 return {
                     loading:false,
-                    haveGroup:vueData.groupFields?true:false,
+                    haveGroup:!!vueData.groupFields,
                     groupFields:vueData.groupFields||{'':vueData.fields},
                     labelCol: { span: 4 },
                     wrapperCol: { span: 18 },
@@ -630,7 +665,11 @@ define(['vueAdmin'], function (va) {
                     }
                 },
                 openNext(row){
-                    this.openBox(getStepNextOpenConfig(row,'lt')).end();
+                    if(row.nextStepInfo&&row.nextStepInfo.listDirectSubmit!==''){
+                        getStepJustDo(row,this)
+                    }else{
+                        this.openBox(getStepNextOpenConfig(row,'lt')).end();
+                    }
                 },
                 open(row){
                     this.openBox({
