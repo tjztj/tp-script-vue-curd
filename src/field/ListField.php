@@ -120,14 +120,14 @@ class ListField extends ModelField
                 $list[$k]=$fieldsObj->getSave();
             }
             if(empty($list)){
-                $this->save='null';
-                $this->defaultCheckRequired('');
+                $this->save=$this->nullVal();
+                $this->defaultCheckRequired($this->nullVal());
             }else{
                 $this->save=json_encode($list);
             }
         }else{
-            $this->save='null';
-            $this->defaultCheckRequired('');
+            $this->save=$this->nullVal();
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

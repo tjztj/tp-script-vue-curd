@@ -143,6 +143,7 @@ class FieldWhere
         }
 
         if(!$isSourceData){
+            $isOldHave=!isset($saveDatas[$this->field->name()])&&$info&&isset($info[$this->field->name()]);
             if($this->field->required()){
                 $field=clone $this->field;
                 $field->required(false);
@@ -151,6 +152,9 @@ class FieldWhere
             }
             $field->setSave($saveDatas);
             $saveDatas[$this->field->name()]=$field->getSave();
+            if($isOldHave&&$saveDatas[$this->field->name()]===$field->nullVal()){
+                $saveDatas[$this->field->name()]=$info[$this->field->name()];
+            }
         }
         if(!isset($saveDatas[$this->field->name()])){
             if(!$info||!isset($info[$this->field->name()])){

@@ -52,7 +52,7 @@ class CheckboxField extends ModelField
         $name=$this->name();
         if(isset($data[$name])){
             if(empty($data[$name])) {
-                $this->save='';
+                $this->save=$this->nullVal();
             }else {
                 is_array($data[$name])||$data[$name]=explode(',',$data[$name]);
                 $data[$name]=array_map('trim',$data[$name]);

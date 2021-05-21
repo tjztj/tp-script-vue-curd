@@ -340,7 +340,6 @@ define(['vueAdmin'], function (va) {
                 },
                 openChildList(row,modelInfo){
                     this.openBox({
-                        //TODO::标题要更详细
                         title:modelInfo.title,
                         offset:'rt',
                         content: modelInfo.listUrl+'?base_id='+row.id,
@@ -635,7 +634,6 @@ define(['vueAdmin'], function (va) {
                 },
                 open(row){
                     this.openBox({
-                        //TODO::标题要更详细
                         title:'<div style="font-size: 15px">'+(row?'修改':'新增')+' <span style="font-size: 14px;color: rgba(0,0,0,.55)">'+vueData.title+'</span> 单条数据</div>',
                         offset: 'auto',
                         area: ['50vw', '72vh'],

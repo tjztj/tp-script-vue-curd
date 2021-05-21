@@ -42,11 +42,11 @@ class MonthField extends ModelField
                     throw new \think\Exception('不是正确的月份格式');
                 }
             }else{
-                $this->save=0;
-                $this->defaultCheckRequired(0,'请选择月份');
+                $this->save=$this->nullVal();
+                $this->defaultCheckRequired($this->nullVal(),'请选择月份');
             }
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

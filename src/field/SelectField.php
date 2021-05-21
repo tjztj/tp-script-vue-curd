@@ -69,7 +69,7 @@ class SelectField extends ModelField
             }
             $this->save=implode(',',$data[$name]);
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

@@ -87,11 +87,11 @@ class DateField extends ModelField
                     }
                 }
             }else{
-                $this->save=0;
-                $this->defaultCheckRequired(0,'请选择日期');
+                $this->save=$this->nullVal();
+                $this->defaultCheckRequired($this->nullVal(),'请选择日期');
             }
         }else{
-            $this->defaultCheckRequired('','请选择日期');
+            $this->defaultCheckRequired($this->nullVal(),'请选择日期');
         }
         return $this;
     }

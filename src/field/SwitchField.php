@@ -75,12 +75,12 @@ class SwitchField extends ModelField
         if(isset($data[$name])){
             if($data[$name]==='') {
                 $this->defaultCheckRequired('','请选择正确的选项');
-                $this->save='';
+                $this->save=$this->nullVal();
             }else {
                 if(!isset($this->getItemsValueTexts()[$data[$name]])){
                     if(empty($data[$name])){
                         $this->defaultCheckRequired('','请选择正确的选项');
-                        $this->save='';
+                        $this->save=$this->nullVal();
                     }else{
                         throw new \think\Exception($data[$name].' 不在可选中');
                     }
@@ -89,7 +89,7 @@ class SwitchField extends ModelField
                 }
             }
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

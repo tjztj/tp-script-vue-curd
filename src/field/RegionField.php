@@ -132,7 +132,7 @@ class RegionField extends ModelField
             if ($this->name === $this->pField()) {
                 $this->save = $this->getSystemRegionPidBySetSave('', $data);
             } else {
-                $this->save = '';
+                $this->save = $this->nullVal();
             }
         }
         $this->defaultCheckRequired($this->save);

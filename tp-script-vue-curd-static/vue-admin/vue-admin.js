@@ -84,7 +84,6 @@ define(requires, function ( axios,Qs) {
                             })
                             layero.find('iframe').css('padding','0px 0 28px 0')
                             box.$.each(body, function (i, v) {
-                                // todo 优化弹出层背景色修改
                                 box.$(v).before('<style>html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}</style>');
                             });
                         }
@@ -195,7 +194,6 @@ define(requires, function ( axios,Qs) {
         let input=document.querySelector('#'+boxId+' input');
         let that=this;
         input.onchange= function(){
-            //todo
             let formData = new FormData();
             formData.append("file", this.files[0]);
             that.postDataAndUpload(formData,option.url).then(function (res) {

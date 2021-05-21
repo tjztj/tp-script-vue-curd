@@ -47,7 +47,7 @@ class PasswordField extends ModelField
             $this->save=trim($data[$this->name()]);
             $this->defaultCheckRequired($this->save);
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

@@ -86,11 +86,11 @@ class DecimalField extends ModelField
                 }
                 $this->save=(float)$data[$name];
             }else{
-                $this->save=0;
+                $this->save=$this->nullVal();
             }
         }else{
             if($this->min>0||$this->max<0){
-                $this->defaultCheckRequired('');
+                $this->defaultCheckRequired($this->nullVal());
             }
         }
         return $this;

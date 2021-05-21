@@ -83,7 +83,7 @@ class MoreStringField extends ModelField
             $this->save=is_array($data[$this->name()])?implode($this->separate(),$data[$this->name()]):$data[$this->name()];
             $this->defaultCheckRequired($this->save);
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

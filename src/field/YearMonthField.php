@@ -38,7 +38,7 @@ class YearMonthField extends ModelField
             $this->save=$data[$name];
             $this->defaultCheckRequired($this->save);
         }else{
-            $this->defaultCheckRequired('');
+            $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
     }

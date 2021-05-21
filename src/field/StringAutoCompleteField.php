@@ -57,7 +57,7 @@ class StringAutoCompleteField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
-            if($this->required()&&$this->save===''){
+            if($this->required()&&($this->save===''||$this->save===$this->nullVal())){
                 $this->defaultCheckRequired($this->save);
             }
         }else{
