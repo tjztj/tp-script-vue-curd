@@ -156,6 +156,7 @@ define([],function(){
                                  tree-checkable
                                  tree-check-strictly
                                  :placeholder="field.placeholder||'请选择村社'"
+                                 :dropdown-style="{ maxHeight: '350px', overflow: 'auto' }"
                             >
                             
                             </a-tree-select>
