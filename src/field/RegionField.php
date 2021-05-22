@@ -35,6 +35,7 @@ class RegionField extends ModelField
     protected string $defaultFilterClass = RegionFilter::class;
     protected bool $canEdit=false;//编辑页面是否可修改
     protected bool $canCheckParent=false;//是否可选中父级
+    protected bool $multiple=false;//是否多选
 
     protected string $pField = '';//父字段名
     protected string $cField = '';//子字段名
@@ -79,6 +80,15 @@ class RegionField extends ModelField
     }
 
 
+    /**
+     * 是否可多选
+     * @param bool $multiple
+     * @return RegionField|bool
+     */
+    public function multiple(bool $multiple=null){
+         return $this->doAttr('multiple',$multiple);
+    }
+
 
 
     /**
@@ -112,27 +122,42 @@ class RegionField extends ModelField
      */
     public function setSaveVal(array $data): self
     {
-        if ($this->pField() === '') {
-            throw new \think\Exception('地区字段未配置 pField');
-        }
-
-        $name = $this->name();
-        if (isset($data[$name])) {
-            if ($this->name === $this->pField()) {
-                $this->save = $this->getSystemRegionPidBySetSave($data[$name], $data);
-            } else {
+        if($this->multiple){
+            $name = $this->name();
+            if (isset($data[$name])) {
                 $val = $data[$name];
                 if (is_array($val)) {
-                    $this->save = end($val);
+                    $this->save = implode(',',$val);
                 } else {
                     $this->save = $val;
                 }
-            }
-        } else {
-            if ($this->name === $this->pField()) {
-                $this->save = $this->getSystemRegionPidBySetSave('', $data);
             } else {
                 $this->save = $this->nullVal();
+            }
+
+        }else{
+            if ($this->pField() === '') {
+                throw new \think\Exception('地区字段未配置 pField');
+            }
+
+            $name = $this->name();
+            if (isset($data[$name])) {
+                if ($this->name === $this->pField()) {
+                    $this->save = $this->getSystemRegionPidBySetSave($data[$name], $data);
+                } else {
+                    $val = $data[$name];
+                    if (is_array($val)) {
+                        $this->save = end($val);
+                    } else {
+                        $this->save = $val;
+                    }
+                }
+            } else {
+                if ($this->name === $this->pField()) {
+                    $this->save = $this->getSystemRegionPidBySetSave('', $data);
+                } else {
+                    $this->save = $this->nullVal();
+                }
             }
         }
         $this->defaultCheckRequired($this->save);
@@ -171,7 +196,22 @@ class RegionField extends ModelField
     {
         $name = $this->name();
         if (isset($dataBaseData[$name])) {
-            $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : ($this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]));
+            if( empty($dataBaseData[$name])){
+                $dataBaseData[$name]='';
+                return;
+            }
+
+            if(!$this->multiple){
+                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
+                return;
+            }
+
+            $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
+
+            foreach ($arr as $k=>$v){
+                $arr[$k]=self::getRegionName($v)?:$v;
+            }
+            $dataBaseData[$name]=implode('，',$arr);
         }
     }
 
