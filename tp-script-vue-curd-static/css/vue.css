@@ -935,7 +935,7 @@ a.red:hover,a.yellow:hover{
     opacity: .78;
 }
 /****************************************************************/
-.field-tips{
+.field-tips.field-tips-have-items{
     padding-bottom: 1px;
 }
 .field-tips-item{

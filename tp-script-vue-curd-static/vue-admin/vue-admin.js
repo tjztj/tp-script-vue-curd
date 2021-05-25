@@ -880,7 +880,7 @@ define(requires, function ( axios,Qs) {
                             <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
-                                    <div class="field-tips">
+                                    <div :class="{'field-tips':true,'field-tips-have-items':field.editTipArr&&field.editTipArr.length>0}">
                                         <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
                                     </div>
                                     <component 
