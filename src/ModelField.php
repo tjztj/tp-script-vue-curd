@@ -9,6 +9,7 @@ use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldDo;
+use tpScriptVueCurd\option\FieldEditTip;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FieldWhere;
@@ -58,6 +59,10 @@ abstract class ModelField
      */
     protected array $fieldDoList=[];//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
     protected ?FieldWhere $hideSelf=null;//编辑时是否隐藏本字段
+    /**
+     * @var FieldEditTip[] $editTips 字段在编辑页面时，可根据填写的内容显示不同的提示信息
+     */
+    protected array $editTips=[];
     public const REQUIRED=true;//开启必填验证
     public bool $objWellToArr=true;
 
@@ -363,6 +368,29 @@ abstract class ModelField
         $this->hideSelf->or($where);
         return $this;
     }
+
+
+    /**
+     * 字段在编辑页面时，可根据填写的内容显示不同的提示信息
+     * @return FieldEditTip[]
+     */
+    public function editTips():array
+    {
+        return $this->editTips;
+    }
+
+
+    /**
+     * 字段在编辑页面时，可根据填写的内容显示不同的提示信息|设置
+     * @param string $message
+     * @param FieldWhere $show
+     * @return FieldEditTip
+     */
+    public function pushEditTip(string $message,FieldWhere $show):FieldEditTip{
+        $fieldEditTip=new FieldEditTip($message,$show);
+        $this->editTips[]=$fieldEditTip;
+        return $fieldEditTip;
+    }
     
 
     /**
@@ -406,13 +434,25 @@ abstract class ModelField
             }else{
                 $data[$k]=$this->$k;
             }
-            if(is_object($data[$k])&&method_exists($data[$k],'toArray')){
-                if($this->objWellToArr){
-                    $data[$k]=$data[$k]->toArray();
-                }else{
-                    unset($data[$k]);
+            if(is_array($data[$k])){
+                foreach($data[$k] as $key=>$val){
+                    if(is_object($val)&&method_exists($val,'toArray')&&$this->objWellToArr){
+                        $data[$k][$key]=$val->toArray();
+                    }
+                }
+            }else if(is_object($data[$k])){
+                if(method_exists($data[$k],'toArray')){
+                    if($this->objWellToArr){
+                        $data[$k]=$data[$k]->toArray();
+                    }else{
+                        unset($data[$k]);
+                    }
                 }
             }
+
+
+
+
         }
         return $data;
     }

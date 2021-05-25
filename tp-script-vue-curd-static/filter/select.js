@@ -9,6 +9,9 @@ define([], function () {
                     val=val.toString();
                 }
             }
+            if(val===''){
+                val=undefined;
+            }
             return {
                 inputValue:Vue.ref(val)
             }
@@ -53,6 +56,7 @@ define([], function () {
                                       allow-clear
                                       show-search 
                                       size="small"
+                                       placeholder="选择相关信息"
                                       :filter-option="filterOption">
                                       <template v-if="haveGroup">
                                          <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>

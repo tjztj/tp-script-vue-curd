@@ -622,7 +622,8 @@ define(requires, function ( axios,Qs) {
                             }
                             return fields;
                         };
-                        this.groupFieldItems.forEach(field=>{
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+                        const checkShowItemBy=function(field){
                             if(!field.items||field.items.length===0){
                                 return;
                             }
@@ -654,10 +655,15 @@ define(requires, function ( axios,Qs) {
                                     v.showItem=false;
                                 }
                             });
-
-                        });
-
-
+                        };
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+                        const checkFieldTipShow=function(field){
+                            if(field.editTips.length===0){
+                                field.editTipArr=[];
+                                return;
+                            }
+                            field.editTipArr= field.editTips.filter(val=>checkFieldWhere(val.show));
+                        }
                         ///////////////////////////////////////////////////////////////////////////////////////////////
                         function arrHave(arr,val){
                             if(typeof arr==='string'){
@@ -670,7 +676,6 @@ define(requires, function ( axios,Qs) {
                             }
                             return false;
                         }
-
                         const changeFieldHideList=(key,fieldName,hide)=>{
                             if(hide){
                                 this.currentFieldHideList[key]=this.currentFieldHideList[key]||[];
@@ -687,9 +692,6 @@ define(requires, function ( axios,Qs) {
                                 delete this.currentFieldHideList[key]
                             }
                         }
-
-
-
                         const checkHideField=(field,checkVal)=>{
                             if(field.hideSelf){
                                 changeFieldHideList(field.name,getWhereFields(field.hideSelf).join(','),checkFieldWhere(field.hideSelf));
@@ -808,12 +810,14 @@ define(requires, function ( axios,Qs) {
                             })
                             //-------------------------
                         }
-
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
                         this.groupFieldItems.forEach(field=>{
+                            checkShowItemBy(field);
+                            checkFieldTipShow(field)
                             checkHideField(field,this.currentFieldHideList[field.name]?'':formVal[field.name]);
-                        })
+                        });
 
                         this.$emit('update:form',formVal);
                     },
@@ -876,6 +880,9 @@ define(requires, function ( axios,Qs) {
                             <div v-for="field in groupFieldItems" :data-name="field.name">
                                 <transition name="slide-fade">
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
+                                    <div class="field-tips">
+                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
+                                    </div>
                                     <component 
                                         :is="'VueCurdEdit'+field.type" 
                                         :field="field" 
