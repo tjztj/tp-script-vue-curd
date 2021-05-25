@@ -183,6 +183,9 @@ define(['vueAdmin'], function (va) {
                             return;
                         }
                         const record=infos[id];
+                        if(!this.$refs.indexcurdtable.isCanDel(record)){
+                            return;
+                        }
                         if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
                             ids.push(id)
                         }
@@ -599,6 +602,9 @@ define(['vueAdmin'], function (va) {
                             return;
                         }
                         const record=infos[id];
+                        if(!this.$refs.indexcurdtable.isCanDel(record)){
+                            return;
+                        }
                         if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
                             ids.push(id)
                         }

@@ -378,6 +378,7 @@ body{
 
 .vuecurd-def-box .field-box > .l {
     flex: 1;
+    width:0;
 }
 
 .vuecurd-def-box .ext-span {

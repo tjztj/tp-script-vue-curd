@@ -114,7 +114,8 @@
             @open-show="openShow"
             @on-delete="deleteRow"
             @open-edit="openEdit"
-            @open-next="openNext">
+            @open-next="openNext"
+            ref="indexcurdtable">
             {block name="tableSlot"}{/block}
         </curd-table>
     </div>
