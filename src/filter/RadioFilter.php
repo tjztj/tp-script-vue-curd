@@ -63,7 +63,7 @@ class RadioFilter extends ModelFilter
     }
 
     public function generateWhere(Query $query,$value):void{
-        if($value||$value===0||$value==='0'){
+        if($value||$value===0||$value==='0'||($value===''&&in_array('',array_column($this->field->items(),'value'),true))){
             if($this->isFindInSet()){
                 is_array($value)||$value=[$value];
                 if(count($value)>1){

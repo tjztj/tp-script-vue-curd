@@ -56,7 +56,7 @@ class SelectFilter extends ModelFilter
     }
 
     public function generateWhere(Query $query,$value):void{
-        if($value||$value===0||$value==='0'){
+        if($value||$value===0||$value==='0'||($value===''&&in_array('',array_column($this->field->items(),'value'),true))){
             if(method_exists($this->field,'multiple')&&$this->field->multiple()){
                 if(is_array($value)){
                     $query->where(function(Query $q)use($value){

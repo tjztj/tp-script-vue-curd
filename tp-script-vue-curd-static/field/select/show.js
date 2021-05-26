@@ -1,37 +1,41 @@
 define([],function(){
     return {
         props:['info','field'],
+        setup(props,ctx){
+            const items={};
+            props.field.items.forEach(item=>{
+                items[item.value.toString()]=item;
+            })
+            return {
+                items
+            }
+        },
         computed:{
           lists(){
               if(typeof this.info['_Original_'+this.field.name]==='undefined'||this.info['_Original_'+this.field.name]===''){
-                  return [];
+                  return this.info[this.field.name]?[this.info[this.field.name]]:[];
               }
               return this.info['_Original_'+this.field.name].toString().split(',');
           }
         },
         methods:{
             color(val){
-                if(val===''||val===undefined){
+                if(val===undefined){
                     return;
                 }
-                for(let key in this.field.items){
-                    if(this.field.items[key].value.toString()===val.toString()){
-                        if(this.field.items[key].color){
-                            return this.field.items[key].color;
-                        }
-                    }
+                if(!this.items[val.toString()]||!this.items[val.toString()].color){
+                    return;
                 }
+                return this.items[val.toString()].color;
             },
             text(val){
-                if(typeof val==='undefined'||val===''){
+                if(val===undefined){
                     return '';
                 }
-                for(let key in this.field.items){
-                    if(this.field.items[key].value.toString()===val.toString()){
-                        return this.field.items[key].title;
-                    }
+                if(!this.items[val.toString()]||!this.items[val.toString()].title){
+                    return val;
                 }
-                return val;
+                return this.items[val.toString()].title;
             }
         },
         template:`<div>

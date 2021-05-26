@@ -153,7 +153,7 @@ trait CheckField
     final protected function getShowText(string $val,bool $isMultiple): string
     {
         if($val===''){
-            return '';
+            return $this->getItemsValueTexts()[$val]??'';
         }
         $textArr=[];
         if($isMultiple){
