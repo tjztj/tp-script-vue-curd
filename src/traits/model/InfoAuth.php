@@ -14,10 +14,11 @@ trait InfoAuth
 
     /**
      * 子类继承重写
-     * @return ModelInfoAuth
+     * @param ModelInfoAuth $authCheck
+     * @return void
      */
-    protected function authCheck():ModelInfoAuth{
-        return new ModelInfoAuth();
+    protected function authCheck(ModelInfoAuth $authCheck):void{
+
     }
 
 
@@ -31,7 +32,8 @@ trait InfoAuth
      */
     public function rowSetAuth(FieldCollection $field,BaseModel $baseInfo=null,array $types=['show','edit','del','add']): self
     {
-        $authCheck=$this->authCheck();
+        $authCheck=new ModelInfoAuth();
+        $this->authCheck($authCheck);
 
         $arr=$this->__auth??[];
 

@@ -132,11 +132,11 @@ trait ModelSave
         if($this instanceof BaseChildModel){
             $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
             $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
-            $saveData=$this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
+            $this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
         }else if($this instanceof BaseModel){
             $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$beforeInfo);
             $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
-            $saveData=$this->doSaveDataAfter($saveData,$id,$beforeInfo);
+            $this->doSaveDataAfter($saveData,$id,$beforeInfo);
         }else{
             $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
         }

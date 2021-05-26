@@ -116,7 +116,7 @@ abstract class BaseModel extends VueCurlModel
 
 
     protected function doSaveDataBefore(FieldCollection $fields,array &$postData,bool $isExcelDo,int $id,?VueCurlModel $beforeInfo):void{} //执行doSaveData前（钩子）
-    protected function doSaveDataAfter(array $saveData,int $id,?VueCurlModel $beforeInfo):array{return $saveData;} //执行doSaveData后（钩子）
+    protected function doSaveDataAfter(array &$saveData,int $id,?VueCurlModel $beforeInfo):void{} //执行doSaveData后（钩子）
     protected function onAddAfter(VueCurlModel $info,array $postData): void{}//添加后钩子
     protected function onEditAfter(VueCurlModel $info,array $postData,?VueCurlModel $beforeInfo): void{}//修改后钩子
 }

@@ -17,6 +17,7 @@ use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
+use tpScriptVueCurd\option\FunControllerListChildBtn;
 
 /**
  * 为了方便有时候子控制器也使用
@@ -159,7 +160,9 @@ trait BaseIndex
                 $childBtns=[];
                 foreach (static::childControllerClassPathList() as $childControllerClass){
                     /* @var $childControllerClass BaseChildController|string */
-                    $childBtns[class_basename($childControllerClass::modelClassPath())]=$childControllerClass::baseListBtnText($info);
+                    $btn=new FunControllerListChildBtn();
+                    $childControllerClass::baseListBtnText($btn,$info);
+                    $childBtns[class_basename($childControllerClass::modelClassPath())]=$btn;
                 }
                 $info->childBtns=$childBtns;
                 return $info;

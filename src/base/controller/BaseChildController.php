@@ -59,17 +59,15 @@ trait BaseChildController
     abstract public static function parentControllerClassPath():string;
 
 
-
     /**
      * 子表在主表列表中的按钮文字，可重写
+     * @param FunControllerListChildBtn $btn
      * @param BaseModel $info
-     * @return FunControllerListChildBtn
+     * @return void
      */
-    public static function baseListBtnText(BaseModel $info):FunControllerListChildBtn{
-        $btn=new FunControllerListChildBtn();
+    public static function baseListBtnText(FunControllerListChildBtn $btn,BaseModel $info):void{
         $btn->color='#d46b08';
         $btn->text='详细列表';
-        return $btn;
     }
 
     /**
