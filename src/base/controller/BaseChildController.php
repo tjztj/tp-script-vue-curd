@@ -38,11 +38,6 @@ trait BaseChildController
         $this->model=new $model;
         $this->fields=$this->model->fields();
 
-        $indexPageOption=new FunControllerIndexPage;
-        $indexPageOption->pageSize=0;//子表默认不分页
-        static::getIndexPage($indexPageOption);
-        $this->indexPageOption=$indexPageOption;
-
         $baseControllerClassPath=static::parentControllerClassPath();
         $baseModel=$baseControllerClassPath::modelClassPath();
         $this->baseModel=new $baseModel;
@@ -79,7 +74,8 @@ trait BaseChildController
      * 列表分页配置
      * @return FunControllerIndexPage
      */
-    public static function getIndexPage(FunControllerIndexPage $indexPageOption):void{
+    public static function setIndexPage(FunControllerIndexPage $indexPageOption):void{
+        $indexPageOption->pageSize=0;//子表默认不分页
     }
 
     public function importBefore(FunControllerChildImportBefore $option):void{

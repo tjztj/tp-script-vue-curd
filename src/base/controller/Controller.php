@@ -60,6 +60,11 @@ trait Controller
         $this->vueInitialize();
 
 
+        $indexPageOption=new FunControllerIndexPage;
+        static::setIndexPage($indexPageOption);
+        $this->indexPageOption=$indexPageOption;
+
+
         $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
         $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
     }
@@ -87,7 +92,7 @@ trait Controller
      * 列表分页配置
      * @return FunControllerIndexPage
      */
-    abstract public static function getIndexPage(FunControllerIndexPage $indexPageOption):void;
+    abstract public static function setIndexPage(FunControllerIndexPage $indexPageOption):void;
 
 
     /**
