@@ -29,7 +29,6 @@ trait BaseHaveChildController
         ExcelHaveChild::justDownBaseExcelTpl insteadof  BaseController;
         ExcelHaveChild::setExcelBaseInfo insteadof  BaseController;
         ExcelHaveChild::excelTilte insteadof  BaseController;
-        BaseController::indexFetch as baseIndexFetch;
     }
 
 
@@ -87,12 +86,9 @@ trait BaseHaveChildController
     /**
      * index页面显示的数据处理
      * @param array $fetch
-     * @return array
+     * @return void
      */
-    protected function indexFetch(array $fetch):array{
-        // 列表页面显示前处理
-        $fetch=$this->baseIndexFetch($fetch);
-
+    protected function indexFetchDoChild(array &$fetch):void{
         $filterComponents=$fetch['filterComponents']??[];
 
         $fetch['childs']=[];
@@ -117,6 +113,5 @@ trait BaseHaveChildController
         }
         $fetch['filterComponents']=$filterComponents;
         $fetch['deleteHaveChildErrorCode']=ErrorCode::DELETE_HAVE_CHILD;
-        return $fetch;
     }
 }

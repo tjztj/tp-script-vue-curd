@@ -62,7 +62,8 @@ trait CurdChild{
             ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))//隐藏地区
             ->toArray());
 
-        return $this->showTpl('child_list',$this->indexFetch([
+
+        $data=[
             'vueCurdAction'=>'childList',
             'indexPageOption'=>$this->indexPageOption,
             'info'=>$info,
@@ -87,7 +88,9 @@ trait CurdChild{
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
-        ]));
+        ];
+        $this->indexFetch($data);
+        return $this->showTpl('child_list',$data);
     }
 
 

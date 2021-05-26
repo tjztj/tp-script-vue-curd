@@ -203,8 +203,7 @@ trait BaseIndex
 
 
 
-
-        $data=$this->indexFetch([
+        $data=[
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
             'indexPageOption'=>$this->indexPageOption,
@@ -236,8 +235,13 @@ trait BaseIndex
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
-        ]);
+        ];
 
+        if($this->type()!=='base_have_child'){
+            $this->indexFetchDoChild($data);
+        }
+
+        $this->indexFetch($data);
         return $this->showTpl('index',$data);
     }
 }

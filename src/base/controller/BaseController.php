@@ -31,6 +31,11 @@ trait BaseController
         $model=static::modelClassPath();
         $this->model=new $model;
         $this->fields=$this->model->fields();
+
+        $indexPageOption=new FunControllerIndexPage;
+        $indexPageOption->pageSize=10;//默认每页显示10条数据
+        static::getIndexPage($indexPageOption);
+        $this->indexPageOption=$indexPageOption;
     }
 
     /**
@@ -42,10 +47,7 @@ trait BaseController
         return 'base';
     }
 
-    public static function getIndexPage():FunControllerIndexPage{
-        $option=new FunControllerIndexPage;
-        $option->pageSize=10;//默认每页显示10条数据
-        return $option;
+    public static function getIndexPage(FunControllerIndexPage $indexPageOption):void{
     }
 
     public function importBefore(FunControllerImportBefore $option):void{

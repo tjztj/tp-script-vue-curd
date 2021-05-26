@@ -60,9 +60,6 @@ trait Controller
         $this->vueInitialize();
 
 
-        $this->indexPageOption=static::getIndexPage();
-
-
         $this->tplPath=root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
         $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
     }
@@ -90,7 +87,7 @@ trait Controller
      * 列表分页配置
      * @return FunControllerIndexPage
      */
-    abstract public static function getIndexPage():FunControllerIndexPage;
+    abstract public static function getIndexPage(FunControllerIndexPage $indexPageOption):void;
 
 
     /**
@@ -104,9 +101,8 @@ trait Controller
     protected function indexData(FunControllerIndexData $option):void{
         //列表数据处理钩子
     }
-    protected function indexFetch(array $fetch):array{
+    protected function indexFetch(array &$fetch):void{
         // 列表页面显示前处理
-        return $fetch;
     }
     
     protected function addAfter(VueCurlModel $info): void
