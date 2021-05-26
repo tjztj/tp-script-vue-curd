@@ -588,6 +588,8 @@ define(['vueAdmin'], function (va) {
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
                     indexUrl:window.location.href,
+                    //其他配置
+                    ...getThisActionOhterData(),
                 }
             },
             mounted() {
@@ -595,6 +597,7 @@ define(['vueAdmin'], function (va) {
                 this.fetch();
             },
             computed: {
+                ...getThisActionOhterComputeds(),
                 delSelectedIds(){
                     const ids=[];
                     this.rowSelection.selectedRowKeys.forEach(id=>{
@@ -611,6 +614,9 @@ define(['vueAdmin'], function (va) {
                     })
                     return ids;
                 }
+            },
+            watch:{
+                ...getThisActionOhterWatchs(),
             },
             methods:{
                 handleTableChange(pagination, filters, sorter) {
@@ -760,6 +766,8 @@ define(['vueAdmin'], function (va) {
                 onDataLoad(){
                     //数据获取完成钩子
                 },
+                ////其他配置
+                ...getThisActionOhterMethods()
             }
 
         };
