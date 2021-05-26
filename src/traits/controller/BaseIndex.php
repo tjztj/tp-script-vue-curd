@@ -237,7 +237,7 @@ trait BaseIndex
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
 
-        if($this->type()!=='base_have_child'){
+        if($this->type()==='base_have_child'){
             $this->indexFetchDoChild($data);
         }
 
