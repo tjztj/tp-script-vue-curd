@@ -29,6 +29,7 @@
 }
 </style>
 {block name="style"}{/block}
+{block name="bodyTop"}{/block}
 <div class="vuecurd-def-box">
 <template v-for="(groupFieldItems,groupTitle) in groupFields">
     <fieldset class="field-group-fieldset" :class="{'show-group':haveGroup}">
@@ -60,3 +61,5 @@
     </fieldset>
 </template>
 </div>
+{block name="bodyBottom"}{/block}
+{block name="script"}{/block}
