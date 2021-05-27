@@ -520,13 +520,24 @@ define(['vueAdmin'], function (va) {
 
     actions.show=function(){
         return {
+            setup(props,ctx){
+                return getThisActionOhterSetup(props,ctx);
+            },
             data(){
                 return {
                     info:vueData.info,
                     haveGroup:vueData.groupFields?true:false,
                     groupFields:vueData.groupFields||{'':vueData.fields},
-                    fieldComponents
+                    fieldComponents,
+                    //其他配置
+                    ...getThisActionOhterData(),
                 }
+            },
+            computed:{
+                ...getThisActionOhterComputeds(),
+            },
+            watch:{
+                ...getThisActionOhterWatchs(),
             },
             methods:{
                 checkShowGroup(groupFieldItems){
@@ -550,6 +561,8 @@ define(['vueAdmin'], function (va) {
                     }
                     window.top.showImages(imgs, start);
                 },
+                ////其他配置
+                ...getThisActionOhterMethods()
             }
 
         }
@@ -567,6 +580,9 @@ define(['vueAdmin'], function (va) {
         }
         const infos={};
         return {
+            setup(props,ctx){
+                return getThisActionOhterSetup(props,ctx);
+            },
             data(){
                 return {
                     dataOther:{},
