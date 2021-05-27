@@ -33,12 +33,18 @@
 <template v-for="(groupFieldItems,groupTitle) in groupFields">
     <fieldset class="field-group-fieldset" :class="{'show-group':haveGroup}">
         <div class="legend-box">
-            <legend>{{groupTitle}}</legend>
+            <legend>
+                {block name="groupTitle"}
+                    {{groupTitle}}
+                {/block}
+            </legend>
         </div>
         <template v-for="field in groupFieldItems">
             <div class="row" v-if="!field.showUseComponent">
                 <div class="l">
-                    {{field.title}}：
+                    {block name="fieldTitle"}
+                        {{field.title}}：
+                    {/block}
                 </div>
                 <div class="r">
                     <curd-show-field :field="field" :info="info"></curd-show-field>
