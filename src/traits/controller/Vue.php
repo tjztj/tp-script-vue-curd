@@ -130,9 +130,20 @@ trait Vue
      * 失败且设置 errorCode
      * @param string $msg
      * @param int $errorCode
+     * @param bool $confirm 是否是返回给前台确认框
+     * @throws \think\Exception
      */
-    public function errorAndCode(string $msg,int $errorCode=0):void{
-        $this->error($msg,'',null,3,[],$errorCode);
+    public function errorAndCode(string $msg,int $errorCode=0,bool $confirm=false):void{
+        if($confirm){
+            if(empty($errorCode)){
+                throw new \think\Exception('confirm为true时，errorCode不可为0，且是要唯一');
+            }
+            if(((int)$this->request->header('confirm-error-code'))===$errorCode){
+                //用户已确认，不再返回前台信息，继续执行下面代码
+                return;
+            }
+        }
+        $this->error($msg,'',null,3,[],$errorCode,$confirm);
     }
 
     /**
@@ -143,8 +154,9 @@ trait Vue
      * @param int $wait
      * @param array $header
      * @param int $errorCode
+     * @param bool $confirm  需要使用 errorAndCode 来调用
      */
-    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0)
+    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,bool $confirm=false)
     {
         if($data===''){
             $data=[];
@@ -164,7 +176,8 @@ trait Vue
             'data' => $data,
             'url'  => $url,
             'wait' => $wait,
-            'errorCode'=>$errorCode
+            'confirm'=>$confirm?1:0,
+            'errorCode'=>$errorCode,
         ];
         if ($type === 'html') {
             $response = view(app('config')->get('app.dispatch_error_tmpl'), $result);

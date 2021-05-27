@@ -40,7 +40,49 @@ define(requires, function ( axios,Qs) {
     /**
      * 初始化请求
      */
-    window.service=axios.create({baseURL:"/"+window.VUE_CURD.MODULE+"/",withCredentials:!0,timeout:15e4}),service.interceptors.response.use(e=>{const r=e.data;return 1==r.code?r:(antd.message.error(r.msg||"失败"),r.url&&-1!==r.url.indexOf(vueData.loginUrl)&&antd.Modal.confirm({content:"登录或已过期，可以取消以留在此页，或重新登录",okText:"确认退出",cancelText:"取消",onOk(){location.href=r.url}}),Promise.reject(r))},e=>("string"==typeof e?e={code:0,msg:e,data:[]}:e.msg||(console.error(e),e={code:0,msg:"发生错误",data:[]}),antd.message.error(e.msg,6),Promise.reject(e)));
+    window.service = axios.create({
+        baseURL: '/' + window.VUE_CURD.MODULE + '/',
+        withCredentials: true,
+        timeout: 150000
+    });
+    service.interceptors.response.use(async response => {
+        const res = response.data;
+        if (res.code == 1) {
+            return res
+        }
+        if(res.confirm==1){
+            return await new Promise((resolve,reject)=>{
+                antd.Modal.confirm({
+                    content: res.msg, okText: '确认', cancelText: '取消', onOk() {
+                        response.config.headers['confirm-error-code']=res.errorCode;
+                        resolve(service(response.config))
+                    },onCancel(){
+                        reject('已取消')
+                    }
+                })
+            })
+        }
+
+
+        antd.message.error(res.msg || '失败');
+        if (res.url && res.url.indexOf(vueData.loginUrl) !== -1) {
+            antd.Modal.confirm({
+                content: '登录或已过期，可以取消以留在此页，或重新登录', okText: '确认退出', cancelText: '取消', onOk() {
+                    location.href = res.url
+                }
+            })
+        }
+        return Promise.reject(res)
+    }, error => {
+        if (typeof error === 'string') {
+            error = {code: 0, msg: error, data: [],}
+        } else if (!error.msg) {
+            console.error(error);
+            error = {code: 0, msg: '发生错误', data: [],}
+        }
+        antd.message.error(error.msg, 6);
+        return Promise.reject(error)
+    })
 
 
     /****窗口方法***/

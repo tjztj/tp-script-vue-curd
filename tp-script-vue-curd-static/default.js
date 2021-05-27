@@ -222,6 +222,8 @@ define(['vueAdmin'], function (va) {
                         this.data = data.data.data;
                         this.loading = false;
                         this.refreshTableTirgger();
+                    }).catch(()=>{
+                        this.loading = false;
                     });
                 },
                 getWhere(){
@@ -369,6 +371,8 @@ define(['vueAdmin'], function (va) {
                         this.data=rows;
                         this.loading = false;
                         this.refreshTableTirgger();
+                    }).catch(()=>{
+                        this.loading = false;
                     });
                 },
                 doFilter(){
@@ -764,6 +768,8 @@ define(['vueAdmin'], function (va) {
                         this.data=rows;
                         this.loading = false;
                         this.refreshTableTirgger();
+                    }).catch(()=>{
+                        this.loading = false;
                     });
                 },
                 downExcelTpl(){
