@@ -310,7 +310,7 @@ trait CurdChild{
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
-                $this->errorAndCode($e->getMessage(),$e->getCode());
+                $this->error($e);
             }
             $this->model->commit();
 
@@ -371,7 +371,7 @@ trait CurdChild{
             $this->doDelect($this->model,$ids);
         }catch (\Exception $e){
             $this->model->rollback();
-            return $this->errorAndCode($e->getMessage(),$e->getCode());
+            return $this->error($e);
         }
         $this->model->commit();
         return $this->success('删除成功');

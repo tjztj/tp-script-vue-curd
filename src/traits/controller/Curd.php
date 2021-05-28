@@ -93,7 +93,7 @@ trait Curd
                 }
             }catch (\Exception $e){
                 $this->model->rollback();
-                $this->errorAndCode($e->getMessage());
+                $this->error($e);
             }
             $this->model->commit();
 
@@ -152,7 +152,7 @@ trait Curd
             $this->doDelect($this->model,$ids);
         }catch (Exception $e){
             $this->model->rollback();
-            return $this->errorAndCode($e->getMessage(),$e->getCode());
+            return $this->error($e);
         }
 
         $this->model->commit();

@@ -9,6 +9,7 @@ use think\exception\HttpResponseException;
 use think\Request;
 use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\middleware\FieldMiddleware;
+use tpScriptVueCurd\option\ConfirmException;
 
 /**
  * Trait Vue
@@ -158,6 +159,14 @@ trait Vue
      */
     public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,$confirm=false)
     {
+        if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
+             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
+                'okText'=>$msg->okText,
+                'cancelText'=>$msg->cancelText,
+            ]:false);
+            return;
+        }
+
         if($data===''){
             $data=[];
         }

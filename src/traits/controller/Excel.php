@@ -107,7 +107,7 @@ trait Excel
         try{
             $data = \tpScriptVueCurd\tool\Excel::importExecl($file->getRealPath(), 0, 0, $options);
         }catch (\Exception $e){
-            return $this->errorAndCode($e->getMessage(),$e->getCode());
+            return $this->error($e);
         }
 
 
