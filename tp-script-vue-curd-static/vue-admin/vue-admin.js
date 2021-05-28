@@ -54,7 +54,7 @@ define(requires, function ( axios,Qs) {
             return await new Promise((resolve,reject)=>{
                 antd.Modal.confirm({
                     content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
-                    title:Vue.createVNode('b',{},res.title),
+                    title:Vue.createVNode('b',{},res.confirm.title),
                     icon:(Vue.openBlock(), Vue.createBlock("svg", {
                         t: "1615779502296",
                         class: "icon anticon",
