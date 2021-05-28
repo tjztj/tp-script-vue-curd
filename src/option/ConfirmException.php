@@ -12,7 +12,7 @@ class ConfirmException extends \think\Exception
     public string $title='操作确认';
 
 
-    public function __construct(string $message,string $okText='确认执行',string $cancelText='取消',string $title='操作确认',?int $errorCode=null)
+    private function __construct(string $message,string $okText='确认执行',string $cancelText='取消',string $title='操作确认',?int $errorCode=null)
     {
         if(is_null($errorCode)){
             $trace=$this->getTrace();
@@ -24,6 +24,19 @@ class ConfirmException extends \think\Exception
         $this->okText=$okText;
         $this->cancelText=$cancelText;
         $this->title=$title;
+    }
+
+    /**
+     * 前台弹出确认款
+     * @throws ConfirmException
+     */
+    public static function throw(string $message, string $okText='确认执行', string $cancelText='取消', string $title='操作确认', ?int $errorCode=null): void
+    {
+        $err=new self($message,$okText,$cancelText,$title,$errorCode);
+        if(((int)request()->header('confirm-error-code'))===((int)$err->getCode())){
+            return ;
+        }
+        throw $err;
     }
 
 }
