@@ -4,8 +4,6 @@
 namespace tpScriptVueCurd\option;
 
 
-use Throwable;
-
 class ConfirmException extends \think\Exception
 {
 
@@ -13,9 +11,15 @@ class ConfirmException extends \think\Exception
     public string $cancelText='取消';
 
 
-    public function __construct(string $message,int $errorCode,string $okText='确认执行',string $cancelText='取消')
+    public function __construct(string $message,string $okText='确认执行',string $cancelText='取消',?int $errorCode=null)
     {
+        if(is_null($errorCode)){
+            $trace=$this->getTrace();
+            $errorCode=count($trace).'0'.(current($trace)['line']).'0'.$this->getLine();
+        }
+
         parent::__construct($message,$errorCode);
+
         $this->okText=$okText;
         $this->cancelText=$cancelText;
     }
