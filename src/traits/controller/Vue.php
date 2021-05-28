@@ -130,10 +130,10 @@ trait Vue
      * 失败且设置 errorCode
      * @param string $msg
      * @param int $errorCode
-     * @param bool $confirm 是否是返回给前台确认框
+     * @param bool|array $confirm 是否是返回给前台确认框
      * @throws \think\Exception
      */
-    public function errorAndCode(string $msg,int $errorCode=0,bool $confirm=false):void{
+    public function errorAndCode(string $msg,int $errorCode=0,$confirm=false):void{
         if($confirm){
             if(empty($errorCode)){
                 throw new \think\Exception('confirm为true时，errorCode不可为0，且是要唯一');
@@ -154,13 +154,26 @@ trait Vue
      * @param int $wait
      * @param array $header
      * @param int $errorCode
-     * @param bool $confirm  需要使用 errorAndCode 来调用
+     * @param bool|array $confirm  需要使用 errorAndCode 来调用
      */
-    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,bool $confirm=false)
+    public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,$confirm=false)
     {
         if($data===''){
             $data=[];
         }
+
+        if($confirm){
+            $confirm=[
+                'show'=>true,
+                'okText'=>is_array($confirm)&&isset($confirm['okText'])?$confirm['okText']:'确认执行',
+                'cancelText'=>is_array($confirm)&&isset($confirm['cancelText'])?$confirm['cancelText']:'取消',
+            ];
+        }else{
+            $confirm=[
+                'show'=>false,'okText'=>'确认执行','cancelText'=>'取消'
+            ];
+        }
+
 
 
         if (is_null($url)) {
@@ -176,7 +189,7 @@ trait Vue
             'data' => $data,
             'url'  => $url,
             'wait' => $wait,
-            'confirm'=>$confirm?1:0,
+            'confirm'=>$confirm,
             'errorCode'=>$errorCode,
         ];
         if ($type === 'html') {

@@ -50,14 +50,14 @@ define(requires, function ( axios,Qs) {
         if (res.code == 1) {
             return res
         }
-        if(res.confirm==1){
+        if(res.confirm.show){
             return await new Promise((resolve,reject)=>{
                 antd.Modal.confirm({
-                    content: res.msg, okText: '确认', cancelText: '取消', onOk() {
+                    content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText, onOk() {
                         response.config.headers['confirm-error-code']=res.errorCode;
                         resolve(service(response.config))
                     },onCancel(){
-                        reject('已取消')
+                        reject({code: 0, msg: '已取消执行', data: [],})
                     }
                 })
             })
