@@ -160,9 +160,10 @@ trait Vue
     public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,$confirm=false)
     {
         if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
-             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
+            $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
                 'okText'=>$msg->okText,
                 'cancelText'=>$msg->cancelText,
+                'title'=>$msg->title,
             ]:false);
             return;
         }
@@ -176,10 +177,11 @@ trait Vue
                 'show'=>true,
                 'okText'=>is_array($confirm)&&isset($confirm['okText'])?$confirm['okText']:'确认执行',
                 'cancelText'=>is_array($confirm)&&isset($confirm['cancelText'])?$confirm['cancelText']:'取消',
+                'title'=>is_array($confirm)&&isset($confirm['title'])?$confirm['title']:'操作确认',
             ];
         }else{
             $confirm=[
-                'show'=>false,'okText'=>'确认执行','cancelText'=>'取消'
+                'show'=>false,'okText'=>'确认执行','cancelText'=>'取消','title'=>'操作确认',
             ];
         }
 
