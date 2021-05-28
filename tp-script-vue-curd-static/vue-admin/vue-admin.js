@@ -1374,7 +1374,7 @@ define(requires, function ( axios,Qs) {
                                         <a v-if="isCanShowInfo(record)" @click="openShow(record)">详情</a>
                                           
                                         <template v-if="isCanEdit(record)">
-                                            <a-divider type="vertical"></a-divider>
+                                            <a-divider v-if="isCanShowInfo(record)" type="vertical"></a-divider>
                                             <a @click="openEdit(record)" :style="{color: editBtnClor(record)}">{{editBtnText(record)}}</a>
                                         </template>
                                     </slot>
