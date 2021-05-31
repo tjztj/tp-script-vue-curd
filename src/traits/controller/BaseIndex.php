@@ -212,6 +212,7 @@ trait BaseIndex
             'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
+            'listUrl'=>url(str_replace(['\\','._'],['.','.'],parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',static::class),'\\'))).'/index')->build(),
             'editUrl'=>url('edit')->build(),
             'showUrl'=>url('show')->build(),
             'delUrl'=>url('del')->build(),

@@ -165,7 +165,7 @@ define(['vueAdmin'], function (va) {
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
-                    indexUrl:VUE_CURD.CONTROLLER+'/index',
+                    indexUrl:vueData.listUrl,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
