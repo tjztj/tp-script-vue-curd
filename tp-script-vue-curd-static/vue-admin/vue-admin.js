@@ -1238,8 +1238,8 @@ define(requires, function ( axios,Qs) {
                 openNext(row){
                     this.$emit('openNext',row)
                 },
-                openChildList(row,modelInfo){
-                    this.$emit('openChildList',row,modelInfo)
+                openChildList(row,modelInfo,btn){
+                    this.$emit('openChildList',row,modelInfo,btn)
                 },
                 onDelete(row){
                     this.$emit('onDelete',row)
@@ -1393,7 +1393,7 @@ define(requires, function ( axios,Qs) {
                                         <template v-for="(vo,kk) in record.childBtns">
                                         <template v-if="vo.show">
                                             <a-divider type="vertical"></a-divider>
-                                            <a @click="openChildList(record,childsObjs[kk])" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
+                                            <a @click="openChildList(record,childsObjs[kk],vo)" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
                                         </template>
                                         </template>
                                         </template>

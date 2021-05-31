@@ -380,11 +380,11 @@ define(['vueAdmin'], function (va) {
                     this.myFilters.page=1;
                     this.fetch()
                 },
-                openChildList(row,modelInfo){
+                openChildList(row,modelInfo,btn){
                     this.openBox({
                         title:modelInfo.title,
                         offset:'rt',
-                        content: modelInfo.listUrl+'?base_id='+row.id,
+                        content: btn.url,
                     }).end();
                 },
                 downExcelTpl(){

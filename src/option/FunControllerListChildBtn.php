@@ -27,4 +27,10 @@ class FunControllerListChildBtn
      */
     public string $text='';
 
+    /**
+     * 按钮连接，为null，自动生成
+     * @var string|null
+     */
+    public ?string $url=null;
+
 }

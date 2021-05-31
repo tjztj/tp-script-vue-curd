@@ -162,6 +162,9 @@ trait BaseIndex
                     /* @var $childControllerClass BaseChildController|string */
                     $btn=new FunControllerListChildBtn();
                     $childControllerClass::baseListBtnText($btn,$info);
+                    if(!isset($btn->url)||is_null($btn->url)){
+                        $btn->url=url(str_replace(['\\','._'],['.','.'],parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index',['base_id'=>$info->id])->build();
+                    }
                     $childBtns[class_basename($childControllerClass::modelClassPath())]=$btn;
                 }
                 $info->childBtns=$childBtns;
