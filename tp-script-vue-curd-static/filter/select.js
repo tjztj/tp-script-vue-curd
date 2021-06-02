@@ -62,17 +62,17 @@ define([], function () {
                                          <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
                                          <template v-for="(items,key) in groupItems">
                                             <template v-if="key">
-                                                 <a-select-opt-group :label="key">
-                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                 <a-select-opt-group :label="key" :key="key">
+                                                     <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                                  </a-select-opt-group>
                                             </template>
                                              <template v-else>
-                                                <a-select-option v-for="optionItem in items" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                                <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                              </template>
                                          </template>
                                      </template>
                                      <template v-else>
-                                         <a-select-option :value="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>
+                                         <a-select-option :value="optionItem.value" :key="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>
                                      </template>
                             </a-select>
                              <a-button @click="search" size="small">确定</a-button>
