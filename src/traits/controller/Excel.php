@@ -66,7 +66,7 @@ trait Excel
         $this->importBefore($option);
         
         $model=new $modelClassName;
-        $info=$model->addInfo($option->saveArr,$model->fields(),true);
+        $info=$model->addInfo($option->saveArr,$this->excelFields(),true);
 
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;
