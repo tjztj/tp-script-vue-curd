@@ -320,24 +320,44 @@ class RegionField extends ModelField
         if (!isset($save[$this->cField()])) {
             return;
         }
+
+        if($this->pField()===$this->name()){
+            return;
+        }
+
         if (!is_numeric($save[$this->cField()])) {
             $regions = explode('-', $save[$this->cField()]);
+
+            if($this->canCheckParent()&&count($regions)===1){
+                $save[$this->cField()]=self::getRegionId($regions[0]);
+                if(!empty(self::getRegionPid($save[$this->cField()]))){
+                    throw new \think\Exception('填写格式不正确');
+                }
+                $save[$this->pField()]=0;
+                return;
+            }
+
 
             if (empty($regions[0]) || empty($regions[1])) {
                 throw new \think\Exception('填写格式不正确');
             }
-            $region_name = $save[$this->cField()];
-            $save[$this->cField()] = self::getRegionId($region_name);
+
+            $save[$this->cField()] = self::getRegionId($regions[1]);
             if ($save[$this->cField()] === '') {
-                throw new \think\Exception('没有找到村社：' . $region_name);
+                throw new \think\Exception('没有找到村社：' . $regions[1]);
             }
         }
         $save[$this->pField()] = self::getRegionPid($save[$this->cField()]);
-        if (empty($save[$this->cField()]) || empty($save[$this->pField()]) || $save[$this->pField()] == RegionConstant::FIRST_PID) {
-            throw new \think\Exception('未获取到正确的村社');
+
+        if(empty($save[$this->cField()]) || empty($save[$this->pField()]) ){
+            throw new \think\Exception('未获取到正确的村社-001');
         }
+        if(!$this->canCheckParent()&&$save[$this->pField()] == RegionConstant::FIRST_PID){
+            throw new \think\Exception('未获取到正确的村社-002');
+        }
+
         if (self::getRegionPid($save[$this->cField()]) != $save[$this->pField()]) {
-            throw new \think\Exception('镇街[' . $regions[0] . ']下未找到' . $regions[1]);
+            throw new \think\Exception('镇街[' . self::getRegionName($save[$this->pField()]) . ']下未找到' . self::getRegionName($save[$this->cField()]));
         }
 
     }

@@ -128,6 +128,11 @@ class SelectField extends ModelField
         $arr=explode("\n",$save[$name]);
         $values=$this->getItemsTextValues();
         foreach ($arr as $k=>$v){
+            $v=trim($v);
+            if($v===''){
+                continue;
+            }
+
             if(isset($values[$v])){
                 $arr[$k]=$values[$v];
             }else{
