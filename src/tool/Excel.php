@@ -257,20 +257,19 @@ class Excel
                         case 'jpg':
                         case 'jpeg':
                             $imageFileName .= '.jpg';
-                            $source = imagecreatefromjpeg($drawing->getPath());
-                            imagejpeg($source, $options['img_save_path'] . $imageFileName);
+                            $source = @imagecreatefromjpeg($drawing->getPath());
                             break;
                         case 'gif':
                             $imageFileName .= '.gif';
-                            $source = imagecreatefromgif($drawing->getPath());
-                            imagegif($source, $options['img_save_path'] . $imageFileName);
+                            $source = @imagecreatefromgif($drawing->getPath());
                             break;
                         case 'png':
                             $imageFileName .= '.png';
-                            $source = imagecreatefrompng($drawing->getPath());
-                            imagepng($source, $options['img_save_path']. $imageFileName);
+                            $source = @imagecreatefrompng($drawing->getPath());
                             break;
                     }
+                    $source || $source=imagecreatefromstring(file_get_contents($drawing->getPath()));
+                    imagepng($source, $options['img_save_path']. $imageFileName);
                 }
 
                 if(!empty($source)){
