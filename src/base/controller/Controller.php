@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\base\controller;
 use think\App;
 use think\db\Query;
 use think\Request;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\traits\controller\Vue;
@@ -119,7 +120,7 @@ trait Controller
         // 数据修改钩子，方便之类处理（之类重写此方法）
     }
 
-    protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel &$data):void
+    protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel &$data,?BaseModel $baseModel):void
     {
         //（添加/编辑页面）生成解析数据前，处理数据（控制字段显示与否），$data为空代表是新增
     }
