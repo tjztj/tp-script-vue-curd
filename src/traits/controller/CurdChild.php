@@ -349,8 +349,11 @@ trait CurdChild{
 
         $fields=$this->fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
 
-        $this->createEditFetchDataBefore($fields,$info,$baseInfo);//切面
-
+        try{
+            $this->createEditFetchDataBefore($fields,$info,$baseInfo);//切面
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
 
 
         $fetchData=$this->createEditFetchData($fields,$info,$baseInfo);//切面

@@ -110,7 +110,11 @@ trait Curd
         $id=$this->request->param('id/d');
 
         $info=$id?$this->model->find($id):null;
-        $this->createEditFetchDataBefore($this->fields,$info,null);
+        try{
+            $this->createEditFetchDataBefore($this->fields,$info,null);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
         $fetchData=$this->createEditFetchData($this->fields,$info);
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
 
