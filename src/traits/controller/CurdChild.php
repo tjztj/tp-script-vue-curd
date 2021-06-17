@@ -52,7 +52,11 @@ trait CurdChild{
         $info||$this->errorAndCode('未找到相关信息');
         $baseInfo=$info;
 
-        FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+        try{
+            FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
 
         $info=$info->toArray();
         $this->baseFields->doShowData($info);//有些数据不允许直接展示
@@ -159,8 +163,13 @@ trait CurdChild{
         $list->map($doSteps)
             ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']));
 
-        //字段钩子
-        FieldDo::doIndex($this->fields,$list,$baseInfo);
+        try{
+            //字段钩子
+            FieldDo::doIndex($this->fields,$list,$baseInfo);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
+
 
         $option->data=$list->toArray();
         foreach ($option->data as $k=>$v){

@@ -252,7 +252,7 @@ class Excel
                     //把图片存起来
                     imagepng($source, $options['img_save_path'] . $imageFileName);
                 } else {
-                    switch ($drawing->getExtension()) {
+                    switch (strtolower($drawing->getExtension())) {
                         case 'jpg':
                         case 'jpeg':
                             $imageFileName .= '.jpg';

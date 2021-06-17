@@ -19,6 +19,7 @@ class FieldStep
     private StepCheck $checkFunc;
     private StepCheck $fieldCheckFunc;
     private $auth;//用来判断是否有编辑当前步骤的权限
+    private $onEditShow;
     private $saveBefore;
     private $saveAfter;
     private $saveAfterCommited;
@@ -206,6 +207,39 @@ class FieldStep
         return $auth($info,$baseInfo,$fields);
     }
 
+
+    /**
+     * 编辑或添加显示时执行
+     * @param $onEditShow
+     * @return $this
+     * @throws \think\Exception
+     */
+    public function onEditShow($onEditShow): self
+    {
+        if(is_callable($onEditShow)){
+            $this->onEditShow=$onEditShow;
+        }else{
+            throw new \think\Exception('参数错误');
+        }
+        return $this;
+    }
+
+
+    /**
+     * 编辑或添加显示时执行
+     * @param array|null $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @param bool $isStepNext
+     */
+    public function doOnEditShow(?array $info,?BaseModel $baseInfo,FieldCollection $fields,bool $isStepNext): void
+    {
+        if(!isset($this->saveAfter)||is_null($this->saveAfter)){
+            return;
+        }
+        $func=$this->saveAfter;
+        $func($info,$baseInfo,$fields);
+    }
 
     /**
      * 设置步骤保存前执行

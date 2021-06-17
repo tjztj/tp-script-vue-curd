@@ -25,52 +25,53 @@ abstract class ModelField
 {
     use Func;
 
-    protected string $guid='';
-    protected string $name='';//字段名
-    protected array $tag=[];//标签
-    protected string $group='';//分组
-    protected string $title='';//标题
-    protected string $ext='';//后缀
-    protected string $placeholder='';//输入提示
-    protected string $editExplain='';//字段编辑时下方的说明
-    protected bool $listShow=false;//是否在列表中显示
-    protected int $listColumnWidth=0;//指定列宽（0，不指定）
-    protected bool $listSort=true;//列表中时候可排序
-    protected string $listFixed='';//列表中，列是否浮动，'left'/'right'
-    protected bool $required=false;//字段是否必填
-    protected bool $readOnly=false;//找到是否只读
-    protected bool $editShow=true;//字段在添加修改时是否显示
-    protected bool $showPage=true;//字段在详情页面中是否显示
-    protected string $type='';//字段类型，不可修改
+    protected string $guid = '';
+    protected string $name = '';//字段名
+    protected array $tag = [];//标签
+    protected string $group = '';//分组
+    protected string $title = '';//标题
+    protected string $ext = '';//后缀
+    protected string $placeholder = '';//输入提示
+    protected string $editExplain = '';//字段编辑时下方的说明
+    protected bool $listShow = false;//是否在列表中显示
+    protected int $listColumnWidth = 0;//指定列宽（0，不指定）
+    protected bool $listSort = true;//列表中时候可排序
+    protected string $listFixed = '';//列表中，列是否浮动，'left'/'right'
+    protected bool $required = false;//字段是否必填
+    protected bool $readOnly = false;//找到是否只读
+    protected bool $editShow = true;//字段在添加修改时是否显示
+    protected bool $showPage = true;//字段在详情页面中是否显示
+    protected string $type = '';//字段类型，不可修改
     protected $save;//提交保存时，要提交的数据库的值
-    protected ?ModelFilter $filter=null;//筛选对象
-    protected string $defaultFilterClass='';//筛选类型
-    protected bool $pub=false;//是否在前台公开
-    protected bool $canExcelImport=true;//是否可以excel导入
-    protected ?array $editLabelCol=null;//编辑界面 label布局
-    protected string $editLabelAlign='right';//编辑界面 label对齐
-    protected ?array $editWrapperCol=null;//编辑界面 为输入控件设置布局样式 用法同 editLabelCol
-    protected bool $editColon=true;//是否显示label后面的冒号
-    protected bool $showUseComponent=false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
-    protected $validateRule=null;//数据验证
-    protected $nullVal='';//字段在数据库中为空时的值
+    protected ?ModelFilter $filter = null;//筛选对象
+    protected string $defaultFilterClass = '';//筛选类型
+    protected bool $pub = false;//是否在前台公开
+    protected bool $canExcelImport = true;//是否可以excel导入
+    protected ?array $editLabelCol = null;//编辑界面 label布局
+    protected string $editLabelAlign = 'right';//编辑界面 label对齐
+    protected ?array $editWrapperCol = null;//编辑界面 为输入控件设置布局样式 用法同 editLabelCol
+    protected bool $editColon = true;//是否显示label后面的冒号
+    protected bool $showUseComponent = false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
+    protected $validateRule = null;//数据验证
+    protected $nullVal = '';//字段在数据库中为空时的值
     /**
      * @var FieldDo[] $fieldDoList
      */
-    protected array $fieldDoList=[];//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
-    protected ?FieldWhere $hideSelf=null;//编辑时是否隐藏本字段
+    protected array $fieldDoList = [];//数据列表时执行，数据显示时执行（方便一些数据处理，也可以叫字段钩子）
+    protected ?FieldWhere $hideSelf = null;//编辑时是否隐藏本字段
     /**
      * @var FieldEditTip[] $editTips 字段在编辑页面时，可根据填写的内容显示不同的提示信息
      */
-    protected array $editTips=[];
-    public const REQUIRED=true;//开启必填验证
-    public bool $objWellToArr=true;
+    protected array $editTips = [];
+    public const REQUIRED = true;//开启必填验证
+    public bool $objWellToArr = true;
 
 
-    public function __construct(){
-        $this->guid=create_guid();
-        $this->type=class_basename(static::class);
-        if($this->defaultFilterClass){
+    public function __construct()
+    {
+        $this->guid = create_guid();
+        $this->type = class_basename(static::class);
+        if ($this->defaultFilterClass) {
             $this->filter(new $this->defaultFilterClass($this));
         }
     }
@@ -82,16 +83,17 @@ abstract class ModelField
      * @param string|null $group
      * @return $this
      */
-    public static function init(string $name=null,string $title=null,string $group=null,$otherConfig=null): self
+    public static function init(string $name = null, string $title = null, string $group = null, $otherConfig = null): self
     {
-        $obj=new static($otherConfig);
-        is_null($name)||$obj->name($name);
-        is_null($title)||$obj->title($title);
-        is_null($group)||$obj->group($group);
+        $obj = new static($otherConfig);
+        is_null($name) || $obj->name($name);
+        is_null($title) || $obj->title($title);
+        is_null($group) || $obj->group($group);
         return $obj;
     }
 
-    public function getType():string{
+    public function getType(): string
+    {
         return $this->type;
     }
 
@@ -99,35 +101,39 @@ abstract class ModelField
      * @param string|null $name
      * @return $this|string
      */
-    public function name(string $name=null){
-        return $this->doAttr('name',$name);
+    public function name(string $name = null)
+    {
+        return $this->doAttr('name', $name);
     }
 
     /**字段标题
      * @param string|null $title
      * @return $this|string
      */
-    public function title(string $title=null){
-        return $this->doAttr('title',$title);
+    public function title(string $title = null)
+    {
+        return $this->doAttr('title', $title);
     }
 
     /**分组
      * @param string|null $group
      * @return $this|string
      */
-    public function group(string $group=null){
-        return $this->doAttr('group',$group);
+    public function group(string $group = null)
+    {
+        return $this->doAttr('group', $group);
     }
 
     /**标签（多个）
      * @param string|null $tag
      * @return $this|array
      */
-    public function tag(string $tag=null){
-        if(is_null($tag)){
+    public function tag(string $tag = null)
+    {
+        if (is_null($tag)) {
             return $this->tag;
         }
-        $this->tag[]=$tag;
+        $this->tag[] = $tag;
         return $this;
     }
 
@@ -136,8 +142,9 @@ abstract class ModelField
      * @param array $tags
      * @return $this
      */
-    public function removeTag(array $tags):self{
-        $this->tag=array_diff($this->tag,$tags);
+    public function removeTag(array $tags): self
+    {
+        $this->tag = array_diff($this->tag, $tags);
         return $this;
     }
 
@@ -146,8 +153,9 @@ abstract class ModelField
      * 清空标签
      * @return $this
      */
-    public function clearTag():self{
-        $this->tag=[];
+    public function clearTag(): self
+    {
+        $this->tag = [];
         return $this;
     }
 
@@ -155,24 +163,27 @@ abstract class ModelField
      * @param string|null $ext
      * @return $this|string
      */
-    public function ext(string $ext=null){
-        return $this->doAttr('ext',$ext);
+    public function ext(string $ext = null)
+    {
+        return $this->doAttr('ext', $ext);
     }
 
     /**输入提示
      * @param string|null $placeholder
      * @return $this|string
      */
-    public function placeholder(string $placeholder=null){
-        return $this->doAttr('placeholder',$placeholder);
+    public function placeholder(string $placeholder = null)
+    {
+        return $this->doAttr('placeholder', $placeholder);
     }
 
     /**字段编辑时下方的说明
      * @param string|null $editExplain
      * @return $this|string
      */
-    public function editExplain(string $editExplain=null){
-        return $this->doAttr('editExplain',$editExplain);
+    public function editExplain(string $editExplain = null)
+    {
+        return $this->doAttr('editExplain', $editExplain);
     }
 
 
@@ -181,18 +192,19 @@ abstract class ModelField
      * @param bool|null $listShow
      * @return $this|bool
      */
-    public function listShow(bool $listShow=null){
-        return $this->doAttr('listShow',$listShow);
+    public function listShow(bool $listShow = null)
+    {
+        return $this->doAttr('listShow', $listShow);
     }
 
     /**列表中，列是否浮动，'left'/'right'
      * @param string|null $listFixed
      * @return $this|string
      */
-    public function listFixed(string $listFixed=null){
-        return $this->doAttr('listFixed',$listFixed);
+    public function listFixed(string $listFixed = null)
+    {
+        return $this->doAttr('listFixed', $listFixed);
     }
-
 
 
     /**
@@ -200,8 +212,9 @@ abstract class ModelField
      * @param int|null $listColumnWidth
      * @return $this|bool
      */
-    public function listColumnWidth(int $listColumnWidth=null){
-        return $this->doAttr('listColumnWidth',$listColumnWidth);
+    public function listColumnWidth(int $listColumnWidth = null)
+    {
+        return $this->doAttr('listColumnWidth', $listColumnWidth);
     }
 
     /**
@@ -209,8 +222,9 @@ abstract class ModelField
      * @param bool|null $listSort
      * @return $this|bool
      */
-    public function listSort(bool $listSort=null){
-        return $this->doAttr('listSort',$listSort);
+    public function listSort(bool $listSort = null)
+    {
+        return $this->doAttr('listSort', $listSort);
     }
 
     /**
@@ -218,40 +232,47 @@ abstract class ModelField
      * @param bool|null $required
      * @return $this|bool
      */
-    public function required(bool $required=null){
-        if(is_null($required)){
-            return self::REQUIRED&&$this->required;
+    public function required(bool $required = null)
+    {
+        if (is_null($required)) {
+            return self::REQUIRED && $this->required;
         }
-        $this->required=$required;
+        $this->required = $required;
         return $this;
     }
+
     /**
      * 字段是否只读
      * @param bool|null $readOnly
      * @return $this|bool
      */
-    public function readOnly(bool $readOnly=null){
-        if(is_null($readOnly)){
+    public function readOnly(bool $readOnly = null)
+    {
+        if (is_null($readOnly)) {
             return $this->readOnly;
         }
-        $this->readOnly=$readOnly;
+        $this->readOnly = $readOnly;
         return $this;
     }
+
     /**
      * 是否在前端公开
      * @param bool|null $pub
      * @return $this|bool
      */
-    public function pub(bool $pub=null){
-        return $this->doAttr('pub',$pub);
+    public function pub(bool $pub = null)
+    {
+        return $this->doAttr('pub', $pub);
     }
+
     /**
      * 是否可以excel模板导入
      * @param bool|null $canExcelImport
      * @return $this|bool
      */
-    public function canExcelImport(bool $canExcelImport=null){
-        return $this->doAttr('canExcelImport',$canExcelImport);
+    public function canExcelImport(bool $canExcelImport = null)
+    {
+        return $this->doAttr('canExcelImport', $canExcelImport);
     }
 
     /**
@@ -259,8 +280,9 @@ abstract class ModelField
      * @param bool|null $editShow
      * @return $this|bool
      */
-    public function editShow(bool $editShow=null){
-        return $this->doAttr('editShow',$editShow);
+    public function editShow(bool $editShow = null)
+    {
+        return $this->doAttr('editShow', $editShow);
     }
 
 
@@ -269,22 +291,24 @@ abstract class ModelField
      * @param bool|null $showPage
      * @return $this|bool
      */
-    public function showPage(bool $showPage=null){
-        return $this->doAttr('showPage',$showPage);
+    public function showPage(bool $showPage = null)
+    {
+        return $this->doAttr('showPage', $showPage);
     }
 
     /**
      * 编辑界面 label布局
      * @param array|null $editLabelCol
-     * @param bool $forceSet  是否强制设置值，当要设置值为null时使用
+     * @param bool $forceSet 是否强制设置值，当要设置值为null时使用
      * @return $this|array|null
      */
-    public function editLabelCol(array $editLabelCol=null,bool $forceSet=false){
-        if($forceSet){
-            $this->editLabelCol=$editLabelCol;
+    public function editLabelCol(array $editLabelCol = null, bool $forceSet = false)
+    {
+        if ($forceSet) {
+            $this->editLabelCol = $editLabelCol;
             return $this;
         }
-        return $this->doAttr('editLabelCol',$editLabelCol);
+        return $this->doAttr('editLabelCol', $editLabelCol);
     }
 
     /**
@@ -292,22 +316,24 @@ abstract class ModelField
      * @param string|null $editLabelAlign
      * @return $this|string
      */
-    public function editLabelAlign(string $editLabelAlign=null){
-        return $this->doAttr('editLabelAlign',$editLabelAlign);
+    public function editLabelAlign(string $editLabelAlign = null)
+    {
+        return $this->doAttr('editLabelAlign', $editLabelAlign);
     }
 
     /**
      * 编辑界面 为输入控件设置布局样式 用法同 editLabelCol
      * @param array|null $editWrapperCol
-     * @param bool $forceSet  是否强制设置值，当要设置值为null时使用
+     * @param bool $forceSet 是否强制设置值，当要设置值为null时使用
      * @return $this|array|null
      */
-    public function editWrapperCol(array $editWrapperCol=null,bool $forceSet=false){
-        if($forceSet){
-            $this->editWrapperCol=$editWrapperCol;
+    public function editWrapperCol(array $editWrapperCol = null, bool $forceSet = false)
+    {
+        if ($forceSet) {
+            $this->editWrapperCol = $editWrapperCol;
             return $this;
         }
-        return $this->doAttr('editWrapperCol',$editWrapperCol);
+        return $this->doAttr('editWrapperCol', $editWrapperCol);
     }
 
 
@@ -316,8 +342,9 @@ abstract class ModelField
      * @param bool|null $showUseComponent
      * @return $this|bool
      */
-    public function showUseComponent(bool $showUseComponent=null){
-        return $this->doAttr('showUseComponent',$showUseComponent);
+    public function showUseComponent(bool $showUseComponent = null)
+    {
+        return $this->doAttr('showUseComponent', $showUseComponent);
     }
 
     /**
@@ -325,8 +352,9 @@ abstract class ModelField
      * @param bool|null $editColon
      * @return $this|bool
      */
-    public function editColon(bool $editColon=null){
-        return $this->doAttr('editColon',$editColon);
+    public function editColon(bool $editColon = null)
+    {
+        return $this->doAttr('editColon', $editColon);
     }
 
 
@@ -335,8 +363,9 @@ abstract class ModelField
      * @param $validateRule
      * @return $this|mixed
      */
-    public function validateRule($validateRule=null){
-        return $this->doAttr('validateRule',$validateRule);
+    public function validateRule($validateRule = null)
+    {
+        return $this->doAttr('validateRule', $validateRule);
     }
 
 
@@ -352,8 +381,9 @@ abstract class ModelField
      * 隐藏本字段条件，不能修改，修改请使用pushHideSelfWhere
      * @return FieldWhere|null
      */
-    public function hideSelf():?FieldWhere{
-        return $this->hideSelf??null;
+    public function hideSelf(): ?FieldWhere
+    {
+        return $this->hideSelf ?? null;
     }
 
     /**
@@ -361,9 +391,10 @@ abstract class ModelField
      * @param FieldWhere $where
      * @return $this
      */
-    public function pushHideSelfWhere(FieldWhere $where):self{
-        if(!$this->hideSelf()){
-            $this->hideSelf=FieldWhere::make(StringField::init(FieldWhere::RETURN_FALSE_FIELD_NAME),FieldWhere::RETURN_FALSE_FIELD_NAME.'[这个条件是初始化条件，不用管]');
+    public function pushHideSelfWhere(FieldWhere $where): self
+    {
+        if (!$this->hideSelf()) {
+            $this->hideSelf = FieldWhere::make(StringField::init(FieldWhere::RETURN_FALSE_FIELD_NAME), FieldWhere::RETURN_FALSE_FIELD_NAME . '[这个条件是初始化条件，不用管]');
         }
         $this->hideSelf->or($where);
         return $this;
@@ -374,7 +405,7 @@ abstract class ModelField
      * 字段在编辑页面时，可根据填写的内容显示不同的提示信息
      * @return FieldEditTip[]
      */
-    public function editTips():array
+    public function editTips(): array
     {
         return $this->editTips;
     }
@@ -386,12 +417,13 @@ abstract class ModelField
      * @param FieldWhere $show
      * @return FieldEditTip
      */
-    public function pushEditTip(string $message,FieldWhere $show):FieldEditTip{
-        $fieldEditTip=new FieldEditTip($message,$show);
-        $this->editTips[]=$fieldEditTip;
+    public function pushEditTip(string $message, FieldWhere $show): FieldEditTip
+    {
+        $fieldEditTip = new FieldEditTip($message, $show);
+        $this->editTips[] = $fieldEditTip;
         return $fieldEditTip;
     }
-    
+
 
     /**
      * 自定义其他属性
@@ -400,57 +432,54 @@ abstract class ModelField
      * @return $this|null|mixed
      * @throws \think\Exception
      */
-    public function other($name, $value=null)
+    public function other($name, $value = null)
     {
-        if(method_exists($this,$name)){
-            throw new \think\Exception('[ '.$name.' ]方法在'.(self::class).'中已存在，请直接调用，或更换属性名称');
+        if (method_exists($this, $name)) {
+            throw new \think\Exception('[ ' . $name . ' ]方法在' . (self::class) . '中已存在，请直接调用，或更换属性名称');
         }
-        if(is_null($value)){
-            return $this->$name??null;
+        if (is_null($value)) {
+            return $this->$name ?? null;
         }
-        $this->$name=$value;
+        $this->$name = $value;
         return $this;
     }
 
 
-
-    protected function doAttr($name,$value)
+    protected function doAttr($name, $value)
     {
-        if(is_null($value)){
+        if (is_null($value)) {
             return $this->$name;
         }
-        $this->$name=$value;
+        $this->$name = $value;
         return $this;
     }
 
     public function toArray(): array
     {
-        $data=[];
-        foreach (get_class_vars(static::class) as $k=>$v){
-            if(method_exists($this,$k)){
-                $data[$k]=$this->$k();
-            }elseif (!isset($this->$k)){
+        $data = [];
+        foreach (get_class_vars(static::class) as $k => $v) {
+            if (method_exists($this, $k)) {
+                $data[$k] = $this->$k();
+            } elseif (!isset($this->$k)) {
                 continue;
-            }else{
-                $data[$k]=$this->$k;
+            } else {
+                $data[$k] = $this->$k;
             }
-            if(is_array($data[$k])){
-                foreach($data[$k] as $key=>$val){
-                    if(is_object($val)&&method_exists($val,'toArray')&&$this->objWellToArr){
-                        $data[$k][$key]=$val->toArray();
+            if (is_array($data[$k])) {
+                foreach ($data[$k] as $key => $val) {
+                    if (is_object($val) && method_exists($val, 'toArray') && $this->objWellToArr) {
+                        $data[$k][$key] = $val->toArray();
                     }
                 }
-            }else if(is_object($data[$k])){
-                if(method_exists($data[$k],'toArray')){
-                    if($this->objWellToArr){
-                        $data[$k]=$data[$k]->toArray();
-                    }else{
+            } else if (is_object($data[$k])) {
+                if (method_exists($data[$k], 'toArray')) {
+                    if ($this->objWellToArr) {
+                        $data[$k] = $data[$k]->toArray();
+                    } else {
                         unset($data[$k]);
                     }
                 }
             }
-
-
 
 
         }
@@ -460,16 +489,16 @@ abstract class ModelField
 
     /**
      * 设置保存的值，子类不能重写
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
      * @return $this
      */
     final public function setSave(array $data): self
     {
         $this->setSaveVal($data);
-        if(isset($this->save)){
-            $checkData=$data;
-            $checkData[$this->name()]=$this->save;
-            $this->validate($checkData,false);
+        if (isset($this->save)) {
+            $checkData = $data;
+            $checkData[$this->name()] = $this->save;
+            $this->validate($checkData, false);
         }
         return $this;
     }
@@ -480,10 +509,11 @@ abstract class ModelField
      * @return $this
      * @throws \think\Exception
      */
-    public function setSaveToNull():self{
-        $nullVal=$this->nullVal();
+    public function setSaveToNull(): self
+    {
+        $nullVal = $this->nullVal();
         $this->defaultCheckRequired($nullVal);
-        $this->save=$nullVal;
+        $this->save = $nullVal;
         return $this;
     }
 
@@ -491,7 +521,8 @@ abstract class ModelField
      * 字段为空时的值
      * @return mixed
      */
-    public function nullVal(){
+    public function nullVal()
+    {
         return $this->nullVal;
     }
 
@@ -500,8 +531,9 @@ abstract class ModelField
      * @param $nullVal
      * @return $this
      */
-    public function setNullVal($nullVal):self{
-        $this->nullVal=$nullVal;
+    public function setNullVal($nullVal): self
+    {
+        $this->nullVal = $nullVal;
         return $this;
     }
 
@@ -511,16 +543,18 @@ abstract class ModelField
      * @return $this
      * @throws \think\Exception
      */
-    protected function setSaveVal(array $data):self{
-        if(isset($data[$this->name()])){
+    protected function setSaveVal(array $data): self
+    {
+        if (isset($data[$this->name()])) {
             $this->defaultCheckRequired($data[$this->name()]);
-            $this->save=$data[$this->name()];
+            $this->save = $data[$this->name()];
         }
         return $this;
     }
 
 
-    public function getSave(){
+    public function getSave()
+    {
         return $this->save;
     }
 
@@ -531,23 +565,24 @@ abstract class ModelField
      * @param bool $throwTitle
      * @throws \think\Exception
      */
-    final public function validate(array $data,bool $throwTitle):void{
-        if(!$this->validateRule()){
+    final public function validate(array $data, bool $throwTitle): void
+    {
+        if (!$this->validateRule()) {
             return;
         }
 
-        $title='';
-        if($throwTitle){
-            if($this->title()){
-                $title='|'.$this->title();
+        $title = '';
+        if ($throwTitle) {
+            if ($this->title()) {
+                $title = '|' . $this->title();
             }
-        }else{
-            $title='|ERROR_TITLE';
+        } else {
+            $title = '|ERROR_TITLE';
         }
 
-        $validate=\think\facade\Validate::rule($this->name().$title, $this->validateRule());
-        if(!$validate->check($data)){
-            throw new \think\Exception(str_replace('ERROR_TITLE','',$validate->getError()));
+        $validate = \think\facade\Validate::rule($this->name() . $title, $this->validateRule());
+        if (!$validate->check($data)) {
+            throw new \think\Exception(str_replace('ERROR_TITLE', '', $validate->getError()));
         }
     }
 
@@ -555,9 +590,11 @@ abstract class ModelField
     /**
      *
      * 显示时要处理的数据
-     * @param array $dataBaseData  从数据库中获取的数据
+     * @param array $dataBaseData 从数据库中获取的数据
      */
-    public function doShowData(array &$dataBaseData): void{}
+    public function doShowData(array &$dataBaseData): void
+    {
+    }
 
 
     /**
@@ -565,12 +602,13 @@ abstract class ModelField
      * @param ModelFilter|null $filter
      * @return $this|ModelFilter
      */
-    public function filter(ModelFilter $filter=null){
-        if($filter&&get_class($filter)===EmptyFilter::class){
-            $this->filter=null;
+    public function filter(ModelFilter $filter = null)
+    {
+        if ($filter && get_class($filter) === EmptyFilter::class) {
+            $this->filter = null;
             return $this;
         }
-        return $this->doAttr('filter',$filter);
+        return $this->doAttr('filter', $filter);
     }
 
 
@@ -579,9 +617,10 @@ abstract class ModelField
      * @param $func
      * @return $this
      */
-    public function doFilter($func):self{
-        $filter=$this->filter();
-        if(is_null($filter)){
+    public function doFilter($func): self
+    {
+        $filter = $this->filter();
+        if (is_null($filter)) {
             return $this;
         }
         $func($filter);
@@ -593,8 +632,9 @@ abstract class ModelField
      * 设置当前字段在列表中默认不显示筛选
      * @return $this
      */
-    public function setDefaultHideFilter():self{
-        $this->doFilter(fn(ModelFilter $filter)=>$filter->setShow(false));
+    public function setDefaultHideFilter(): self
+    {
+        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(false));
         return $this;
     }
 
@@ -604,17 +644,17 @@ abstract class ModelField
      * @param ExcelFieldTpl $excelFieldTpl
      * @return void
      */
-    abstract public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void;
+    abstract public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void;
 
 
     /**
      * EXCEL导入时，对数据的处理（之后再执行setSave）
      * @param array $save
      */
-    public function excelSaveDoData(array &$save):void{
+    public function excelSaveDoData(array &$save): void
+    {
         //默认不用处理
     }
-
 
 
     /**
@@ -623,8 +663,9 @@ abstract class ModelField
      * @param string $msg
      * @throws \think\Exception
      */
-    final protected function defaultCheckRequired($val,string $msg='不可为空'):void{
-        if($this->required()&&empty($val)){
+    final protected function defaultCheckRequired($val, string $msg = '不可为空'): void
+    {
+        if ($this->required() && (empty($val) || $this->nullVal() === $val)) {
             throw new \think\Exception($msg);
         }
     }
@@ -634,7 +675,7 @@ abstract class ModelField
      * 字段模板配置
      * @return FieldTpl
      */
-    abstract public static function componentUrl():FieldTpl;
+    abstract public static function componentUrl(): FieldTpl;
 
 
     protected FieldStepCollection $steps;
@@ -645,30 +686,31 @@ abstract class ModelField
      * @return $this|FieldStepCollection|null
      * @throws \think\Exception
      */
-    public function steps($steps=null){
-        if(is_null($steps)){
-            return $this->steps??null;
+    public function steps($steps = null)
+    {
+        if (is_null($steps)) {
+            return $this->steps ?? null;
         }
 
-        if(is_array($steps)){
-            $stepList=FieldStepCollection::make();
-            foreach ($steps as $v){
+        if (is_array($steps)) {
+            $stepList = FieldStepCollection::make();
+            foreach ($steps as $v) {
                 $stepList->push(clone $v);
                 $v->removeFieldData();
             }
-        }else if($steps instanceof FieldStep){
-            $stepList=FieldStepCollection::make([clone $steps]);
+        } else if ($steps instanceof FieldStep) {
+            $stepList = FieldStepCollection::make([clone $steps]);
             $steps->removeFieldData();
-        }else{
-            throw new \think\Exception($this->name().' 的steps设置类型错误');
+        } else {
+            throw new \think\Exception($this->name() . ' 的steps设置类型错误');
         }
 
 
-        $stepList=$stepList->map(function(FieldStep $val){
+        $stepList = $stepList->map(function (FieldStep $val) {
             $val->setFieldName($this->name());
             return $val;
         });
-        $this->steps=$stepList;
+        $this->steps = $stepList;
         return $this;
     }
 
@@ -680,11 +722,11 @@ abstract class ModelField
      * @return $this
      * @throws \think\Exception
      */
-    public function setStepsAndGroup($step,string $group=null): self
+    public function setStepsAndGroup($step, string $group = null): self
     {
         $this->steps($step);
-        if(is_null($group)){
-            $group=$this->steps()[0]->getTitle();
+        if (is_null($group)) {
+            $group = $this->steps()[0]->getTitle();
         }
         $this->group($group);
         return $this;
@@ -696,13 +738,14 @@ abstract class ModelField
      * @param FieldDo|null $fieldDo
      * @return $this|FieldDo
      */
-    public function pushFieldDo(FieldDo $fieldDo=null){
-        if(!is_null($fieldDo)){
-            $this->fieldDoList[]=$fieldDo;
+    public function pushFieldDo(FieldDo $fieldDo = null)
+    {
+        if (!is_null($fieldDo)) {
+            $this->fieldDoList[] = $fieldDo;
             return $this;
         }
-        $fieldDo=new FieldDo;
-        $this->fieldDoList[]=$fieldDo;
+        $fieldDo = new FieldDo;
+        $this->fieldDoList[] = $fieldDo;
         return $fieldDo;
     }
 
@@ -711,7 +754,8 @@ abstract class ModelField
      * 获取FieldDo列表
      * @return FieldDo[]
      */
-    public function getFieldDoList():array{
+    public function getFieldDoList(): array
+    {
         return $this->fieldDoList;
     }
 
@@ -723,42 +767,43 @@ abstract class ModelField
 
     /**
      * 复制字段，且重新设置字段名
-     * @param null|bool|string $newName  新的字段名，如果为null自动生成生成。如果是string，表示为新的字段名
-     * @param bool $saveSetOldName         是否 保存数据库时，使用的字段名称为老的字段的名称
+     * @param null|bool|string $newName 新的字段名，如果为null自动生成生成。如果是string，表示为新的字段名
+     * @param bool $saveSetOldName 是否 保存数据库时，使用的字段名称为老的字段的名称
      * @return $this
      */
-    public function cloneField(string $newName=null,bool $saveSetOldName=true):self{
-        $field=clone $this;
+    public function cloneField(string $newName = null, bool $saveSetOldName = true): self
+    {
+        $field = clone $this;
 
-        $oldName=$field->name();
-        if(is_null($newName)){
-            $newName='__CLONE__'.$oldName;
+        $oldName = $field->name();
+        if (is_null($newName)) {
+            $newName = '__CLONE__' . $oldName;
         }
 
         $field->name($newName);
 
         //克隆的字段在数据库中有克隆的字段的字段名
-        if(!$saveSetOldName){
+        if (!$saveSetOldName) {
             return $field;
         }
 
         $field->pushFieldDo()
-            ->setEditShowDo(function(?VueCurlModel &$info,?BaseModel $base,ModelField $field,$isStepNext)use($oldName){
-                if(isset($info[$oldName])){
-                    $info[$field->name()]=$info[$oldName];
+            ->setEditShowDo(function (?VueCurlModel &$info, ?BaseModel $base, ModelField $field, $isStepNext) use ($oldName) {
+                if (isset($info[$oldName])) {
+                    $info[$field->name()] = $info[$oldName];
                 }
             })
-            ->setSaveBeforeCheckedDo(function(array &$postData,?VueCurlModel $before,?BaseModel $base,ModelField $field)use($oldName){
-                if(isset($postData[$field->name()])){
-                    $postData[$oldName]=$postData[$field->name()];
+            ->setSaveBeforeCheckedDo(function (array &$postData, ?VueCurlModel $before, ?BaseModel $base, ModelField $field) use ($oldName) {
+                if (isset($postData[$field->name()])) {
+                    $postData[$oldName] = $postData[$field->name()];
                 }
-            })->setShowInfoBeforeDo(function(VueCurlModel $info,?BaseModel $base,ModelField $field)use($oldName){
-                if(isset($info[$oldName])){
-                    $info[$field->name()]=$info[$oldName];
+            })->setShowInfoBeforeDo(function (VueCurlModel $info, ?BaseModel $base, ModelField $field) use ($oldName) {
+                if (isset($info[$oldName])) {
+                    $info[$field->name()] = $info[$oldName];
                 }
-            })->setIndexRowDo(function(VueCurlModel $row,?BaseModel $base,ModelField $field)use($oldName){
-                if(isset($row[$oldName])){
-                    $row[$field->name()]=$row[$oldName];
+            })->setIndexRowDo(function (VueCurlModel $row, ?BaseModel $base, ModelField $field) use ($oldName) {
+                if (isset($row[$oldName])) {
+                    $row[$field->name()] = $row[$oldName];
                 }
             });
 

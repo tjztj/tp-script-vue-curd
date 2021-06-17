@@ -177,12 +177,16 @@ trait BaseIndex
 
 
             //字段钩子
-            if(is_array($baseInfo)){
-                foreach ($list as $v){
-                    FieldDo::doIndex($this->fields,\think\model\Collection::make([$v]),$baseInfo[$v[$this->model::parentField()]]??null);
+            try{
+                if(is_array($baseInfo)){
+                    foreach ($list as $v){
+                        FieldDo::doIndex($this->fields,\think\model\Collection::make([$v]),$baseInfo[$v[$this->model::parentField()]]??null);
+                    }
+                }else{
+                    FieldDo::doIndex($this->fields,$list,$baseInfo);
                 }
-            }else{
-                FieldDo::doIndex($this->fields,$list,$baseInfo);
+            }catch(\Exception $e){
+                return $this->error($e);
             }
 
 
@@ -198,7 +202,11 @@ trait BaseIndex
         }
 
 
-        FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+        try{
+            FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
 
         $listColumns=array_values($this->fields->listShowItems()->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;

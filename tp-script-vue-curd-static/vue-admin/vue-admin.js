@@ -447,7 +447,7 @@ define(requires, function ( axios,Qs) {
         ...loadMsg,
         ...uploadMethods,
         '$get'(url, params){
-            if(url.indexOf('/'+window.VUE_CURD.MODULE+'/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
+            if(url.indexOf('/'+window.VUE_CURD.MODULE+ '/')===0){url=url.replace('\/'+window.VUE_CURD.MODULE+'\/','')}
             return service({url, method: 'get',params,headers:{'X-REQUESTED-WITH':'xmlhttprequest'}})
         },
         '$post'(url, data){

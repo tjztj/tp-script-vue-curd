@@ -108,8 +108,12 @@ trait CurdFunc
             $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
         }
 
-        //字段钩子
-        FieldDo::doShowBefore($this->fields,$data,$baseInfo);
+        try{
+            //字段钩子
+            FieldDo::doShowBefore($this->fields,$data,$baseInfo);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
 
 
         $fields=$this->fields->filterHideFieldsByShow($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
@@ -118,8 +122,13 @@ trait CurdFunc
             return $this->errorAndCode('您不能查看当前数据信息');
         }
 
-        //字段钩子
-        FieldDo::doShow($fields,$data,$baseInfo);
+        try{
+            //字段钩子
+            FieldDo::doShow($fields,$data,$baseInfo);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
+
 
         //控制器钩子
         if($this->model instanceof BaseChildModel){
@@ -191,7 +200,12 @@ trait CurdFunc
         }
 
         $sourceData=$data?clone $data:null;//用来验证，防止被修改
-        FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
+        try{
+            FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
+        }catch(\Exception $e){
+            return $this->error($e);
+        }
+
 
 
         //data可能在上面改变为有值
@@ -220,6 +234,19 @@ trait CurdFunc
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($sourceData,$baseModel,$fields)===false){
             return $this->error('您不能进行此操作-05');
         }
+
+        if($fields->saveStepInfo){
+            if($fields->saveStepInfo->authCheck($sourceData,$baseModel,$fields)){
+                try{
+                    $fields->saveStepInfo->doOnEditShow($info,$baseModel,$fields,$isStepNext);
+                }catch(\Exception $e){
+                    return $this->error($e);
+                }
+            }else{
+                return $this->error('您不能进行此操作-05');
+            }
+        }
+
 
         $fieldArr=array_values($fields->rendGroup()->toArray());
         return [
