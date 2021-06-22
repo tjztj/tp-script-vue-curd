@@ -630,13 +630,17 @@ define(requires, function ( axios,Qs) {
                                 return false;
                             }
                             let val=null;
-                            if(typeof formVal[fieldWhere.field.name]==='undefined'){
+                            let formValue=formVal[fieldWhere.field.name];
+                            if((fieldWhere.field.type==='RegionField'||fieldWhere.field.type==='FilesField')&&this.info.sourceData&&typeof this.info.sourceData[fieldWhere.field.name]!=='undefined'){
+                                formValue=this.info.sourceData[fieldWhere.field.name];
+                            }
+                            if(typeof formValue==='undefined'){
                                 if(!this.info||typeof this.info[fieldWhere.field.name]==='undefined'){
                                     return !fieldWhere.isNot;
                                 }
                                 val=this.info[fieldWhere.field.name];
                             }else {
-                                val=formVal[fieldWhere.field.name];
+                                val=formValue;
                             }
                             if(val===null){
                                 return !fieldWhere.isNot;
