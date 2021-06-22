@@ -234,11 +234,11 @@ class FieldStep
      */
     public function doOnEditShow(?array $info,?BaseModel $baseInfo,FieldCollection $fields,bool $isStepNext): void
     {
-        if(!isset($this->saveAfter)||is_null($this->saveAfter)){
+        if(!isset($this->onEditShow)||is_null($this->onEditShow)){
             return;
         }
-        $func=$this->saveAfter;
-        $func($info,$baseInfo,$fields);
+        $func=$this->onEditShow;
+        $func($info,$baseInfo,$fields,$isStepNext);
     }
 
     /**
