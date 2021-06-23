@@ -187,11 +187,13 @@ trait CurdFunc
                 $isStepNext=true;
             }else{
                 $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
-                if(!$this->checkEditUrl($fields,$stepInfo)){
-                    return $this->error('您不能进行此操作-06');
-                }
                 $isStepNext=false;
             }
+
+            if(!$this->checkEditUrl($fields,$stepInfo)){
+                return $this->error('您不能进行此操作-06');
+            }
+
             $fields->saveStepInfo=$stepInfo;
         }else{
             $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
@@ -426,7 +428,8 @@ trait CurdFunc
     protected function checkEditUrl(FieldCollection $fields,?FieldStep $stepInfo):bool{
         if($stepInfo&&!$fields->isEmpty()){
             if(!empty($stepInfo->config['listBtnUrl'])){
-                if(stripos($this->request->url(),$stepInfo->config['listBtnUrl'])!==0){
+                if(stripos($this->request->url(),$stepInfo->config['listBtnUrl'])!==0
+                    &&stripos($this->request->url(),url($stepInfo->config['listBtnUrl'],[],false)->build())!==0){
                     return false;
                 }
             }else if(url('edit')->build()!==$this->request->baseUrl()){
