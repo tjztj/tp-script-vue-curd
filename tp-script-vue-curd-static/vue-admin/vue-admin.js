@@ -899,7 +899,7 @@ define(requires, function (axios, Qs) {
                             let val = null;
                             let formValue = formVal[fieldWhere.field.name];
                             if ((fieldWhere.field.type === 'RegionField' || fieldWhere.field.type === 'FilesField')
-                                && fieldWhere.field.field.editShow === false
+                                && fieldWhere.field.editShow === false
                                 && this.info.sourceData && typeof this.info.sourceData[fieldWhere.field.name] !== 'undefined') {
                                 formValue = this.info.sourceData[fieldWhere.field.name];
                             }
