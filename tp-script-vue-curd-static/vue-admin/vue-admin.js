@@ -1623,7 +1623,7 @@ define(requires, function (axios, Qs) {
                                                 <template v-for="item in stepInfo.tags"><a-tag v-if="item.text" :color="item.color">{{item.text}}</a-tag></template>
                                                 <a-popover v-if="stepInfo.remark" trigger="click">
                                                       <template #content>{{stepInfo.remark}}</template>
-                                                      <a class="curd-table-row-step-other-more">查看</a>
+                                                      <a class="curd-table-row-step-other-more">{{stepInfo.remarkBtnText}}</a>
                                                 </a-popover>
                                             </div>
                                         </div>

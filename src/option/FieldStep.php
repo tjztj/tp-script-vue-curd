@@ -35,6 +35,7 @@ class FieldStep
      */
     private array $tags=[];
     private string $remark='';//将在列表步骤中显示的备注
+    private string $remarkBtnText='查看';
     private $listRowDo;
     private string $listDirectSubmit='';//列表中直接提交，不经过编辑页面，按钮提示的字段。如果有，列表中直接提交
 
@@ -90,6 +91,7 @@ class FieldStep
             'config'=>$this->config,
             'tags'=>$tags,
             'remark'=>$this->getRemark(),
+            'remarkBtnText'=>$this->getRemarkBtnText(),
             'listDirectSubmit'=>$this->listDirectSubmit(),
         ];
     }
@@ -461,6 +463,24 @@ class FieldStep
         return $this;
     }
 
+    /**
+     * 获取备注的按钮子：默认是查看
+     * @return string
+     */
+    public function getRemarkBtnText(): string
+    {
+        return $this->remarkBtnText;
+    }
+
+    /**
+     * 设置备注的按钮子：默认是查看
+     * @param string $remarkBtnText
+     */
+    public function setRemarkBtnText(string $remarkBtnText): void
+    {
+        $this->remarkBtnText = $remarkBtnText;
+    }
+
 
     /**
      * 列表数据设置执行
@@ -503,4 +523,6 @@ class FieldStep
             return $this;
         }
     }
+
+
 }
