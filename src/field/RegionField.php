@@ -66,16 +66,11 @@ class RegionField extends ModelField
     }
 
     /**父字段名
-     * @param string|null $canCheckParent
+     * @param bool|null $canCheckParent
      * @return $this|string
      */
-    public function canCheckParent(string $canCheckParent = null)
+    public function canCheckParent(bool $canCheckParent = null)
     {
-        if (!is_null($canCheckParent)) {
-            if ($this->cField() === '' && $this->name() !== $canCheckParent) {
-                $this->cField($this->name());
-            }
-        }
         return $this->doAttr('canCheckParent', $canCheckParent);
     }
 
