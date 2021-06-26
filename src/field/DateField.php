@@ -26,6 +26,7 @@ class DateField extends ModelField
     protected $nullVal=0;//字段在数据库中为空时的值
     protected ?int $max=null;
     protected ?int $min=null;
+    protected bool $showTime=false;//显示/选择 具体时间（时分秒）
 
     public function __construct()
     {
@@ -52,12 +53,25 @@ class DateField extends ModelField
         return $this->doAttr('max', $max);
     }
 
-    public function minNull(){
+
+    /**
+     * 显示/选择 具体时间（时分秒）
+     * @param bool|null $showTime
+     * @return $this|bool
+     */
+    public function showTime(bool $showTime = null)
+    {
+        return $this->doAttr('showTime', $showTime);
+    }
+
+    public function minNull(): DateField
+    {
         $this->min=null;
         return $this;
     }
 
-    public function maxNull(){
+    public function maxNull(): DateField
+    {
         $this->max=null;
         return $this;
     }
@@ -65,14 +79,16 @@ class DateField extends ModelField
 
     /**
      * 设置保存的值
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
      * @return $this
+     * @throws \think\Exception
      */
     public function setSaveVal(array $data): self
     {
         $name=$this->name();
         if(isset($data[$name])){
             if($data[$name]){
+                $data[$name]=trim(str_replace(['时','点','分','秒'],':',$data[$name]),':');
                 $data[$name]=trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
                 $this->save=is_numeric($data[$name])?$data[$name]:\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name]);
                 if($this->save===false){
@@ -80,10 +96,10 @@ class DateField extends ModelField
                 }
                 if($this->save!==0){
                     if($this->min!==null&&$this->min>$this->save){
-                        throw new \think\Exception('日期不能小于'.date('Y-m-d',$this->min));
+                        throw new \think\Exception('日期不能小于'.date($this->showTime()?'Y-m-d H:i:s':'Y-m-d',$this->min));
                     }
                     if($this->max!==null&&$this->max<$this->save){
-                        throw new \think\Exception('日期不能大于'.date('Y-m-d',$this->max));
+                        throw new \think\Exception('日期不能大于'.date($this->showTime()?'Y-m-d H:i:s':'Y-m-d',$this->max));
                     }
                 }
             }else{
@@ -110,7 +126,7 @@ class DateField extends ModelField
                 $dataBaseData[$name]='';
             }else if(is_numeric($dataBaseData[$name])){
                 //有些时间戳小于10位
-                $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d',$dataBaseData[$name]);
+                $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate($this->showTime()?'Y-m-d H:i:s':'Y-m-d',$dataBaseData[$name]);
             }
         }
     }
@@ -122,7 +138,11 @@ class DateField extends ModelField
      * @return void
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
-        $excelFieldTpl->explain="请填入日期，如：\n2021/01/01\n2020/1/1\n2020-01-01\n2020.01.01\n2020年01月01日";
+        if($this->showTime()){
+            $excelFieldTpl->explain="请填入时间，如：\n2021/01/01 15:25:35\n2020/1/1 15:25:35\n2020-01-01 15:25:35\n2020.01.01 15:25:35\n2020年01月01日 15:25:35";
+        }else{
+            $excelFieldTpl->explain="请填入日期，如：\n2021/01/01\n2020/1/1\n2020-01-01\n2020.01.01\n2020年01月01日";
+        }
         $excelFieldTpl->width=40;
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->isText=true;

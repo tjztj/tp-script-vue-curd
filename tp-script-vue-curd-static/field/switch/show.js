@@ -2,7 +2,7 @@ define([],function(){
     return {
         props:['info','field'],
         methods:{
-            getVal(){
+            checked(){
                 const val=this.info[this.field.name].toString();
                 return val===this.field.items[1].value.toString()||val===this.field.items[1].title.toString();
             },
