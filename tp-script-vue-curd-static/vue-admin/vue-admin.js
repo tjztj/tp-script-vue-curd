@@ -1358,7 +1358,7 @@ define(requires, function (axios, Qs) {
 
 
                 //可prop动态设置宽度
-                const newActionW = Vue.ref(props.actionDefWidth || 28);
+                const newActionW = Vue.ref(props.actionDefWidth || (32+28));
                 columns.push({
                     // title:'操作',
                     slots: {customRender: 'action', title: 'custom-title-action'},
@@ -1449,7 +1449,7 @@ define(requires, function (axios, Qs) {
             },
             methods: {
                 getActionWidthByProps() {
-                    let btnWidth = 0, defW = 0;
+                    let btnWidth = 28, defW = 0;
                     this.data.forEach(record => {
                         let stepWidth = 0;
                         if (this.stepBtnShow(record) && record.nextStepInfo.config.listBtnText) {
