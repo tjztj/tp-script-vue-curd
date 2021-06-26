@@ -69,6 +69,7 @@
                     {block name="toolBtnLeft"}{/block}
 
                     <template v-if="auth.add&&auth.stepAdd&&auth.rowAuthAdd">
+                        {block name="toolAddBtn"}
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">
                                 <plus-outlined></plus-outlined>
@@ -78,6 +79,7 @@
                         <div class="ant-space-item">
                             <a-divider type="vertical"></a-divider>
                         </div>
+                        {/block}
                     </template>
 
                     <template v-if="auth.importExcelTpl">

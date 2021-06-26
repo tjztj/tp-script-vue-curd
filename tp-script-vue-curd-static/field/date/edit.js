@@ -19,7 +19,6 @@ define([], function () {
                     return moment(val);
                 },
                 set(val) {
-                    console.log(val);
                     this.$emit('update:value', val.format(this.field.showTime ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'));
                 },
             },

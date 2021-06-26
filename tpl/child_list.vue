@@ -64,11 +64,13 @@
         <div class="title-right">
             {block name="toolBtnLeft"}{/block}
             <template v-if="auth.add&&auth.stepAdd&&auth.rowAuthAdd">
+                {block name="toolAddBtn"}
                 <a-button type="primary" @click="openAdd">
                     <plus-outlined></plus-outlined>
                     <span> 添加</span>
                 </a-button>
                 <a-divider type="vertical"></a-divider>
+                {/block}
             </template>
 
             <template v-if="auth.importExcelTpl">
