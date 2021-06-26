@@ -1358,7 +1358,7 @@ define(requires, function (axios, Qs) {
 
 
                 //可prop动态设置宽度
-                const newActionW = Vue.ref(props.actionDefWidth || 0);
+                const newActionW = Vue.ref(props.actionDefWidth || 28);
                 columns.push({
                     // title:'操作',
                     slots: {customRender: 'action', title: 'custom-title-action'},
