@@ -194,7 +194,7 @@ trait BaseIndex
             foreach ($option->data as $k=>$v){
                 $this->fields->doShowData($option->data[$k]);
             }
-
+            $option->baseInfo=$baseInfo;
 
             $this->indexData($option);
 

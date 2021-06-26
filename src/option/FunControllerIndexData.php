@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\option;
 
 
 use think\db\Query;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 
 class FunControllerIndexData
@@ -49,6 +50,13 @@ class FunControllerIndexData
      * @var Query|null
      */
     public ?Query $model=null;
+
+
+    /**
+     * 如果是子表，且查询的是某一个父下面的子表，才会有
+     * @var BaseModel|null
+     */
+    public ?BaseModel $baseInfo=null;
 
 
     /**

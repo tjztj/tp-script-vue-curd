@@ -176,6 +176,7 @@ trait CurdChild{
             $this->fields->doShowData($option->data[$k]);
         }
 
+        $option->baseInfo=$baseInfo;
         return $option;
     }
 

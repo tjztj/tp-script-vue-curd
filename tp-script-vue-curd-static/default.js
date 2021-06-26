@@ -406,7 +406,9 @@ define(['vueAdmin'], function (va) {
                 onDataLoad(){
                     //数据获取完成钩子
                 },
-
+                getInfos(){
+                    return infos;
+                },
                 ////其他配置
                 ...getThisActionOhterMethods()
             }
