@@ -369,6 +369,13 @@ define(['vueAdmin'], function (va) {
                             return;
                         }
                         this.data=rows;
+                        //如果有才改变
+                        for(const n in data.data.other){
+                            this.dataOther[n]=data.data.other[n]
+                        }
+                        data.data.data.forEach(item=>{
+                            infos[item.id]=item;
+                        })
                         this.loading = false;
                         this.refreshTableTirgger();
                     }).catch(()=>{
@@ -768,6 +775,13 @@ define(['vueAdmin'], function (va) {
                             return;
                         }
                         this.data=rows;
+                        //如果有才改变
+                        for(const n in data.data.other){
+                            this.dataOther[n]=data.data.other[n]
+                        }
+                        data.data.data.forEach(item=>{
+                            infos[item.id]=item;
+                        })
                         this.loading = false;
                         this.refreshTableTirgger();
                     }).catch(()=>{
