@@ -212,7 +212,8 @@ define(['vueAdmin'], function (va) {
                 },
                 fetch() {
                     this.loading = true;
-                    this.$get(this.indexUrl,this.getWhere()).then(data => {
+                    const where=this.getWhere();
+                    this.$get(this.indexUrl,where).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
@@ -221,7 +222,7 @@ define(['vueAdmin'], function (va) {
                         })
                         this.data = data.data.data;
                         this.loading = false;
-                        this.refreshTableTirgger();
+                        this.refreshTableTirgger(this.indexUrl,where,data);
                     }).catch(()=>{
                         this.loading = false;
                     });
@@ -251,8 +252,8 @@ define(['vueAdmin'], function (va) {
                     }
                     return filter;
                 },
-                refreshTableTirgger(){
-                    this.onDataLoad();//触发钩子
+                refreshTableTirgger(url,where,res){
+                    this.onDataLoad(url,where,res);//触发钩子
                     //列表加载完成
                     if(window.onListFetch){
                         Vue.nextTick(()=>{
@@ -377,7 +378,7 @@ define(['vueAdmin'], function (va) {
                             infos[item.id]=item;
                         })
                         this.loading = false;
-                        this.refreshTableTirgger();
+                        this.refreshTableTirgger(this.indexUrl,where,data);
                     }).catch(()=>{
                         this.loading = false;
                     });
@@ -410,7 +411,7 @@ define(['vueAdmin'], function (va) {
                 actionWidth(row){
                     return this.actionDefWidth
                 },
-                onDataLoad(){
+                onDataLoad(url,where,res){
                     //数据获取完成钩子
                 },
                 getInfos(){
@@ -659,7 +660,8 @@ define(['vueAdmin'], function (va) {
                 },
                 fetch() {
                     this.tableLoading = true;
-                    this.$get(this.indexUrl,this.getWhere()).then(data => {
+                    const where=this.getWhere();
+                    this.$get(this.indexUrl,where).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
@@ -669,7 +671,7 @@ define(['vueAdmin'], function (va) {
                         })
                         this.tableLoading = false;
                         //列表加载完成
-                        this.refreshTableTirgger();//触发钩子
+                        this.refreshTableTirgger(this.indexUrl,where,data);//触发钩子
                     }).catch(err=>{
                         this.tableLoading = false;
                     });
@@ -682,8 +684,8 @@ define(['vueAdmin'], function (va) {
                         sortOrder:this.pagination.sortOrder,
                     };
                 },
-                refreshTableTirgger(){
-                    this.onDataLoad();//触发钩子
+                refreshTableTirgger(url,where,res){
+                    this.onDataLoad(url,where,res);//触发钩子
                     //列表加载完成
                     if(window.onListFetch){
                         Vue.nextTick(()=>{
@@ -783,7 +785,7 @@ define(['vueAdmin'], function (va) {
                             infos[item.id]=item;
                         })
                         this.loading = false;
-                        this.refreshTableTirgger();
+                        this.refreshTableTirgger(this.indexUrl,where,data);
                     }).catch(()=>{
                         this.loading = false;
                     });
@@ -801,7 +803,7 @@ define(['vueAdmin'], function (va) {
                         }
                     }).trigger();
                 },
-                onDataLoad(){
+                onDataLoad(url,where,res){
                     //数据获取完成钩子
                 },
                 ////其他配置
