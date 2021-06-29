@@ -191,6 +191,10 @@ class RegionField extends ModelField
     {
         $name = $this->name();
         if (isset($dataBaseData[$name])) {
+            if(!is_numeric($dataBaseData[$name])){
+                return;
+            }
+
             if( empty($dataBaseData[$name])){
                 $dataBaseData[$name]=$this->getTreeToList()[$dataBaseData[$name]]['label']??'';
                 return;
