@@ -116,7 +116,7 @@ class ListField extends ModelField
             }
             foreach ($list as $k=>$v){
                 $fieldsObj=clone $this->fields;
-                $fieldsObj->setSave($v);
+                $fieldsObj->setSave($v,null);
                 $list[$k]=$fieldsObj->getSave();
             }
             if(empty($list)){
