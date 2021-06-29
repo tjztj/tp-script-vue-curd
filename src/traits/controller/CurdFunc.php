@@ -480,15 +480,13 @@ trait CurdFunc
         }
 
         return static function(Query $query)use($steps){
-            $query->where(function()use($steps,$query){
-                foreach ($steps as $v){
-                    $where=$v->getAuthWhere();
-                    if($where===null){
-                        continue;
-                    }
-                    $query->whereOr($where);
+            foreach ($steps as $v){
+                $where=$v->getAuthWhere();
+                if($where===null){
+                    continue;
                 }
-            });
+                $query->whereOr($where);
+            }
         };
     }
 }
