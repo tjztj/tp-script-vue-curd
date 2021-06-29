@@ -152,4 +152,14 @@ if (!function_exists('getModelDefaultStepField')) {
         return 'step';
     }
 }
+
+if (!function_exists('getModelDefaultNextStepField')) {
+    /**
+     * 字段下一个步骤默认名称
+     * @return string
+     */
+    function getModelDefaultNextStepField():string{
+        return 'next_step';
+    }
+}
 ########################################################################################################################

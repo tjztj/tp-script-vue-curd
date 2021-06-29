@@ -107,6 +107,9 @@ abstract class BaseChildModel extends VueCurlModel
         $this->onAddAfter($info,$data,$baseInfo);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,$baseInfo,$fields,$data);
+            $info=$this->fields()->getNextStepInfo($info,$baseInfo);
+            $info[static::getNestStepField()]=$info===null?'':$info->getStep();
+            $info->save();
         }
 
         $returnSaveData=$data;

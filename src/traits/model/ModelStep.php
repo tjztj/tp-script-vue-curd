@@ -17,6 +17,14 @@ trait ModelStep
         return getModelDefaultStepField();
     }
 
+    /**
+     * 下一步步骤字段
+     * @return string
+     */
+    public static function getNestStepField():string{
+        return getModelDefaultNextStepField();
+    }
+
 
     /**
      * 使用 $info->getBackStepData($newStep,$baseInfo)
