@@ -100,8 +100,8 @@ trait ModelSave
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
-            $info=$this->fields()->getNextStepInfo($info,$baseInfo);
-            $info[static::getNestStepField()]=$info===null?'':$info->getStep();
+            $nestStep=$this->fields()->getNextStepInfo($info,$baseInfo);
+            $info[static::getNestStepField()]=$nestStep===null?'':$nestStep->getStep();
             $info->save();
         }
 
