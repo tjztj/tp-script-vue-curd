@@ -90,6 +90,7 @@ trait BaseIndex
                         }
                     }
                 })
+                ->where($this->stepAuthWhere())
                 ->order($this->getListOrder());
 
 

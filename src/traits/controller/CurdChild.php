@@ -117,6 +117,7 @@ trait CurdChild{
             })
             ->where(function (Query $query){$this->indexListWhere($query);})
             ->where($this->fields->getFilterWhere())
+            ->where($this->stepAuthWhere())
             ->order($this->getListOrder());
 
         $baseInfo=$this->baseModel->find($base_id);

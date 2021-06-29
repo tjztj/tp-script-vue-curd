@@ -555,9 +555,9 @@ class FieldStep
 
     /**
      * 获取权限条件
-     * @return callable
+     * @return callable|null
      */
-    public function getAuthWhere():callable{
-        return $this->authWhere;
+    public function getAuthWhere():?callable{
+        return $this->authWhere??null;
     }
 }

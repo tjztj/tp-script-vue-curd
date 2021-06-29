@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use think\db\Query;
 use think\helper\Str;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
@@ -447,5 +448,47 @@ trait CurdFunc
         $this->assign('vueCurdAction','edit');
         $this->autoStepNext=true;
         return $this->edit();
+    }
+
+
+    /**
+     * 数据步骤查询权限
+     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
+     * @return array|\Closure
+     * @throws \think\Exception
+     */
+    protected function stepAuthWhere(){
+        if(!$this->fields->stepIsEnable()){
+            return [];
+        }
+        /**
+         * @var FieldStep[] $steps
+         */
+        $steps=[];
+        $this->fields->each(function(ModelField $field)use(&$steps){
+            $stepList=$field->steps();
+            if($stepList===null||$stepList->isEmpty()){
+                return;
+            }
+            $stepList->each(function(FieldStep $step)use(&$steps){
+                isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step;
+            });
+        });
+
+        if(empty($steps)){
+            return [];
+        }
+
+        return static function(Query $query)use($steps){
+            $query->where(function()use($steps,$query){
+                foreach ($steps as $v){
+                    $where=$v->getAuthWhere();
+                    if($where===null){
+                        continue;
+                    }
+                    $query->whereOr($where);
+                }
+            });
+        };
     }
 }
