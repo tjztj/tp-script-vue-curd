@@ -252,7 +252,7 @@ class FilesField extends ModelField
 
 
     public static function getExtMime(string $extOrurl):?string{
-        $ext=stripos($mime,'.')===false?$extOrurl:pathinfo($extOrurl, PATHINFO_EXTENSION);
+        $ext=stripos($extOrurl,'.')===false?$extOrurl:pathinfo($extOrurl, PATHINFO_EXTENSION);
         $ext=strtolower($ext);
         $data=self::extAboutMime();
         if(!isset($data[$ext])){
