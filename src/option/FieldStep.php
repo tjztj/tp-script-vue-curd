@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\option;
 
 
 
+use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
@@ -38,6 +39,20 @@ class FieldStep
     private string $remarkBtnText='查看';
     private $listRowDo;
     private string $listDirectSubmit='';//列表中直接提交，不经过编辑页面，按钮提示的字段。如果有，列表中直接提交
+
+    /**
+     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
+     * @var callable $authWhere
+     */
+    private $authWhere;//每个步骤对角色的查询条件
+//    switch($auth_id){
+//        case 1:
+//            $query->where(...);
+//            break;
+//        case 2:
+//            $query->where(...);
+//            break;
+//    }
 
     /**
      * FieldStep constructor.
@@ -525,4 +540,24 @@ class FieldStep
     }
 
 
+    /**
+     * 设置权限条件
+     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
+     * @param string|array|callable|Query $where
+     * @return $this
+     */
+    public function setAuthWhere($where):self{
+        $this->authWhere= static function(Query $query)use($where){
+            $query->where($where);
+        };
+        return $this;
+    }
+
+    /**
+     * 获取权限条件
+     * @return callable
+     */
+    public function getAuthWhere():callable{
+        return $this->authWhere;
+    }
 }

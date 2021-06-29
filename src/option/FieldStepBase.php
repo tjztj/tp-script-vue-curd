@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\option;
 
 
+use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
@@ -51,7 +52,10 @@ abstract class FieldStepBase
             fn(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$baseInfo,$fields)
         )->saveAfter(
             fn(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
-        )->listDirectSubmit($this->listDirectSubmit);
+        )->listDirectSubmit($this->listDirectSubmit)
+            ->setAuthWhere(function(Query $query){
+                $this->authWhere($query);
+            });
 
         foreach ($fields as $v){
             $v->steps($this->step);
@@ -100,6 +104,13 @@ abstract class FieldStepBase
      * @return bool
      */
     abstract protected function auth(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool;
+
+
+    /**
+     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
+     * @param Query $query
+     */
+    abstract protected function authWhere(Query $query):void;
 
     /**
      * 验证数据是否符合当前步骤
