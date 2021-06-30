@@ -547,9 +547,13 @@ class FieldStep
      * @return $this
      */
     public function setAuthWhere($where):self{
-        $this->authWhere= static function(Query $query)use($where){
-            $query->where($where);
-        };
+        if(is_callable($where)){
+            $this->authWhere=$where;
+        }else{
+            $this->authWhere= static function(Query $query)use($where){
+                $query->where($where);
+            };
+        }
         return $this;
     }
 
