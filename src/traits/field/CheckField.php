@@ -161,7 +161,7 @@ trait CheckField
                 $textArr[]=$this->getShowText($v,false);
             }
         }else{
-            $textArr[]=$this->getItemsValueTexts()[$val];
+            $textArr[]=$this->getItemsValueTexts()[$val]??$val;
         }
         return implode(',',$textArr);
     }
