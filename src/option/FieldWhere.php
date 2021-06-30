@@ -13,7 +13,7 @@ class FieldWhere
     public const TYPE_BETWEEN='between';
     public const TYPE_FIND_IN_SET='find_in_set';
 
-        //别名
+    //别名
     public const IN=self::TYPE_IN;
     public const BETWEEN=self::TYPE_BETWEEN;
     public const FIND_IN_SET=self::TYPE_FIND_IN_SET;
@@ -76,10 +76,15 @@ class FieldWhere
         if($type===self::TYPE_IN){
             $this->valueData=(array)$valueData;
         }else if($type===self::TYPE_FIND_IN_SET){
-            if($valueData===''||is_array($valueData)||is_null($valueData)){
+            if($valueData===''||is_null($valueData)){
                 throw new \think\Exception('FieldWhere 参数错误-001');
             }
-            $this->valueData=[(string)$valueData];
+            if(is_array($valueData)){
+                $valueData=array_map('strval',$valueData);
+            }else{
+                $valueData=[(string)$valueData];
+            }
+            $this->valueData=$valueData;
         }else{
             $valueData=(array)$valueData;
             $valueData=array_values($valueData);
@@ -185,7 +190,9 @@ class FieldWhere
             return in_array($val,$this->valueData);
         }
         if($this->type===self::TYPE_FIND_IN_SET){
-            return in_array($this->valueData[0],is_array($val)?$val:explode(',',$val));
+            $vals=is_array($val)?$val:explode(',',$val);
+            $vals=array_map('strval',$vals);
+            return (bool)array_intersect($this->valueData,$vals);
         }
         if(is_null($this->valueData[0])){
             return $val<=$this->valueData[1];

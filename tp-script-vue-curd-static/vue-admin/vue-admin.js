@@ -876,8 +876,10 @@ define(requires, function (axios, Qs) {
                                 if (val === '') val = [];
                                 const valArr = typeof val === 'object' ? val : val.toString().split(',');
                                 for (let i in valArr) {
-                                    if (fieldWhere.valueData[0] == valArr[i]) {
-                                        return true;
+                                    for(let n in fieldWhere.valueData){
+                                        if(fieldWhere.valueData[n]===valArr[i]){
+                                            return true;
+                                        }
                                     }
                                 }
                                 return false;
