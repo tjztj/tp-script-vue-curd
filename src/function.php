@@ -84,6 +84,38 @@ function eqEndStep($step,$stepOrInfo): bool
     return $step===$endStep['step'];
 }
 
+/**
+ * 判断对象数据库存的步骤是否已经过了 $step，会自动去掉退回的一些步骤
+ * @param $step
+ * @param $stepOrInfo
+ * @return bool
+ */
+function stepPast($step,$stepOrInfo):bool{
+    if(is_string($stepOrInfo)){
+        $stepHistory=json_decode($stepOrInfo,true);
+    }else if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+        $stepHistory=json_decode($stepOrInfo[$stepOrInfo::getStepField()],true);
+    }else if(is_array($stepOrInfo)){
+        $stepHistory=$stepOrInfo;
+    }else{
+        return false;
+    }
+
+    if($step instanceof \tpScriptVueCurd\option\FieldStep){
+        $step=$step->getStep();
+    }
+
+    $stepValues=[];
+    foreach ($stepHistory as $v){
+        if(empty($v['back'])){
+            $stepValues[]=(string)$v['step'];
+        }else{
+            $stepValues=array_slice($stepValues,0,count($stepValues)-$v['back']);
+        }
+    }
+    return in_array((string)$step,$stepValues,true);
+}
+
 if (!function_exists('create_guid')) {
     function create_guid(): string
     {
