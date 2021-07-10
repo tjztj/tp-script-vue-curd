@@ -191,8 +191,14 @@ class RegionField extends ModelField
     {
         $name = $this->name();
         if (isset($dataBaseData[$name])) {
-            if(!is_numeric($dataBaseData[$name])){
-                return;
+            if($this->multiple){
+                if(!is_numeric(str_replace(',','',$dataBaseData[$name]))){
+                    return;
+                }
+            }else{
+                if(!is_numeric($dataBaseData[$name])){
+                    return;
+                }
             }
 
             if( empty($dataBaseData[$name])){
