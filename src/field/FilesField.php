@@ -22,6 +22,7 @@ class FilesField extends ModelField
     protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
     protected bool $canExcelImport=false;//不能使用excel导入数据
     protected string $accept='';//上传文件类型
+    protected bool $multiple=true;//是否可多选
 
     /**
      * @var callable $fileInfoOn
@@ -69,6 +70,14 @@ class FilesField extends ModelField
         }
         $this->url=$url;
         return $this;
+    }
+    /**
+     * 是否可多选
+     * @param bool|null $multiple
+     * @return $this|bool
+     */
+    public function multiple(bool $multiple=null){
+        return $this->doAttr('multiple',$multiple);
     }
 
     /**

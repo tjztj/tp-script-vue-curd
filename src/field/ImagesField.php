@@ -21,7 +21,7 @@ class ImagesField extends ModelField
 
     protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
     protected bool $removeMissings;//默认值是 tpScriptVueCurdImageRemoveMissings
-
+    protected bool $multiple=true;//是否可多选
 
 
     /**最小值
@@ -35,6 +35,15 @@ class ImagesField extends ModelField
         }
         $this->url=$url;
         return $this;
+    }
+
+    /**
+     * 是否可多选
+     * @param bool|null $multiple
+     * @return $this|bool
+     */
+    public function multiple(bool $multiple=null){
+        return $this->doAttr('multiple',$multiple);
     }
 
     /**

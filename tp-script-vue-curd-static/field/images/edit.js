@@ -53,6 +53,13 @@ define([],function(){
             },
             handleChange(data,field) {
                 let urls=[];
+                if(!this.field.multiple){
+                    if(data.fileList.length>1){
+                        data.fileList=[data.fileList[data.fileList.length-1]];
+                    }
+                }
+
+
                 this.fileList =data.fileList.map(function(file){
                     if(file.status==='done'){
                         if(file.response){
@@ -73,6 +80,7 @@ define([],function(){
                     }
                     return true;
                 });
+
                 let value=urls.join('|');
                 this.$emit('update:value',value);
                 this.$emit('update:validateStatus',value?'success':'error');
@@ -82,7 +90,7 @@ define([],function(){
         template:`<div class="field-box" :class="[id]">
                     <div class="l">
                         <a-upload
-                            multiple
+                            :multiple="field.multiple"
                             :action="field.url"
                             accept="image/*"
                             list-type="picture-card"
