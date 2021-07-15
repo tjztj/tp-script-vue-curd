@@ -99,10 +99,11 @@ class FilesField extends ModelField
 
     /**
      * 设置保存的值
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
      * @return $this
+     * @throws \think\Exception
      */
-    public function setSaveVal(array $data): self
+    protected function setSaveVal(array $data): self
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];
@@ -217,14 +218,33 @@ class FilesField extends ModelField
     }
 
 
+
     public static function checkUrlIsMimeOrExt(string $url,string $mimeOrExt):bool{
+        $mimeOrExt=strtolower($mimeOrExt);
         $ext=strtolower( pathinfo($url, PATHINFO_EXTENSION));
 
-        if(stripos($mimeOrExt,'.')!==false){
+        if(strpos($mimeOrExt,'.')!==false){
             return $ext===strtolower(pathinfo($mimeOrExt, PATHINFO_EXTENSION));
         }
 
-        return self::getExtMime($ext)===strtolower(pathinfo($mimeOrExt, PATHINFO_EXTENSION));
+        $mime=self::getExtMime($ext);
+
+        if($mimeOrExt===$mime){
+            return true;
+        }
+
+        if($mime===strtolower(pathinfo($mimeOrExt, PATHINFO_EXTENSION))){
+            return true;
+        }
+
+        if(strpos($mimeOrExt,'*')!==false){
+            $str='/^'.str_replace(['/','-','*'],['\\/','-','.+'],$mimeOrExt).'$/';
+            if(preg_match ($str,$mime)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static function getMimeAboutExt(string $mime):array{

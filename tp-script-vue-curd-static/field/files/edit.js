@@ -118,6 +118,13 @@ define([],function(){
                         if(accepts[i].toLowerCase()===file.type.toLowerCase()){
                             isAccOk[file.uid]=true;
                             return;
+                        }else if(accepts[i].indexOf('*')!==-1){
+                            const testStr=accepts[i].toLowerCase().replace('/','\\/').replace('-','\\-').replace('*','.+')
+                            const testAcc=new RegExp('^'+testStr+'$');
+                            if(testAcc.test(file.type.toLowerCase())){
+                                isAccOk[file.uid]=true;
+                                return;
+                            }
                         }
 
                     }
