@@ -91,7 +91,7 @@ class EditorField extends ModelField
      * @return $this|int
      */
     public function height(int $height=null){
-        return $this->doAttr('height',$height)
+        return $this->doAttr('height',$height);
     }
 
 
