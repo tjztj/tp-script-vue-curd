@@ -215,7 +215,7 @@ trait BaseIndex
 
 
         try{
-            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
+            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add');
         }catch (\Exception $e){
             $rowAuthAdd=false;
         }

@@ -121,7 +121,7 @@ trait CurdFunc
 
 
         try{
-            $canShow=$data->checkRowAuth($fields,$baseInfo,'show')
+            $canShow=$data->checkRowAuth($fields,$baseInfo,'show');
         }catch (\Exception $exception){
             return $this->errorAndCode($exception->getMessage());
         }
