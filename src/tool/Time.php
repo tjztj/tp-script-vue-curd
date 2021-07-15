@@ -18,6 +18,9 @@ class Time
         return $datetime->format($format);
     }
     public static function dateToUnixtime($date, $timezone = 'PRC') {
+        if(empty($date)){
+            throw new \think\Exception('传入时间参数为空了');
+        }
         $datetime= new \DateTime($date, new \DateTimeZone($timezone));
         return $datetime->format('U');
     }

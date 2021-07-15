@@ -67,6 +67,12 @@ trait CurdChild{
             ->toArray());
 
 
+        try{
+            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add');
+        }catch (\Exception $e){
+            $rowAuthAdd=false;
+        }
+
         $data=[
             'vueCurdAction'=>'childList',
             'indexPageOption'=>$this->indexPageOption,
@@ -87,7 +93,7 @@ trait CurdChild{
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
                 'stepAdd'=>$this->getAuthAdd($baseInfo),
-                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
+                'rowAuthAdd'=>$rowAuthAdd
             ],
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$this->fields->getFilterComponents(),

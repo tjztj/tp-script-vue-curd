@@ -214,6 +214,12 @@ trait BaseIndex
 
 
 
+        try{
+            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
+        }catch (\Exception $e){
+            $rowAuthAdd=false;
+        }
+
 
         $data=[
             'model'=>static::modelClassPath(),
@@ -242,7 +248,7 @@ trait BaseIndex
                 'importExcelTpl'=>true,
                 'downExcelTpl'=>true,
                 'stepAdd'=>$this->getAuthAdd($baseInfo),
-                'rowAuthAdd'=>$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add')
+                'rowAuthAdd'=>$rowAuthAdd
             ],
             'baseInfo'=>$baseInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),

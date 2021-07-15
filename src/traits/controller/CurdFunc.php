@@ -119,7 +119,13 @@ trait CurdFunc
 
         $fields=$this->fields->filterHideFieldsByShow($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
 
-        if($data->checkRowAuth($fields,$baseInfo,'show')===false){
+
+        try{
+            $canShow=$data->checkRowAuth($fields,$baseInfo,'show')
+        }catch (\Exception $exception){
+            return $this->errorAndCode($exception->getMessage());
+        }
+        if($canShow===false){
             return $this->errorAndCode('您不能查看当前数据信息');
         }
 
@@ -227,11 +233,23 @@ trait CurdFunc
 
 
         if($data&&!empty($data->id)){
-            if(!$data->checkRowAuth($fields,$baseModel,'edit')){
+            try{
+                $canEdit=$data->checkRowAuth($fields,$baseModel,'edit');
+            }catch (\Exception $e){
+                return $this->error($e->getMessage());
+            }
+            if(!$canEdit){
                 return $this->error('不能修改当前数据信息');
             }
-        }else if($data?!$data->checkRowAuth($fields,$baseModel,'add'):!$this->model->checkRowAuth($fields,$baseModel,'add')){
-            return $this->error('不能添加此栏目信息');
+        }else{
+            try{
+                $canAdd=$data?$data->checkRowAuth($fields,$baseModel,'add'):$this->model->checkRowAuth($fields,$baseModel,'add');
+            }catch (\Exception $e){
+                return $this->error($e->getMessage());
+            }
+            if(!$canAdd){
+                return $this->error('不能添加此栏目信息');
+            }
         }
 
         if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($sourceData,$baseModel,$fields)===false){
