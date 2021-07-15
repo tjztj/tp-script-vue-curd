@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?wangeditor/wangEditor.js'], function (wangEditor) {
+define(['/tp-script-vue-curd-static.php?wangeditor/wangEditor.min.js'], function (wangEditor) {
     const styleId='editor-edit-field-style';
     const style = `
 <style id="${styleId}">
