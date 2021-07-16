@@ -101,7 +101,6 @@
     </div>
     <div class="week-table-box">
         <curd-table
-            ref="CurdTable"
             :data="data"
             :pagination="pagination"
             :loading="tableLoading"
