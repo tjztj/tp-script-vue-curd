@@ -467,6 +467,9 @@ define(['vueAdmin'], function (va) {
             },
             methods:{
                 onSubmit(option){
+                    if(window.vueEditOnSubmit){
+                        return  window.vueEditOnSubmit.bind(this)(option);
+                    }
                     //我想要子组件可以不关闭当前窗口提交（就是自定义的字段可以新增数据后继续编辑）
                     option=option||{};
 
