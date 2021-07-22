@@ -202,6 +202,8 @@ trait BaseIndex
             return $this->success($option->toArray());
         }
 
+        //要改fields，可以直接在 indexShowBefore 里面$this->fields
+        $this->indexShowBefore($baseInfo);
 
         try{
             FieldDo::doIndexShow($this->fields,$baseInfo,$this);
@@ -221,6 +223,13 @@ trait BaseIndex
         }
 
 
+        $filterFields=clone $this->fields;
+        $paranFilterData=$this->request->param('filter_data','',null);
+        $filterData=$paranFilterData?json_decode($paranFilterData,true):null;
+        $showFilter=$this->request->param('show_filter/d',1)===1;
+        $this->filterShowBefore($filterFields,$filterData,$showFilter);
+
+
         $data=[
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
@@ -235,9 +244,9 @@ trait BaseIndex
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseInfo?$baseInfo->id:0])->build(),
             'title'=>static::getTitle(),
             'childs'=>[],//会在BaseHaveChildController中更改
-            'filterConfig'=>$this->fields->getFilterShowData(),
-            'filter_data'=>json_decode($this->request->param('filter_data','',null)),
-            'showFilter'=>$this->request->param('show_filter/d',1)===1,
+            'filterConfig'=>$filterFields->getFilterShowData(),
+            'filter_data'=>$filterData?:null,
+            'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
             'canEdit'=>$showTableTool,
             'canDel'=>$showTableTool,
@@ -252,7 +261,7 @@ trait BaseIndex
             ],
             'baseInfo'=>$baseInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
-            'filterComponents'=>$this->fields->getFilterComponents(),
+            'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
 

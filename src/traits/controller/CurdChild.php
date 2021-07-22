@@ -52,6 +52,10 @@ trait CurdChild{
         $info||$this->errorAndCode('未找到相关信息');
         $baseInfo=$info;
 
+
+        //要改fields，可以直接在 indexShowBefore 里面$this->fields
+        $this->indexShowBefore($baseInfo);
+
         try{
             FieldDo::doIndexShow($this->fields,$baseInfo,$this);
         }catch (\Exception $e){

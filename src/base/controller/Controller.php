@@ -103,14 +103,27 @@ trait Controller
     protected function indexListWhere(Query $query):void{
 
     }
-
+    protected function indexShowBefore(?BaseModel &$baseInfo):void{
+        //要改fields，可以直接在 这里 $this->fields
+        // 列表页面显示前处理，在indexFetch前
+    }
+    protected function indexFetch(array &$fetch):void{
+        // 列表页面显示前处理，在indexShowBefore后
+    }
     protected function indexData(FunControllerIndexData $option):void{
         //列表数据处理钩子
     }
-    protected function indexFetch(array &$fetch):void{
-        // 列表页面显示前处理
+
+    /**
+     * @param FieldCollection $filterFields 筛选相关字段
+     * @param array|null $filterData    筛选默认值
+     * @param bool $showFilter  是否显示筛选
+     * @return void
+     */
+    protected function filterShowBefore(FieldCollection &$filterFields,?array &$filterData,bool &$showFilter):void{
+        //index筛选显示前
     }
-    
+
     protected function addAfter(VueCurlModel $info): void
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
