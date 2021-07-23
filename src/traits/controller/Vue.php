@@ -159,6 +159,12 @@ trait Vue
      */
     public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,$confirm=false)
     {
+        if($msg instanceof \think\exception\HttpResponseException||$msg instanceof \think\exception\HttpException
+            ||is_subclass_of($msg,\think\exception\HttpResponseException)
+            ||is_subclass_of($msg,\think\exception\HttpException)){
+            throw $msg;
+        }
+
         if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
                 'okText'=>$msg->okText,

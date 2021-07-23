@@ -15,6 +15,7 @@ use think\Request;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
+use tpScriptVueCurd\option\FunControllerIndexData;
 
 /**
  * Trait CurdFunc
@@ -506,5 +507,33 @@ trait CurdFunc
                 $query->whereOr($where);
             }
         };
+    }
+
+    /**
+     * @param Query|BaseModel|BaseChildModel $model
+     * @return FunControllerIndexData
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function indexListSelect($model):FunControllerIndexData{
+        $option=new FunControllerIndexData();
+        $option->model=clone $model;
+        if($this->indexPageOption->pageSize>0){
+            $pageSize=$this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize;
+            $list=$model->paginate($pageSize);
+            $option->currentPage=$list->currentPage();
+            $option->lastPage=$list->lastPage();
+            $option->perPage=$list->listRows();
+            $option->total=$list->total();
+            $option->sourceList=$list->getCollection();
+        }else{
+            $option->sourceList=$model->select();
+            $option->total=$option->sourceList->count();
+            $option->currentPage=1;
+            $option->lastPage=1;
+            $option->perPage=$option->total;
+        }
+        return $option;
     }
 }

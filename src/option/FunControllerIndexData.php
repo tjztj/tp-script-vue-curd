@@ -4,10 +4,16 @@
 namespace tpScriptVueCurd\option;
 
 
+use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 
+/**
+ * Class FunControllerIndexData
+ * @property Collection|\think\model\Collection $sourceList
+ * @package tpScriptVueCurd\option
+ */
 class FunControllerIndexData
 {
 
@@ -22,6 +28,11 @@ class FunControllerIndexData
      * @var array
      */
     public array $data = [];
+
+    /**
+     * @var Collection|\think\model\Collection
+     */
+    public $sourceList;
 
 
     /**

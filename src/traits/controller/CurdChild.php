@@ -3,6 +3,8 @@
 namespace tpScriptVueCurd\traits\controller;
 
 
+use think\Collection;
+use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\FilesField;
@@ -38,31 +40,56 @@ trait CurdChild{
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function index(){
-        $base_id=$this->request->param('base_id/d',0);
-        $base_id||$this->errorAndCode('缺少必要参数');
-
-
-        if($this->request->isAjax()){//只返回list
-            $listData=$this->getChildList($base_id);
-            $this->indexData($listData);
-            return $this->success($listData->toArray());
+        //设置父表信息
+        $baseInfo=null;
+        try{
+            $this->childIndexBeforeSetBase($baseInfo);
+        }catch (\Exception $e){
+            $this->error($e);
         }
 
-        $info=$this->baseModel->find($base_id);
-        $info||$this->errorAndCode('未找到相关信息');
-        $baseInfo=$info;
+        if($this->request->isAjax()){//只返回list
+            $model=$this->childIndexListModelWhere($this->model,$baseInfo);;
+            $option=$this->indexListSelect($model);
+            $list=$option->sourceList;
+
+            $list=$this->childSetListDataStep($list,$baseInfo);
+            $list=$this->childSetListDataRowAuth($list,$baseInfo);
 
 
-        //要改fields，可以直接在 indexShowBefore 里面$this->fields
-        $this->indexShowBefore($baseInfo);
+            try{
+                //字段钩子
+                FieldDo::doIndex($this->fields,$list,$baseInfo);
+            }catch (\Exception $e){
+                return $this->error($e);
+            }
+
+
+            //显示处理
+            $option->data=$list->toArray();
+            foreach ($option->data as $k=>$v){
+                $this->fields->doShowData($option->data[$k]);
+            }
+
+            $option->baseInfo=$baseInfo;
+            $this->indexData($option);
+            return $this->success($option->toArray());
+        }
+
+
 
         try{
+            //要改fields，可以直接在 indexShowBefore 里面$this->fields
+            $this->indexShowBefore($baseInfo);
+            //字段钩子触发
             FieldDo::doIndexShow($this->fields,$baseInfo,$this);
         }catch (\Exception $e){
             return $this->error($e);
         }
 
-        $info=$info->toArray();
+
+        //base显示的字段处理
+        $info=$baseInfo->toArray();
         $this->baseFields->doShowData($info);//有些数据不允许直接展示
 
         $listColumns=array_values($this->fields
@@ -71,6 +98,7 @@ trait CurdChild{
             ->toArray());
 
 
+        //是否显示添加按钮
         try{
             $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add');
         }catch (\Exception $e){
@@ -86,8 +114,8 @@ trait CurdChild{
             'editUrl'=>url('edit')->build(),
             'delUrl'=>url('del')->build(),
             'showUrl'=>url('show')->build(),
-            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$base_id])->build(),
-            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$base_id])->build(),
+            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseInfo->id])->build(),
+            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseInfo->id])->build(),
             'title'=>static::getTitle(),
             'canDel'=>true,
             'auth'=>[
@@ -103,93 +131,16 @@ trait CurdChild{
             'filterComponents'=>$this->fields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
-        $this->indexFetch($data);
+
+        try{
+            $this->indexFetch($data);
+        }catch (\Exception $e){
+            $this->error($e);
+        }
         return $this->showTpl('child_list',$data);
     }
 
 
-    /**
-     * #title 获取子列表
-     * @param int $base_id
-     * @return FunControllerIndexData
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    private function getChildList(int $base_id):FunControllerIndexData{
-        $model=$this->model
-            ->where($this->model::parentField(),$base_id)
-            ->where(function($query){
-                $id=$this->request->param('id/d');
-                if($id){
-                    $query->where('id',$id);
-                }
-            })
-            ->where(function (Query $query){$this->indexListWhere($query);})
-            ->where($this->fields->getFilterWhere())
-            ->where($this->stepAuthWhere())
-            ->order($this->getListOrder());
-
-        $baseInfo=$this->baseModel->find($base_id);
-
-        $doSteps=function(VueCurlModel $info)use($baseInfo){
-            if(!$this->fields->stepIsEnable()){
-                return $info;
-            }
-
-            $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
-            $stepInfo === null ||$stepInfo=clone $stepInfo;
-            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
-
-            $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
-            $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
-            $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info));
-
-            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
-            $info->stepFields=$stepFields->column('name');
-
-            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
-
-            return $info;
-        };
-
-        $option=new FunControllerIndexData();
-        $option->model=clone $model;
-        if($this->indexPageOption->pageSize>0){
-            $list=$model->paginate($this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize);
-            $option->currentPage=$list->currentPage();
-            $option->lastPage=$list->lastPage();
-            $option->perPage=$list->listRows();
-            $option->total=$list->total();
-            $list=$list->getCollection();
-        }else{
-            $list=$model->select();
-            $option->total=$list->count();
-            $option->currentPage=1;
-            $option->lastPage=1;
-            $option->perPage=$option->total;
-        }
-
-        $list->map($doSteps)
-            ->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']));
-
-        try{
-            //字段钩子
-            FieldDo::doIndex($this->fields,$list,$baseInfo);
-        }catch (\Exception $e){
-            return $this->error($e);
-        }
-
-
-        $option->data=$list->toArray();
-        foreach ($option->data as $k=>$v){
-            $this->fields->doShowData($option->data[$k]);
-        }
-
-        $option->baseInfo=$baseInfo;
-        return $option;
-    }
 
 
 
@@ -399,5 +350,92 @@ trait CurdChild{
         }
         $this->model->commit();
         return $this->success('删除成功');
+    }
+
+
+
+    /**
+     * BaseIndex 的列表中对$baseInfo赋值的逻辑
+     * @param BaseModel|null $baseInfo
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function childIndexBeforeSetBase(?BaseModel &$baseInfo): void
+    {
+        if($baseInfo){
+            //如果有了，就不设置了
+            return;
+        }
+        $base_id=$this->request->param('base_id/d',0);
+        if(empty($base_id)){
+            throw new \think\Exception('缺少必要参数 base_id');
+        }
+
+        $baseInfo=$this->baseModel->find($base_id);
+        if(empty($baseInfo)){
+            throw new \think\Exception('未找到相关父表信息');
+        }
+    }
+
+    /**
+     * 列表显示的where条件处理
+     * @param BaseChildModel $model
+     * @param BaseModel $baseInfo
+     * @return BaseChildModel
+     */
+    protected function childIndexListModelWhere(BaseChildModel $model,BaseModel $baseInfo){
+        return $model
+            ->where(function($query){
+                $id=$this->request->param('id/d');
+                empty($id)||$query->where('id',$id);
+            })
+            ->where($this->model::parentField(),$baseInfo->id)
+            ->where(function (Query $query){
+                $this->indexListWhere($query);
+            })
+            ->where($this->fields->getFilterWhere())
+            ->where($this->stepAuthWhere());
+    }
+
+    /**
+     * 设置列表数据步骤信息
+     * @param Collection|\think\model\Collection $list
+     * @param BaseModel $baseInfo
+     * @return Collection|\think\model\Collection
+     */
+    protected function childSetListDataStep($list,BaseModel $baseInfo){
+        return $list->map(function(VueCurlModel $info)use($baseInfo){
+            if(!$this->fields->stepIsEnable()){
+                return $info;
+            }
+
+            $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
+            $stepInfo === null ||$stepInfo=clone $stepInfo;
+            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
+
+            $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
+            $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
+            $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
+            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info));
+
+            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
+            $info->stepFields=$stepFields->column('name');
+
+            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
+
+            return $info;
+        });
+    }
+
+    /**
+     * 设置数据 __auth 的值，是否具有增删改的权限
+     * @param Collection|\think\model\Collection $list
+     * @param BaseModel $baseInfo
+     * @return Collection|\think\model\Collection
+     */
+    protected function childSetListDataRowAuth($list,BaseModel $baseInfo){
+        return $list->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,$baseInfo,['show','edit','del']));
     }
 }
