@@ -160,8 +160,8 @@ trait Vue
     public function error($msg = '', $data = '', $url = null, $wait = 3, array $header = [],int $errorCode=0,$confirm=false)
     {
         if($msg instanceof \think\exception\HttpResponseException||$msg instanceof \think\exception\HttpException
-            ||is_subclass_of($msg,\think\exception\HttpResponseException)
-            ||is_subclass_of($msg,\think\exception\HttpException)){
+            ||is_subclass_of($msg,\think\exception\HttpResponseException::class)
+            ||is_subclass_of($msg,\think\exception\HttpException::class)){
             throw $msg;
         }
 
