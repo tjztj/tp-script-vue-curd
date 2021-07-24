@@ -77,7 +77,7 @@ trait Curd
                     }else{
                         $this->fields=$this->fields->filterCurrentStepFields($old,null,$stepInfo);
                         if(!$this->checkEditUrl($this->fields,$stepInfo)){
-                            return $this->error('您不能进行此操作-06');
+                            return $this->error('您不能进行此操作-061');
                         }
                     }
                     $this->fields->saveStepInfo=$stepInfo;

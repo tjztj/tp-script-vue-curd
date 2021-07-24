@@ -264,7 +264,7 @@ trait CurdChild{
                     }else{
                         $this->fields=$this->fields->filterCurrentStepFields($info,$baseInfo,$stepInfo);
                         if(!$this->checkEditUrl($this->fields,$stepInfo)){
-                            return $this->error('您不能进行此操作-06');
+                            return $this->error('您不能进行此操作-062');
                         }
                     }
                     $this->fields->saveStepInfo=$stepInfo;

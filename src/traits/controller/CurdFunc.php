@@ -198,8 +198,8 @@ trait CurdFunc
                 $isStepNext=false;
             }
 
-            if(!$this->checkEditUrl($fields,$stepInfo)){
-                return $this->error('您不能进行此操作-06');
+            if(!empty($data->id)&&!$this->checkEditUrl($fields,$stepInfo)){
+                return $this->error('您不能进行此操作-063');
             }
 
             $fields->saveStepInfo=$stepInfo;
