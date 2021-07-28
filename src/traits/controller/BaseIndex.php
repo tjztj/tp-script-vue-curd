@@ -198,6 +198,9 @@ trait BaseIndex
             return;
         }
         $baseId=$this->request->param('base_id/d',0);
+        if(empty($baseId)){
+            return;
+        }
         $baseInfo=$this->baseModel->find($baseId);
         if(!$baseInfo){
             throw new \think\Exception('未能获取到相关父表信息');

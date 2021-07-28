@@ -186,16 +186,14 @@ trait CurdFunc
      */
     protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
         if($data){
-            $isNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
-            if(is_null($isNext)){
+            $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
+            if(is_null($isStepNext)){
                 return $this->error('数据不满足当前步骤');
             }
-            if($isNext){
+            if($isStepNext){
                 $fields=$fields->filterNextStepFields($data,$baseModel,$stepInfo);
-                $isStepNext=true;
             }else{
                 $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
-                $isStepNext=false;
             }
 
             if(!empty($data->id)&&!$this->checkEditUrl($fields,$stepInfo)){
