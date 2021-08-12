@@ -160,6 +160,6 @@ trait Curd
         }
 
         $this->model->commit();
-        return $this->success('删除成功');
+        $this->success('删除成功');
     }
 }

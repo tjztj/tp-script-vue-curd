@@ -95,7 +95,7 @@ trait BaseIndex
                 $this->error($e);
             }
 
-            return $this->success($option->toArray());
+            $this->success($option->toArray());
         }
 
 

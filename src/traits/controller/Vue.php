@@ -119,11 +119,11 @@ trait Vue
         if(is_string($msgOrData)){
             $this->parentSuccess($msgOrData,$data,$url,$wait,$header);
         }
-        return json([
+        throw new HttpResponseException(json([
             'code'=>1,
             'msg'=>is_string($data)?$data:'',
             'data'=>$msgOrData
-        ]);
+        ]));
     }
 
 

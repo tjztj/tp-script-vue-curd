@@ -73,7 +73,7 @@ trait CurdChild{
 
             $option->baseInfo=$baseInfo;
             $this->indexData($option);
-            return $this->success($option->toArray());
+            $this->success($option->toArray());
         }
 
 
@@ -206,7 +206,7 @@ trait CurdChild{
                 }
             }
         }
-        return $this->success($data);
+        $this->success($data);
     }
 
 
@@ -349,7 +349,7 @@ trait CurdChild{
             return $this->error($e);
         }
         $this->model->commit();
-        return $this->success('删除成功');
+        $this->success('删除成功');
     }
 
 

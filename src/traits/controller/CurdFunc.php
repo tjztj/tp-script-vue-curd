@@ -325,7 +325,7 @@ trait CurdFunc
     protected function showTpl($file,$data){
         FilesField::setShowFileInfos();
         if($this->dontShowTpl){
-            return $this->success($data);
+            $this->success($data);
         }
 
         if(isset($this->fetchPath)&&$this->fetchPath!==''){

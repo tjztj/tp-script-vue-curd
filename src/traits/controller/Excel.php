@@ -165,7 +165,7 @@ trait Excel
         }
 
         $this->model->commit();
-        return $this->success('导入成功');
+        $this->success('导入成功');
     }
 
 
