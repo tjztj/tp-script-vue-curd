@@ -6,6 +6,12 @@ define([],function(){
             if(props.value){
                 let imgList=props.value.split('|'),fid=0;
                 fileList.value=imgList.map(function(v){
+                    let url=v.toLowerCase();
+                    if(document.location.protocol==='https'
+                        &&url.indexOf('https://')!==0&&url.indexOf('http://'+ document.location.host+'/')===0){
+                        v=v.substring(5);
+                    }
+
                     fid--;
                     return {
                         uid:fid,
