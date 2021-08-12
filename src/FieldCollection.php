@@ -101,10 +101,11 @@ class FieldCollection extends Collection
      * @param array $data
      * @param VueCurlModel|null $old 原数据
      * @param bool $isExcelDo 是否EXCEL添加
+     * @param FieldCollection|null $saveFields  更新保存的字段
      * @return $this
      * @throws \think\Exception
      */
-    public function setSave(array $data,?VueCurlModel $old,bool $isExcelDo=false): self
+    public function setSave(array $data,?VueCurlModel $old,bool $isExcelDo=false,self &$saveFields=null): self
     {
         if($isExcelDo){
             //先处理一遍数据
@@ -166,8 +167,13 @@ class FieldCollection extends Collection
             }
         });
 
+        $saveFields=$fields->filter(fn($v)=>is_null($notNullNames)||in_array($v->name(),$notNullNames,true));
+
         return $this;
     }
+
+
+
 
     /**
      * 返回数据中指定的一列

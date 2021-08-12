@@ -47,9 +47,9 @@ abstract class BaseModel extends VueCurlModel
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 
-        $data=$this->doSaveData($postData,$fields,$isExcelDo);
+        $data=$this->doSaveData($postData,$fields,$isExcelDo,null,null,$saveFields);
 
-        FieldDo::doSaveBeforeChecked($fields,$data,null,null);
+        FieldDo::doSaveBeforeChecked($saveFields,$data,null,null);
 
         //没有设置当前步骤， excel导入不分步骤
         $haveDoStep=!isset($data[static::getStepField()])&&!$isExcelDo&&$fields->stepIsEnable();
@@ -76,7 +76,7 @@ abstract class BaseModel extends VueCurlModel
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
 
-        FieldDo::doSaveAfter($fields,$data,null,$info,null);
+        FieldDo::doSaveAfter($saveFields,$data,null,$info,null);
         $this->onAddAfter($info,$data);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter(null,$info,null,$fields,$data);

@@ -41,7 +41,7 @@ trait ModelSave
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 
-        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo);
+        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo,$saveFields);
 
         if(empty($postData['id'])){
             throw new \think\Exception('缺少ID');
@@ -49,7 +49,7 @@ trait ModelSave
 
         $data['id']=$postData['id'];
 
-        FieldDo::doSaveBeforeChecked($fields,$data,$beforeInfo,$baseInfo);
+        FieldDo::doSaveBeforeChecked($saveFields,$data,$beforeInfo,$baseInfo);
 
         //没有设置当前步骤
         $haveDoStep=!isset($data[static::getStepField()])&&$fields->stepIsEnable();
@@ -96,7 +96,7 @@ trait ModelSave
         $info=clone $beforeInfo;
         $info->save($data);
 
-        FieldDo::doSaveAfter($fields,$data,$beforeInfo,$info,$baseInfo);
+        FieldDo::doSaveAfter($saveFields,$data,$beforeInfo,$info,$baseInfo);
         $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
@@ -114,13 +114,14 @@ trait ModelSave
      * 保存前 验证数据，数据处理
      * @param array $postData
      * @param FieldCollection|null $fields
-     * @param bool $isExcelDo                   是否excel操作
-     * @param BaseModel|null $baseInfo          base表数据
-     * @param VueCurlModel|null $beforeInfo     数据之前的老值
+     * @param bool $isExcelDo 是否excel操作
+     * @param BaseModel|null $baseInfo base表数据
+     * @param VueCurlModel|null $beforeInfo 数据之前的老值
+     * @param FieldCollection|null $saveFields 当前操作要保存到数据库的字段
      * @return array
      * @throws \think\Exception
      */
-    final protected function doSaveData(array $postData,FieldCollection $fields=null,bool $isExcelDo=false,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null):array{
+    final protected function doSaveData(array $postData,FieldCollection $fields=null,bool $isExcelDo=false,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null,FieldCollection &$saveFields=null):array{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -134,14 +135,14 @@ trait ModelSave
         //切面
         if($this instanceof BaseChildModel){
             $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
+            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
             $this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
         }else if($this instanceof BaseModel){
             $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$beforeInfo);
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
+            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
             $this->doSaveDataAfter($saveData,$id,$beforeInfo);
         }else{
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo)->getSave();
+            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
         }
         return $saveData;
     }
