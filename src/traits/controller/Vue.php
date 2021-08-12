@@ -296,6 +296,6 @@ trait Vue
      * @return bool
      */
     public static function debug():bool{
-        return false;
+        return \think\facade\App::isDebug();
     }
 }
