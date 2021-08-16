@@ -120,7 +120,7 @@ trait Controller
      * @param bool $showFilter  是否显示筛选
      * @return void
      */
-    protected function filterShowBefore(FieldCollection &$filterFields,?array &$filterData,bool &$showFilter):void{
+    protected function indexFilterBefore(FieldCollection &$filterFields,?array &$filterData,bool &$showFilter):void{
         //index筛选显示前
     }
 

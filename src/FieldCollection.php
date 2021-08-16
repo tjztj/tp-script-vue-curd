@@ -289,22 +289,35 @@ class FieldCollection extends Collection
      */
     private function getFilterWhereData(array $myFilter=null):array{
         if(is_null($myFilter)){
-            $myFilter=input('filterData',null,null);
-            if(empty($myFilter)){
-                //支持下划线写法
-                $myFilter=input('filter_data',null,null);
-                if(empty($myFilter)){
-                    return [];
-                }
-            }
-        }
-        if(is_string($myFilter)){
+            $myFilter=$this->getParamFilterData();
+        }else if(is_string($myFilter)){
             $myFilter=json_decode($myFilter,true);
         }
         if(empty($myFilter)){
             return [];
         }
         return $myFilter;
+    }
+
+
+    /**
+     * 根据参数获取 查询信息
+     * @return array
+     */
+    public function getParamFilterData():array{
+        $myFilter=input('filterData',null,null);
+        if(empty($myFilter)){
+            //支持下划线写法
+            $myFilter=input('filter_data',null,null);
+            if(empty($myFilter)){
+                return [];
+            }
+        }
+        if($myFilter){
+            $myFilter=json_decode($myFilter,true);
+        }
+
+        return $myFilter?:[];
     }
 
     /**

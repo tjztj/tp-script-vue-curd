@@ -173,14 +173,14 @@ class FieldDo
         $this->indexFilterBeforeDo=$func;
         return $this;
     }
-    public function doIndexFilterBeforeDo(ModelField $field,Query $query,array $filterData): self
+    public function doIndexFilterBeforeDo(ModelField $field,Query $query,array &$filterData): self
     {
         $func=$this->indexFilterBeforeDo?? static function(){};
         $func($field,$query,$filterData);
         return $this;
     }
-    public static function doIndexFilterBefore(FieldCollection $field,Query $query,array $filterData):void{
-        $field->each(static function(ModelField $field)use($query,$filterData){
+    public static function doIndexFilterBefore(FieldCollection $field,Query $query,array &$filterData):void{
+        $field->each(static function(ModelField $field)use($query,&$filterData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doIndexFilterBeforeDo($field,$query,$filterData);
             }

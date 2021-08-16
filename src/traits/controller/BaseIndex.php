@@ -123,7 +123,7 @@ trait BaseIndex
         $paranFilterData=$this->request->param('filter_data','',null);
         $filterData=$paranFilterData?json_decode($paranFilterData,true):null;
         $showFilter=$this->request->param('show_filter/d',1)===1;
-        $this->filterShowBefore($filterFields,$filterData,$showFilter);
+        $this->indexFilterBefore($filterFields,$filterData,$showFilter);
 
 
 
@@ -215,6 +215,9 @@ trait BaseIndex
      */
     protected function indexListModelWhere($model,?BaseModel $baseInfo)
     {
+        $filterFields=clone $this->fields;
+        $filterData=$filterFields->getParamFilterData();
+        $this->indexFilterBefore($filterFields,$filterData)
         return $model
             ->where(function (Query $query)use($baseInfo){
                 $id=$this->request->param('id/d');
@@ -225,7 +228,7 @@ trait BaseIndex
                 //这里不应该抛出异常
                 $this->indexListWhere($query);
             })
-            ->where($this->fields->getFilterWhere())
+            ->where($this->fields->getFilterWhere($filterData))
             ->where(function(Query $query){
                 $childFilterData=$this->request->param('childFilterData',null,null);
                 if($childFilterData){
