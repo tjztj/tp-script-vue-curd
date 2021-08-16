@@ -217,7 +217,7 @@ trait BaseIndex
     {
         $filterFields=clone $this->fields;
         $filterData=$filterFields->getParamFilterData();
-        $this->indexFilterBefore($filterFields,$filterData)
+        $this->indexFilterBefore($filterFields,$filterData);
         return $model
             ->where(function (Query $query)use($baseInfo){
                 $id=$this->request->param('id/d');
