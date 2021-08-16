@@ -114,16 +114,6 @@ trait Controller
         //列表数据处理钩子
     }
 
-    /**
-     * @param FieldCollection $filterFields 筛选相关字段
-     * @param array|null $filterData    筛选默认值
-     * @param bool $showFilter  是否显示筛选
-     * @return void
-     */
-    protected function indexFilterBefore(FieldCollection &$filterFields,?array &$filterData,bool &$showFilter):void{
-        //index筛选显示前
-    }
-
     protected function addAfter(VueCurlModel $info): void
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
