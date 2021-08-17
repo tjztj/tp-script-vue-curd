@@ -217,18 +217,20 @@ trait BaseIndex
     {
         $filterFields=clone $this->fields;
         $filterData=$filterFields->getParamFilterData();
-        $this->indexFilterBefore($filterFields,$filterData);
+        $showFilter=true;
+        $this->indexFilterBefore($filterFields,$filterData,$showFilter);
+
         return $model
             ->where(function (Query $query)use($baseInfo){
                 $id=$this->request->param('id/d');
                 empty($id)||$query->where('id',$id);
-                empty($baseInfo)|| $query->where($this->model::parentField(),$baseInfo->id);
+                $baseInfo === null || $query->where($this->model::parentField(),$baseInfo->id);
             })
             ->where(function(Query $query){
                 //这里不应该抛出异常
                 $this->indexListWhere($query);
             })
-            ->where($this->fields->getFilterWhere($filterData))
+            ->where($filterFields->getFilterWhere($filterData))
             ->where(function(Query $query){
                 $childFilterData=$this->request->param('childFilterData',null,null);
                 if($childFilterData){
