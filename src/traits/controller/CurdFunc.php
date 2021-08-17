@@ -182,7 +182,7 @@ trait CurdFunc
 
         if($baseModel){
             //子表的地区为父表的值
-            $fields=$fields>filter(fn(ModelField $v)=>!in_array($v->name(),[$model::getRegionField(),$model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
+            $fields=$fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$model::getRegionField(),$model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
         }
 
 
