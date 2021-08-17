@@ -47,6 +47,166 @@ trait CurdFunc
     }
 
 
+    /**
+     * @param FieldCollection|null $fields  要更改的字段信息
+     * @param VueCurlModel|null $model      更改到的模型
+     * @param VueCurlModel|null $baseModel  父表
+     * @return mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function editFields(FieldCollection $fields=null,VueCurlModel $model=null,VueCurlModel $baseModel=null){
+        if(is_null($fields)){
+            $fields=$this->fields;
+        }
+        if(is_null($model)){
+            $model=$this->model;
+        }
+
+        if($this->request->isAjax()){
+            $data=$this->request->post();
+            $model->startTrans();
+            $savedInfo=null;
+            $baseInfo=null;
+            $old=null;
+            $returnSaveData=[];
+            $isNext=false;
+            try{
+                if(empty($data['id'])){
+                    if($baseModel){
+                        if(empty($data[$this->model::parentField()])){
+                            throw new \think\Exception('缺少关键信息');
+                        }
+
+                        $baseInfo=$baseModel->find($data[$model::parentField()]);
+                        if(is_null($baseInfo)){
+                            throw new \think\Exception('未找到所属数据');
+                        }
+                        $this->addBefore($data,$baseInfo);
+                    }else{
+                        $this->addBefore($data);
+                    }
+
+
+                    $isNext=true;
+                    //步骤字段
+                    $fields=$fields->filterNextStepFields($old,$baseInfo,$stepInfo);
+                    $fields->saveStepInfo=$stepInfo;
+
+                    //步骤权限验证
+                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$baseInfo,$fields)===false){
+                        return $this->error('您不能进行此操作-01');
+                    }
+
+                    if($baseModel){
+                        $savedInfo=$model->addInfo($data,$baseInfo,$fields,false,$returnSaveData);
+                    }else{
+                        $savedInfo=$model->addInfo($data,$fields,false,$returnSaveData);
+                    }
+
+                    $this->addAfter($savedInfo);
+                }else{
+                    $old=$model->find($data['id']);
+                    if($baseModel){
+                        $baseInfo=$baseModel->find($old[$model::parentField()]);
+                        $this->editBefore($data,$old,$baseInfo);
+                    }else{
+                        $this->editBefore($data,$old);
+                    }
+
+
+
+                    //步骤
+                    $isNext=$this->autoGetSaveStepIsNext($fields,$old,$baseInfo);
+                    if(is_null($isNext)){
+                        return $this->error('数据不满足当前步骤');
+                    }
+                    if($isNext){
+                        $fields=$fields->filterNextStepFields($old,$baseInfo,$stepInfo);
+                    }else{
+                        $fields=$fields->filterCurrentStepFields($old,$baseInfo,$stepInfo);
+                        if(!$this->checkEditUrl($fields,$stepInfo)){
+                            return $this->error('您不能进行此操作-061');
+                        }
+                    }
+                    $fields->saveStepInfo=$stepInfo;
+
+
+                    //步骤权限验证
+                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$baseInfo,$fields)===false){
+                        return $this->error('您不能进行此操作-02');
+                    }
+
+                    $savedInfo=$model->saveInfo($data,$fields,$baseInfo,$old,$returnSaveData);
+                    $this->editAfter($savedInfo);
+                }
+            }catch (\Exception $e){
+                $model->rollback();
+                $this->error($e);
+            }
+            $model->commit();
+
+            //提交后
+            $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
+            $this->editCommitAfter($msg,$old,$savedInfo,$baseInfo,$returnSaveData);
+
+            $this->success($msg,[
+                'data'=>$data,
+                'info'=>$savedInfo,
+                'baseInfo'=>$baseInfo,
+            ]);
+        }
+
+        $id=$this->request->param('id/d');
+        if($id){
+            $info=$model->find($id);
+            if($baseModel){
+                $base_id=$info[$model::parentField()];
+                $baseInfo=$baseModel->find($info[$model::parentField()]);
+            }else{
+                $baseInfo=null;
+            }
+        }else{
+            $info=clone $model;
+            if($baseModel){
+                $base_id=$this->request->param('base_id/d',0);
+                $base_id||$this->errorAndCode('缺少必要参数');
+                $baseInfo=$baseModel->find($base_id);
+            }else{
+                $baseInfo=null;
+            }
+        }
+
+
+        if($baseModel){
+            //子表的地区为父表的值
+            $fields=$fields>filter(fn(ModelField $v)=>!in_array($v->name(),[$model::getRegionField(),$model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
+        }
+
+
+
+
+        try{
+            $this->createEditFetchDataBefore($fields,$info,$baseInfo);
+        }catch (\Exception $e){
+            return $this->error($e);
+        }
+        $fetchData=$this->createEditFetchData($fields,$info,$baseInfo);
+
+        if($baseModel){
+            $fetchData['baseId']=$base_id;
+            $fetchData['baseInfo']=$baseInfo;
+            $fetchData['parentField']=$this->model::parentField();
+            $fetchData['vueCurdAction']='childEdit';
+        }
+
+
+        $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
+
+        return $this->showTpl('edit',$fetchData);
+    }
 
 
     /**
@@ -184,30 +344,24 @@ trait CurdFunc
      * @return array
      * @throws \think\Exception
      */
-    protected function createEditFetchData(FieldCollection $fields,?VueCurlModel $data,BaseModel $baseModel=null){
-        if($data){
-            $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
-            if(is_null($isStepNext)){
-                return $this->error('数据不满足当前步骤');
-            }
-            if($isStepNext){
-                $fields=$fields->filterNextStepFields($data,$baseModel,$stepInfo);
-            }else{
-                $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
-            }
-
-            if(!empty($data->id)&&!$this->checkEditUrl($fields,$stepInfo)){
-                return $this->error('您不能进行此操作-063');
-            }
-
-            $fields->saveStepInfo=$stepInfo;
+    protected function createEditFetchData(FieldCollection $fields,VueCurlModel $data,BaseModel $baseModel=null){
+        $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
+        if(is_null($isStepNext)){
+            return $this->error('数据不满足当前步骤');
+        }
+        if($isStepNext){
+            $fields=$fields->filterNextStepFields($data,$baseModel,$stepInfo);
         }else{
-            $fields=$fields->filterNextStepFields(null,$baseModel,$stepInfo);
-            $fields->saveStepInfo=$stepInfo;
-            $isStepNext=true;
+            $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
         }
 
-        $sourceData=$data?clone $data:null;//用来验证，防止被修改
+        if(!empty($data->id)&&!$this->checkEditUrl($fields,$stepInfo)){
+            return $this->error('您不能进行此操作-063');
+        }
+
+        $fields->saveStepInfo=$stepInfo;
+
+        $sourceData=clone $data;//用来验证，防止被修改
         try{
             FieldDo::doEditShow($fields,$data,$baseModel,$isStepNext);
         }catch(\Exception $e){
@@ -217,21 +371,17 @@ trait CurdFunc
 
 
         //data可能在上面改变为有值
-        if($data){
-            $info=$data->toArray();
-            //只处理地区
-            $fields->filter(fn(ModelField $v)=> (in_array($v->name(), [$data::getRegionField(), $data::getRegionPidField()]) && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
-            //原信息
-            $info['sourceData']=$data;
-        }else{
-            $info=null;
-        }
+        $info=$data->toArray();
+        //只处理地区
+        $fields->filter(fn(ModelField $v)=> (in_array($v->name(), [$data::getRegionField(), $data::getRegionPidField()]) && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
+        //原信息
+        $info['sourceData']=$data;
 
 
 
 
 
-        if($data&&!empty($data->id)){
+        if(!empty($data->id)){
             try{
                 $canEdit=$data->checkRowAuth($fields,$baseModel,'edit');
             }catch (\Exception $e){
@@ -242,7 +392,7 @@ trait CurdFunc
             }
         }else{
             try{
-                $canAdd=$data?$data->checkRowAuth($fields,$baseModel,'add'):$this->model->checkRowAuth($fields,$baseModel,'add');
+                $canAdd=$data->checkRowAuth($fields,$baseModel,'add');
             }catch (\Exception $e){
                 return $this->error($e->getMessage());
             }

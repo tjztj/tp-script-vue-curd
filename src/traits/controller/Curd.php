@@ -39,86 +39,8 @@ trait Curd
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    function edit(){
-        if($this->request->isAjax()){
-            $data=$this->request->post();
-            $this->model->startTrans();
-            $savedInfo=null;
-            $old=null;
-            $returnSaveData=[];
-            $isNext=false;
-            try{
-                if(empty($data['id'])){
-                    $this->addBefore($data);
-                    $isNext=true;
-                    //步骤字段
-                    $this->fields=$this->fields->filterNextStepFields(null,null,$stepInfo);
-                    $this->fields->saveStepInfo=$stepInfo;
-
-                    //步骤权限验证
-                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($old,null,$this->fields)===false){
-                        return $this->error('您不能进行此操作-01');
-                    }
-
-                    $savedInfo=$this->model->addInfo($data,$this->fields,false,$returnSaveData);
-                    $this->addAfter($savedInfo);
-                }else{
-                    $old=$this->model->find($data['id']);
-
-                    $this->editBefore($data,$old);
-
-                    //步骤
-                    $isNext=$this->autoGetSaveStepIsNext($this->fields,$old,null);
-                    if(is_null($isNext)){
-                        return $this->error('数据不满足当前步骤');
-                    }
-                    if($isNext){
-                        $this->fields=$this->fields->filterNextStepFields($old,null,$stepInfo);
-                    }else{
-                        $this->fields=$this->fields->filterCurrentStepFields($old,null,$stepInfo);
-                        if(!$this->checkEditUrl($this->fields,$stepInfo)){
-                            return $this->error('您不能进行此操作-061');
-                        }
-                    }
-                    $this->fields->saveStepInfo=$stepInfo;
-
-
-                    //步骤权限验证
-                    if($this->fields->saveStepInfo&&$this->fields->saveStepInfo->authCheck($old,null,$this->fields)===false){
-                        return $this->error('您不能进行此操作-02');
-                    }
-
-                    $savedInfo=$this->model->saveInfo($data,$this->fields,null,$old,$returnSaveData);
-                    $this->editAfter($savedInfo);
-                }
-            }catch (\Exception $e){
-                $this->model->rollback();
-                $this->error($e);
-            }
-            $this->model->commit();
-
-            //提交后
-            $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
-            $this->editCommitAfter($msg,$old,$savedInfo,null,$returnSaveData);
-
-            $this->success($msg,[
-                'data'=>$data,
-                'info'=>$savedInfo,
-            ]);
-        }
-
-        $id=$this->request->param('id/d');
-
-        $info=$id?$this->model->find($id):null;
-        try{
-            $this->createEditFetchDataBefore($this->fields,$info,null);
-        }catch (\Exception $e){
-            return $this->error($e);
-        }
-        $fetchData=$this->createEditFetchData($this->fields,$info);
-        $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
-
-        return $this->showTpl('edit',$fetchData);
+    public function edit(){
+        return $this->editFields();
     }
 
 
@@ -127,7 +49,7 @@ trait Curd
     /**
      * #title 删除数据
      */
-    function del(){
+    public function del(){
         $ids=$this->request->param('ids/a',[]);
         $ids=array_filter($ids);
         if(empty($ids)){
