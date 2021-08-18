@@ -873,7 +873,7 @@ a.red:hover,a.yellow:hover{
     padding: 2px 0;
 }
 
-.filter-select-show-item-box .ant-dropdown-menu-item > a.filter-select-show-item {
+.filter-select-show-item-box .ant-dropdown-menu-item > a.filter-select-show-item,.filter-select-show-item-box .ant-dropdown-menu-title-content > a.filter-select-show-item{
     display: flex;
 }
 
@@ -887,7 +887,9 @@ a.red:hover,a.yellow:hover{
     color: #003a8c;
     line-height: inherit;
 }
-
+.filter-select-show-item-box .filter-select-show-item{
+    color: rgba(0,0,0,.85);
+}
 .filter-select-show-item-box .filter-select-show-item.checked {
     color: #1890ff;
 }
