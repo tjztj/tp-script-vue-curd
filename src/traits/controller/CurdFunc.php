@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\traits\controller;
 
 
 use think\db\Query;
+use think\db\Raw;
 use think\helper\Str;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
@@ -510,10 +511,10 @@ trait CurdFunc
 
 
     /**
-     * 获取列表排序
-     * @return string
+     * 获取列表排序   Raw 是为了方便重写
+     * @return string|Raw
      */
-    protected function getListOrder():string{
+    protected function getListOrder(){
         $sortField=$this->request->param('sortField');
         if($sortField){
             $sortOrder=$this->request->param('sortOrder','');
