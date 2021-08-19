@@ -401,10 +401,12 @@ body{
 }
 .vuecurd-def-box .ant-form-item-label{
     line-height:1.5715;
-    padding-top: 9px;
+    /*padding-top: 9px;*/
 }
 .vuecurd-def-box .ant-form-item-label label{
     white-space: normal;
+    min-height: 32px;
+    height: auto;
 }
 .vuecurd-def-box .ant-form-item-control.has-success .ant-form-explain{
     display: none;
