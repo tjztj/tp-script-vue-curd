@@ -207,6 +207,9 @@ body{
 .ant-pro-table-list-toolbar .ant-pro-table-list-toolbar-right .ant-space-align-center .ant-space-item:nth-last-child(1) .ant-divider{
     display: none;
 }
+.ant-table-cell-fix-left.ant-table-row-cell-ellipsis, .ant-table-cell-fix-right.ant-table-row-cell-ellipsis{
+    overflow: visible;
+}
 
 /**** ant btn 样式 ***/
 
