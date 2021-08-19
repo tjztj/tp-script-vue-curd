@@ -208,7 +208,7 @@ body{
     display: none;
 }
 .ant-table-cell-fix-left.ant-table-row-cell-ellipsis, .ant-table-cell-fix-right.ant-table-row-cell-ellipsis{
-    overflow-x: visible;
+    overflow: visible;
 }
 
 /**** ant btn 样式 ***/
