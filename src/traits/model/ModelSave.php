@@ -97,7 +97,12 @@ trait ModelSave
         $info->save($data);
 
         FieldDo::doSaveAfter($saveFields,$data,$beforeInfo,$info,$baseInfo);
-        $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
+        if($this instanceof BaseChildModel){
+            $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
+        }else{
+            $this->onEditAfter($info,$data,$beforeInfo);
+        }
+
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
             $nestStep=$this->fields()->getNextStepInfo($info,$baseInfo);
