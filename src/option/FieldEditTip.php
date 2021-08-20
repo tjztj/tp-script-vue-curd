@@ -11,7 +11,7 @@ namespace tpScriptVueCurd\option;
  */
 class FieldEditTip
 {
-    public FieldWhere $show;
+    public ?FieldWhere $show;
 
     public string $message;
 
