@@ -29,7 +29,7 @@ class FieldEditTip
     private string $guid;
     
     
-    public function __construct(string $message,FieldWhere $show)
+    public function __construct(string $message,?FieldWhere $show)
     {
         $this->show=$show;
         $this->message=$message;
@@ -40,7 +40,7 @@ class FieldEditTip
     public function toArray():array
     {
         return [
-            'show'=>$this->show->toArray(),
+            'show'=>$this->show?$this->show->toArray():null,
             'message'=>$this->message,
             'title'=>$this->title,
             'type'=>$this->type,

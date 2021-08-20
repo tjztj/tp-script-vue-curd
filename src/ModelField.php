@@ -417,7 +417,7 @@ abstract class ModelField
      * @param FieldWhere $show
      * @return FieldEditTip
      */
-    public function pushEditTip(string $message, FieldWhere $show): FieldEditTip
+    public function pushEditTip(string $message, FieldWhere $show=null): FieldEditTip
     {
         $fieldEditTip = new FieldEditTip($message, $show);
         $this->editTips[] = $fieldEditTip;

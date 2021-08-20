@@ -995,7 +995,7 @@ define(requires, function (axios, Qs) {
                                 field.editTipArr = [];
                                 return;
                             }
-                            field.editTipArr = field.editTips.filter(val => checkFieldWhere(val.show));
+                            field.editTipArr = field.editTips.filter(val => val.show===null?true:checkFieldWhere(val.show));
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
