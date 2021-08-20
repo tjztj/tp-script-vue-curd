@@ -26,10 +26,45 @@ class MonthField extends ModelField
     protected $nullVal=0;//字段在数据库中为空时的值
 
 
+    protected ?int $max=null;
+    protected ?int $min=null;
+
+
+    /**最小值
+     * @param int|null $min
+     * @return $this|int
+     */
+    public function min(int $min = null)
+    {
+        return $this->doAttr('min', $min);
+    }
+
+    /**最大值
+     * @param int|null $max
+     * @return $this|int
+     */
+    public function max(int $max = null)
+    {
+        return $this->doAttr('max', $max);
+    }
+
+    public function minNull(): self
+    {
+        $this->min=null;
+        return $this;
+    }
+
+    public function maxNull(): self
+    {
+        $this->max=null;
+        return $this;
+    }
+
     /**
      * 设置保存的值
      * @param array $data 数据值集合
      * @return $this
+     * @throws \think\Exception
      */
     public function setSaveVal(array $data): self
     {
@@ -40,6 +75,14 @@ class MonthField extends ModelField
                 $this->save=is_numeric($data[$name])?$data[$name]:\tpScriptVueCurd\tool\Time::dateToUnixtime($data[$name].'-01');
                 if($this->save===false){
                     throw new \think\Exception('不是正确的月份格式');
+                }
+                if($this->save!==0){
+                    if($this->min!==null&&$this->min>$this->save){
+                        throw new \think\Exception('月份不能小于'.date('Y年m月',$this->min));
+                    }
+                    if($this->max!==null&&$this->max<$this->save){
+                        throw new \think\Exception('月份不能大于'.date('Y年m月',$this->max));
+                    }
                 }
             }else{
                 $this->save=$this->nullVal();
