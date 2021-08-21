@@ -20,6 +20,7 @@ class FieldStepBaseConfig
     public string $titleEdit='';//编辑时显示文字
     public ?string $listBtnColorEdit=null;//编辑时的标题
     public array $other=[];
+    public bool $okRefreshList=false;//操作成功后，是否刷新整个列表而不单单刷新当前数据
 
 
     public function __construct(array $config=[]){
@@ -47,6 +48,7 @@ class FieldStepBaseConfig
             'titleEdit'=>$this->titleEdit,
             'listBtnColorEdit'=>$this->listBtnColorEdit,
             'other'=>$this->other,
+            'okRefreshList'=>$this->okRefreshList,
         ];
     }
 

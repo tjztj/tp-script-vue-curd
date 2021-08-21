@@ -153,10 +153,16 @@ trait CurdFunc
             $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
             $this->editCommitAfter($msg,$old,$savedInfo,$baseInfo,$returnSaveData);
 
+            $refreshList=$this->request->refreshList??false;
+            if($fields->stepIsEnable()&&$fields->saveStepInfo){
+                $refreshList=$fields->saveStepInfo->config['okRefreshList']??false;
+            }
+
             $this->success($msg,[
                 'data'=>$data,
                 'info'=>$savedInfo,
                 'baseInfo'=>$baseInfo,
+                'refreshList'=> $refreshList,
             ]);
         }
 

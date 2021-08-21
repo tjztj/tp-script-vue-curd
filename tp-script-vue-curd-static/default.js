@@ -486,7 +486,7 @@ define(['vueAdmin'], function (va) {
                         }
                         this.$post(window.location.href,this.form).then(async res=>{
                             parentWindow.antd.message.success(res.msg);
-                            if(this.form&&this.form.id){
+                            if(this.form&&this.form.id&&!res.data.refreshList){
                                 window.listVue.refreshId(this.form.id);
                             }else{
                                 window.listVue.refreshTable();

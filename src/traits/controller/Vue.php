@@ -187,7 +187,8 @@ trait Vue
             ];
         }else{
             $confirm=[
-                'show'=>false,'okText'=>'确认执行','cancelText'=>'取消','title'=>'操作确认',
+                'show'=>false,
+//                'okText'=>'确认执行','cancelText'=>'取消','title'=>'操作确认',
             ];
         }
 
