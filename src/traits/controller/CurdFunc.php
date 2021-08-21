@@ -68,6 +68,9 @@ trait CurdFunc
 
         if($this->request->isAjax()){
             $data=$this->request->post();
+            if(isset($this->request->editId)){
+                $data['id']=$this->request->editId;
+            }
             $model->startTrans();
             $savedInfo=null;
             $baseInfo=null;
@@ -166,7 +169,7 @@ trait CurdFunc
             ]);
         }
 
-        $id=$this->request->param('id/d');
+        $id=$this->request->editId??$this->request->param('id/d');
         if($id){
             $info=$model->find($id);
             if($baseModel){
@@ -262,7 +265,7 @@ trait CurdFunc
      * @throws \think\db\exception\ModelNotFoundException
      */
     function show(){
-        $id=$this->request->param('id/d');
+        $id=$this->request->showId??$this->request->param('id/d');
         if(empty($id)){
             return $this->errorAndCode('缺少必要参数');
         }
