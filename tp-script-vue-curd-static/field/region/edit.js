@@ -28,7 +28,7 @@ define([],function(){
         return setParentDisable(field.regionTree);
     }
     return {
-        props:['field','value','validateStatus','form'],
+        props:['field','value','validateStatus','form','info'],
         setup(props,ctx){
             let justOne=true;
             props.field.regionTree.forEach(v=>{
@@ -69,6 +69,12 @@ define([],function(){
                 //如果是添加，且是必填，且为空
                 if(justOne){
                     ctx.emit('update:value', regionValues[Object.keys(regionValues)[Object.keys(regionValues).length - 1]]);
+                }
+            }else{
+                if(props.form.id){
+                    if(props.form[props.field.name]&&!/\d+/.test(props.form[props.field.name])){
+                        ctx.emit('update:value', props.info['_Original_'+props.field.name]);
+                    }
                 }
             }
 
@@ -133,10 +139,10 @@ define([],function(){
                    <template v-if="showSelected">
                         <div class="l">
                             <template v-if="field.cField">
-                                <span v-if="field.pField&&form[field.pField]">{{form[field.pField]}}/</span>{{form[field.cField]}}
+                                <span v-if="field.pField&&info[field.pField]">{{info[field.pField]}}/</span>{{info[field.cField]}}
                             </template>
                             <template v-else>
-                                {{value}}
+                                {{info[field.name]}}
                             </template>
                         </div>
                     </template>
