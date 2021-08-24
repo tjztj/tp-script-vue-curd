@@ -638,6 +638,20 @@ trait CurdFunc
     }
 
 
+
+    /**
+     * 编辑当前步骤
+     * @return mixed
+     */
+    protected function currentStepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->setSaveStepNext(false);
+        return $this->edit();
+    }
+
+
+
+
     /**
      * 数据步骤查询权限
      * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）

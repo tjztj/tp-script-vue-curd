@@ -191,15 +191,25 @@ class FieldStep
 
     private function setAuthCheckAndCheckBefore($beforeCheckFunc): void
     {
+        //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
         if(is_callable($beforeCheckFunc)){
             $this->authCheckAndCheckBefore=$beforeCheckFunc;
         }else if(is_bool($beforeCheckFunc)){
             $this->authCheckAndCheckBefore= static fn()=>$beforeCheckFunc;
         }else if(is_null($beforeCheckFunc)){
-            $this->authCheckAndCheckBefore=fn(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$baseInfo);
+            $this->authCheckAndCheckBefore=$this->getAuthCheckAndCheckBeforeDefVal();
         }else{
             throw new \think\Exception('参数错误');
         }
+    }
+
+    /**
+     * authCheckAndCheckBefore 的默认值
+     * @return \Closure
+     */
+    public function getAuthCheckAndCheckBeforeDefVal(){
+        //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
+        return fn(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$baseInfo);
     }
 
     /**
@@ -210,6 +220,7 @@ class FieldStep
      * @return bool
      */
     public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
+        //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
         if(!isset($this->authCheckAndCheckBefore)||is_null($this->authCheckAndCheckBefore)){
             $this->setAuthCheckAndCheckBefore(null);
         }

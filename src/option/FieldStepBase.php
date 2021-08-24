@@ -45,7 +45,18 @@ abstract class FieldStepBase
             $config,
         )->auth(
             fn(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null) => $this->auth($info, $baseInfo, $fields),
-            $this->beforeAuthCheckFunc(),
+            function (VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null){
+                $fn=$this->beforeAuthCheckFunc();
+                if(is_bool($fn)){
+                    return $fn;
+                }
+                $val=is_null($fn)?null:$fn($info,$baseInfo,$fields);
+                if(is_null($val)){
+                    $fn=$this->step->getAuthCheckAndCheckBeforeDefVal();
+                    return $fn($info,$baseInfo,$fields);
+                }
+                return $val;
+            },
         )->setListRowDo(
             fn(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $baseInfo, $fields,$step)
         )->saveBefore(
