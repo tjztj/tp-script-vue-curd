@@ -627,6 +627,16 @@ trait CurdFunc
         return $this->edit();
     }
 
+    /**
+     * 执行下一步
+     * @return mixed
+     */
+    protected function nextStepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->setSaveStepNext(true);
+        return $this->edit();
+    }
+
 
     /**
      * 数据步骤查询权限
