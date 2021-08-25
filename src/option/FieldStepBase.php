@@ -46,16 +46,8 @@ abstract class FieldStepBase
         )->auth(
             fn(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null) => $this->auth($info, $baseInfo, $fields),
             function (VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null){
-                $fn=$this->beforeAuthCheckFunc();
-                if(is_bool($fn)){
-                    return $fn;
-                }
-                $val=is_null($fn)?null:$fn($info,$baseInfo,$fields);
-                if(is_null($val)){
-                    $fn=$this->step->getAuthCheckAndCheckBeforeDefVal();
-                    return $fn($info,$baseInfo,$fields);
-                }
-                return $val;
+                $fn=$this->step->getAuthCheckAndCheckBeforeDefVal();
+                return $fn($info,$baseInfo,$fields)||$this->canEdit($info,$baseInfo,$fields);
             },
         )->setListRowDo(
             fn(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $baseInfo, $fields,$step)
@@ -140,15 +132,14 @@ abstract class FieldStepBase
 
 
     /**
-     * 默认执行authCheck前，执行beforeCheck（这样只能执行下一步，不能编辑当前步骤）
-     *                                  beforeCheck=null            不可以编辑数据当前步骤
-     *                                  beforeCheck=true            绿灯到authCheck （可以编辑当前步骤）
-     *                                  beforeCheck=false           authCheck 返回false （不可以编辑当前步骤，也不可以编辑下一步）
-     *                                  beforeCheck=function(){}    自定义
-     * @return mixed|null
+     * 步骤是否可以编辑
+     * @param VueCurlModel|null $info
+     * @param BaseModel|null $baseInfo
+     * @param FieldCollection|null $fields
+     * @return bool
      */
-    public function beforeAuthCheckFunc(){
-        return null;
+    public function canEdit(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null):bool{
+        return false;
     }
 
 
