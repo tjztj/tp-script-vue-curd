@@ -162,4 +162,28 @@ if (!function_exists('getModelDefaultNextStepField')) {
         return 'next_step';
     }
 }
+
+if (!function_exists('imgFieldShowUrlDo')) {
+    /**
+     * 字段下一个步骤默认名称
+     * @param string $urls
+     * @param \tpScriptVueCurd\field\ImagesField $field
+     * @return string
+     */
+    function imgFieldShowUrlDo(string $urls,\tpScriptVueCurd\field\ImagesField $field):string{
+        return $urls;
+    }
+}
+
+if (!function_exists('fileFieldShowUrlDo')) {
+    /**
+     * 字段下一个步骤默认名称
+     * @param string $urls
+     * @param \tpScriptVueCurd\field\FilesField $field
+     * @return string
+     */
+    function fileFieldShowUrlDo(string $urls,\tpScriptVueCurd\field\FilesField $field):string{
+        return $urls;
+    }
+}
 ########################################################################################################################

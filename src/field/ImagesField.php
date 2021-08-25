@@ -23,6 +23,11 @@ class ImagesField extends ModelField
     protected bool $removeMissings;//默认值是 tpScriptVueCurdImageRemoveMissings
     protected bool $multiple=true;//是否可多选
 
+    /**
+     * @var callable
+     */
+    protected $imgFieldShowUrlDo=null;
+
 
     /**最小值
      * @param string|null $url
@@ -79,6 +84,16 @@ class ImagesField extends ModelField
         return $this;
     }
 
+    /**
+     * 图片显示前，对地址处理
+     * @param callable $imgFieldShowUrlDo
+     * @return $this
+     */
+    public function setImgFieldShowUrlDo(callable $imgFieldShowUrlDo):self{
+        $this->imgFieldShowUrlDo=$imgFieldShowUrlDo;
+        return $this;
+    }
+
 
     /**
      * 显示时对数据处理
@@ -88,7 +103,13 @@ class ImagesField extends ModelField
     {
         parent::doShowData($dataBaseData);
         if(isset($dataBaseData[$this->name()])){
-            $dataBaseData[$this->name()]=trim($dataBaseData[$this->name()]);
+            $dataBaseData[$this->name()]=imgFieldShowUrlDo(trim($dataBaseData[$this->name()]),$this);
+
+            $imgFieldShowUrlDo=$this->imgFieldShowUrlDo;
+            if($imgFieldShowUrlDo!==null){
+                $dataBaseData[$this->name()]=$imgFieldShowUrlDo($dataBaseData[$this->name()],$dataBaseData);
+            }
+
             $dataBaseData[$this->name().'Arr']=$dataBaseData[$this->name()]?explode('|',$dataBaseData[$this->name()]):[];
         }
     }

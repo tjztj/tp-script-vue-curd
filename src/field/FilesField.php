@@ -25,6 +25,11 @@ class FilesField extends ModelField
     protected bool $multiple=true;//是否可多选
 
     /**
+     * @var callable
+     */
+    protected $fileFieldShowUrlDo=null;
+
+    /**
      * @var callable $fileInfoOn
      */
     private $fileInfoOn;
@@ -128,7 +133,15 @@ class FilesField extends ModelField
         $this->defaultCheckRequired($this->save,'请上传附件');
         return $this;
     }
-
+    /**
+     * 文件显示前，对地址处理
+     * @param callable $fileFieldShowUrlDo
+     * @return $this
+     */
+    public function setFileFieldShowUrlDo(callable $fileFieldShowUrlDo):self{
+        $this->fileFieldShowUrlDo=$fileFieldShowUrlDo;
+        return $this;
+    }
 
     /**
      * 显示时对数据处理
@@ -138,7 +151,13 @@ class FilesField extends ModelField
     {
         parent::doShowData($dataBaseData);
         if(isset($dataBaseData[$this->name()])){
-            $dataBaseData[$this->name()]=trim($dataBaseData[$this->name()]);
+            $dataBaseData[$this->name()]=fileFieldShowUrlDo(trim($dataBaseData[$this->name()]),$this);
+
+            $fileFieldShowUrlDo=$this->fileFieldShowUrlDo;
+            if($fileFieldShowUrlDo!==null){
+                $dataBaseData[$this->name()]=$fileFieldShowUrlDo($dataBaseData[$this->name()],$dataBaseData);
+            }
+
             $dataBaseData[$this->name().'Arr']=$dataBaseData[$this->name()]?explode('|',$dataBaseData[$this->name()]):[];
             $dataBaseData[$this->name().'InfoArr']=[];
             self::$doShowFields[$this->guid()]=[
