@@ -390,15 +390,18 @@ trait BaseIndex
             if($nextStepFieldName&&in_array($nextStepFieldName,$this->model::getTableFields())){
                 $nextStepField=SelectField::init($nextStepFieldName,'下一步')->multiple(true)->items($steps);
                 $nextStepField->filter()->multiple(true);
-                $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepFieldName){
-                    if(empty($filterData[$field->name()])){
+                $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
+                    $nextStepFieldName=$field->name();
+                    if(empty($filterData[$nextStepFieldName])){
                         return;
                     }
-                    $val=$filterData[$field->name()];
-                    unset($filterData[$field->name()]);
+                    $val=$filterData[$nextStepFieldName];
+                    unset($filterData[$nextStepFieldName]);
                     is_array($val)||$val=[$val];
-                    $query->whereIn($field->name(),$val);
+                    $query->whereIn($nextStepFieldName,$val);
                 });
+
+                $filterFields->unshift($nextStepField);
             }
 
 
@@ -407,12 +410,13 @@ trait BaseIndex
             $stepFieldName=$this->model::getStepField();
             $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
             $stepField->filter()->multiple(true);
-            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepFieldName){
-                if(empty($filterData[$field->name()])){
+            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
+                $stepFieldName=$field->name();
+                if(empty($filterData[$stepFieldName])){
                     return;
                 }
-                $val=$filterData[$field->name()];
-                unset($filterData[$field->name()]);
+                $val=$filterData[$stepFieldName];
+                unset($filterData[$stepFieldName]);
 
                 $sqls=[];
                 is_array($val)||$val=[$val];
