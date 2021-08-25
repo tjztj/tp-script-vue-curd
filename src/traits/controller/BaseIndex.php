@@ -388,7 +388,7 @@ trait BaseIndex
 
             $nextStepFieldName=$this->model::getNestStepField();
             if($nextStepFieldName&&in_array($nextStepFieldName,$this->model::getTableFields())){
-                $nextStepField=SelectField::init($nextStepFieldName,'下一步')->multiple(true)->items($steps);
+                $nextStepField=SelectField::init($nextStepFieldName,'下一个步骤')->multiple(true)->items($steps);
                 $nextStepField->filter()->multiple(true);
                 $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
                     $nextStepFieldName=$field->name();
