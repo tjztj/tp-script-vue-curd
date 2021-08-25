@@ -586,10 +586,18 @@ trait CurdFunc
 
         if($nextStepInfo->authCheck($info,$base,$nextFields)){
             if($curStepInfo->authCheck($info,$base,$currFields)){
-                throw new \think\Exception('['.$nextStepInfo->getStep().']同时满足修改与下一步，理念冲突');
+                $curUrl=$this->checkEditUrl($currFields,$curStepInfo);
+                $nextUrl=$this->checkEditUrl($nextFields,$nextStepInfo);
+
+                if($curUrl===$nextUrl){
+                    throw new \think\Exception('['.$nextStepInfo->getStep().']同时满足修改与下一步，且修改与下一步执行地址都'.($curUrl?'符合':'不符合').'步骤');
+                }else{
+                    return !$curUrl;
+                }
             }
             return true;
         }
+
         if($curStepInfo->authCheck($info,$base,$currFields)){
             return false;
         }
