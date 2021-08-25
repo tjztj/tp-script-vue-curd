@@ -385,6 +385,25 @@ trait BaseIndex
                     isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step->getTitle();
                 });
             });
+
+            $nextStepFieldName=$this->model::getNestStepField();
+            if($nextStepFieldName&&in_array($nextStepFieldName,$this->model::getTableFields())){
+                $nextStepField=SelectField::init($nextStepFieldName,'下一步')->multiple(true)->items($steps);
+                $nextStepField->filter()->multiple(true);
+                $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepFieldName){
+                    if(empty($filterData[$field->name()])){
+                        return;
+                    }
+                    $val=$filterData[$field->name()];
+                    unset($filterData[$field->name()]);
+                    is_array($val)||$val=[$val];
+                    $query->whereIn($field->name(),$val);
+                });
+            }
+
+
+
+
             $stepFieldName=$this->model::getStepField();
             $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
             $stepField->filter()->multiple(true);
