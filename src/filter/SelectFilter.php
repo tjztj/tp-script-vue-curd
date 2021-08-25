@@ -16,6 +16,7 @@ use think\db\Query;
 class SelectFilter extends ModelFilter
 {
     protected array $items=[];
+    protected bool $multiple=false;
 
     public function config():array{
         if(empty($this->items)){
@@ -36,9 +37,18 @@ class SelectFilter extends ModelFilter
         }
         return [
             'items'=>$this->items,
+            'multiple'=>$this->multiple(),
         ];
     }
 
+
+    public function multiple(bool $multiple=null){
+        if($multiple===null){
+            return $this->multiple;
+        }
+        $this->multiple=$multiple;
+        return $this;
+    }
 
     /**
      * 设置筛选选项
@@ -59,19 +69,31 @@ class SelectFilter extends ModelFilter
         if($value||$value===0||$value==='0'||($value===''&&in_array('',array_column($this->field->items(),'value'),true))){
             if(method_exists($this->field,'multiple')&&$this->field->multiple()){
                 if(is_array($value)){
-                    $query->where(function(Query $q)use($value){
-                        foreach ($value as $v){
-                            $q->whereFindInSet($this->field->name(),$v);
-                        }
-                    });
+                    if($this->multiple()){
+                        $query->where(function(Query $q)use($value){
+                            foreach ($value as $v){
+                                $q->whereFindInSet($this->field->name(),$v);
+                            }
+                        });
+                    }else{
+                        throw new \think\Exception('筛选的值错误');
+                    }
                 }else{
                     $query->whereFindInSet($this->field->name(),$value);
                 }
-            }else if(is_array($value)){
-                $query->whereIn($this->field->name(),$value);
             }else{
-                $query->where($this->field->name(),$value);
+                if(is_array($value)){
+                    if($this->multiple()){
+                        $query->whereIn($this->field->name(),$value);
+                    }else{
+                        throw new \think\Exception('筛选的值错误');
+                    }
+                }else{
+                    $query->where($this->field->name(),$value);
+                }
             }
+
+
         }
     }
 

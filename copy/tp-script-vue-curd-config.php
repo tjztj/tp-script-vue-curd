@@ -165,7 +165,7 @@ if (!function_exists('getModelDefaultNextStepField')) {
 
 if (!function_exists('imgFieldShowUrlDo')) {
     /**
-     * 字段下一个步骤默认名称
+     * 数据图片显示前
      * @param string $urls
      * @param \tpScriptVueCurd\field\ImagesField $field
      * @return string
@@ -177,7 +177,7 @@ if (!function_exists('imgFieldShowUrlDo')) {
 
 if (!function_exists('fileFieldShowUrlDo')) {
     /**
-     * 字段下一个步骤默认名称
+     * 数据文件显示前
      * @param string $urls
      * @param \tpScriptVueCurd\field\FilesField $field
      * @return string

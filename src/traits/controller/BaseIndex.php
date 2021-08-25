@@ -12,9 +12,12 @@ use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\FilesField;
+use tpScriptVueCurd\field\SelectField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
+use tpScriptVueCurd\option\FieldStep;
+use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
@@ -124,6 +127,8 @@ trait BaseIndex
         $filterData=$paranFilterData?json_decode($paranFilterData,true):null;
         $showFilter=$this->request->param('show_filter/d',1)===1;
         $this->indexFilterBefore($filterFields,$filterData,$showFilter);
+        $this->setIndexFilterAddStep($filterFields,$filterData);
+
 
 
 
@@ -219,6 +224,7 @@ trait BaseIndex
         $filterData=$filterFields->getParamFilterData();
         $showFilter=true;
         $this->indexFilterBefore($filterFields,$filterData,$showFilter);
+        $this->setIndexFilterAddStep($filterFields,$filterData);
 
         return $model
             ->where(function (Query $query)use($baseInfo){
@@ -359,6 +365,48 @@ trait BaseIndex
      */
     protected function setListDataRowAuth($list,$baseInfo){
         return $list->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,is_array($baseInfo)?($baseInfo[$info[$this->model::parentField()]]??null):$baseInfo,['show','edit','del']));
+    }
+
+    /**
+     * 如果启用了步骤，在列表筛选中会出现当前步骤筛选
+     * @param FieldCollection $filterFields
+     * @param array|null $filterData
+     * @throws \think\Exception
+     */
+    protected function setIndexFilterAddStep(FieldCollection $filterFields,?array $filterData){
+        if($filterFields->stepIsEnable()){
+            $steps=[];
+            $filterFields->each(function (ModelField $v)use(&$steps){
+                /**
+                 * @var FieldStepCollection $stepList
+                 */
+                $stepList=$v->steps();
+                $stepList&&$stepList->each(function (FieldStep $step)use(&$steps){
+                    isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step->getTitle();
+                });
+            });
+            $stepFieldName=$this->model::getStepField();
+            $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
+            $stepField->filter()->multiple(true);
+            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepFieldName){
+                if(empty($filterData[$field->name()])){
+                    return;
+                }
+                $val=$filterData[$field->name()];
+                unset($filterData[$field->name()]);
+
+                $sqls=[];
+                is_array($val)||$val=[$val];
+                foreach ($val as $stepVal){
+                    $stepVal=str_replace(["'",'\\','"'],'',$stepVal);
+                    $sqls[]="JSON_EXTRACT(`$stepFieldName`,CONCAT(\"$[\",JSON_LENGTH(`$stepFieldName` ->> '$')-1,\"].step\"))='$stepVal'";
+                }
+
+                $query->whereRaw(implode(" OR ",$sqls));
+            });
+
+            $filterFields->unshift($stepField);
+        }
     }
 
     /**
