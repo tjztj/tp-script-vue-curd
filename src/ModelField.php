@@ -431,18 +431,16 @@ abstract class ModelField
      */
     public function pushAttrByWhere(string $attr,$val,?FieldWhere $where):self{
         if(!is_string($val)&&!is_integer($val)&&!is_float($val)&&!is_bool($val)&&!is_null($val)){
-//            return $this;
             throw new \think\Exception('不能使用pushAttrByWhere设置'.$attr.'为'.gettype($attr).'类型的值');
         }
-        if($attr==='name'){
-            return $this;
-            throw new \think\Exception('name不能改变');
+        if($attr==='name'||$attr==='type'||$attr==='guid'||$attr==='group'){
+            throw new \think\Exception($attr.'不能通过pushAttrByWhere改变');
         }
         isset($this->attrWhereValueList[$attr])||$this->attrWhereValueList[$attr]=[];
-        array_push($this->attrWhereValueList[$attr],[
-            'value'=>$val,
-            'where'=>$where,
-        ]);
+        $this->attrWhereValueList[$attr][] = [
+            'value' => $val,
+            'where' => $where,
+        ];
         return $this;
     }
 
