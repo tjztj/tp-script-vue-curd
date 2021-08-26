@@ -277,6 +277,7 @@ define(requires, function (axios, Qs) {
             let appObj = box.appParam;
             //如果不是iframe,打于开当前页面
             return MyPromise(function (trigger) {
+
                 let key;
                 const openInfo={
                     visible:false,
@@ -313,6 +314,8 @@ define(requires, function (axios, Qs) {
                         option.area = ['45vw', '100vh'];
                     }
                 }
+                this.openType=key;
+                this.openIndex=appObj[key]?0:appObj[key].length;
 
 
                 openInfo.title = option.title || undefined;
@@ -326,7 +329,7 @@ define(requires, function (axios, Qs) {
                     trigger('close');
                 }
 
-                openInfo.onload = function (e) {
+                openInfo.onload =  (e)=> {
                     let iframe = e.target;
                     let body = iframe.contentWindow.document.querySelector('body');
                     iframe.contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
@@ -335,8 +338,9 @@ define(requires, function (axios, Qs) {
                         iframe,
                         body,
                         option: openInfo,
-                        close() {
-                            openInfo.visible = false;
+                        close:()=> {
+                            appObj[this.openType][this.openIndex].visible = false;
+                            // openInfo.visible = false;
                         }
                     };
                     let myEvent = new Event("closeIframe", {option: openInfo});
@@ -1151,12 +1155,28 @@ define(requires, function (axios, Qs) {
                             //-------------------------
                         }
                         ///////////////////////////////////////////////////////////////////////////////////////////////
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+                        const setFieldAttrByWhere=(field)=>{
+                            const def='--setAttrValByWheres--def--';
+                            for(const attr in field.attrWhereValueList){
+                                let val=typeof field[attr]==='undefined'?def:field[attr];
+                                field.attrWhereValueList[attr].forEach(({value,where})=>{
+                                    if(where===null||checkFieldWhereSelf(where)){
+                                        val=value;
+                                    }
+                                })
+                                if((typeof field[attr]==='undefined'&&val!==def)||field[attr]!==val){
+                                    field[attr]=val;
+                                }
+                            }
+                        }
 
 
                         this.groupFieldItems.forEach(field => {
                             checkShowItemBy(field);
                             checkFieldTipShow(field)
                             checkHideField(field, this.currentFieldHideList[field.name] ? '' : formVal[field.name]);
+                            setFieldAttrByWhere(field);
                         });
 
                         this.$emit('update:form', formVal);

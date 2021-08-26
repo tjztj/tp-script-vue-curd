@@ -51,12 +51,14 @@ class MonthField extends ModelField
     public function minNull(): self
     {
         $this->min=null;
+        $this->fieldPushAttrByWhere('min',$this->min);
         return $this;
     }
 
     public function maxNull(): self
     {
         $this->max=null;
+        $this->fieldPushAttrByWhere('max',$this->max);
         return $this;
     }
 

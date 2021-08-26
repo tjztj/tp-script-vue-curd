@@ -61,6 +61,7 @@ class SwitchField extends ModelField
             return $this->indexChangeUrl;
         }
         $this->indexChangeUrl=$getDoUrl();
+        $this->fieldPushAttrByWhere('indexChangeUrl',$this->indexChangeUrl);
         return $this;
     }
 

@@ -65,6 +65,7 @@ abstract class ModelField
     protected array $editTips = [];
     public const REQUIRED = true;//开启必填验证
     public bool $objWellToArr = true;
+    protected array $attrWhereValueList=[];
 
 
     public function __construct()
@@ -238,6 +239,7 @@ abstract class ModelField
             return self::REQUIRED && $this->required;
         }
         $this->required = $required;
+        $this->fieldPushAttrByWhere('required',$required);
         return $this;
     }
 
@@ -252,6 +254,7 @@ abstract class ModelField
             return $this->readOnly;
         }
         $this->readOnly = $readOnly;
+        $this->fieldPushAttrByWhere('readOnly',$readOnly);
         return $this;
     }
 
@@ -306,6 +309,7 @@ abstract class ModelField
     {
         if ($forceSet) {
             $this->editLabelCol = $editLabelCol;
+            $this->fieldPushAttrByWhere('editLabelCol',$editLabelCol);
             return $this;
         }
         return $this->doAttr('editLabelCol', $editLabelCol);
@@ -410,6 +414,84 @@ abstract class ModelField
         return $this->editTips;
     }
 
+    /**
+     * 字段属性的值的集合
+     * @return array
+     */
+    public function attrWhereValueList():array{
+        return $this->attrWhereValueList;
+    }
+
+    /**
+     * 根据条件设置字段的属性（只能设置下面几种值的属性，），将会在前台显示时、数据保存时，编辑显示时，满足条件的时候设置为 这里的$val
+     * @param string $attr                  属性
+     * @param string|int|bool|float|null $val    值只能是这三种类型
+     * @param FieldWhere $where             条件，如果为null，表示直接达成条件
+     * @return $this
+     */
+    public function pushAttrByWhere(string $attr,$val,?FieldWhere $where):self{
+        if(!is_string($val)&&!is_integer($val)&&!is_float($val)&&!is_bool($val)&&!is_null($val)){
+//            return $this;
+            throw new \think\Exception('不能使用pushAttrByWhere设置'.$attr.'为'.gettype($attr).'类型的值');
+        }
+        if($attr==='name'){
+            return $this;
+            throw new \think\Exception('name不能改变');
+        }
+        isset($this->attrWhereValueList[$attr])||$this->attrWhereValueList[$attr]=[];
+        array_push($this->attrWhereValueList[$attr],[
+            'value'=>$val,
+            'where'=>$where,
+        ]);
+        return $this;
+    }
+
+    protected function fieldPushAttrByWhere(string $attr,$val):self{
+        try{
+            $this->pushAttrByWhere($attr,$val,null);
+        }catch (\Exception $exception){}
+        return $this;
+    }
+
+
+    /**
+     * 验证数据是否符合条件
+     * @param array $saveDatas
+     * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
+     * @param VueCurlModel|null $info  原数据
+     * @return $this
+     */
+    public function setAttrValByWheres(array $saveDatas,bool $isSourceData,?VueCurlModel $info):self{
+        $def='--setAttrValByWheres--def--';
+        foreach ($this->attrWhereValueList as $attr=>$valList){
+            $value=$this->$attr??$def;
+            foreach ($valList as $valArr){
+                /**
+                 * @var FieldWhere|null $where
+                 */
+                $val=$valArr['value'];
+                $where=$valArr['where'];
+                if(is_null($where)||$where->check($saveDatas,$isSourceData,$info)){
+                    $value=$val;
+                }
+            }
+            if(isset($this->$attr)){
+                if($value!==$this->$attr){
+                    $this->$attr=$value;
+                }
+            }else{
+                if($value!==$def){
+                    $this->$attr=$value;
+                }
+            }
+
+            if($value!==$this->$attr&&$value!==$def){
+                $this->$attr=$value;
+            }
+        }
+        return $this;
+    }
+
 
     /**
      * 字段在编辑页面时，可根据填写的内容显示不同的提示信息|设置
@@ -441,6 +523,7 @@ abstract class ModelField
             return $this->$name ?? null;
         }
         $this->$name = $value;
+        $this->fieldPushAttrByWhere($name,$value);
         return $this;
     }
 
@@ -451,11 +534,22 @@ abstract class ModelField
             return $this->$name;
         }
         $this->$name = $value;
+        $this->fieldPushAttrByWhere($name,$value);
         return $this;
     }
 
     public function toArray(): array
     {
+        $toArr=function (&$arr)use(&$toArr){
+            foreach ($arr as $arrK=>$arrV){
+                if(is_array($arrV)){
+                    $toArr($arr[$arrK]);
+                }else if (is_object($arrV) && method_exists($arrV, 'toArray')){
+                    $arr[$arrK]=$arrV->toArray();
+                }
+            }
+        };
+
         $data = [];
         foreach (get_class_vars(static::class) as $k => $v) {
             if (method_exists($this, $k)) {
@@ -465,11 +559,10 @@ abstract class ModelField
             } else {
                 $data[$k] = $this->$k;
             }
+
             if (is_array($data[$k])) {
-                foreach ($data[$k] as $key => $val) {
-                    if (is_object($val) && method_exists($val, 'toArray') && $this->objWellToArr) {
-                        $data[$k][$key] = $val->toArray();
-                    }
+                if($this->objWellToArr){
+                    $toArr($data[$k]);
                 }
             } else if (is_object($data[$k])) {
                 if (method_exists($data[$k], 'toArray')) {

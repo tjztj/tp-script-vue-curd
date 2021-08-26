@@ -154,7 +154,8 @@ class FieldCollection extends Collection
         }else{
             $fields=$this->filterHideFieldsByData($data,$old,false);
         }
-        $fields->each(function(ModelField $v)use($data,$notNullNames){
+        $fields->each(function(ModelField $v)use($data,$notNullNames,$old){
+            $v->setAttrValByWheres($data,false,$old);
             try{
                 if(is_null($notNullNames)||in_array($v->name(),$notNullNames,true)){
                     $v->setSave($data);
@@ -250,6 +251,18 @@ class FieldCollection extends Collection
      */
     public function filterHideFieldsByShow(VueCurlModel $sourceData):self{
         return $this->filterHideFieldsByData($sourceData->toArray(),$sourceData,true);
+    }
+
+    /**
+     * 查看页面，显示的字段处理
+     * @param VueCurlModel $sourceData
+     * @return $this
+     */
+    public function whenShowSetAttrValByWheres(VueCurlModel $sourceData):self{
+        $this->each(function (ModelField $v)use($sourceData){
+            $v->setAttrValByWheres($sourceData->toArray(),true,$sourceData);
+        });
+        return $this;
     }
 
 

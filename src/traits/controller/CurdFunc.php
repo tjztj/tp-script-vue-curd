@@ -288,7 +288,7 @@ trait CurdFunc
         }
 
 
-        $fields=$this->fields->filterHideFieldsByShow($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
+        $fields=$this->fields->filterHideFieldsByShow($data)->whenShowSetAttrValByWheres($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
 
 
         try{

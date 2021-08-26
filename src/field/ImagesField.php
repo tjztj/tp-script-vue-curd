@@ -39,6 +39,7 @@ class ImagesField extends ModelField
             return $this->url?:tpScriptVueCurdUploadDefaultUrl();
         }
         $this->url=$url;
+        $this->fieldPushAttrByWhere('url',$this->url);
         return $this;
     }
 
@@ -65,6 +66,7 @@ class ImagesField extends ModelField
             return $this->removeMissings;
         }else{//设置
             $this->removeMissings=$removeMissings;
+            $this->fieldPushAttrByWhere('removeMissings',$this->removeMissings);
             return $this;
         }
     }

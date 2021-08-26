@@ -67,12 +67,14 @@ class DateField extends ModelField
     public function minNull(): DateField
     {
         $this->min=null;
+        $this->fieldPushAttrByWhere('min',null);
         return $this;
     }
 
     public function maxNull(): DateField
     {
         $this->max=null;
+        $this->fieldPushAttrByWhere('max',null);
         return $this;
     }
 

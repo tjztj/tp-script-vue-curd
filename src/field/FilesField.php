@@ -74,6 +74,7 @@ class FilesField extends ModelField
             return $this->url?:tpScriptVueCurdUploadDefaultUrl();
         }
         $this->url=$url;
+        $this->fieldPushAttrByWhere('url',$url);
         return $this;
     }
     /**
@@ -95,6 +96,7 @@ class FilesField extends ModelField
             return $this->accept;
         }
         $this->accept=str_replace(' ','',$accept);
+        $this->fieldPushAttrByWhere('accept',$this->accept);
         return $this;
     }
 
