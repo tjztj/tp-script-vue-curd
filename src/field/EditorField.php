@@ -44,6 +44,7 @@ class EditorField extends ModelField
     protected string $uploadUrl='';
 
     protected int $height=300;
+    protected int $zIndex=0;//编辑器基本的zIndex
 
 
 
@@ -92,6 +93,15 @@ class EditorField extends ModelField
      */
     public function height(int $height=null){
         return $this->doAttr('height',$height);
+    }
+
+    /**
+     * 编辑器基本的zIndex
+     * @param int|null $zIndex
+     * @return EditorField
+     */
+    public function zIndex(int $zIndex=null){
+        return $this->doAttr('zIndex',$zIndex);
     }
 
 

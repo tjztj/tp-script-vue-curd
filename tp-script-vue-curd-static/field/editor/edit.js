@@ -64,6 +64,9 @@ pointer-events: none;
         },
         mounted() {
             const editor =new wangEditor('#'+this.editorId)
+            if(this.field.zIndex){
+                editor.config.zIndex = this.field.zIndex
+            }
             if(this.field.height){
                 editor.config.height=this.field.height;
             }
