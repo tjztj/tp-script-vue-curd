@@ -271,59 +271,62 @@ define(requires, function (axios, Qs) {
                 box.layer.open(option);
             })
         } else {
-            if (!box.appParam.bodyModal || !box.appParam.bodyDrawer) {
+            if (!box.appParam.bodyModals || !box.appParam.bodyDrawers) {
                 box.appParam = box.appPage;
             }
-            let vObj = box.appParam;
+            let appObj = box.appParam;
             //如果不是iframe,打于开当前页面
             return MyPromise(function (trigger) {
                 let key;
+                const openInfo={
+                    visible:false,
+                };
                 if (option.offset && option.offset === 'auto') {
-                    key = 'bodyModal';
+                    key = 'bodyModals';
                 } else {
-                    key = 'bodyDrawer';
+                    key = 'bodyDrawers';
                     if (option.offset) {
                         switch (option.offset) {
                             case 'l':
                             case 'lt':
                             case 'lb':
-                                vObj.bodyDrawer.offset = 'left';
-                                vObj.bodyDrawer.width = vObj.bodyDrawer.width || '45vw';
+                                openInfo.offset = 'left';
+                                openInfo.width = openInfo.width||'45vw';
                                 break;
                             case 'r':
                             case 'rt':
                             case 'rb':
-                                vObj.bodyDrawer.offset = 'right';
-                                vObj.bodyDrawer.width = vObj.bodyDrawer.width || '45vw';
+                                openInfo.offset = 'right';
+                                openInfo.width = openInfo.width || '45vw';
                                 break;
                             case 't':
-                                vObj.bodyDrawer.offset = 'top';
+                                openInfo.offset = 'top';
                                 break;
                             case 'b':
-                                vObj.bodyDrawer.offset = 'bottom';
+                                openInfo.offset = 'bottom';
                                 break;
                             default:
-                                vObj.bodyDrawer.offset = option.offset;
+                                openInfo.offset = option.offset;
                         }
-                        vObj.bodyDrawer.placement = vObj.bodyDrawer.offset;
+                        openInfo.placement = openInfo.offset;
                     } else {
                         option.area = ['45vw', '100vh'];
                     }
                 }
 
 
-                vObj[key].title = option.title || undefined;
-                vObj[key].url = option.url || option.content || undefined;
+                openInfo.title = option.title || undefined;
+                openInfo.url = option.url || option.content || undefined;
                 if (option.area) {
-                    vObj[key].width = option.area[0];
-                    vObj[key].height = option.area[1];
+                    openInfo.width = option.area[0];
+                    openInfo.height = option.area[1];
                 }
-                vObj[key].zIndex = option.zIndex || undefined;
-                vObj[key].onclose = function () {
+                openInfo.zIndex = option.zIndex || undefined;
+                openInfo.onclose = function () {
                     trigger('close');
                 }
 
-                vObj[key].onload = function (e) {
+                openInfo.onload = function (e) {
                     let iframe = e.target;
                     let body = iframe.contentWindow.document.querySelector('body');
                     iframe.contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
@@ -331,12 +334,12 @@ define(requires, function (axios, Qs) {
                     let paramData = {
                         iframe,
                         body,
-                        option: vObj[key],
+                        option: openInfo,
                         close() {
-                            vObj[key].visible = false;
+                            openInfo.visible = false;
                         }
                     };
-                    let myEvent = new Event("closeIframe", {option: vObj[key]});
+                    let myEvent = new Event("closeIframe", {option: openInfo});
                     body.addEventListener("closeIframe", e => {
                         paramData.close()
                     });
@@ -346,7 +349,8 @@ define(requires, function (axios, Qs) {
                     iframe.contentWindow.document.querySelector('head').appendChild(style);
                     trigger('success', paramData);
                 }
-                vObj[key].visible = true;
+                openInfo.visible = true;
+                appObj[key].push(openInfo);
             });
         }
     };
@@ -705,12 +709,8 @@ define(requires, function (axios, Qs) {
             return {};
         };
         let dt = option.data();
-        dt.bodyDrawer = {
-            visible: false,
-        };
-        dt.bodyModal = {
-            visible: false,
-        };
+        dt.bodyDrawers=[];
+        dt.bodyModals=[];
         dt.imgShowConfig = {
             list: [],
         },

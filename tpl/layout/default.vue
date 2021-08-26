@@ -38,6 +38,7 @@
         {__CONTENT__}
     </a-config-provider>
     <a-modal
+        v-for="bodyModal in bodyModals"
         wrap-class-name="body-iframe-modal"
         :destroy-on-close="true"
         v-model:visible="bodyModal.visible"
@@ -57,6 +58,7 @@
         <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyModal.url" :onload="bodyModal.onload" :style="{height:bodyModal.height==='auto'?'auto':'calc('+bodyModal.height+' - 56px)'}"></iframe>
     </a-modal>
     <a-drawer
+        v-for="bodyDrawer in bodyDrawers"
         wrap-class-name="body-iframe-drawer"
         :destroy-on-close="true"
         :mask-closable="false"
