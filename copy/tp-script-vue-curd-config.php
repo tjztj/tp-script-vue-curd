@@ -163,6 +163,27 @@ if (!function_exists('getModelDefaultNextStepField')) {
     }
 }
 
+if (!function_exists('getModelDefaultStepPastsField')) {
+    /**
+     * 数据当前流程已走步骤名称集合
+     * @return string
+     */
+    function getModelDefaultStepPastsField():string{
+        return 'step_pasts';
+    }
+}
+
+
+if (!function_exists('getModelDefaultCurrentStepField')) {
+    /**
+     * 字段当前步骤默认名称
+     * @return string
+     */
+    function getModelDefaultCurrentStepField():string{
+        return 'current_step';
+    }
+}
+
 if (!function_exists('imgFieldShowUrlDo')) {
     /**
      * 数据图片显示前

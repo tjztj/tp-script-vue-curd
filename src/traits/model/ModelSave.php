@@ -51,19 +51,36 @@ trait ModelSave
 
         FieldDo::doSaveBeforeChecked($saveFields,$data,$beforeInfo,$baseInfo);
 
-        //没有设置当前步骤
-        $haveDoStep=!isset($data[static::getStepField()])&&$fields->stepIsEnable();
-        if($haveDoStep){
-            if(!$saveStepInfo){
-                throw new \think\Exception('未能获取到当前步骤信息');
+
+        $haveDoStep=false;
+        if($fields->stepIsEnable()){
+            //如果启用了步骤
+            if(!static::hasStepField()){
+                throw new \think\Exception('未设置步骤字段');
             }
-            $saveStepInfo->doSaveBefore($data,$beforeInfo,$baseInfo,$fields);
-            //如果已经在doSaveBefore中设置了，就不再设置
-            isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson($beforeInfo[static::getStepField()]);
+            //没有设置当前步骤
+            if(!isset($data[static::getStepField()])){
+                if(!$saveStepInfo){
+                    throw new \think\Exception('未能获取到当前步骤信息');
+                }
+                $haveDoStep=true;
+                isset($data[static::getStepField()])||$data[static::getStepField()]=$saveStepInfo->getNewStepJson($beforeInfo[static::getStepField()]);
+            }
         }
+
         if(isset($data[static::getStepField()])){
             //为了防止赋值错误，修正为正确的步骤的值，主要是back
             $data[static::getStepField()]=FieldStep::correctSteps($data[static::getStepField()]);
+            if(static::hasCurrentStepField()){
+                $data[static::getCurrentStepField()]=endStepVal($data[static::getStepField()]);
+            }
+            if(static::hasStepPastsField()){
+                $pasts=getStepPasts($data[static::getStepField()]);
+                if(is_null($pasts)){
+                    throw new \think\Exception('获取数据执行过步骤错误');
+                }
+                $data[static::getStepPastsField()]=implode(',',$pasts);
+            }
         }
 
         unset( $data['create_time']
@@ -105,8 +122,10 @@ trait ModelSave
 
         if($haveDoStep&&$saveStepInfo){
             $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
-            $nestStep=$this->fields()->getNextStepInfo($info,$baseInfo);
-            $info[static::getNestStepField()]=$nestStep===null?'':$nestStep->getStep();
+            if(static::hasNextStepField()){
+                $nestStep=$this->fields()->getNextStepInfo($info,$baseInfo);
+                $info[static::getNextStepField()]=$nestStep===null?'':$nestStep->getStep();
+            }
         }
         $info->save();
 

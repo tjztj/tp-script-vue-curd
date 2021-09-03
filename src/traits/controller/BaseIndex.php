@@ -386,7 +386,7 @@ trait BaseIndex
                 });
             });
 
-            $nextStepFieldName=$this->model::getNestStepField();
+            $nextStepFieldName=$this->model::getNextStepField();
             if($nextStepFieldName&&in_array($nextStepFieldName,$this->model::getTableFields())){
                 $nextStepField=SelectField::init($nextStepFieldName,'下一个步骤')->multiple(true)->items($steps);
                 $nextStepField->filter()->multiple(true);
@@ -406,11 +406,18 @@ trait BaseIndex
 
 
 
+            if($this->model::hasCurrentStepField()){
+                $stepNameIsCurrentStep=true;
+                $stepFieldName=$this->model::getCurrentStepField();
+            }else{
+                $stepNameIsCurrentStep=false;
+                $stepFieldName=$this->model::getStepField();
+            }
 
-            $stepFieldName=$this->model::getStepField();
+
             $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
             $stepField->filter()->multiple(true);
-            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
+            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepNameIsCurrentStep){
                 $stepFieldName=$field->name();
                 if(empty($filterData[$stepFieldName])){
                     return;
@@ -418,14 +425,18 @@ trait BaseIndex
                 $val=$filterData[$stepFieldName];
                 unset($filterData[$stepFieldName]);
 
-                $sqls=[];
                 is_array($val)||$val=[$val];
-                foreach ($val as $stepVal){
-                    $stepVal=str_replace(["'",'\\','"'],'',$stepVal);
-                    $sqls[]="JSON_EXTRACT(`$stepFieldName`,CONCAT(\"$[\",JSON_LENGTH(`$stepFieldName` ->> '$')-1,\"].step\"))='$stepVal'";
-                }
 
-                $query->whereRaw(implode(" OR ",$sqls));
+                if($stepNameIsCurrentStep){
+                    $query->whereIn($stepFieldName,$val);
+                }else{
+                    $sqls=[];
+                    foreach ($val as $stepVal){
+                        $stepVal=str_replace(["'",'\\','"'],'',$stepVal);
+                        $sqls[]="JSON_EXTRACT(`$stepFieldName`,CONCAT(\"$[\",JSON_LENGTH(`$stepFieldName` ->> '$')-1,\"].step\"))='$stepVal'";
+                    }
+                    $query->whereRaw(implode(" OR ",$sqls));
+                }
             });
 
             $filterFields->unshift($stepField);

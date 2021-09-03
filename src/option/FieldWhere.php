@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\option;
 
 
+use think\db\Query;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\ModelField;
 
@@ -236,6 +237,76 @@ class FieldWhere
             }
         }
         return false;
+    }
+
+
+
+    private function getWhere(Query $query):void{
+        $name=$this->field->name();
+        if($this->type===self::TYPE_IN){
+            $query->whereOr($name,$this->isNot?'not in':'in',$this->valueData);
+            return;
+        }
+        if($this->type===self::TYPE_FIND_IN_SET){
+            if($this->isNot){
+                $sqls=[];
+                foreach ($this->valueData as $v){
+                    $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
+                }
+                $query->whereOrRaw('NOT ('.implode(' OR ',$sqls).')');
+            }else{
+                foreach ($this->valueData as $v){
+                    $query->whereFindInSet($name,$v,'OR');
+                }
+            }
+            return;
+        }
+        if(is_null($this->valueData[0])){
+            $query->whereOr($name,$this->isNot?'>':'<=',$this->valueData[1]);
+            return;
+        }
+
+        if(is_null($this->valueData[1])){
+            $query->whereOr($name,$this->isNot?'<':'>=',$this->valueData[0]);
+            return;
+        }
+
+        if($this->isNot){
+            $query->whereNotBetween($name,$this->valueData,'OR');
+        }else{
+            $query->whereBetween($name,$this->valueData,'OR');
+        }
+    }
+
+    /**
+     * 转换到数据库查询条件
+     * @param Query $query
+     * @param string $modelClass  相关模型的class，主要是用来获取相关字段信息
+     */
+    public function toQuery(Query $query,string $modelClass):void{
+        $name=$this->field->name();
+        if($name===self::RETURN_FALSE_FIELD_NAME){
+            return ;
+        }
+        $query->where(function (Query $query)use($modelClass,$name){
+            $fields=$modelClass::getTableFields();
+            if(in_array($name,$fields,true)){
+                $this->getWhere($query);
+            }else{
+                if($this->isNot){
+                    //已满足条件，不再往下执行
+                    return;
+                }else{
+                    $query->where($modelClass::make()->getPk(),'FIELD-WHERE-NOT-FIELD');
+                }
+            }
+            foreach ($this->ors as $v){
+                $v->toQuery($query,$modelClass);
+            }
+        });
+        foreach ($this->ands as $v){
+            $v->toQuery($query,$modelClass);
+        }
     }
 
     public function getAboutFields():array{

@@ -251,6 +251,7 @@ trait FieldCollectionStep
     /**
      * 步骤查看规则 dataStepHistory
      * @param VueCurlModel $info
+     * @param BaseModel|null $baseInfo
      * @return $this
      * @throws \think\Exception
      */
@@ -261,32 +262,20 @@ trait FieldCollectionStep
             return $this;
         }
 
-        if(empty($info[$info::getStepField()])){
-            $this->items=[];
-            return $this;
-        }
-        if(is_string($info[$info::getStepField()])){
-            $steps=json_decode($info[$info::getStepField()],true);
-            if(empty($steps)){
+        if($info::hasStepPastsField()&&$info[$info::getStepPastsField()]!==''){
+            $stepVals=explode(',',$info[$info::getStepPastsField()]);
+        }else{
+            if(empty($info[$info::getStepField()])){
                 $this->items=[];
                 return $this;
             }
-        }else{
-            $steps=$info[$info::getStepField()];
-        }
-        $stepVals=[];
-        foreach ($steps as $k=>$v){
-            if(empty($v['back'])){
-                $stepVals[]=$v['step'];
-            }else{
-                $stepVals=array_slice($stepVals,0,count($stepVals)-$v['back']);
+            $stepVals=getStepPasts($info[$info::getStepField()]);
+            if(empty($stepVals)){
+                $this->items=[];
+                return $this;
             }
         }
-        if(empty($stepVals)){
-            $this->items=[];
-            return $this;
-        }
-        return $this->filter(fn(ModelField $v)=>$v->steps()->filter(fn(FieldStep $val)=>in_array($val->getStep(),$stepVals))->count()>0);
+        return $this->filter(fn(ModelField $v)=>$v->steps()->filter(fn(FieldStep $val)=>in_array((string)$val->getStep(),$stepVals,true))->count()>0);
     }
 
 

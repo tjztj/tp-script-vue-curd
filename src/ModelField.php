@@ -463,7 +463,7 @@ abstract class ModelField
         $def='--setAttrValByWheres--def--';
         foreach ($this->attrWhereValueList as $attr=>$valList){
             $value=$this->$attr??$def;
-            foreach ($valList as $valArr){
+            foreach (array_reverse($valList) as $valArr){
                 /**
                  * @var FieldWhere|null $where
                  */
@@ -471,8 +471,10 @@ abstract class ModelField
                 $where=$valArr['where'];
                 if(is_null($where)||$where->check($saveDatas,$isSourceData,$info)){
                     $value=$val;
+                    break;
                 }
             }
+
             if(isset($this->$attr)){
                 if($value!==$this->$attr){
                     $this->$attr=$value;

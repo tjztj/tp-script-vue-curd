@@ -41,7 +41,7 @@ function vueCurdMergeArrays(array $old,array $new):array{
 
 
 /**
- * 获取最后一步
+ * 获取最后一步的详细信息
  * @param array|string|\tpScriptVueCurd\base\model\VueCurlModel $stepOrInfo
  * @return array|null
  */
@@ -60,7 +60,58 @@ function endStep($stepOrInfo): ?array
     }
 
     if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+        if(!$stepOrInfo::hasStepField()){
+            return null;
+        }
+
         return endStep($stepOrInfo[$stepOrInfo::getStepField()]);
+    }
+
+    return null;
+}
+
+
+/**
+ * 获取最后一步的步骤的值
+ * @param $stepOrInfo
+ * @return string|null
+ */
+function endStepVal($stepOrInfo):?string{
+    if(empty($stepOrInfo)&&$stepOrInfo!==0&&$stepOrInfo!=='0'){
+        return null;
+    }
+
+    $endStepInfoVal=function($val){
+        $endStep=endStep($val);
+        if(is_null($endStep)){
+            return null;
+        }
+        return $endStep['step'];
+    };
+
+    if(is_string($stepOrInfo)){
+        $json=json_decode($stepOrInfo,true);
+        if($json===null){
+            return $stepOrInfo;
+        }
+        return $endStepInfoVal($json);
+    }
+
+    if(is_array($stepOrInfo)){
+        return $endStepInfoVal($stepOrInfo);
+    }
+
+    if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+        if($stepOrInfo::hasCurrentStepField()&&$stepOrInfo[$stepOrInfo::getCurrentStepField()]!=='') {
+            return $stepOrInfo[$stepOrInfo::getCurrentStepField()];
+        }
+        if($stepOrInfo::hasStepPastsField()&&$stepOrInfo[$stepOrInfo::getStepPastsField()]!=='') {
+            $steps=explode(',',$stepOrInfo[$stepOrInfo::getStepPastsField()]);
+            return end($steps);
+        }
+        if($stepOrInfo::hasStepField()){
+            return $endStepInfoVal($stepOrInfo[$stepOrInfo::getStepField()]);
+        }
     }
 
     return null;
@@ -77,20 +128,19 @@ function eqEndStep($step,$stepOrInfo): bool
     if($step instanceof \tpScriptVueCurd\option\FieldStep){
         $step=$step->getStep();
     }
-    $endStep=endStep($stepOrInfo);
-    if(!$endStep){
+    $endStep=endStepVal($stepOrInfo);
+    if($endStep===null){
         return false;
     }
-    return $step===$endStep['step'];
+    return $step===$endStep;
 }
 
 /**
- * 判断对象数据库存的步骤是否已经过了 $step，会自动去掉退回的一些步骤
- * @param $step
- * @param $stepOrInfo
- * @return bool
+ * 获取数据所有已完成的步骤，已退回的步骤不算在里面
+ * @param string|\tpScriptVueCurd\base\model\VueCurlModel|array $stepOrInfo
+ * @return array
  */
-function stepPast($step,$stepOrInfo):bool{
+function getStepPasts($stepOrInfo):array{
     if(is_string($stepOrInfo)){
         $stepHistory=json_decode($stepOrInfo,true);
     }else if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
@@ -98,11 +148,7 @@ function stepPast($step,$stepOrInfo):bool{
     }else if(is_array($stepOrInfo)){
         $stepHistory=$stepOrInfo;
     }else{
-        return false;
-    }
-
-    if($step instanceof \tpScriptVueCurd\option\FieldStep){
-        $step=$step->getStep();
+        return [];
     }
 
     $stepValues=[];
@@ -113,7 +159,20 @@ function stepPast($step,$stepOrInfo):bool{
             $stepValues=array_slice($stepValues,0,count($stepValues)-$v['back']);
         }
     }
-    return in_array((string)$step,$stepValues,true);
+    return $stepValues;
+}
+
+/**
+ * 判断对象数据库存的步骤是否已经过了 $step，会自动去掉退回的一些步骤
+ * @param string|\tpScriptVueCurd\option\FieldStep $step
+ * @param string|\tpScriptVueCurd\base\model\VueCurlModel|array $stepOrInfo
+ * @return bool
+ */
+function stepPast($step,$stepOrInfo):bool{
+    if($step instanceof \tpScriptVueCurd\option\FieldStep){
+        $step=$step->getStep();
+    }
+    return in_array((string)$step,getStepPasts($stepOrInfo),true);
 }
 
 if (!function_exists('create_guid')) {
