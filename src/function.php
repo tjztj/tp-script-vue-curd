@@ -152,7 +152,7 @@ function getStepPasts($stepOrInfo):array{
     }
 
     $stepValues=[];
-    foreach ($stepHistory as $v){
+    if($stepHistory)foreach ($stepHistory as $v){
         if(empty($v['back'])){
             $stepValues[]=(string)$v['step'];
         }else{
