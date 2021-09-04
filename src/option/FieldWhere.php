@@ -283,30 +283,33 @@ class FieldWhere
      * @param Query $query
      * @param string $modelClass  相关模型的class，主要是用来获取相关字段信息
      */
-    public function toQuery(Query $query):void{
+    public function toQuery(Query $query,bool $isOr=false):void{
         $name=$this->field->name();
         if($name===self::RETURN_FALSE_FIELD_NAME){
             return ;
         }
-        $query->where(function (Query $query)use($name){
-            $fields=$query->getTableFields();
-            if(in_array($name,$fields,true)){
-                $this->getWhere($query);
-            }else{
-                if($this->isNot){
-                    //已满足条件，不再往下执行
-                    return;
+        $func=$isOr?'whereOr':'where';
+        $query->$func(function (Query $query)use($name){
+            $query->where(function (Query $query)use($name){
+                $fields=$query->getTableFields();
+                if(in_array($name,$fields,true)){
+                    $this->getWhere($query);
                 }else{
-                    $query->where($query->getPk(),'FIELD-WHERE-NOT-FIELD');
+                    if($this->isNot){
+                        //已满足条件，不再往下执行
+                        return;
+                    }else{
+                        $query->where($query->getPk(),'FIELD-WHERE-NOT-FIELD');
+                    }
                 }
-            }
-            foreach ($this->ors as $v){
+                foreach ($this->ors as $v){
+                    $v->toQuery($query,true);
+                }
+            });
+            foreach ($this->ands as $v){
                 $v->toQuery($query);
             }
         });
-        foreach ($this->ands as $v){
-            $v->toQuery($query);
-        }
     }
 
     public function getAboutFields():array{
