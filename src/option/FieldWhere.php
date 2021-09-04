@@ -283,13 +283,13 @@ class FieldWhere
      * @param Query $query
      * @param string $modelClass  相关模型的class，主要是用来获取相关字段信息
      */
-    public function toQuery(Query $query,string $modelClass):void{
+    public function toQuery(Query $query):void{
         $name=$this->field->name();
         if($name===self::RETURN_FALSE_FIELD_NAME){
             return ;
         }
-        $query->where(function (Query $query)use($modelClass,$name){
-            $fields=$modelClass::getTableFields();
+        $query->where(function (Query $query)use($name){
+            $fields=$query->getTableFields();
             if(in_array($name,$fields,true)){
                 $this->getWhere($query);
             }else{
@@ -297,15 +297,15 @@ class FieldWhere
                     //已满足条件，不再往下执行
                     return;
                 }else{
-                    $query->where($modelClass::make()->getPk(),'FIELD-WHERE-NOT-FIELD');
+                    $query->where($query->getPk(),'FIELD-WHERE-NOT-FIELD');
                 }
             }
             foreach ($this->ors as $v){
-                $v->toQuery($query,$modelClass);
+                $v->toQuery($query);
             }
         });
         foreach ($this->ands as $v){
-            $v->toQuery($query,$modelClass);
+            $v->toQuery($query);
         }
     }
 
