@@ -666,15 +666,15 @@ trait CurdFunc
      * @return array|\Closure
      * @throws \think\Exception
      */
-    protected function stepAuthWhere(){
-        if(!$this->fields->stepIsEnable()){
+    protected function stepAuthWhere(FieldCollection $fields){
+        if(!$fields->stepIsEnable()){
             return [];
         }
         /**
          * @var FieldStep[] $steps
          */
         $steps=[];
-        $this->fields->each(function(ModelField $field)use(&$steps){
+        $fields->each(function(ModelField $field)use(&$steps){
             $stepList=$field->steps();
             if($stepList===null||$stepList->isEmpty()){
                 return;
@@ -684,11 +684,13 @@ trait CurdFunc
             });
         });
 
-        if(empty($steps)){
-            return [];
-        }
-
-        return static function(Query $query)use($steps){
+        return function(Query $query)use($steps){
+            $query->whereOr(function (Query $query){
+                $this->stepAuthWhereOr($query);
+            });
+            if(empty($steps)){
+                return;
+            }
             foreach ($steps as $v){
                 $where=$v->getAuthWhere();
                 if($where===null){
@@ -698,6 +700,13 @@ trait CurdFunc
             }
         };
     }
+
+    /**
+     * 步骤 or 条件，当角色不满足步骤时，却又要显示相关数据，可在此处加入条件
+     * @param Query $query
+     */
+    protected function stepAuthWhereOr(Query $query):void{}
+
 
     /**
      * @param Query|BaseModel|BaseChildModel $model

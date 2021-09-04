@@ -260,7 +260,7 @@ trait BaseIndex
                     }
                 }
             })
-            ->where($this->stepAuthWhere());
+            ->where($this->stepAuthWhere($filterFields));
     }
 
 

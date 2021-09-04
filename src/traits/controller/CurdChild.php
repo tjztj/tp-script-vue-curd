@@ -287,7 +287,7 @@ trait CurdChild{
                 $this->indexListWhere($query);
             })
             ->where($this->fields->getFilterWhere())
-            ->where($this->stepAuthWhere());
+            ->where($this->stepAuthWhere($this->fields));
     }
 
     /**
