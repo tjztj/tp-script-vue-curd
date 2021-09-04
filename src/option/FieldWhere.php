@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\option;
 use think\db\Query;
 use think\Model;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\ModelField;
 
 class FieldWhere
