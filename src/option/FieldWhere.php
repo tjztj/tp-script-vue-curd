@@ -109,12 +109,23 @@ class FieldWhere
     }
 
 
-    public function and(self $where):self{
+    /**
+     * 初始化一个无条件的where
+     * @return static
+     */
+    public static function init():self{
+        return FieldWhere::make(StringField::init(FieldWhere::RETURN_FALSE_FIELD_NAME), FieldWhere::RETURN_FALSE_FIELD_NAME . '[这个条件是初始化条件，不用管]');
+    }
+
+
+    public function and($whereField,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
+        $where=$whereField instanceof self?$whereField:static::make($whereField,$valueData,$type,$isNot);
         $this->ands[]=$where;
         return $this;
     }
 
-    public function or(self $where):self{
+    public function or($whereField,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
+        $where=$whereField instanceof self?$whereField:static::make($whereField,$valueData,$type,$isNot);
         $this->ors[]=$where;
         return $this;
     }
