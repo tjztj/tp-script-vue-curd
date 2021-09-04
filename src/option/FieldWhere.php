@@ -268,14 +268,15 @@ class FieldWhere
                 foreach ($this->valueData as $v){
                     $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
                 }
-                $query=$query->whereRaw('NOT ('.implode(' OR ',$sqls).')');
-            }else{
-                foreach ($this->valueData as $v){
-                    $query=$query->whereFindInSet($name,$v);
-                }
+                return $query->whereRaw('NOT ('.implode(' OR ',$sqls).')');
+            }
+
+            foreach ($this->valueData as $v){
+                $query=$query->whereFindInSet($name,$v);
             }
             return $query;
         }
+
         if(is_null($this->valueData[0])){
             return $query->where($name,$this->isNot?'>':'<=',$this->valueData[1]);
         }
@@ -286,15 +287,15 @@ class FieldWhere
 
         if($this->isNot){
             return $query->whereNotBetween($name,$this->valueData);
-        }else{
-            return $query->whereBetween($name,$this->valueData);
         }
+
+        return $query->whereBetween($name,$this->valueData);
     }
 
     /**
      * 转换到数据库查询条件
      * @param Query|Model $query
-     * @param string $modelClass  相关模型的class，主要是用来获取相关字段信息
+     * @param bool $isOr  是否为 or 条件
      */
     public function toQuery(&$query,bool $isOr=false):void{
         $name=$this->field->name();
@@ -328,9 +329,13 @@ class FieldWhere
         };
         if($isOr){
             $query=$query->whereOr($func);
-        }else{
-            $query=$func($query);
+            return;
         }
+        if($this->ors){
+            $query=$query->where($func);
+            return;
+        }
+        $query=$func($query);
     }
 
     public function getAboutFields():array{
