@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\option;
 
 
 use think\db\Query;
+use think\Model;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\ModelField;
 
@@ -240,12 +241,14 @@ class FieldWhere
     }
 
 
-
-    private function getWhere(Query $query):void{
+    /**
+     * @param Query|Model $query
+     * @return Query|Model
+     */
+    private function getWhere($query){
         $name=$this->field->name();
         if($this->type===self::TYPE_IN){
-            $query->whereOr($name,$this->isNot?'not in':'in',$this->valueData);
-            return;
+            return $query->where($name,$this->isNot?'not in':'in',$this->valueData);
         }
         if($this->type===self::TYPE_FIND_IN_SET){
             if($this->isNot){
@@ -253,63 +256,69 @@ class FieldWhere
                 foreach ($this->valueData as $v){
                     $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
                 }
-                $query->whereOrRaw('NOT ('.implode(' OR ',$sqls).')');
+                $query=$query->whereRaw('NOT ('.implode(' OR ',$sqls).')');
             }else{
                 foreach ($this->valueData as $v){
-                    $query->whereFindInSet($name,$v,'OR');
+                    $query=$query->whereFindInSet($name,$v);
                 }
             }
-            return;
+            return $query;
         }
         if(is_null($this->valueData[0])){
-            $query->whereOr($name,$this->isNot?'>':'<=',$this->valueData[1]);
-            return;
+            return $query->where($name,$this->isNot?'>':'<=',$this->valueData[1]);
         }
 
         if(is_null($this->valueData[1])){
-            $query->whereOr($name,$this->isNot?'<':'>=',$this->valueData[0]);
-            return;
+            return $query->where($name,$this->isNot?'<':'>=',$this->valueData[0]);
         }
 
         if($this->isNot){
-            $query->whereNotBetween($name,$this->valueData,'OR');
+            return $query->whereNotBetween($name,$this->valueData);
         }else{
-            $query->whereBetween($name,$this->valueData,'OR');
+            return $query->whereBetween($name,$this->valueData);
         }
     }
 
     /**
      * 转换到数据库查询条件
-     * @param Query $query
+     * @param Query|Model $query
      * @param string $modelClass  相关模型的class，主要是用来获取相关字段信息
      */
-    public function toQuery(Query $query,bool $isOr=false):void{
+    public function toQuery(&$query,bool $isOr=false):void{
         $name=$this->field->name();
-        if($name===self::RETURN_FALSE_FIELD_NAME){
-            return ;
-        }
-        $func=$isOr?'whereOr':'where';
-        $query->$func(function (Query $query)use($name){
-            $query->where(function (Query $query)use($name){
+        $func=function ($query)use($name){
+            $thisWhere=function ($query)use($name){
                 $fields=$query->getTableFields();
-                if(in_array($name,$fields,true)){
-                    $this->getWhere($query);
-                }else{
-                    if($this->isNot){
-                        //已满足条件，不再往下执行
-                        return;
+                if($name!==self::RETURN_FALSE_FIELD_NAME){
+                    if(in_array($name,$fields,true)){
+                        $query=$this->getWhere($query);
                     }else{
-                        $query->where($query->getPk(),'FIELD-WHERE-NOT-FIELD');
+                        if(!$this->isNot){
+                            //已不满足条件，不再往下执行
+                            return $query->where($query->getPk(),'FIELD-WHERE-NOT-FIELD');
+                        }
                     }
                 }
+                foreach ($this->ands as $v){
+                    $query=$v->toQuery($query);
+                }
+                return $query;
+            };
+            if($this->ors){
+                $query=$query->where($thisWhere);
                 foreach ($this->ors as $v){
                     $v->toQuery($query,true);
                 }
-            });
-            foreach ($this->ands as $v){
-                $v->toQuery($query);
+            }else{
+                $query=$thisWhere($query);
             }
-        });
+            return $query;
+        };
+        if($isOr){
+            $query=$query->whereOr($func);
+        }else{
+            $query=$func($query);
+        }
     }
 
     public function getAboutFields():array{
