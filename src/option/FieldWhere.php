@@ -440,6 +440,10 @@ class FieldWhere
     }
 
 
+    /**
+     * 打印当前结构
+     * @param bool $dumpIsHtml  使用HTML，阅读更方便
+     */
     public function dump(bool $dumpIsHtml=false):void{
         $pdEm=2;
         $str=$this->dumpStr($dumpIsHtml,false,$pdEm);
@@ -451,9 +455,12 @@ class FieldWhere
 
     /**
      * 打印当前where结构
+     * @param bool $dumpIsHtml
+     * @param bool $haveParent
+     * @param int $pdEm
      * @return string
      */
-    public function dumpStr(bool $dumpIsHtml=false,bool $haveParent=false,$pdEm=2):string{
+    public function dumpStr(bool $dumpIsHtml=false,bool $haveParent=false,int $pdEm=2):string{
         $levelStyle=' style="padding-left: '.$pdEm.'em"';
         $kStyle='padding-left: '.$pdEm.'em;font-weight: bold;color: #237804;';
         $kStyle2n='padding-left: '.($pdEm*2).'em;font-weight: bold;color: #237804;';
