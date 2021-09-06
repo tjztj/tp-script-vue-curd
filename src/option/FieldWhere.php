@@ -268,13 +268,19 @@ class FieldWhere
                 foreach ($this->valueData as $v){
                     $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
                 }
-                return $query->whereRaw('NOT ('.implode(' OR ',$sqls).')');
+                if(count($sqls)>1){
+                    return $query->whereRaw('NOT ('.implode(' OR ',$sqls).')');
+                }
+                return $query->whereRaw('NOT '.current($sqls));
             }
-
-            foreach ($this->valueData as $v){
-                $query=$query->whereFindInSet($name,$v);
+            if(count($this->valueData)>0){
+                return $query->where(function (Query $query)use($name){
+                    foreach ($this->valueData as $v){
+                        $query->whereFindInSet($name,$v,'OR');
+                    }
+                });
             }
-            return $query;
+            return $query->whereFindInSet($name,current($this->valueData));;
         }
 
         if(is_null($this->valueData[0])){
@@ -336,6 +342,163 @@ class FieldWhere
             return;
         }
         $query=$func($query);
+    }
+
+
+    /**
+     * 获取当前不包括and与or的where结构
+     * @return string
+     */
+    private function getDump(bool $dumpIsHtml=false):string{
+        $name=$this->field->name();
+        if($this->type===self::TYPE_IN){
+            if(count($this->valueData)>1){
+                if($dumpIsHtml){
+                    return $name.' '.($this->isNot?'<b style="color: #c41d7f">NOT IN</b>':'<b style="color: #c41d7f">IN</b>').' <b style="color: #c41d7f">("</b><span style="color: #8c8c8c">'.implode('</span><b style="color: #c41d7f">","</b><span style="color: #8c8c8c">',$this->valueData).'</span><b style="color: #c41d7f">")</span>';
+                }
+                return $name.' '.($this->isNot?'NOT IN':'IN').' ("'.implode('","',$this->valueData).'")';
+            }
+            if($dumpIsHtml){
+                return $name.' '.($this->isNot?'<b style="color: #c41d7f"><></b>':'<b style="color: #c41d7f">=</b>').' <b style="color: #c41d7f">"</b><span style="color: #8c8c8c">'.current($this->valueData).'</span><b style="color: #c41d7f">"</b>';
+            }
+            return $name.' '.($this->isNot?'<>':'=').' "'.current($this->valueData).'"';
+
+        }
+        if($this->type===self::TYPE_FIND_IN_SET){
+            if($this->isNot){
+                $sqls=[];
+                foreach ($this->valueData as $v){
+                    if($dumpIsHtml){
+                        $sqls[]='<b style="color: #c41d7f">FIND_IN_SET("</b><span style="color: #8c8c8c">'.addslashes($v).'</span><b style="color: #c41d7f">",</b>'.$name.'<b style="color: #c41d7f">)</b>';
+                    }else{
+                        $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
+                    }
+
+                }
+                if(count($sqls)>0){
+                    if($dumpIsHtml){
+                        return '<b style="color: #c41d7f">NOT (</b>'.implode(' <b style="color: #c41d7f">OR</b> ',$sqls).'<b style="color: #c41d7f">)</b>';
+                    }
+                    return 'NOT ('.implode(' OR ',$sqls).')';
+                }
+                if($dumpIsHtml){
+                    return '<b style="color: #c41d7f">NOT</b> '.current($sqls);
+                }
+                return 'NOT '.current($sqls);
+
+            }
+            $sqls=[];
+            foreach ($this->valueData as $v){
+                if($dumpIsHtml){
+                    $sqls[]='<b style="color: #c41d7f">FIND_IN_SET("</b><span style="color: #8c8c8c">'.addslashes($v).'</span><b style="color: #c41d7f">",</b>'.$name.'<b style="color: #c41d7f">)</b>';
+                }else{
+                    $sqls[]='FIND_IN_SET("'.addslashes($v).'",'.$name.')';
+                }
+            }
+            if($dumpIsHtml){
+                $sqlStr=implode(' <b style="color: #c41d7f">OR</b> ',$sqls);
+            }else{
+                $sqlStr=implode(' OR ',$sqls);
+            }
+
+            if(count($sqls)>1){
+                if($dumpIsHtml){
+                    return '<b style="color: #c41d7f">(</b>'.$sqlStr.'<b style="color: #c41d7f">)</b>';
+                }
+                return '('.$sqlStr.')';
+            }
+            return $sqlStr;
+        }
+
+        if(is_null($this->valueData[0])){
+            if($dumpIsHtml){
+                return $name.' '.($this->isNot?'<b style="color: #c41d7f">&gt;</b>':'<b style="color: #c41d7f">&lt;=</b>').'<b style="color: #c41d7f">"</b><span style="color: #8c8c8c">'.$this->valueData[1].'</span><b style="color: #c41d7f">"</b>';
+            }
+            return $name.' '.($this->isNot?'>':'<=').'"'.$this->valueData[1].'"';
+        }
+
+        if(is_null($this->valueData[1])){
+            if($dumpIsHtml){
+                return $name.' '.($this->isNot?'<b style="color: #c41d7f">&lt;</b>':'<b style="color: #c41d7f">&gt;=</b>').'<b style="color: #c41d7f">"</b><span style="color: #8c8c8c">'.$this->valueData[0].'</span><b style="color: #c41d7f">"</b>';
+            }
+            return $name.' '.($this->isNot?'<':'>=').'"'.$this->valueData[0].'"';
+        }
+
+        if($this->isNot){
+            if($dumpIsHtml){
+                return '<b style="color: #c41d7f">(</b>'.$name.' <b style="color: #c41d7f">&lt;"</b><span style="color: #8c8c8c">'.$this->valueData[0].'</span><b style="color: #c41d7f">" AND</b> '.$name.' <b style="color: #c41d7f">&gt; "</b><span style="color: #8c8c8c">'.$this->valueData[1].'</span><b style="color: #c41d7f">")</b>';
+            }
+            return '('.$name.' <"'.$this->valueData[0].'" AND '.$name.' > "'.$this->valueData[1].'")';
+        }
+        if($dumpIsHtml){
+            return '<b style="color: #c41d7f">(</b>'.$name.' <b style="color: #c41d7f">&gt;="</b><span style="color: #8c8c8c">'.$this->valueData[0].'</span><b style="color: #c41d7f">" AND</b> '.$name.' <b style="color: #c41d7f">&lt;= "</b><span style="color: #8c8c8c">'.$this->valueData[1].'</span><b style="color: #c41d7f">")</b>';
+        }
+        return '('.$name.' >="'.$this->valueData[0].'" AND '.$name.' <= "'.$this->valueData[1].'")';
+    }
+
+
+    public function dump(bool $dumpIsHtml=false):void{
+        echo $this->dumpStr($dumpIsHtml);
+    }
+
+    /**
+     * 打印当前where结构
+     * @return string
+     */
+    public function dumpStr(bool $dumpIsHtml=false,bool $haveParent=false):string{
+        $levelStyle=' style="padding-left: 12px"';
+        $leftK=$dumpIsHtml?'<div style="padding-left: 12px;font-weight: bold;color: #237804;">(</div>':'(';
+        $rightK=$dumpIsHtml?'<div style="padding-left: 12px;font-weight: bold;color: #237804;">)</div>':')';
+        $andHtm='<div style="padding-left: 12px;color: #d48806;background-color: #fffbe6; ">AND</div>';
+        $orHtm='<div style="padding-left: 12px;color: #9254de;background-color: #f9f0ff">OR</div>';
+
+
+
+        $ands=[];
+        if($this->field->name()!==self::RETURN_FALSE_FIELD_NAME){
+            $ands[]=$this->getDump($dumpIsHtml);
+        }
+        foreach ($this->ands as $v){
+            $ands[]=$v->dumpStr($dumpIsHtml,count($this->ors)>0||(empty($v->ands)?count($v->ors)>0:!empty($v->ors)));
+        }
+        if($dumpIsHtml){
+            $str='<div '.$levelStyle.'>'.implode('</div>'.$andHtm.'<div '.$levelStyle.'>',$ands).'</div>';
+        }else{
+            $str=implode(' AND ',$ands);
+        }
+
+
+
+
+        if(empty($this->ors)){
+            if(count($ands)>1&&$haveParent){
+                return ' '.$leftK.' '.$str.' '.$rightK.' ';
+            }
+            return $str;
+        }
+        $ors=[];
+        foreach ($this->ors as $v){
+            $ors[]=$v->dumpStr($dumpIsHtml,false);
+        }
+
+        if($dumpIsHtml){
+            $orStr='<div '.$levelStyle.'>'.implode('</div>'.$orHtm.'<div '.$levelStyle.'>',$ors).'</div>';
+        }else{
+            $orStr=implode(' OR ',$ors);
+        }
+
+
+        if(count($ands)>1){
+            $str=' '.$leftK.' '.$str.' '.$rightK.' ';
+        }
+
+        if(count($ors)>0){
+            $orStr=' '.$leftK.' '.$orStr.' '.$rightK.' ';
+        }
+        if($haveParent){
+            return ' '.$leftK.' '.$str.($dumpIsHtml?$orHtm:' OR ').$orStr.' '.$rightK.' ';
+        }
+        return $str.($dumpIsHtml?$orHtm:' OR ').$orStr;
     }
 
     public function getAboutFields():array{
