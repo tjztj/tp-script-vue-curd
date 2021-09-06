@@ -9,9 +9,12 @@ use think\Model;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\traits\field_where\FieldWhereDump;
 
 class FieldWhere
 {
+    use FieldWhereDump;
+
     public const TYPE_IN='in';
     public const TYPE_BETWEEN='between';
     public const TYPE_FIND_IN_SET='find_in_set';
