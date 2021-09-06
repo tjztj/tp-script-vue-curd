@@ -160,7 +160,8 @@ trait FieldWhereDump
             $parentAllCount=$parentAndCount+$parentAndCount;
 
             $showK=($parentType==='or'&&$allCount>1)
-                ||($parentType==='and'&&$parentorCount>0&&$allCount>1);
+                ||($parentType==='and'&&$parentorCount>0&&$allCount>1)
+                ||($orCount>0&&$parentAllCount>0&&$allCount>1);;
 
             $str='';
             if($showK){
