@@ -444,7 +444,7 @@ class FieldWhere
      * 打印当前结构
      * @param bool $dumpIsHtml  使用HTML，阅读更方便
      */
-    public function dump(bool $dumpIsHtml=false):void{
+    public function dump(bool $dumpIsHtml=true):void{
         $pdEm=2;
         $str=$this->dumpStr($dumpIsHtml,false,$pdEm);
         if($dumpIsHtml){
