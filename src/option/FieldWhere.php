@@ -351,6 +351,9 @@ class FieldWhere
      */
     private function getDump(bool $dumpIsHtml=false):string{
         $name=$this->field->name();
+        if($dumpIsHtml){
+            $name='<span style="color:#006d75;border-bottom: 1px solid #36cfc9">'.$name.'</span>';
+        }
         if($this->type===self::TYPE_IN){
             if(count($this->valueData)>1){
                 if($dumpIsHtml){
@@ -438,19 +441,30 @@ class FieldWhere
 
 
     public function dump(bool $dumpIsHtml=false):void{
-        echo $this->dumpStr($dumpIsHtml);
+        $pdEm=2;
+        $str=$this->dumpStr($dumpIsHtml,false,$pdEm);
+        if($dumpIsHtml){
+            $str='<div style="margin-left: -'.$pdEm.'em;">'.$str.'</div>';
+        }
+        echo $str;
     }
 
     /**
      * 打印当前where结构
      * @return string
      */
-    public function dumpStr(bool $dumpIsHtml=false,bool $haveParent=false):string{
-        $levelStyle=' style="padding-left: 12px"';
-        $leftK=$dumpIsHtml?'<div style="padding-left: 12px;font-weight: bold;color: #237804;">(</div>':'(';
-        $rightK=$dumpIsHtml?'<div style="padding-left: 12px;font-weight: bold;color: #237804;">)</div>':')';
-        $andHtm='<div style="padding-left: 12px;color: #d48806;background-color: #fffbe6; ">AND</div>';
-        $orHtm='<div style="padding-left: 12px;color: #9254de;background-color: #f9f0ff">OR</div>';
+    public function dumpStr(bool $dumpIsHtml=false,bool $haveParent=false,$pdEm=2):string{
+        $levelStyle=' style="padding-left: '.$pdEm.'em"';
+        $kStyle='padding-left: '.$pdEm.'em;font-weight: bold;color: #237804;';
+        $kStyle2n='padding-left: '.($pdEm*2).'em;font-weight: bold;color: #237804;';
+
+        $leftK=$dumpIsHtml?'<div style="'.$kStyle.'">(</div>':'(';
+        $rightK=$dumpIsHtml?'<div style="'.$kStyle.'">)</div>':')';
+        $leftK2=$dumpIsHtml?'<div style="'.$kStyle2n.'">(</div>':'(';
+        $rightK2=$dumpIsHtml?'<div style="'.$kStyle2n.'">)</div>':')';
+        $andHtm='<div style="margin-left: '.($pdEm).'em;color: #d48806;background-color: #fffbe6;width: 3em;text-align: center;">AND</div>';
+        $orHtm='<div style="margin-left: '.($pdEm).'em;color: #9254de;background-color: #f9f0ff;width: 2em;text-align:center;">OR</div>';
+        $orHtm2='<div style="margin-left: '.($pdEm*2).'em;color: #9254de;background-color: #f9f0ff;width: 2em;text-align:center;">OR</div>';
 
 
 
@@ -459,44 +473,46 @@ class FieldWhere
             $ands[]=$this->getDump($dumpIsHtml);
         }
         foreach ($this->ands as $v){
-            $ands[]=$v->dumpStr($dumpIsHtml,count($this->ors)>0||(empty($v->ands)?count($v->ors)>0:!empty($v->ors)));
+            $ands[]=$v->dumpStr($dumpIsHtml,count($this->ors)>0||(empty($v->ands)?count($v->ors)>0:!empty($v->ors)),$pdEm);
         }
         if($dumpIsHtml){
-            $str='<div '.$levelStyle.'>'.implode('</div>'.$andHtm.'<div '.$levelStyle.'>',$ands).'</div>';
+            $str='<div '.$levelStyle.' data-loc="ands">'.implode('</div>'.$andHtm.'<div data-loc="c-ands">',$ands).'</div>';
         }else{
             $str=implode(' AND ',$ands);
         }
 
 
-
-
         if(empty($this->ors)){
             if(count($ands)>1&&$haveParent){
-                return ' '.$leftK.' '.$str.' '.$rightK.' ';
+                return ' '.$leftK.' <div '.$levelStyle.' data-loc="and1-p">'.$str.'</div> '.$rightK.' ';
             }
             return $str;
         }
         $ors=[];
         foreach ($this->ors as $v){
-            $ors[]=$v->dumpStr($dumpIsHtml,false);
+            $ors[]=$v->dumpStr($dumpIsHtml,false,$pdEm);
         }
 
         if($dumpIsHtml){
-            $orStr='<div '.$levelStyle.'>'.implode('</div>'.$orHtm.'<div '.$levelStyle.'>',$ors).'</div>';
+            $orStr='<div '.$levelStyle.' data-loc="ors">'.implode('</div>'.$orHtm.'<div data-loc="c-ors">',$ors).'</div>';
         }else{
             $orStr=implode(' OR ',$ors);
         }
 
 
         if(count($ands)>1){
-            $str=' '.$leftK.' '.$str.' '.$rightK.' ';
+            $str=' '.$leftK.' <div '.$levelStyle.' data-loc="and-gt1-have-or">'.$str.'</div> '.$rightK.' ';
         }
 
         if(count($ors)>0){
-            $orStr=' '.$leftK.' '.$orStr.' '.$rightK.' ';
+            if($haveParent){
+                $orStr=' '.$leftK2.' '.$orStr.' '.$rightK2.' ';
+            }else{
+                $orStr=' '.$leftK.' '.$orStr.' '.$rightK.' ';
+            }
         }
         if($haveParent){
-            return ' '.$leftK.' '.$str.($dumpIsHtml?$orHtm:' OR ').$orStr.' '.$rightK.' ';
+            return ' '.$leftK.' '.$str.($dumpIsHtml?$orHtm2:' OR ').$orStr.' '.$rightK.' ';
         }
         return $str.($dumpIsHtml?$orHtm:' OR ').$orStr;
     }
