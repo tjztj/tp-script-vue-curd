@@ -138,8 +138,6 @@ trait FieldWhereDump
      * @return string
      */
     public function dumpStr(bool $dumpIsHtml=false):string{
-        $dumpIsHtml=false;
-
         $tree=$this->dumpArr($dumpIsHtml);
 
         $getChildsOne=function ($info)use(&$getChildsOne){
