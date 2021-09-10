@@ -31,7 +31,7 @@ class PasswordField extends ModelField
      */
     public function listShow(bool $listShow=null){
         if($listShow===true){
-            throw new \think\Exception('字段类型[ListField]不能设置listShow未true');
+            throw new \think\Exception('字段类型['.$this->getType().']不能设置listShow未true');
         }
         return $this->doAttr('listShow',$listShow);
     }

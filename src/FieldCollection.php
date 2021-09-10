@@ -595,7 +595,7 @@ class FieldCollection extends Collection
             }
             $tpl=$field::componentUrl();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
-            if($field->getType()==='ListField'){
+            if($field->getType()==='ListField'||$field->getType()==='TableField'){
                 foreach ($field->fields()->getComponents($type) as $k=>$v){
                     $return[$field->name().'['.$k.']']=$v;
                 }
