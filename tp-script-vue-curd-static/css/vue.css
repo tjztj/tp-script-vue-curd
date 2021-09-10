@@ -447,6 +447,33 @@ body{
     border-left: 1px solid #91d5ff;
     text-shadow: 1px 1px 1px rgba(0,0 ,0 , .08);
 }
+.vuecurd-show-def-box .field-group-fieldset>.row{
+    display: flex;
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    vertical-align: top;
+    padding: 12px 18px;
+}
+.vuecurd-show-def-box .field-group-fieldset>.row:nth-child(odd){
+    background-color: #fbfbff;
+    border-top:1px solid #e9f3ff;
+    border-bottom:1px solid #e9f3ff;
+}
+.vuecurd-show-def-box .field-group-fieldset>.row>.l{
+    padding-right: .5em;
+    width: 16.66666667%;
+    /*text-align: right;*/
+    color: rgba(0,0,0,.85);
+    color: #000;
+    font-weight: bold;
+    letter-spacing: .08em;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.08);
+}
+.vuecurd-show-def-box .field-group-fieldset>.row>.r{
+    flex: 1;
+    color: rgba(0,0,0,.65);
+}
 .vuecurd-def-box .add-inputs-box-item-icon,.vuecurd-def-box .add-list-field-box-item-icon{
     color: #1890ff;
     cursor: pointer;

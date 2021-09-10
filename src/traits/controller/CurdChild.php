@@ -58,6 +58,7 @@ trait CurdChild{
 
 
             try{
+                $this->fields->each(function (ModelField $v)use($list,$baseInfo){$v->onIndexList($list,$baseInfo);});
                 //字段钩子
                 FieldDo::doIndex($this->fields,$list,$baseInfo);
             }catch (\Exception $e){
@@ -81,6 +82,8 @@ trait CurdChild{
         try{
             //要改fields，可以直接在 indexShowBefore 里面$this->fields
             $this->indexShowBefore($baseInfo);
+
+            $this->fields->each(function (ModelField $v)use($baseInfo){$v->onIndexShow($baseInfo);});
             //字段钩子触发
             FieldDo::doIndexShow($this->fields,$baseInfo,$this);
         }catch (\Exception $e){

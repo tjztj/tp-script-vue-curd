@@ -6,6 +6,21 @@ define([], function () {
                 errorUrls: {}
             }
         },
+        computed:{
+            list(){
+                if(this.info[this.field.name+'Arr']){
+                    return this.info[this.field.name+'Arr'];
+                }
+                let val=this.info[this.field.name]||'';
+                if(!val){
+                    return [];
+                }
+                if(typeof val==='object'){
+                    return val;
+                }
+                return val.split('|')
+            },
+        },
         methods: {
             getUrlTitle(url) {
                 if(!this.info[this.field.name+'InfoArr']||!this.info[this.field.name+'InfoArr'][url]||!this.info[this.field.name+'InfoArr'][url].original_name){
@@ -18,7 +33,7 @@ define([], function () {
         template: `<div>
                     <div class="file-box">
                         <div class="ant-upload-list ant-upload-list-text">
-                            <div v-for="(vo,key) in info[field.name+'Arr']">
+                            <div v-for="(vo,key) in list">
                                 <div class="ant-upload-list-item ant-upload-list-item-done ant-upload-list-item-list-type-text">
                                     <div class="ant-upload-list-item-info" style="display: inline-block">
                                         <span>

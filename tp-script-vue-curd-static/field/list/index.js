@@ -62,7 +62,7 @@ padding: 6px;
         props:['record','field'],
         setup(props,ctx){
             if (!document.getElementById(styleId)) {
-                document.querySelector('head').insertAdjacentHTML('afterend', style);
+                document.querySelector('head').insertAdjacentHTML('beforeend', style);
             }
 
             const canShow=Vue.ref(false);

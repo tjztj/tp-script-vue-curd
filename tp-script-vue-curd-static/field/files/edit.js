@@ -1,18 +1,18 @@
 define([],function(){
     const isAccOk={};
     return {
-        props:['field','value','validateStatus'],
+        props:['field','value','validateStatus','info'],
         setup(props,ctx){
             let fileList=Vue.ref([]),id='upload-class-'+window.guid();
             if(props.value){
                 let imgList=props.value.split('|'),fid=0;
 
                 function getUrlTitle(url) {
-                    if(!vueData||!vueData.info||!vueData.info[props.field.name+'InfoArr']||!vueData.info[props.field.name+'InfoArr'][url]||!vueData.info[props.field.name+'InfoArr'][url].original_name){
+                    if(!props.info||!props.info[props.field.name+'InfoArr']||!props.info[props.field.name+'InfoArr'][url]||!props.info[props.field.name+'InfoArr'][url].original_name){
                         let arr=url.split('/');
                         return arr[arr.length-1];
                     }
-                    return vueData.info[props.field.name+'InfoArr'][url].original_name
+                    return props.info[props.field.name+'InfoArr'][url].original_name
                 }
                 fileList.value=imgList.map(function(v){
                     fid--;

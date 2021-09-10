@@ -11,14 +11,12 @@ use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
-use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\field\SelectField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
-use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
 
@@ -44,7 +42,7 @@ trait BaseIndex
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    function index(){
+    public function index(){
         //是否有父表
         $baseInfo=null;
         try{
@@ -72,10 +70,19 @@ trait BaseIndex
             //字段钩子
             try{
                 if(is_array($baseInfo)){
+                    $listArr=[];
                     foreach ($list as $v){
-                        FieldDo::doIndex($this->fields,\think\model\Collection::make([$v]),$baseInfo[$v[$this->model::parentField()]]??null);
+                        isset($listArr[$v[$this->model::parentField()]])||$listArr[$v[$this->model::parentField()]]=[];
+                        $listArr[$v[$this->model::parentField()]][]=$v;
+                    }
+                    foreach ($listArr as $k=>$vs){
+                        $cList=\think\model\Collection::make($vs);
+                        $bs=$baseInfo[$k]??null;
+                        $this->fields->each(function (ModelField $v)use($cList,$bs){$v->onIndexList($cList,$bs);});
+                        FieldDo::doIndex($this->fields,$cList,$bs);
                     }
                 }else{
+                    $this->fields->each(function (ModelField $v)use($list,$baseInfo){$v->onIndexList($list,$baseInfo);});
                     FieldDo::doIndex($this->fields,$list,$baseInfo);
                 }
             }catch(\Exception $e){
@@ -104,6 +111,7 @@ trait BaseIndex
 
 
         try{
+            $this->fields->each(function (ModelField $v)use($baseInfo){$v->onIndexShow($baseInfo);});
             //要改fields，可以直接在 indexShowBefore 里面$this->fields
             $this->indexShowBefore($baseInfo);
             //字段钩子触发
@@ -169,7 +177,7 @@ trait BaseIndex
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
 
-        if($this->type()==='base_have_child'){
+        if(self::type()==='base_have_child'){
             $this->indexFetchDoChild($data);
         }
 
@@ -217,6 +225,7 @@ trait BaseIndex
      * @param BaseModel|BaseChildModel $model
      * @param BaseModel|null $baseInfo
      * @return Query|BaseChildModel|BaseModel
+     * @throws \think\Exception
      */
     protected function indexListModelWhere($model,?BaseModel $baseInfo)
     {

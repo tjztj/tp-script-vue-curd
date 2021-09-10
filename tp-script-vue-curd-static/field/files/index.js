@@ -7,6 +7,21 @@ define([],function(){
                 show
             }
         },
+        computed:{
+          list(){
+              if(this.record.record[this.field.name+'Arr']){
+                  return this.record.record[this.field.name+'Arr'];
+              }
+              let val=this.record.record[this.field.name]||'';
+              if(!val){
+                  return [];
+              }
+              if(typeof val==='object'){
+                  return val;
+              }
+              return val.split('|')
+          },
+        },
         methods:{
             getUrlTitle(url) {
                 if(!this.record.record[this.field.name+'InfoArr']||!this.record.record[this.field.name+'InfoArr'][url]||!this.record.record[this.field.name+'InfoArr'][url].original_name){
@@ -22,7 +37,7 @@ define([],function(){
       <template #content>
          <div class="file-box">
             <div class="ant-upload-list ant-upload-list-text">
-                <div v-for="(vo,key) in record.record[field.name+'Arr']">
+                <div v-for="(vo,key) in list">
                     <div class="ant-upload-list-item ant-upload-list-item-done ant-upload-list-item-list-type-text">
                         <div class="ant-upload-list-item-info">
                             <span>

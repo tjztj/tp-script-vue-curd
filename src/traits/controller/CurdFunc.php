@@ -104,6 +104,8 @@ trait CurdFunc
                         return $this->error('您不能进行此操作-01');
                     }
 
+
+                    $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onEditSave($data,$baseInfo);});
                     if($baseModel){
                         $savedInfo=$model->addInfo($data,$baseInfo,$fields,false,$returnSaveData);
                     }else{
@@ -142,7 +144,7 @@ trait CurdFunc
                     if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$baseInfo,$fields)===false){
                         return $this->error('您不能进行此操作-02');
                     }
-
+                    $fields->each(function (ModelField $v)use($data,$baseInfo,$old){$v->onEditSave($data,$old,$baseInfo,);});
                     $savedInfo=$model->saveInfo($data,$fields,$baseInfo,$old,$returnSaveData);
                     $this->editAfter($savedInfo);
                 }
@@ -300,7 +302,9 @@ trait CurdFunc
             return $this->errorAndCode('您不能查看当前数据信息');
         }
 
+
         try{
+            $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onShow($data,$baseInfo);});
             //字段钩子
             FieldDo::doShow($fields,$data,$baseInfo);
         }catch (\Exception $e){
@@ -355,6 +359,8 @@ trait CurdFunc
      * @throws \think\Exception
      */
     protected function createEditFetchData(FieldCollection $fields,VueCurlModel $data,BaseModel $baseModel=null){
+        $fields->each(function (ModelField $v)use($data,$baseModel){$v->onEditShow($data,$baseModel);});
+
         $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
         if(is_null($isStepNext)){
             return $this->error('数据不满足当前步骤');

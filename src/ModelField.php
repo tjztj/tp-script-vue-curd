@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd;
 
 
+use think\Collection;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\StringField;
@@ -903,5 +904,42 @@ abstract class ModelField
         return $field;
 
     }
+
+
+    /**
+     * 子字段可重写
+     * @param VueCurlModel $data
+     * @param BaseModel|null $baseInfo
+     * @return void
+     */
+    public function onEditShow(VueCurlModel &$data,BaseModel &$baseInfo=null):void{}
+    /**
+     * 子字段可重写
+     * @param VueCurlModel $data
+     * @param BaseModel|null $baseInfo
+     * @return void
+     */
+    public function onEditSave(array &$postData,BaseModel &$baseInfo=null):void{}
+    /**
+     * 子字段可重写
+     * @param VueCurlModel $data
+     * @param BaseModel|null $baseInfo
+     * @return void
+     */
+    public function onShow(VueCurlModel &$data,BaseModel &$baseInfo=null):void{}
+
+    /**
+     * 子字段可重写
+     * @param BaseModel|null $baseInfo
+     * @return void
+     */
+    public function onIndexShow(BaseModel &$baseInfo=null):void{}
+    /**
+     * 子字段可重写
+     * @param Collection $list
+     * @param BaseModel|null $baseInfo
+     * @return void
+     */
+    public function onIndexList(Collection $list,BaseModel &$baseInfo=null):void{}
 
 }

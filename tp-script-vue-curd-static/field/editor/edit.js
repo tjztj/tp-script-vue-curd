@@ -51,7 +51,7 @@ pointer-events: none;
         props: ['field', 'value', 'validateStatus'],
         setup(props, ctx) {
             if (!document.getElementById(styleId)) {
-                document.querySelector('head').insertAdjacentHTML('afterend', style);
+                document.querySelector('head').insertAdjacentHTML('beforeend', style);
             }
             return {
                 editorId: 'edit-'+window.guid(),
