@@ -161,7 +161,7 @@ class FieldWhere
 
     private function checkSelf($saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
         if($this->field->name()===self::RETURN_FALSE_FIELD_NAME){
-            return false;
+            return count($this->ands)>0;
         }
 
         if(!$isSourceData){

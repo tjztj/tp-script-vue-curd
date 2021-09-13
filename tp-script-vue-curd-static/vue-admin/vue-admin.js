@@ -900,7 +900,7 @@ define(requires, function (axios, Qs) {
                         }
                         const checkFieldWhereSelf = (fieldWhere) => {
                             if (fieldWhere.field.name === fieldWhere.RETURN_FALSE_FIELD_NAME) {
-                                return false;
+                                return fieldWhere.ands&&fieldWhere.ands.length>0;
                             }
                             let val = null;
                             let formValue = formVal[fieldWhere.field.name];
