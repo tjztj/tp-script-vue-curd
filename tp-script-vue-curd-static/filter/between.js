@@ -2,10 +2,19 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
+            const start=Vue.ref('');
+            const end=Vue.ref('');
+            const onParentSearch=function (){
+                start.value=props.config.activeValue?props.config.activeValue.start:'';
+                end.value=props.config.activeValue?props.config.activeValue.end:'';
+            }
+            onParentSearch();
+
             return {
-                start:Vue.ref(props.config.activeValue?props.config.activeValue.start:''),
-                end:Vue.ref(props.config.activeValue?props.config.activeValue.end:''),
+                start,
+                end,
                 separator:'',
+                onParentSearch,
             }
         },
         computed:{
@@ -32,6 +41,10 @@ define([],function(){
                     start:this.start,
                     end:this.end,
                 });
+            },
+            onParentSearch(){
+                this.start=this.config.activeValue?this.config.activeValue.start:'';
+                this.end=this.config.activeValue?this.config.activeValue.end:''
             }
         },
         template:`<div>

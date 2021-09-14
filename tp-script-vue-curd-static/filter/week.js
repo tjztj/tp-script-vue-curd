@@ -2,15 +2,21 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
-            let val='';
-            if(props.config.activeValue){
-                val=props.config.activeValue;
-                if(typeof val==='number'){
-                    val=val.toString();
+            const inputValue=Vue.ref('');
+            const onParentSearch = () => {
+                let val='';
+                if(props.config.activeValue){
+                    val=props.config.activeValue;
+                    if(typeof val==='number'){
+                        val=val.toString();
+                    }
                 }
+                inputValue.value=val;
             }
+            onParentSearch();
+
             return {
-                inputValue:Vue.ref(val)
+                inputValue,onParentSearch
             }
         },
         computed:{

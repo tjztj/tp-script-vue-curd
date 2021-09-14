@@ -1789,7 +1789,15 @@ define(requires, function (axios, Qs) {
                 },
                 search(val, item) {
                     item.activeValue = val;
-                    this.$emit('search', this.getFilterData());
+                    const data=this.getFilterData();
+                    if(this.$refs){
+                        for(let key in this.$refs){
+                            if(key.indexOf('filters.')===0&&typeof this.$refs[key].onParentSearch==='function'){
+                                this.$refs[key].onParentSearch();
+                            }
+                        }
+                    }
+                    this.$emit('search',data);
                 },
                 getFilterData() {
                     let curdFilters = [], curdChildFilters = {}, haveHide = false;
@@ -1832,7 +1840,6 @@ define(requires, function (axios, Qs) {
                             if (v.filterData) {
                                 //如果filterData有，不能筛选，只能是filterData的值
                                 childFilterData[v.name] = Object.assign(childFilterData[v.name], v.filterData);
-                                ;
                             }
                         })
                     }
@@ -1867,6 +1874,7 @@ define(requires, function (axios, Qs) {
                                             <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
                                              <component :is="item.type" 
                                                         :config="item"
+                                                        :ref="'filters.filterConfig.'+item.name"
                                                         @search="search($event,item)"
                                                 ></component>
                                             </div></div>
@@ -1884,6 +1892,7 @@ define(requires, function (axios, Qs) {
                                                     <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
                                                      <component :is="item.type" 
                                                                 :config="item"
+                                                                :ref="'filters.'+child.name+'.'+item.name"
                                                                 @search="search($event,item)"
                                                         ></component>
                                                     </div></div>

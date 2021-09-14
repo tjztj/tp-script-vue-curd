@@ -3,11 +3,23 @@ define([],function(){
         props:['config'],
         setup(props,ctx){
             const range=Vue.ref([]);
-            if(props.config.activeValue){
-                range.value=[moment(props.config.activeValue.start),moment(props.config.activeValue.end)]
+            const onParentSearch = () => {
+                if(props.config.activeValue&&props.config.activeValue.start&&props.config.activeValue.end){
+                    range.value=[moment(props.config.activeValue.start),moment(props.config.activeValue.end)]
+                }else{
+                    range.value=[];
+                    if(props.config.activeValue&&(props.config.activeValue.start||props.config.activeValue.end)){
+                        ctx.emit('search',{
+                            start:'',
+                            end:'',
+                        });
+                    }
+                }
             }
+            onParentSearch();
+
             return {
-                range
+                range,onParentSearch
             }
         },
         computed:{

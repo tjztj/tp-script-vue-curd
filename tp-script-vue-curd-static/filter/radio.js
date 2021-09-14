@@ -2,21 +2,29 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
-            let val=props.config.activeValue||'';
-            if(props.config.isMore){
-                if(typeof val==='number'){
-                    val=val.toString();
+
+            const value=Vue.ref('');
+
+            const onParentSearch=function (){
+                let val=props.config.activeValue||'';
+                if(props.config.isMore){
+                    if(typeof val==='number'){
+                        val=val.toString();
+                    }
+                    if(val===''){
+                        val=[];
+                    }else if(typeof val==='string'){
+                        val=props.config.activeValue.split(',')
+                    }
                 }
-                if(val===''){
-                    val=[];
-                }else if(typeof val==='string'){
-                    val=props.config.activeValue.split(',')
-                }
-            }
+                value.value=val;
+            };
+            onParentSearch();
 
 
             return {
-                value:Vue.ref(val)
+                value,
+                onParentSearch
             }
         },
         methods: {
@@ -50,7 +58,7 @@ define([],function(){
                 }
 
                 return this.value.includes(val);
-            }
+            },
         },
         template:`<div>
                     <div class="filter-item-check-item" @click="val('')" :class="{active:isActive('')}"><div class="filter-item-check-item-value">全部</div></div>

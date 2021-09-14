@@ -2,6 +2,7 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
+            const regionValue=Vue.ref(props.config.activeValue||'')
             return {
                 regionValue:Vue.ref(props.config.activeValue||'')
             }

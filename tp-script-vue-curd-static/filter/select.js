@@ -2,18 +2,25 @@ define([], function () {
     return {
         props: ['config'],
         setup(props,ctx){
-            let val='';
-            if(props.config.activeValue){
-                val=props.config.activeValue;
-                if(typeof val==='number'){
-                    val=val.toString();
+            const inputValue=Vue.ref(undefined);
+            const onParentSearch = () => {
+                let val='';
+                if(props.config.activeValue){
+                    val=props.config.activeValue;
+                    if(typeof val==='number'){
+                        val=val.toString();
+                    }
                 }
+                if(val===''){
+                    val=undefined;
+                }
+                inputValue.value=val;
             }
-            if(val===''){
-                val=undefined;
-            }
+            onParentSearch();
+
+
             return {
-                inputValue:Vue.ref(val)
+                inputValue,onParentSearch
             }
         },
         computed:{
@@ -58,7 +65,9 @@ define([], function () {
                                       size="small"
                                       placeholder="选择相关信息"
                                       :mode="config.multiple?'multiple':null"
-                                      :filter-option="filterOption">
+                                      :filter-option="filterOption"
+                                      @change="search"
+                                      >
                                       <template v-if="haveGroup">
                                          <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
                                          <template v-for="(items,key) in groupItems">

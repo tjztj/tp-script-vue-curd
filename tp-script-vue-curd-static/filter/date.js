@@ -3,11 +3,23 @@ define([],function(){
         props:['config'],
         setup(props,ctx){
             const range=Vue.ref([]);
-            if(props.config.activeValue){
-                range.value=[moment(props.config.activeValue.start),moment(props.config.activeValue.end)]
+            const onParentSearch = () => {
+                if(props.config.activeValue&&props.config.activeValue.start&&props.config.activeValue.end){
+                    range.value=[moment(props.config.activeValue.start),moment(props.config.activeValue.end)]
+                }else{
+                    range.value=[];
+                    if(props.config.activeValue&&(props.config.activeValue.start||props.config.activeValue.end)){
+                        ctx.emit('search',{
+                            start:'',
+                            end:'',
+                        });
+                    }
+                }
             }
+            onParentSearch();
+
             return {
-                range
+                range,onParentSearch
             }
         },
         computed:{
@@ -42,7 +54,7 @@ define([],function(){
                     start:this.range[0]?this.range[0].format('YYYY-MM-DD'):'',
                     end:this.range[1]?this.range[1].format('YYYY-MM-DD'):'',
                 });
-            }
+            },
         },
         template:`<div>
                     <div class="filter-item-check-item" @click="val('','')" :class="{active:checked('','')}"><div class="filter-item-check-item-value">全部</div></div>

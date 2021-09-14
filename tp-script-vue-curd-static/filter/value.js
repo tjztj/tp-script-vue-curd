@@ -14,15 +14,21 @@ define([],function(){
             if (!document.getElementById(styleId)) {
                 document.querySelector('head').insertAdjacentHTML('beforeend', style);
             }
-            let val='';
-            if(props.config.activeValue){
-                val=props.config.activeValue;
-                if(typeof val==='number'){
-                    val=val.toString();
+            const inputValue=Vue.ref('');
+            const onParentSearch = () => {
+                let val='';
+                if(props.config.activeValue){
+                    val=props.config.activeValue;
+                    if(typeof val==='number'){
+                        val=val.toString();
+                    }
                 }
+                inputValue.value=val;
             }
+            onParentSearch();
+
             return {
-                inputValue:Vue.ref(val)
+                inputValue,onParentSearch
             }
         },
         methods: {
