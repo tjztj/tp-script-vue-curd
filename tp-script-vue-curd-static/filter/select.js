@@ -1,7 +1,19 @@
 define([], function () {
+    const styleId='filter-select-field-style';
+    const style = `
+<style id="${styleId}">
+.region-value-div .ant-select-single.ant-select-sm:not(.ant-select-customize-input) .ant-select-selector{
+    padding: 2px 7px;
+    height: 26px;
+}
+</style>
+`;
     return {
         props: ['config'],
         setup(props,ctx){
+            if (!document.getElementById(styleId)) {
+                document.querySelector('head').insertAdjacentHTML('beforeend', style);
+            }
             const inputValue=Vue.ref(undefined);
             const onParentSearch = () => {
                 let val='';
@@ -57,36 +69,33 @@ define([], function () {
         },
         template: `<div>
                     <div class="region-value-div">
-                        <a-input-group compact size="small">
-                             <a-select style="width: 210px" 
-                                      v-model:value="inputValue"
-                                      allow-clear
-                                      show-search 
-                                      size="small"
-                                      placeholder="选择相关信息"
-                                      :mode="config.multiple?'multiple':null"
-                                      :filter-option="filterOption"
-                                      @change="search"
-                                      >
-                                      <template v-if="haveGroup">
-                                         <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
-                                         <template v-for="(items,key) in groupItems">
-                                            <template v-if="key">
-                                                 <a-select-opt-group :label="key" :key="key">
-                                                     <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                                 </a-select-opt-group>
-                                            </template>
-                                             <template v-else>
-                                                <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                             </template>
-                                         </template>
-                                     </template>
+                        <a-select style="width: 236px" 
+                              v-model:value="inputValue"
+                              allow-clear
+                              show-search 
+                              size="small"
+                              placeholder="选择相关信息"
+                              :mode="config.multiple?'multiple':null"
+                              :filter-option="filterOption"
+                              @change="search"
+                              >
+                              <template v-if="haveGroup">
+                                 <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
+                                 <template v-for="(items,key) in groupItems">
+                                    <template v-if="key">
+                                         <a-select-opt-group :label="key" :key="key">
+                                             <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                         </a-select-opt-group>
+                                    </template>
                                      <template v-else>
-                                         <a-select-option :value="optionItem.value" :key="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>
+                                        <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
                                      </template>
-                            </a-select>
-                             <a-button @click="search" size="small">确定</a-button>
-                        </a-input-group>
+                                 </template>
+                             </template>
+                             <template v-else>
+                                 <a-select-option :value="optionItem.value" :key="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>
+                             </template>
+                        </a-select>
                     </div>
 </div>`,
     }

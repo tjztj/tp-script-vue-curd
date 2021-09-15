@@ -1,5 +1,5 @@
 define([],function(){
-    const styleId='list-index-field-style';
+    const styleId='filter-index-field-style';
     const style = `
 <style id="${styleId}">
 .filter-input-field-box .ant-input-group-sm span.ant-input-affix-wrapper{
