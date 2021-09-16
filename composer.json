@@ -24,12 +24,9 @@
             "tpScriptVueCurdCopy\\": "copy/"
         }
     },
-    "scripts": {
-        "post-package-install": [
-            "tpScriptVueCurdCopy\\install::copyAboutFiles"
-        ],
-        "post-package-update": [
-            "tpScriptVueCurdCopy\\install::copyAboutFiles"
-        ]
+    "extra": {
+        "installer-paths": {
+            "public": ["copy/test"]
+        }
     }
 }
