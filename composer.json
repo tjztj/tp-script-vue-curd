@@ -28,7 +28,7 @@
     "extra": {
         "installer-types": ["tp-script-vue-curd"],
         "installer-paths": {
-            "public": ["copy/test"]
+            "public/": ["copy/test"]
         }
     }
 }
