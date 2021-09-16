@@ -20,12 +20,16 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "tpScriptVueCurd\\": "src/"
+            "tpScriptVueCurd\\": "src/",
+            "tpScriptVueCurdCopy\\": "copy/"
         }
     },
     "scripts": {
         "post-package-install": [
-            "tpScriptVueCurd\\copy\\install::copyAboutFiles"
+            "tpScriptVueCurdCopy\\install::copyAboutFiles"
+        ],
+        "post-package-update": [
+            "tpScriptVueCurdCopy\\install::copyAboutFiles"
         ]
     }
 }
