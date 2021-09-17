@@ -34,7 +34,7 @@ trait ColumnGetterSetter
      */
     public function getDefault(): ?string
     {
-        return $this->default;
+        return $this->default??null;
     }
 
     /**

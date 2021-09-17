@@ -2,8 +2,7 @@
 
 namespace tpScriptVueCurd\field;
 
-use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
+
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;

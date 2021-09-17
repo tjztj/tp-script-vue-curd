@@ -36,4 +36,19 @@ trait TableGetterSetter
     {
         $this->comment = $comment;
     }
+    /**
+     * @return bool
+     */
+    public function isModifyColumn(): bool
+    {
+        return $this->modifyColumn;
+    }
+
+    /**
+     * @param bool $modifyColumn
+     */
+    public function setModifyColumn(bool $modifyColumn): void
+    {
+        $this->modifyColumn = $modifyColumn;
+    }
 }

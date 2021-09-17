@@ -2,6 +2,7 @@
 
 namespace tpScriptVueCurd\traits\model;
 
+use think\facade\Db;
 use tpScriptVueCurd\option\generate_table\GenerateTableOption;
 
 trait GenerateTable
@@ -39,7 +40,10 @@ trait GenerateTable
             return;
         }
         $sql=$table->getSql();
-        dd($sql);
+        if($sql){
+            Db::execute($sql);
+        }
+
     }
 
 }

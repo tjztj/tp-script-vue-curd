@@ -57,15 +57,15 @@ class GenerateColumnOption
 
     /**
      * 获取执行的sql
-     * @param string $type MODIFY|ADD
+     * @param string $type MODIFY|ADD|''
      * @param string $beforeField 前面的字段
      * @return string
      * @throws \think\Exception
      */
     public function getSql(string $type='',string $beforeField=''):string{
         $type=strtoupper($type);
-        if($type!=='MODIFY'&&$type!=='ADD'){
-            throw new \think\Exception('GenerateColumnOption的getSql中$type不符合要求（MODIFY|ADD）');
+        if($type!=='MODIFY'&&$type!=='ADD'&&$type!==''){
+            throw new \think\Exception('GenerateColumnOption的getSql中$type不符合要求（MODIFY|ADD|\'\'）');
         }
 
         $comment=addslashes($this->comment);
@@ -88,7 +88,11 @@ class GenerateColumnOption
             $beforeField='AFTER `'.$beforeField.'`';
         }
 
-        return $type." COLUMN `$this->name` ".$this->getTypeStr()." NOT NULL $default COMMENT '$comment' $beforeField";
+        if($type){
+            $type.=' COLUMN ';
+        }
+
+        return $type."`$this->name` ".$this->getTypeStr()." NOT NULL $default COMMENT '$comment' $beforeField";
     }
 
 
@@ -108,7 +112,7 @@ class GenerateColumnOption
 
     public function getDefaultStr()
     {
-        if(is_null($this->default)){
+        if(!isset($this->default)||is_null($this->default)){
             return null;
         }else{
             if($this->type==='varchar'){
@@ -127,7 +131,7 @@ class GenerateColumnOption
             return true;
         }
         $def=$this->getDefaultStr();
-        if((is_null($def)||is_null($field['default']))&&$field['default']!==(string)$def){
+        if((is_null($def)&&!is_null($field['default']))&&$field['default']!==(string)$def){
             return true;
         }
         if(strtolower($this->getTypeStr())!==$field['type']){

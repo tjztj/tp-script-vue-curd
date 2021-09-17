@@ -35,6 +35,23 @@ class GenerateTableOption extends Collection
      * @var bool
      */
     protected bool $modifyColumn=false;
+    
+
+    /**
+     * @return string
+     */
+    public function getEngine(): string
+    {
+        return $this->engine;
+    }
+
+    /**
+     * @param string $engine
+     */
+    public function setEngine(string $engine): void
+    {
+        $this->engine = $engine;
+    }
 
     protected VueCurlModel $model;
 
@@ -90,7 +107,34 @@ class GenerateTableOption extends Collection
        //重新设置字段
         $this->items = $this->convertToArray($this->generateItems());
 
+
         $controll=$model::getControllerClass();
+        if($controll::type()==='child'){
+            $pf=new GenerateColumnOption($model::parentField());
+            $pf->setTypeInt();
+            $pf->setComment('父表ID');
+            $this->push($pf);
+        }
+
+        if($model->fields()->stepIsEnable()){
+            $pf=new GenerateColumnOption($model::getStepField());
+            $pf->setTypeJson();
+            $pf->setComment('步骤');
+            $this->push($pf);
+            $pf=new GenerateColumnOption($model::getNextStepField());
+            $pf->setTypeVarchar(30);
+            $pf->setComment('下一步');
+            $this->push($pf);
+            $pf=new GenerateColumnOption($model::getCurrentStepField());
+            $pf->setTypeVarchar(30);
+            $pf->setComment('当前步骤');
+            $this->push($pf);
+            $pf=new GenerateColumnOption($model::getStepPastsField());
+            $pf->setTypeVarchar(300);
+            $pf->setComment('已走步骤');
+            $this->push($pf);
+        }
+
 
         $tableName=$model->getTable();
         $tableOld=Db::table('INFORMATION_SCHEMA.TABLES')
@@ -109,12 +153,6 @@ class GenerateTableOption extends Collection
             $hasFields=$model->getFields();
 
 
-            if($controll::type()==='child'){
-                $pf=new GenerateColumnOption($model::parentField());
-                $pf->setTypeInt();
-                $pf->setComment('父表ID');
-                $this->push($pf);
-            }
 
             $cols=[];
             $this->each(function (GenerateColumnOption $v)use(&$cols,&$before,$hasFields){
@@ -130,31 +168,38 @@ class GenerateTableOption extends Collection
                 $before=$v->getName();
             });
 
-            $beforeSql="ALTER TABLE `$tableName` \n ".implode(" ,\n ",$cols);
+            $beforeSql="ALTER TABLE `$tableName` ";
+
+
+            $colsSql=$cols?" \n ".implode(" ,\n ",$cols):'';
+
 
             $sql='';
             $engineChange=false;
             if(strtolower($this->engine)!==strtolower($tableOld['ENGINE'])){
-                $sql.=" ,\n ENGINE=$this->engine";
+                if($cols){
+                    $sql.=" , \n";
+                }
+                $sql.=" ENGINE=$this->engine";
                 $engineChange=true;
             }
             if($comment!==$tableOld['TABLE_COMMENT']){
                 if(!$engineChange){
                     $sql.=" ,\n";
-                }else{
+                }else if($cols){
                     $sql.=" ,";
                 }
                 $sql.=" COMMENT = '".addslashes($comment)."'";
             }
-            if($sql){
-                $sql=$beforeSql.$sql.';';
+            if($sql||$colsSql){
+                $sql=$beforeSql.$colsSql.$sql.';';
             }else{
                 $sql='';
             }
         }else{
             $cols=[];
             $this->each(function (GenerateColumnOption $v)use(&$cols){
-                $cols[]=$v->getSql('ADD');
+                $cols[]=$v->getSql('');
             });
 
 
@@ -168,15 +213,13 @@ class GenerateTableOption extends Collection
                 $stepFields="  `".$model::getStepField()."` json NOT NULL COMMENT '步骤',
   `".$model::getNextStepField()."` varchar(30) NOT NULL DEFAULT '' COMMENT '下一步',
   `".$model::getCurrentStepField()."` varchar(30) NOT NULL DEFAULT '' COMMENT '当前步骤',
-  `".$model::getStepPastsField()."` varchar(255) NOT NULL DEFAULT '' COMMENT '已走步骤',";
+  `".$model::getStepPastsField()."` varchar(300) NOT NULL DEFAULT '' COMMENT '已走步骤',";
 
             }
 
 
 
             $sql="CREATE TABLE `$tableName`  ( `id` int NOT NULL AUTO_INCREMENT, \n ".implode(" ,\n ",$cols).", \n 
-            $patentField
-$stepFields
   `create_time` int(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
   `create_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
   `update_time` int(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
@@ -184,7 +227,7 @@ $stepFields
   `delete_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
   `update_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
   PRIMARY KEY (`id`)
-); ENGINE=$this->engine , COMMENT = '".addslashes($this->comment)."';";
+) ENGINE=$this->engine , COMMENT = '".addslashes($comment)."';";
 
         }
         return $sql;
