@@ -11,7 +11,7 @@ trait GenerateTable
 
     /**
      * 是否生成表
-     * @param GenerateTableOption $table
+     * @param GenerateTableOption $table 对生成表的配置
      * @return bool
      */
     public function generateTable(GenerateTableOption $table):bool{
@@ -19,7 +19,7 @@ trait GenerateTable
     }
 
     /**
-     * 执行表
+     * 执行表的 自动生成
      */
     private function doGenerateSql():void{
         if(!app()->isDebug()){

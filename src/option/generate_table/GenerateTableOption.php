@@ -67,6 +67,11 @@ class GenerateTableOption extends Collection
     }
 
 
+    /**
+     * 生成字段列表
+     * @return array
+     * @throws \think\Exception
+     */
     public function generateItems():array{
         $arr=[];
         $this->model->fields()->each(function (ModelField $v)use(&$arr){

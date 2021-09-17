@@ -6,6 +6,7 @@ trait TableGetterSetter
 {
 
     /**
+     * 获取表引擎
      * @return string
      */
     public function getEngine(): string
@@ -14,6 +15,7 @@ trait TableGetterSetter
     }
 
     /**
+     * 设置表引擎 InnoDB|MyISAM
      * @param string $engine
      */
     public function setEngine(string $engine): void
@@ -22,6 +24,7 @@ trait TableGetterSetter
     }
 
     /**
+     * 获取表的备注与说明
      * @return string
      */
     public function getComment(): string
@@ -30,6 +33,7 @@ trait TableGetterSetter
     }
 
     /**
+     * 设置表的备注与说明
      * @param string $comment
      */
     public function setComment(string $comment): void
@@ -37,6 +41,7 @@ trait TableGetterSetter
         $this->comment = $comment;
     }
     /**
+     * 获取表时候可以修改列（如果为false，表示只会新增列）
      * @return bool
      */
     public function isModifyColumn(): bool
@@ -45,6 +50,7 @@ trait TableGetterSetter
     }
 
     /**
+     * 设置表时候可以修改列（如果为false，表示只会新增列；如果为true，当模型配置的字段有所更改时，会更改表中字段相关信息）
      * @param bool $modifyColumn
      */
     public function setModifyColumn(bool $modifyColumn): void

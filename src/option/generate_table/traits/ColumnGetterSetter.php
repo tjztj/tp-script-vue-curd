@@ -4,16 +4,26 @@ namespace tpScriptVueCurd\option\generate_table\traits;
 
 trait ColumnGetterSetter
 {
+    /**
+     * 获取字段名
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
+
+    /**
+     * 获取字段类型
+     * @return string
+     */
     public function getType(): string
     {
         return $this->type;
     }
 
     /**
+     * 获取字段长度
      * @return int|null
      */
     public function getLength(): ?int
@@ -22,6 +32,7 @@ trait ColumnGetterSetter
     }
 
     /**
+     * 设置字段长度
      * @param int|null $length
      */
     public function setLength(?int $length): void
@@ -30,6 +41,7 @@ trait ColumnGetterSetter
     }
 
     /**
+     * 获取默认值
      * @return string|null
      */
     public function getDefault(): ?string
@@ -38,6 +50,7 @@ trait ColumnGetterSetter
     }
 
     /**
+     * 设置默认值
      * @param string|null $default
      */
     public function setDefault(?string $default): void
@@ -46,6 +59,7 @@ trait ColumnGetterSetter
     }
 
     /**
+     * 获取备注说明
      * @return string
      */
     public function getComment(): string
@@ -54,6 +68,7 @@ trait ColumnGetterSetter
     }
 
     /**
+     * 设置备注说明
      * @param string $comment
      */
     public function setComment(string $comment): void

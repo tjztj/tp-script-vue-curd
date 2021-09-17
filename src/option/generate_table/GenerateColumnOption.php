@@ -96,6 +96,10 @@ class GenerateColumnOption
     }
 
 
+    /**
+     * 获取类型处理的结果
+     * @return string
+     */
     public function getTypeStr():string{
         $typeStr=$this->type;
         if($this->length){
@@ -110,6 +114,10 @@ class GenerateColumnOption
     }
 
 
+    /**
+     * 获取默认值处理的结果
+     * @return float|int|string|null
+     */
     public function getDefaultStr()
     {
         if(!isset($this->default)||is_null($this->default)){
@@ -126,6 +134,11 @@ class GenerateColumnOption
         }
     }
 
+    /**
+     * 判断字段是否已经变更
+     * @param array $field
+     * @return bool
+     */
     public function checkIsChange(array $field):bool{
         if($field['comment']!==$this->comment){
             return true;
