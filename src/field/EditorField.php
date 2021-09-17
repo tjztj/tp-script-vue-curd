@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\field;
 
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -113,5 +114,14 @@ class EditorField extends ModelField
             new Show($type,'/tp-script-vue-curd-static.php?field/editor/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/editor/edit.js')
         );
+    }
+
+    /**
+     * 数据库字段生成配置
+     * @param  GenerateColumnOption $option
+     * @return void
+     */
+    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+        $option->setTypeText();
     }
 }

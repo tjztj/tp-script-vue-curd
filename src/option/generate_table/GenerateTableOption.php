@@ -5,16 +5,12 @@ namespace tpScriptVueCurd\option\generate_table;
 use think\Collection;
 use think\facade\Db;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\traits\TableGetterSetter;
 
 class GenerateTableOption extends Collection
 {
     use TableGetterSetter;
-
-    /**
-     * @var string 表名（不包含前缀）
-     */
-    protected string $name;
 
 
     /**
@@ -34,20 +30,72 @@ class GenerateTableOption extends Collection
     protected $items = [];
 
 
-    public function getSql(VueCurlModel $model,bool $canEditColumn=false):string{
+    /**
+     * 是否可修改列
+     * @var bool
+     */
+    protected bool $modifyColumn=false;
+
+    protected VueCurlModel $model;
+
+    public function __construct(VueCurlModel $model)
+    {
+        $this->model=clone $model;
+        parent::__construct($this->generateItems());
+    }
+
+    public static function make($items = [])
+    {
+        throw new \think\Exception('不能使用此方法');
+    }
+
+
+    public function generateItems():array{
+        $arr=[];
+        $this->model->fields()->each(function (ModelField $v)use(&$arr){
+            if(!$v->generateSql()){
+                return;
+            }
+            try{
+                $field=new GenerateColumnOption($v->name());
+            }catch (\Exception $e){
+                throw new \think\Exception('字段'.$v->name().$e->getMessage().';如果不想生成此字段的Sql,请对字段->generateSql(false)');
+            }
+
+            $v->getColumnGenerateSqlConfig($field);
+            if(empty($field->getComment())){
+                $field->setComment(($v->group()?$v->group().'|':'').$v->title());
+            }
+            $arr[]=$field;
+        });
+        return $arr;
+    }
+
+
+    /**
+     * 生成数据库操作语句
+     *
+     * @return string
+     * @throws \think\Exception
+     */
+    public function getSql():string{
+        $model=$this->model;
+
         if($this->isEmpty()){
             throw new \think\Exception(get_class($model) .'未在模型中定义字段');
         }
        if($this->engine!=='InnoDB'&&$this->engine!=='MyISAM'){
            throw new \think\Exception('engine不能设置为'.$this->engine.'，只能是InnoDB与MyISAM');
        }
+       //重新设置字段
+        $this->items = $this->convertToArray($this->generateItems());
 
         $controll=$model::getControllerClass();
 
         $tableName=$model->getTable();
-        $hasTable=!empty(Db::table('INFORMATION_SCHEMA.TABLES')
+        $tableOld=Db::table('INFORMATION_SCHEMA.TABLES')
             ->where('TABLE_SCHEMA',$model->getConfig('database'))
-            ->where('TABLE_NAME',$tableName)->value('TABLE_NAME'));
+            ->where('TABLE_NAME',$tableName)->find();
 
 
         $comment=$this->comment;
@@ -56,10 +104,9 @@ class GenerateTableOption extends Collection
         }
 
 
-        if($hasTable){
+        if($tableOld){
             $before='';
-            $hasFieldsKey=array_flip($model->getTableFields());
-
+            $hasFields=$model->getFields();
 
 
             if($controll::type()==='child'){
@@ -70,11 +117,40 @@ class GenerateTableOption extends Collection
             }
 
             $cols=[];
-            $this->each(function (GenerateColumnOption $v)use(&$cols,&$before,$hasFieldsKey,$canEditColumn){
-                $cols[]=$v->getSql(isset($hasFieldsKey[$v->getName()])&&$canEditColumn?'MODIFY':'ADD',$before?:'id');
+            $this->each(function (GenerateColumnOption $v)use(&$cols,&$before,$hasFields){
+                if(isset($hasFields[$v->getName()])){
+                    if(!$this->modifyColumn||!$v->checkIsChange($hasFields[$v->getName()])){
+                        $before=$v->getName();
+                        return;
+                    }
+                    $cols[]=$v->getSql('MODIFY',$before?:'id');
+                }else{
+                    $cols[]=$v->getSql('ADD',$before?:'id');
+                }
                 $before=$v->getName();
             });
-            $sql="ALTER TABLE `$tableName` \n ".implode(" ,\n ",$cols)." ,\n ENGINE=$this->engine , COMMENT = '".addslashes($comment)."';";
+
+            $beforeSql="ALTER TABLE `$tableName` \n ".implode(" ,\n ",$cols);
+
+            $sql='';
+            $engineChange=false;
+            if(strtolower($this->engine)!==strtolower($tableOld['ENGINE'])){
+                $sql.=" ,\n ENGINE=$this->engine";
+                $engineChange=true;
+            }
+            if($comment!==$tableOld['TABLE_COMMENT']){
+                if(!$engineChange){
+                    $sql.=" ,\n";
+                }else{
+                    $sql.=" ,";
+                }
+                $sql.=" COMMENT = '".addslashes($comment)."'";
+            }
+            if($sql){
+                $sql=$beforeSql.$sql.';';
+            }else{
+                $sql='';
+            }
         }else{
             $cols=[];
             $this->each(function (GenerateColumnOption $v)use(&$cols){

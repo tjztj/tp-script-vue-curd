@@ -14,6 +14,7 @@ use tpScriptVueCurd\option\FieldEditTip;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FieldWhere;
+use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\traits\Func;
 
@@ -67,6 +68,7 @@ abstract class ModelField
     public const REQUIRED = true;//开启必填验证
     public bool $objWellToArr = true;
     protected array $attrWhereValueList=[];
+    protected bool $generateSql=true;
 
 
     public function __construct()
@@ -941,5 +943,22 @@ abstract class ModelField
      * @return void
      */
     public function onIndexList(Collection $list,BaseModel &$baseInfo=null):void{}
+
+
+    /**
+     * 是否要生成字段
+     * @param bool|null $generateSql
+     * @return $this|bool
+     */
+    public function generateSql(bool $generateSql = null)
+    {
+        return $this->doAttr('generateSql', $generateSql);
+    }
+    /**
+     * 数据库字段生成配置
+     * @param  GenerateColumnOption $option
+     * @return void
+     */
+    abstract public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void;
 
 }

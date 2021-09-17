@@ -8,6 +8,7 @@ use tpScriptVueCurd\base\controller\BaseChildController;
 use tpScriptVueCurd\base\controller\BaseController;
 use tpScriptVueCurd\base\controller\BaseHaveChildController;
 use tpScriptVueCurd\FieldCollection;
+use tpScriptVueCurd\traits\model\GenerateTable;
 use tpScriptVueCurd\traits\model\InfoAuth;
 use tpScriptVueCurd\traits\model\ModelBaseField;
 use tpScriptVueCurd\traits\model\ModelDelTraits;
@@ -21,7 +22,14 @@ use tpScriptVueCurd\traits\model\ModelStep;
  */
 abstract class VueCurlModel extends TimeModel
 {
-    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep,InfoAuth;
+    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep,InfoAuth,GenerateTable;
+
+
+    public function __construct(array $data = [])
+    {
+        parent::__construct($data);
+        $this->doGenerateSql();
+    }
 
 
     abstract public function fields():FieldCollection;

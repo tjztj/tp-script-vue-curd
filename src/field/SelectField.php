@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\SelectFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -151,5 +152,30 @@ class SelectField extends ModelField
             new Show($type,'/tp-script-vue-curd-static.php?field/select/show.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/select/edit.js')
         );
+    }
+
+    /**
+     * 数据库字段生成配置
+     * @param  GenerateColumnOption $option
+     * @return void
+     */
+    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+        if($this->multiple){
+            $option->setTypeVarchar(64);
+        }else{
+            $isNumVal=true;
+            foreach ($this->items() as $v){
+                if(!is_numeric($v['value'])){
+                    $isNumVal=false;
+                    break;
+                }
+            }
+            if($isNumVal){
+                $option->setTypeInt();
+            }else{
+                $option->setTypeVarchar(64);
+            }
+        }
+
     }
 }

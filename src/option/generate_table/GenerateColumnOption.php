@@ -68,6 +68,31 @@ class GenerateColumnOption
             throw new \think\Exception('GenerateColumnOption的getSql中$type不符合要求（MODIFY|ADD）');
         }
 
+        $comment=addslashes($this->comment);
+
+        $default=$this->getDefaultStr();
+        if(is_null($default)){
+            $default='';
+        }else{
+            if(is_string($default)){
+                $default="'".addslashes($default)."'";
+            }
+            $default='DEFAULT '.$default;
+        }
+
+
+        if($beforeField){
+            if(!self::checkName($beforeField)){
+                throw new \think\Exception('GenerateColumnOption的getSql中$beforeField不符合要求（需小写字母开头，可包含a到z、_、0到9）');
+            }
+            $beforeField='AFTER `'.$beforeField.'`';
+        }
+
+        return $type." COLUMN `$this->name` ".$this->getTypeStr()." NOT NULL $default COMMENT '$comment' $beforeField";
+    }
+
+
+    public function getTypeStr():string{
         $typeStr=$this->type;
         if($this->length){
             $typeStr.='('.$this->length;
@@ -77,29 +102,38 @@ class GenerateColumnOption
             $typeStr.=')';
         }
 
-        $comment=addslashes($this->comment);
+        return $typeStr;
+    }
 
+
+    public function getDefaultStr()
+    {
         if(is_null($this->default)){
-            $default='';
+            return null;
         }else{
             if($this->type==='varchar'){
-                $default="'".addslashes($this->default)."'";
+                $default=(string)$this->default;
             }else if(strpos($this->default,'.')){
                 $default=(float)$this->default;
             }else{
                 $default=(int)$this->default;
             }
-            $default='DEFAULT '.$default;
+            return $default;
         }
+    }
 
-        if($beforeField){
-            if(!self::checkName($beforeField)){
-                throw new \think\Exception('GenerateColumnOption的getSql中$beforeField不符合要求（需小写字母开头，可包含a到z、_、0到9）');
-            }
-            $beforeField='AFTER `'.$beforeField.'`';
+    public function checkIsChange(array $field):bool{
+        if($field['comment']!==$this->comment){
+            return true;
         }
-
-        return $type." COLUMN `$this->name` $typeStr NOT NULL $default COMMENT '$comment' $beforeField";
+        $def=$this->getDefaultStr();
+        if((is_null($def)||is_null($field['default']))&&$field['default']!==(string)$def){
+            return true;
+        }
+        if(strtolower($this->getTypeStr())!==$field['type']){
+            return true;
+        }
+        return false;
     }
 
 }

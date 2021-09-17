@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\LikeFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -84,5 +85,14 @@ class StringAutoCompleteField extends ModelField
             new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/string_auto_complete/edit.js')
         );
+    }
+
+    /**
+     * 数据库字段生成配置
+     * @param  GenerateColumnOption $option
+     * @return void
+     */
+    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+        $option->setTypeVarchar();
     }
 }
