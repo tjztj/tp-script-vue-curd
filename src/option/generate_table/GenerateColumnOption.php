@@ -175,7 +175,7 @@ class GenerateColumnOption
             throw new \think\Exception($lenErr);
         }
 
-        if(preg_match('/^([a-z]+)\((\d+)(?:,(\d+))?\)$/','decimal(13,2)',$matches)){
+        if(preg_match('/^([a-z]+)\((\d+)(?:,(\d+))?\)$/',$field['type'],$matches)){
             $oldType=$matches[1];
             $oldLen=$matches[2];
             $oldPlaces=$matches[3]??null;//小数位数
