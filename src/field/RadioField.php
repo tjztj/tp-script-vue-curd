@@ -138,6 +138,7 @@ class RadioField extends ModelField
      * @return void
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
+        $isNumVal=true;
         foreach ($this->items() as $v){
             if(!is_numeric($v['value'])){
                 $isNumVal=false;
