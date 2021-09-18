@@ -167,7 +167,7 @@ class DateField extends ModelField
      * @param  GenerateColumnOption $option
      * @return void
      */
-    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+    public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeInt(10);
     }
 

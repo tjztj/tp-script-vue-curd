@@ -28,7 +28,7 @@ abstract class VueCurlModel extends TimeModel
     public function __construct(array $data = [])
     {
         parent::__construct($data);
-        $this->doGenerateSql();
+        $this->doGenerateTable();
     }
 
 

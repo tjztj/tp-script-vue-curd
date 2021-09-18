@@ -84,7 +84,7 @@ class TableField extends ListField
      * @param  GenerateColumnOption $option
      * @return void
      */
-    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+    public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeJson();
     }
 }

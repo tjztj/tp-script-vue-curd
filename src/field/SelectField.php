@@ -159,7 +159,7 @@ class SelectField extends ModelField
      * @param  GenerateColumnOption $option
      * @return void
      */
-    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+    public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         if($this->multiple){
             $option->setTypeVarchar(64);
         }else{

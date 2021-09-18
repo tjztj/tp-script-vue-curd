@@ -68,7 +68,7 @@ abstract class ModelField
     public const REQUIRED = true;//开启必填验证
     public bool $objWellToArr = true;
     protected array $attrWhereValueList=[];
-    protected bool $generateSql=true;
+    protected bool $generateColumn=true;
 
 
     public function __construct()
@@ -947,18 +947,18 @@ abstract class ModelField
 
     /**
      * 是否要生成字段
-     * @param bool|null $generateSql
+     * @param bool|null $generateColumn
      * @return $this|bool
      */
-    public function generateSql(bool $generateSql = null)
+    public function generateColumn(bool $generateColumn = null)
     {
-        return $this->doAttr('generateSql', $generateSql);
+        return $this->doAttr('generateColumn', $generateColumn);
     }
     /**
      * 数据库字段生成配置
      * @param  GenerateColumnOption $option
      * @return void
      */
-    abstract public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void;
+    abstract public function getGenerateColumnConfig(GenerateColumnOption $option):void;
 
 }

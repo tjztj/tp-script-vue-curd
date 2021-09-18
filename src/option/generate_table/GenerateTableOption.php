@@ -75,16 +75,16 @@ class GenerateTableOption extends Collection
     public function generateItems():array{
         $arr=[];
         $this->model->fields()->each(function (ModelField $v)use(&$arr){
-            if(!$v->generateSql()){
+            if(!$v->generateColumn()){
                 return;
             }
             try{
                 $field=new GenerateColumnOption($v->name());
             }catch (\Exception $e){
-                throw new \think\Exception('字段'.$v->name().$e->getMessage().';如果不想生成此字段的Sql,请对字段->generateSql(false)');
+                throw new \think\Exception('字段'.$v->name().$e->getMessage().';如果不想生成此字段的Sql,请对字段->generateColumn(false)');
             }
 
-            $v->getColumnGenerateSqlConfig($field);
+            $v->getGenerateColumnConfig($field);
             if(empty($field->getComment())){
                 $field->setComment(($v->group()?$v->group().'|':'').$v->title());
             }
@@ -162,6 +162,8 @@ class GenerateTableOption extends Collection
             $cols=[];
             $this->each(function (GenerateColumnOption $v)use(&$cols,&$before,$hasFields){
                 if(isset($hasFields[$v->getName()])){
+                    $v->changeFieldTypeByOldField($hasFields[$v->getName()]);
+
                     if(!$this->modifyColumn||!$v->checkIsChange($hasFields[$v->getName()])){
                         $before=$v->getName();
                         return;
@@ -206,21 +208,6 @@ class GenerateTableOption extends Collection
             $this->each(function (GenerateColumnOption $v)use(&$cols){
                 $cols[]=$v->getSql('');
             });
-
-
-            $patentField='';
-            if($controll::type()==='child'){
-                $patentField="`".$model::parentField()."` int(11) NOT NULL DEFAULT 0 COMMENT '项目ID',";
-            }
-
-            $stepFields='';
-            if($model->fields()->stepIsEnable()){
-                $stepFields="  `".$model::getStepField()."` json NOT NULL COMMENT '步骤',
-  `".$model::getNextStepField()."` varchar(30) NOT NULL DEFAULT '' COMMENT '下一步',
-  `".$model::getCurrentStepField()."` varchar(30) NOT NULL DEFAULT '' COMMENT '当前步骤',
-  `".$model::getStepPastsField()."` varchar(300) NOT NULL DEFAULT '' COMMENT '已走步骤',";
-
-            }
 
 
 

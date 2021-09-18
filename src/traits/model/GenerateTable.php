@@ -21,7 +21,7 @@ trait GenerateTable
     /**
      * 执行表的 自动生成
      */
-    private function doGenerateSql():void{
+    private function doGenerateTable():void{
         if(!app()->isDebug()){
             return;
         }

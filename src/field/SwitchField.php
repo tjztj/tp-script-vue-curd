@@ -166,7 +166,7 @@ class SwitchField extends ModelField
      * @param  GenerateColumnOption $option
      * @return void
      */
-    public function getColumnGenerateSqlConfig(GenerateColumnOption $option):void{
+    public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $isNumVal=true;
         foreach ($this->items() as $v){
             if(!is_numeric($v['value'])){

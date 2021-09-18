@@ -153,4 +153,112 @@ class GenerateColumnOption
         return false;
     }
 
+
+    /**
+     * 根据老的字段类型，改变当前的字段类型，因为有些字段类型的修改有影响
+     * @param array $field
+     * @throws \think\Exception
+     */
+    public function changeFieldTypeByOldField(array $field):void{
+        $typeStr=$this->getTypeStr();
+        if(strtolower($this->getTypeStr())===$field['type']){
+            //如果字段的类型没有改变，不往下执行
+            return;
+        }
+
+        $msg='系统不会在数据库表中为您改变这个字段的类型，请您自行到数据库表中更改字段的类型为'.$typeStr.'，或者配置字段不自动更改表：$field->generateColumn(false)。';
+        $err='您在模型字段配置中将字段'.$this->name.'的类型由'.$field['type'].'改为了'.$typeStr.'，可能会造成数据的丢失。所以'.$msg;
+        $lenErr='您在模型字段配置中将字段'.$this->name.'的类型由'.$field['type'].'改为了'.$typeStr.'，字段的长度变短，可能会造成数据的丢失。所以'.$msg;
+
+
+        if($this->type!=='longtext'&&$field['type']==='longtext'){
+            throw new \think\Exception($lenErr);
+        }
+
+        if(preg_match('/^([a-z]+)\((\d+)(?:,(\d+))?\)$/','decimal(13,2)',$matches)){
+            $oldType=$matches[1];
+            $oldLen=$matches[2];
+            $oldPlaces=$matches[3]??null;//小数位数
+        }else{
+            $oldType=$field['type'];
+            $oldLen=null;
+            $oldPlaces=null;//小数位数
+        }
+
+        switch ($this->type){
+            case 'longtext':
+                //这个因为字段长度很长，所以当字段类型改变为 longtext 时，不会丢失数据
+                break;
+            case 'text':
+                //因为老的字段不是 longtext (上面那个判断过了)。所以如果新的字段的类型是 text ，那么数据不会丢失
+                break;
+            case 'int':
+                //int只能由小变大，其他任何类型不能变为int
+                if($oldType==='int'){
+                    if($oldLen>$this->length){
+                        //如果新设置的长度比，老的短，那么不改变长度
+                        $this->length=$oldLen;
+                    }
+                }else{
+                    //以前是其他类型，不允许改变为int
+                    throw new \think\Exception($err);
+                }
+                break;
+            case 'bigint':
+                //bigint可改为int，除此外，不允许修改
+                if($oldType==='int'||$oldType==='bigint'){
+                    if($oldLen>$this->length){
+                        //如果新设置的长度比，老的短，那么不改变长度
+                        $this->length=$oldLen;
+                    }
+                }else{
+                    //以前是其他类型，不允许改变为int
+                    throw new \think\Exception($err);
+                }
+                break;
+            case 'varchar':
+                //除了text、longtext、json，其他的都可以改变为varchar
+                if(empty($oldLen)||$oldType==='text'||$oldType==='longtext'||$oldType==='json'){
+                    throw new \think\Exception($lenErr);
+                }
+                if($oldType==='decimal'||$oldType==='float'){
+                    $oldLen+=$oldPlaces?:0;
+                }
+                if($oldLen>$this->length){
+                    //如果新设置的长度比，老的短，那么不改变长度
+                    $this->length=$oldLen;
+                }
+                break;
+            case 'decimal':
+            case 'float':
+                //这两个字段处理方式一样
+                if($oldType===$this->type){
+                    if($oldPlaces&&$oldPlaces>2){
+                        throw new \think\Exception($lenErr);
+                    }
+                    if($oldLen>$this->length){
+                        //如果新设置的长度比，老的短，那么不改变长度
+                        $this->length=$oldLen;
+                    }
+                }else if($oldType==='int'||$oldType==='bigint'){
+                    if(($this->length-$oldLen)<2){
+                        $this->length=$oldLen+2;
+                    }
+                }else{
+                    throw new \think\Exception($err);
+                }
+                break;
+            case 'json':
+                //任何字段不能转为json
+                if($oldType!==$this->type){
+                    throw new \think\Exception('您在模型字段配置中将字段'.$this->name.'的类型由'.$field['type'].'改为了'.$typeStr.'，部分数据可能不是正确的json格式可能会出现无法设置成功。所以'.$msg);
+                }
+                break;
+        }
+
+
+
+
+    }
+
 }
