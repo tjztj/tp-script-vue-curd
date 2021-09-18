@@ -385,6 +385,11 @@ class RegionField extends ModelField
      * @return void
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
-        $option->setTypeInt();
+        if($this->multiple){
+            $option->setTypeText();
+        }else{
+            $option->setTypeInt();
+        }
+
     }
 }
