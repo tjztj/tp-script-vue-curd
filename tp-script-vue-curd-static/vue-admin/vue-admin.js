@@ -1171,7 +1171,7 @@ define(requires, function (axios, Qs) {
                             const def='--setAttrValByWheres--def--';
                             for(const attr in field.attrWhereValueList){
                                 let val=typeof field[attr]==='undefined'?def:field[attr];
-                                for(let k=field.attrWhereValueList[attr].length-1;k<field.attrWhereValueList[attr].length;k++){
+                                for(let k=field.attrWhereValueList[attr].length-1;k>=0;k--){
                                     const {value,where}=field.attrWhereValueList[attr][k];
                                     if(where===null||checkFieldWhereSelf(where)){
                                         val=value;
