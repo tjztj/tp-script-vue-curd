@@ -40,7 +40,7 @@ class GenerateColumnOption
     public function __construct(string $name)
     {
         if(!self::checkName($name)){
-            throw new \think\Exception('字段名称不符合规范（需小写字母开头，可包含a到z、_、0到9）');
+            throw new \think\Exception('字段名称['.$name.']不符合规范（需小写字母开头，可包含a到z、_、0到9）');
         }
         $this->name=$name;
     }

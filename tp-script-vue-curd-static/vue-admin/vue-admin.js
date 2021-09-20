@@ -920,6 +920,15 @@ define(requires, function (axios, Qs) {
                             if (val === null) {
                                 return !fieldWhere.isNot;
                             }
+
+                            if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
+                                if(!/^\d+$/.test(val.toString())){
+                                    val = moment(val).unix()
+                                }else if(val < 10000){
+                                    val = moment(val+'-01-01').unix()
+                                }
+                            }
+
                             if (typeof val === 'object') {
                                 if (fieldWhere.field.type === 'RegionField') {
                                     const regionKeys = Object.keys(val);
@@ -1044,8 +1053,10 @@ define(requires, function (axios, Qs) {
                                     inputVal = checkVal || '';
                                     //如果是时间格式
                                     if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
-                                        if (!/^\d+$/.test(checkVal.toString()) || checkVal < 10000) {
+                                        if(!/^\d+$/.test(checkVal.toString())){
                                             inputVal = moment(checkVal).unix()
+                                        }else if(checkVal < 10000){
+                                            inputVal = moment(checkVal+'-01-01').unix()
                                         }
                                     } else if (field.type === 'RegionField' && typeof checkVal !== 'number' && typeof checkVal !== 'string') {
                                         const regionKeys = Object.keys(checkVal);
