@@ -65,14 +65,16 @@ trait ColumnSetTypes
     /**
      * 设置字段类型为 decimal ,长度如果传入0，代表不改变长度，如果传入数字，代表改变字段长度为传入值
      * @param int $length
+     * @param int $precision
      * @param int|null $default
      * @return $this
      */
-    public function setTypeDecimal(int $length = 11, ?int $default = 0): self
+    public function setTypeDecimal(int $length = 11,int $precision=2, ?int $default = 0): self
     {
         $this->type = 'decimal';
         if ($length) {
             $this->length = $length;
+            $this->precision=$precision;
         }
         if (!is_null($default)) {
             $this->default = $default;
@@ -84,14 +86,16 @@ trait ColumnSetTypes
     /**
      * 设置字段类型为 float ,长度如果传入0，代表不改变长度，如果传入数字，代表改变字段长度为传入值
      * @param int $length
+     * @param int $precision
      * @param int|null $default
      * @return $this
      */
-    public function setTypeFloat(int $length = 11, ?int $default = 0): self
+    public function setTypeFloat(int $length = 11,int $precision=2, ?int $default = 0): self
     {
         $this->type = 'float';
         if ($length) {
             $this->length = $length;
+            $this->precision=$precision;
         }
         if (!is_null($default)) {
             $this->default = $default;

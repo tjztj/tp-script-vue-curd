@@ -129,6 +129,6 @@ class DecimalField extends ModelField
      * @return void
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
-        $option->setTypeDecimal(13);
+        $option->setTypeDecimal(13,$this->precision());
     }
 }

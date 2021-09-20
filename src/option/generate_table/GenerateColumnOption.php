@@ -25,6 +25,9 @@ class GenerateColumnOption
      */
     protected ?int $length = null;
 
+
+    protected int $precision=0;
+
     /**
      * @var string|null 默认值
      */
@@ -105,7 +108,7 @@ class GenerateColumnOption
         if($this->length){
             $typeStr.='('.$this->length;
             if($this->type==='float'||$this->type==='decimal'){
-                $typeStr.=',2';
+                $typeStr.=','.$this->precision;
             }
             $typeStr.=')';
         }
@@ -233,7 +236,7 @@ class GenerateColumnOption
             case 'float':
                 //这两个字段处理方式一样
                 if($oldType===$this->type){
-                    if($oldPlaces&&$oldPlaces>2){
+                    if($oldPlaces&&$oldPlaces>$this->precision){
                         throw new \think\Exception($lenErr);
                     }
                     if($oldLen>$this->length){
@@ -241,8 +244,8 @@ class GenerateColumnOption
                         $this->length=$oldLen;
                     }
                 }else if($oldType==='int'||$oldType==='bigint'){
-                    if(($this->length-$oldLen)<2){
-                        $this->length=$oldLen+2;
+                    if(($this->length-$oldLen)<$this->precision){
+                        $this->length=$oldLen+$this->precision;
                     }
                 }else{
                     throw new \think\Exception($err);
