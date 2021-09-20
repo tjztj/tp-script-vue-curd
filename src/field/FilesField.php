@@ -101,7 +101,7 @@ class FilesField extends ModelField
         return $this;
     }
 
-    public function acceptTexts(string $acceptTexts=null){
+    public function acceptTexts(array $acceptTexts=null){
         return $this->doAttr('acceptTexts',$acceptTexts);
     }
 
