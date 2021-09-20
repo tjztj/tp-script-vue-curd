@@ -72,10 +72,10 @@ class EditorField extends ModelField
 
     /**
      * 工具栏显示按钮
-     * @param bool|null $toolbar
+     * @param array|null $toolbar
      * @return $this|bool
      */
-    public function toolbar(bool $toolbar=null){
+    public function toolbar(array $toolbar=null){
         return $this->doAttr('toolbar',$toolbar);
     }
 
