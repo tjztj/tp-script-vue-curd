@@ -21,6 +21,7 @@ class FieldStepBaseConfig
     public ?string $listBtnColorEdit=null;//编辑时的标题
     public array $other=[];
     public bool $okRefreshList=false;//操作成功后，是否刷新整个列表而不单单刷新当前数据
+    private ?bool $canEditReturn=null;//FieldStepBase中canEdit的返回值，null代表未执行到canEdit
 
 
     public function __construct(array $config=[]){

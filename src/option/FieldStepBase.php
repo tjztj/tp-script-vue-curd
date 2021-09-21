@@ -47,7 +47,12 @@ abstract class FieldStepBase
             fn(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null) => $this->auth($info, $baseInfo, $fields),
             function (VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null){
                 $fn=$this->step->getAuthCheckAndCheckBeforeDefVal();
-                return $fn($info,$baseInfo,$fields)||$this->canEdit($info,$baseInfo,$fields);
+                if($fn($info,$baseInfo,$fields)){
+                    $this->step->config['canEditReturn']=null;
+                    return true;
+                }
+                $this->step->config['canEditReturn']=$this->canEdit($info,$baseInfo,$fields);
+                return $this->step->config['canEditReturn'];
             },
         )->setListRowDo(
             fn(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $baseInfo, $fields,$step)

@@ -570,8 +570,29 @@ trait CurdFunc
 
         $defNext=is_null($info)||empty($info->id)||$this->getSaveStepNext();
 
+
+        $curStepInfo=null;
+        $currFields=null;
+        $currAuthCheck=null;
         if($this->autoStepNext===false){
-            return $defNext;
+            if($defNext){
+                //如果直接下一步，那么就不管，我这里只验证能否编辑
+                return $defNext;
+            }
+            //如果当前步骤是编辑
+            //获取当前步骤信息
+            $currFields=(clone $fields)->filterCurrentStepFields($info,$base,$curStepInfo);
+            if(empty($curStepInfo)||$currFields->isEmpty()){
+                //不能继续执行下去，所以只能返回
+                return $defNext;
+            }
+            //通过authCheck获取canEditReturn
+            $currAuthCheck= $curStepInfo->authCheck($info,$base,$currFields);
+            if($curStepInfo->config['canEditReturn']!==false){
+                //canEditReturn可能是null或者true，这种情况，直接返回，因为true时，可以编辑。null时，不能知道是否要到下一步
+                return $defNext;
+            }
+            $defNext=true;
         }
 
         $nextFields=(clone $fields)->filterNextStepFields($info,$base,$nextStepInfo);
@@ -580,10 +601,16 @@ trait CurdFunc
             return $nextFields->isEmpty()||$nextStepInfo->authCheck($info,$base,$nextFields)===false?null:true;
         }
 
-        $currFields=(clone $fields)->filterCurrentStepFields($info,$base,$curStepInfo);
+        $currFields=$currFields?:(clone $fields)->filterCurrentStepFields($info,$base,$curStepInfo);
 
         if(is_null($nextStepInfo)||$nextFields->isEmpty()){
-            return $currFields->isEmpty()||$curStepInfo->authCheck($info,$base,$currFields)===false?null:false;
+            if($currFields->isEmpty()){
+                return null;
+            }
+            if(is_null($currAuthCheck)){
+                $currAuthCheck=$curStepInfo->authCheck($info,$base,$currFields);
+            }
+            return $currAuthCheck===false?null:false;
         }
 
         if(is_null($curStepInfo)||$currFields->isEmpty()){
@@ -591,7 +618,10 @@ trait CurdFunc
         }
 
         if($nextStepInfo->authCheck($info,$base,$nextFields)){
-            if($curStepInfo->authCheck($info,$base,$currFields)){
+            if(is_null($currAuthCheck)){
+                $currAuthCheck=$curStepInfo->authCheck($info,$base,$currFields);
+            }
+            if($currAuthCheck){
                 $curUrl=$this->checkEditUrl($currFields,$curStepInfo);
                 $nextUrl=$this->checkEditUrl($nextFields,$nextStepInfo);
 
@@ -603,8 +633,10 @@ trait CurdFunc
             }
             return true;
         }
-
-        if($curStepInfo->authCheck($info,$base,$currFields)){
+        if(is_null($currAuthCheck)){
+            $currAuthCheck=$curStepInfo->authCheck($info,$base,$currFields);
+        }
+        if($currAuthCheck){
             return false;
         }
         return null;
