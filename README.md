@@ -17,6 +17,9 @@ thinkphp6 自动生成curd逻辑，并生成数据库相关表
         <img src="https://img.shields.io/badge/ant design vue-2.0.0+-green.svg" alt="ant-design-vue Version">
     </a>
 </p>
+<p align="center">
+**[感谢 jetbrains 公司](https://www.jetbrains.com/)**
+</p>
 
 > 项目初衷
 
