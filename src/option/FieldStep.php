@@ -232,7 +232,7 @@ class FieldStep
             return true;
         }
         $auth=$this->auth;
-        return $auth($info,$baseInfo,$fields);
+        return $auth($info,$baseInfo,$fields,$this);
     }
 
 

@@ -588,7 +588,7 @@ trait CurdFunc
             }
             //通过authCheck获取canEditReturn
             $currAuthCheck= $curStepInfo->authCheck($info,$base,$currFields);
-            if($curStepInfo->config['canEditReturn']!==false){
+            if(!isset($curStepInfo->config['canEditReturn'])||$curStepInfo->config['canEditReturn']!==false){
                 //canEditReturn可能是null或者true，这种情况，直接返回，因为true时，可以编辑。null时，不能知道是否要到下一步
                 return $defNext;
             }
