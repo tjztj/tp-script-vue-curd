@@ -211,7 +211,13 @@ trait Vue
             'errorCode'=>$errorCode,
         ];
         if ($type === 'html') {
-            $response = view(app('config')->get('app.dispatch_error_tmpl'), $result);
+            $tpl=app('config')->get('app.dispatch_error_tmpl');
+            if($tpl){
+                $response = view($tpl, $result);
+            }else{
+                $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'jump.vue');
+                $response = view(static::getTplPath().'jump/error.vue', ['vue_data_json'=>json_encode($result)]);
+            }
         } elseif ($type === 'json') {
             $response = json($result);
         }
@@ -249,7 +255,13 @@ trait Vue
 
         $type = (request()->isJson() || request()->isAjax() || request()->isPost()) ? 'json' : 'html';
         if ($type === 'html') {
-            $response = view(app('config')->get('app.dispatch_success_tmpl'), $result);
+            $tpl=app('config')->get('app.dispatch_success_tmpl');
+            if($tpl){
+                $response = view($tpl, $result);
+            }else{
+                $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'jump.vue');
+                $response = view(static::getTplPath().'jump/success.vue', ['vue_data_json'=>json_encode($result)]);
+            }
         } elseif ($type === 'json') {
             $response = json($result);
         }
@@ -258,7 +270,7 @@ trait Vue
 
 
     final public static function getTplPath():string{
-        return root_path().'vendor'.DIRECTORY_SEPARATOR.'tj'.DIRECTORY_SEPARATOR.'tp-script-vue-curd'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR;
+        return getVCurdDir().'tpl'.DIRECTORY_SEPARATOR;
     }
 
 

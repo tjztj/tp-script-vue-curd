@@ -190,3 +190,11 @@ if (!function_exists('create_guid')) {
         return $uuid;
     }
 }
+
+/**
+ * 框架根目录地址
+ * @return string
+ */
+function getVCurdDir():string{
+    return dirname(__DIR__).DIRECTORY_SEPARATOR;
+}
