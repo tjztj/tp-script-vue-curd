@@ -225,7 +225,7 @@ class FieldStep
             $this->setAuthCheckAndCheckBefore(null);
         }
         $authCheckAndCheckBefore=$this->authCheckAndCheckBefore;
-        if(!$authCheckAndCheckBefore($info,$baseInfo,$fields)){
+        if(!$authCheckAndCheckBefore($info,$baseInfo,$fields,$this)){
             return false;
         }
         if(!isset($this->auth)){
