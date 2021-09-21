@@ -315,7 +315,12 @@ define(requires, function (axios, Qs) {
                     }
                 }
                 this.openType=key;
-                this.openIndex=appObj[key]?0:appObj[key].length;
+                if(appObj[key]){
+                    this.openIndex=appObj[key].length;
+                }else{
+                    this.openIndex=0;
+                    appObj[key]=[];
+                }
 
 
                 openInfo.title = option.title || undefined;
