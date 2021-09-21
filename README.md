@@ -18,7 +18,9 @@ thinkphp6 自动生成curd逻辑，并生成数据库相关表
     </a>
 </p>
 <p align="center">
-**[感谢 jetbrains 公司](https://www.jetbrains.com/)**
+
+[感谢 jetbrains 公司](https://www.jetbrains.com/)
+
 </p>
 
 > 项目初衷
