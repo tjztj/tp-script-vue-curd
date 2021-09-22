@@ -192,7 +192,11 @@ class GenerateTableOption extends Collection
             }
             if($comment!==$tableOld['TABLE_COMMENT']){
                 if(!$engineChange){
-                    $sql.=" ,\n";
+                    if($cols){
+                        $sql.=" ,\n";
+                    }else{
+                        $sql= " \n";
+                    }
                 }else if($cols){
                     $sql.=" ,";
                 }
