@@ -383,7 +383,7 @@ trait BaseIndex
      * @throws \think\Exception
      */
     protected function setIndexFilterAddStep(FieldCollection $filterFields,?array $filterData){
-        if($filterFields->stepIsEnable()){
+        if($filterFields->stepIsEnable()&&$filterFields->getStepConfig()['showFilter']){
             $steps=[];
             $filterFields->each(function (ModelField $v)use(&$steps){
                 /**

@@ -21,6 +21,8 @@ trait FieldCollectionStep
         //【可以自定义一个函数，参数是要显示的对象function($fields,$info,$baseInfo):void】
         'showSortSteps'=>'dataStepHistory',
         'listFixed'=>'',//列表中，列是否浮动，'left'/'right'
+        'width'=>0,//0为自动
+        'showFilter'=>true,//显示筛选
     ];
 
 

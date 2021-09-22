@@ -1379,8 +1379,11 @@ define(requires, function (axios, Qs) {
                         slots: {customRender: 'step-info', title: 'custom-title-step-info'},
                         fixed: props.fieldStepConfig.listFixed ? props.fieldStepConfig.listFixed : false,
                     };
+                    if(props.fieldStepConfig.width&&props.fieldStepConfig.width>0){
+                        stepCol.width=props.fieldStepConfig.width;
+                    }
                     if (props.fieldStepConfig.listFixed) {
-                        stepCol.width = 180;
+                        stepCol.width = stepCol.width||180;
                         if(props.showCreateTime===undefined||props.showCreateTime){
                             columns.push(createTimeCol)
                             columnsCount++;
