@@ -40,7 +40,7 @@ class TreeSelect extends ModelField
     /**
      * 是否可多选
      * @param bool $multiple
-     * @return RegionField|bool
+     * @return $this|bool
      */
     public function multiple(bool $multiple=null){
         return $this->doAttr('multiple',$multiple);
