@@ -43,6 +43,10 @@ class RegionField extends ModelField
 
     protected $nullVal=0;//字段在数据库中为空时的值
 
+    protected bool $isRegionField=true;
+    protected string $pTitle='镇街';
+    protected string $cTitle='村社';
+
 
 
     public function __construct($otherConfig)
@@ -82,7 +86,36 @@ class RegionField extends ModelField
      * @return RegionField|bool
      */
     public function multiple(bool $multiple=null){
-         return $this->doAttr('multiple',$multiple);
+        return $this->doAttr('multiple',$multiple);
+    }
+
+
+    /**
+     * 是否镇村字段
+     * @param bool $isRegionField
+     * @return RegionField|bool
+     */
+    public function isRegionField(bool $isRegionField=null){
+        return $this->doAttr('isRegionField',$isRegionField);
+    }
+
+
+    /**
+     * @param string|null $pTitle
+     * @return $this|string
+     */
+    public function pTitle(string $pTitle = null)
+    {
+        return $this->doAttr('pTitle', $pTitle);
+    }
+
+    /**
+     * @param string|null $cTitle
+     * @return $this|string
+     */
+    public function cTitle(string $cTitle = null)
+    {
+        return $this->doAttr('cTitle', $cTitle);
     }
 
 
@@ -176,7 +209,10 @@ class RegionField extends ModelField
                 $cRegionId = $data[$this->cField()];
             }
             if ($cRegionId) {
-                return self::getRegionPid($cRegionId);
+                if($this->getRegionPid()){
+                    return self::getRegionPid($cRegionId);
+                }
+                return $this->getTreeInfoPid($cRegionId);
             }
         }
         return $val;
@@ -208,14 +244,22 @@ class RegionField extends ModelField
             }
 
             if(!$this->multiple){
-                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
+                if($this->isRegionField()){
+                    $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
+                }else{
+                    $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??$this->getTreeInfoName($dataBaseData[$name]);
+                }
                 return;
             }
 
             $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
 
             foreach ($arr as $k=>$v){
-                $arr[$k]=self::getRegionName($v)?:$v;
+                if($this->isRegionField()){
+                    $arr[$k]=self::getRegionName($v)?:$v;
+                }else{
+                    $arr[$k]=$this->getTreeInfoName($v)?:$v;
+                }
             }
             $dataBaseData[$name]=implode('，',$arr);
         }
@@ -228,11 +272,15 @@ class RegionField extends ModelField
      */
     public function getTreeToList(){
         static $list=[];
-        $func=function($tree)use(&$list,&$func){
+        $func=function($tree,$pid=null)use(&$list,&$func){
             foreach ($tree as $v){
+                if(!isset($v['pid'])){
+                    $v['pid']=is_null($pid)?'':(string)$pid;
+                }
+
                 $list[$v['value']]=$v;
                 if(!empty($v['children'])){
-                    $func($v['children']);
+                    $func($v['children'],$v['value']);
                 }
             }
         };
@@ -259,6 +307,15 @@ class RegionField extends ModelField
             $regions = array_column(SystemRegion::getAll(), 'name', 'id');
         }
         return $regions[$cRegionId] ?? '';
+    }
+
+
+    private function getTreeInfoPid(int $cRegionId){
+        return $this->getTreeToList()[$cRegionId]['pid']??'';
+    }
+
+    private function getTreeInfoName(int $cRegionId){
+        return $this->getTreeToList()[$cRegionId]['label']??'';
     }
 
     /** 可以是 桐君街道 或 阆苑村 或 桐君街道-阆苑村
@@ -302,7 +359,7 @@ class RegionField extends ModelField
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
     {
-        $excelFieldTpl->explain = "填入：镇街-村社,需和\n" . url('index/showRegionPage', [], true, true)->build() . "\n中的名称对应";
+        $excelFieldTpl->explain = "填入：$this->pField-$this->cField,需和\n" . url('index/showRegionPage', [], true, true)->build() . "\n中的名称对应";
         $excelFieldTpl->width = 40;
         $excelFieldTpl->wrapText = true;
     }
@@ -336,9 +393,16 @@ class RegionField extends ModelField
 
             if($this->canCheckParent()&&count($regions)===1){
                 $save[$this->cField()]=self::getRegionId($regions[0]);
-                if(!empty(self::getRegionPid($save[$this->cField()]))){
-                    throw new \think\Exception('填写格式不正确');
+                if($this->isRegionField()){
+                    if(!empty(self::getRegionPid($save[$this->cField()]))){
+                        throw new \think\Exception('填写格式不正确-001');
+                    }
+                }else{
+                    if(!empty($this->getTreeInfoPid($save[$this->cField()]))){
+                        throw new \think\Exception('填写格式不正确-002');
+                    }
                 }
+
                 $save[$this->pField()]=0;
                 return;
             }
@@ -353,7 +417,12 @@ class RegionField extends ModelField
                 throw new \think\Exception('没有找到村社：' . $regions[1]);
             }
         }
-        $save[$this->pField()] = self::getRegionPid($save[$this->cField()]);
+        if($this->isRegionField()){
+            $save[$this->pField()] = self::getRegionPid($save[$this->cField()]);
+        }else{
+            $save[$this->pField()] =$this->getTreeInfoPid($save[$this->cField()]);
+        }
+
 
         if(empty($save[$this->cField()]) || empty($save[$this->pField()]) ){
             throw new \think\Exception('未获取到正确的村社-001');
@@ -362,9 +431,16 @@ class RegionField extends ModelField
             throw new \think\Exception('未获取到正确的村社-002');
         }
 
-        if (self::getRegionPid($save[$this->cField()]) != $save[$this->pField()]) {
-            throw new \think\Exception('镇街[' . self::getRegionName($save[$this->pField()]) . ']下未找到' . self::getRegionName($save[$this->cField()]));
+        if($this->isRegionField()){
+            if (self::getRegionPid($save[$this->cField()]) != $save[$this->pField()]) {
+                throw new \think\Exception($this->pField.'[' . self::getRegionName($save[$this->pField()]) . ']下未找到' . self::getRegionName($save[$this->cField()]));
+            }
+        }else{
+            if ($this->getTreeInfoPid($save[$this->cField()]) != $save[$this->pField()]) {
+                throw new \think\Exception($this->pField.'[' . $this->getTreeInfoName($save[$this->pField()]) . ']下未找到' . $this->getTreeInfoName($save[$this->cField()]));
+            }
         }
+
 
     }
 

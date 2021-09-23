@@ -32,9 +32,9 @@ define([],function(){
         setup(props,ctx){
             let justOne=true;
             props.field.regionTree.forEach(v=>{
-                regions[parseInt(v.id)]=v;
-                regionValues[parseInt(v.id)]=[parseInt(v.id)];
-                textValues['/'+v.name]=regionValues[parseInt(v.id)];
+                regions[parseInt(v.value)]=v;
+                regionValues[parseInt(v.value)]=[parseInt(v.value)];
+                textValues['/'+v.name]=regionValues[parseInt(v.value)];
                 if(v.children){
                     if(v.children.length>1){
                         justOne=false;
@@ -43,9 +43,9 @@ define([],function(){
                         if(level===1){
                             level=2;
                         }
-                        regions[parseInt(val.id)]=val;
-                        regionValues[parseInt(val.id)]=[parseInt(v.id),parseInt(val.id)];
-                        textValues[v.name+'/'+val.name]=regionValues[parseInt(val.id)];
+                        regions[parseInt(val.value)]=val;
+                        regionValues[parseInt(val.value)]=[parseInt(v.value),parseInt(val.value)];
+                        textValues[v.name+'/'+val.name]=regionValues[parseInt(val.value)];
                         if(val.children){
                             if(val.children.length>1){
                                 justOne=false;
@@ -54,9 +54,9 @@ define([],function(){
                                 if(level!==3){
                                     level=3;
                                 }
-                                regions[parseInt(vo.id)]=vo;
-                                regionValues[parseInt(vo.id)]=[parseInt(v.id),parseInt(val.id),parseInt(vo.id)];
-                                textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.id)];
+                                regions[parseInt(vo.value)]=vo;
+                                regionValues[parseInt(vo.value)]=[parseInt(v.value),parseInt(val.value),parseInt(vo.value)];
+                                textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.value)];
                                 level_3=true;
                             })
                         }
@@ -161,7 +161,7 @@ define([],function(){
                                  style="width: 100%"
                                  tree-checkable
                                  tree-check-strictly
-                                 :placeholder="field.placeholder||'请选择村社'"
+                                 :placeholder="field.placeholder||'请选择'+field.cTitle"
                                  :dropdown-style="{ maxHeight: '350px', overflow: 'auto' }"
                             >
                             
@@ -169,7 +169,7 @@ define([],function(){
                             <a-cascader v-else
                                 v-model:value="modelVal"
                                 :options="dataTree"
-                                :placeholder="field.placeholder||'请选择村社'"
+                                :placeholder="field.placeholder||'请选择'+field.cTitle"
                                 show-search
                                 :disabled="field.readOnly"
                                 :change-on-select="field.canCheckParent"
