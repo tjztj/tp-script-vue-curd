@@ -18,10 +18,12 @@ define([],function(){
                     const arr=typeof this.value==='string'?this.value.split(','):this.value;
                     const vals=[];
                     arr.forEach(v=>{
-                        vals.push({
-                            value:v.toString(),
-                            label:valTitles[v.toString()]
-                        })
+                        if(v.toString()!==''){
+                            vals.push({
+                                value:v.toString(),
+                                label:valTitles[v.toString()]
+                            })
+                        }
                     })
                     this.val=vals;
                 }
