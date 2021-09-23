@@ -3,7 +3,9 @@
 namespace tpScriptVueCurd\field;
 
 use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\CascaderFilter;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\ModelFilter;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
@@ -12,6 +14,8 @@ use tpScriptVueCurd\tool\field_tpl\Show;
 
 class TreeSelect extends ModelField
 {
+
+    protected string $defaultFilterClass=CascaderFilter::class;
 
     protected bool $canCheckParent=false;//是否可选中父级
     protected bool $multiple=false;//是否多选
@@ -255,9 +259,15 @@ class TreeSelect extends ModelField
         foreach ($tree as $val) {
             $val['parents']=$parents;
             $list[$val[$pkName]]=$val;
+            $list[$val[$pkName]]['childVals']=[];//所有子的ID
+            $list[$val[$pkName]]['childLastVals']=[];//所有子最底层，的ID
             if (isset($val[$childName])) {
                 foreach (self::treeToList($val[$childName],$pkName,$childName,[...$parents,$val[$pkName]]) as $v){
                     $list[$v[$pkName]]=$v;
+                    $list[$val[$pkName]]['childVals'][]=$v[$pkName];
+                    if(!isset($v[$childName])){
+                        $list[$val[$pkName]]['childLastVals'][]=$v[$pkName];
+                    }
                 }
             }
 
