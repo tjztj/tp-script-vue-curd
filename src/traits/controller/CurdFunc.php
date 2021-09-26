@@ -651,7 +651,17 @@ trait CurdFunc
      */
     protected function checkEditUrl(FieldCollection $fields,?FieldStep $stepInfo):bool{
         if($stepInfo&&!$fields->isEmpty()){
-            if(!empty($stepInfo->config['listBtnUrl'])){
+            if(!empty($stepInfo->config['canEditActions'])){
+                // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
+                $app=app('http')->getName();
+                $app&&$app.='/';
+                return (bool)array_intersect([
+                    $app.$this->request->controller().'/'.$this->request->action(),
+                    $app.str_replace('._','.',parse_name($this->request->controller())).'/'.$this->request->action(),
+                    $app.str_replace('._','.',parse_name($this->request->controller())).'/'.parse_name($this->request->action()),
+                    $app.$this->request->controller().'/'.parse_name($this->request->action()),
+                ],$stepInfo->config['canEditActions']);
+            }else if(!empty($stepInfo->config['listBtnUrl'])){
                 if(stripos($this->request->url(),$stepInfo->config['listBtnUrl'])!==0
                     &&stripos($this->request->url(),url($stepInfo->config['listBtnUrl'],[],false)->build())!==0){
                     return false;

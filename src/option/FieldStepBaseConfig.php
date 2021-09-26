@@ -22,6 +22,7 @@ class FieldStepBaseConfig
     public array $other=[];
     public bool $okRefreshList=false;//操作成功后，是否刷新整个列表而不单单刷新当前数据
     private ?bool $canEditReturn=null;//FieldStepBase中canEdit的返回值，null代表未执行到canEdit
+    public array $canEditActions=[];//可以提交此步骤字段信息的action集合
 
 
     public function __construct(array $config=[]){
@@ -50,6 +51,7 @@ class FieldStepBaseConfig
             'listBtnColorEdit'=>$this->listBtnColorEdit,
             'other'=>$this->other,
             'okRefreshList'=>$this->okRefreshList,
+            'canEditActions'=>$this->canEditActions,
         ];
     }
 
