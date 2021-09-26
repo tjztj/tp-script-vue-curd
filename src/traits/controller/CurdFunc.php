@@ -133,9 +133,9 @@ trait CurdFunc
                         $fields=$fields->filterNextStepFields($old,$baseInfo,$stepInfo);
                     }else{
                         $fields=$fields->filterCurrentStepFields($old,$baseInfo,$stepInfo);
-                        if(!$this->checkEditUrl($fields,$stepInfo)){
-                            return $this->error('您不能进行此操作-061');
-                        }
+                    }
+                    if(!$this->checkEditUrl($fields,$stepInfo)){
+                        return $this->error('您不能进行此操作-061');
                     }
                     $fields->saveStepInfo=$stepInfo;
 
@@ -371,7 +371,7 @@ trait CurdFunc
             $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
         }
 
-        if(!empty($data->id)&&!$this->checkEditUrl($fields,$stepInfo)){
+        if(!$this->checkEditUrl($fields,$stepInfo)){
             return $this->error('您不能进行此操作-063');
         }
 
@@ -650,27 +650,50 @@ trait CurdFunc
      * @return bool
      */
     protected function checkEditUrl(FieldCollection $fields,?FieldStep $stepInfo):bool{
-        if($stepInfo&&!$fields->isEmpty()){
-            if(!empty($stepInfo->config['canEditActions'])){
-                // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
-                $app=app('http')->getName();
-                $app&&$app.='/';
-                return (bool)array_intersect([
-                    $app.$this->request->controller().'/'.$this->request->action(),
-                    $app.str_replace('._','.',parse_name($this->request->controller())).'/'.$this->request->action(),
-                    $app.str_replace('._','.',parse_name($this->request->controller())).'/'.parse_name($this->request->action()),
-                    $app.$this->request->controller().'/'.parse_name($this->request->action()),
-                ],$stepInfo->config['canEditActions']);
-            }else if(!empty($stepInfo->config['listBtnUrl'])){
-                if(stripos($this->request->url(),$stepInfo->config['listBtnUrl'])!==0
-                    &&stripos($this->request->url(),url($stepInfo->config['listBtnUrl'],[],false)->build())!==0){
-                    return false;
-                }
-            }else if(url('edit')->build()!==$this->request->baseUrl()){
-                return false;
-            }
+        if($stepInfo === null){
+            return true;
         }
-        return true;
+        if(!empty($stepInfo->config['canEditActions'])){
+            // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
+            $app=app('http')->getName();
+            $app&&$app.='/';
+            return (bool)array_intersect([
+                $app.$this->request->controller().'/'.$this->request->action(),
+                $app.str_replace('._','.',parse_name($this->request->controller())).'/'.$this->request->action(),
+                $app.str_replace('._','.',parse_name($this->request->controller())).'/'.parse_name($this->request->action()),
+                $app.$this->request->controller().'/'.parse_name($this->request->action()),
+            ],$stepInfo->config['canEditActions']);
+        }
+
+        if(!empty($stepInfo->config['listBtnUrl'])){
+            $listBtnUrlOptin=$stepInfo->config['listBtnUrl'];
+            if(stripos($stepInfo->config['listBtnUrl'],'index.php')===0){
+                $urlArr=explode('/',substr($stepInfo->config['listBtnUrl'],9));
+            }else if(stripos($stepInfo->config['listBtnUrl'],'/index.php')===0){
+                $urlArr=explode('/',substr($stepInfo->config['listBtnUrl'],10));
+            }else{
+                $urlArr=explode('/',$stepInfo->config['listBtnUrl']);
+            }
+            $urlArr=array_values(array_filter($urlArr));
+            if(app('http')->getName()){
+                $listBtnUrlArr=[
+                    $urlArr[0],$urlArr[1],current(explode('.',$urlArr[2]))
+                ];
+            }else{
+                $listBtnUrlArr=[
+                    $urlArr[0],current(explode('.',$urlArr[1]))
+                ];
+            }
+
+            return stripos($this->request->url(),$stepInfo->config['listBtnUrl'])===0
+                ||stripos($this->request->url(),url(implode('/',$listBtnUrlArr),[],false)->build())===0
+                ||stripos($this->request->url(),url(implode('/',$listBtnUrlArr),[],true)->build())===0
+                ||stripos($this->request->url(),url($stepInfo->config['listBtnUrl'],[],false)->build())===0
+                ||stripos($this->request->url(),url($stepInfo->config['listBtnUrl'],[],true)->build())===0;
+        }
+
+        return url('edit')->build()===$this->request->baseUrl()
+            || url('edit',[],true,true)->build()===$this->request->baseUrl();
     }
 
     /**
