@@ -109,6 +109,7 @@
             :can-del="canDel"
             :row-selection="canDel?rowSelection:null"
             :field-step-config="fieldStepConfig"
+            :action-width="actionWidth"
             :action-def-width="actionDefWidth"
             @refresh-table="refreshTable"
             @change="handleTableChange"

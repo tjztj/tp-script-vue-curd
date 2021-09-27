@@ -809,6 +809,9 @@ define(['vueAdmin'], function (va) {
                 onDataLoad(url,where,res){
                     //数据获取完成钩子
                 },
+                actionWidth(row){
+                    return this.actionDefWidth
+                },
                 ////其他配置
                 ...getThisActionOhterMethods()
             }
