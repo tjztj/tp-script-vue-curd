@@ -917,11 +917,12 @@ abstract class ModelField
     public function onEditShow(VueCurlModel &$data,BaseModel &$baseInfo=null):void{}
     /**
      * 子字段可重写
-     * @param VueCurlModel $data
+     * @param array $postData
+     * @param VueCurlModel|null $old
      * @param BaseModel|null $baseInfo
      * @return void
      */
-    public function onEditSave(array &$postData,BaseModel &$baseInfo=null):void{}
+    public function onEditSave(array &$postData,VueCurlModel &$old=null,BaseModel &$baseInfo=null):void{}
     /**
      * 子字段可重写
      * @param VueCurlModel $data
