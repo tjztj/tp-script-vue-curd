@@ -13,6 +13,7 @@ use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldEditTip;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
+use tpScriptVueCurd\option\FieldTip;
 use tpScriptVueCurd\option\FieldWhere;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
@@ -35,6 +36,7 @@ abstract class ModelField
     protected string $ext = '';//后缀
     protected string $placeholder = '';//输入提示
     protected string $editExplain = '';//字段编辑时下方的说明
+    protected string $explain='';//字段编辑和显示时，底部显示
     protected bool $listShow = false;//是否在列表中显示
     protected int $listColumnWidth = 0;//指定列宽（0，不指定）
     protected bool $listSort = true;//列表中时候可排序
@@ -65,6 +67,7 @@ abstract class ModelField
      * @var FieldEditTip[] $editTips 字段在编辑页面时，可根据填写的内容显示不同的提示信息
      */
     protected array $editTips = [];
+    protected array $tips = [];//字段编辑和显示时显示在字段顶部的提示
     public const REQUIRED = true;//开启必填验证
     public bool $objWellToArr = true;
     protected array $attrWhereValueList=[];
@@ -190,6 +193,14 @@ abstract class ModelField
         return $this->doAttr('editExplain', $editExplain);
     }
 
+    /**字段编辑和显示时下方的说明
+     * @param string|null $explain
+     * @return $this|string
+     */
+    public function explain(string $explain = null)
+    {
+        return $this->doAttr('explain', $explain);
+    }
 
     /**
      * 是否在后台列表中显示出来
@@ -418,6 +429,15 @@ abstract class ModelField
     }
 
     /**
+     * 字段在编辑页面时，可根据填写的内容显示不同的提示信息
+     * @return FieldTip[]
+     */
+    public function tips(): array
+    {
+        return $this->tips;
+    }
+
+    /**
      * 字段属性的值的集合
      * @return array
      */
@@ -499,7 +519,7 @@ abstract class ModelField
     /**
      * 字段在编辑页面时，可根据填写的内容显示不同的提示信息|设置
      * @param string $message
-     * @param FieldWhere $show
+     * @param FieldWhere|null $show
      * @return FieldEditTip
      */
     public function pushEditTip(string $message, FieldWhere $show=null): FieldEditTip
@@ -507,6 +527,19 @@ abstract class ModelField
         $fieldEditTip = new FieldEditTip($message, $show);
         $this->editTips[] = $fieldEditTip;
         return $fieldEditTip;
+    }
+
+    /**
+     * 字段在编辑和显示页面时，可根据填写的内容显示不同的提示信息|设置
+     * @param string $message
+     * @param FieldWhere|null $show
+     * @return FieldTip
+     */
+    public function pushTip(string $message, FieldWhere $show=null): FieldTip
+    {
+        $fieldTip = new FieldTip($message, $show);
+        $this->tips[] = $fieldTip;
+        return $fieldTip;
     }
 
 

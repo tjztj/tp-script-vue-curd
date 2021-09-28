@@ -1008,12 +1008,21 @@ define(requires, function (axios, Qs) {
                             });
                         };
                         ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const checkFieldTipShow = function (field) {
+                        const checkFieldEditTipShow = function (field) {
                             if (field.editTips.length === 0) {
                                 field.editTipArr = [];
                                 return;
                             }
                             field.editTipArr = field.editTips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                        }
+
+                        ///////////////////////////////////////////////////////////////////////////////////////////////
+                        const checkFieldTipShow = function (field) {
+                            if (field.tips.length === 0) {
+                                field.tipArr = [];
+                                return;
+                            }
+                            field.tipArr = field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1192,7 +1201,8 @@ define(requires, function (axios, Qs) {
 
                         this.groupFieldItems.forEach(field => {
                             checkShowItemBy(field);
-                            checkFieldTipShow(field)
+                            checkFieldTipShow(field);
+                            checkFieldEditTipShow(field);
                             checkHideField(field, this.currentFieldHideList[field.name] ? '' : formVal[field.name]);
                             setFieldAttrByWhere(field);
                         });
@@ -1261,6 +1271,9 @@ define(requires, function (axios, Qs) {
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.editTipArr&&field.editTipArr.length>0}">
                                         <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
                                     </div>
+                                    <div :class="{'field-tips':true,'field-tips-have-items':field.tipArr&&field.tipArr.length>0}">
+                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.tipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
+                                    </div>
                                     <component 
                                         :is="'VueCurdEdit'+field.type" 
                                         :field="field" 
@@ -1274,7 +1287,12 @@ define(requires, function (axios, Qs) {
                                         :group-field-items="groupFieldItems"
                                         @submit="$emit('submit',$event)"
                                     ></component>
+                                    <transition name="to-right">
                                     <div v-if="field.editExplain" style="color: #bfbfbf">{{field.editExplain}}</div>
+                                    </transition>
+                                    <transition name="to-right">
+                                    <div v-if="field.explain" style="color: #bfbfbf">{{field.explain}}</div>
+                                    </transition>
                                 </a-form-item>
                                 </transition>
                             </div>
@@ -1289,6 +1307,14 @@ define(requires, function (axios, Qs) {
                 return {
                     fieldComponents
                 }
+            },
+            computed:{
+                tipArr(){
+                    if (this.field.tips.length === 0) {
+                        return [];
+                    }
+                    return field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                },
             },
             methods: {
                 showImages(imgs, start) {
@@ -1306,6 +1332,9 @@ define(requires, function (axios, Qs) {
                 },
             },
             template: `<div class="curd-show-field-box" :data-name="field.name">
+                            <div :class="{'field-tips':true,'field-tips-have-items':tipArr.length>0}">
+                                <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in tipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
+                            </div>
                              <component 
                                 v-if="fieldComponents['VueCurdShow'+field.type]"
                                 :is="'VueCurdShow'+field.type" 
@@ -1315,6 +1344,9 @@ define(requires, function (axios, Qs) {
                             <div v-else>
                                 <div>{{info[field.name]}}<span class="ext-box" v-if="field.ext">（{{field.ext}}）</span></div>
                             </div>
+                            <transition name="to-right">
+                             <div v-if="field.explain" style="color: #bfbfbf">{{field.explain}}</div>
+                             </transition>
                         </div>`,
         });
 
