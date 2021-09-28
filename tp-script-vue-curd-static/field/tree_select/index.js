@@ -28,7 +28,7 @@ define([], function () {
                     return [];
                 }
                 const vals=[];
-                val.split(',').forEach(v=>{
+                val.toString().split(',').forEach(v=>{
                     vals.push(getText(this.field.items,v,''))
                 })
 
