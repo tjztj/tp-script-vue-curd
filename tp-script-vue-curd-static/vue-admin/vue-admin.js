@@ -1291,7 +1291,7 @@ define(requires, function (axios, Qs) {
                                     <div v-if="field.editExplain" style="color: #bfbfbf">{{field.editExplain}}</div>
                                     </transition>
                                     <transition name="to-right">
-                                    <div v-if="field.explain" style="color: #bfbfbf">{{field.explain}}</div>
+                                    <div v-if="field.explain" :style="{color:field.explainColor}">{{field.explain}}</div>
                                     </transition>
                                 </a-form-item>
                                 </transition>
@@ -1345,7 +1345,7 @@ define(requires, function (axios, Qs) {
                                 <div>{{info[field.name]}}<span class="ext-box" v-if="field.ext">（{{field.ext}}）</span></div>
                             </div>
                             <transition name="to-right">
-                             <div v-if="field.explain" style="color: #bfbfbf">{{field.explain}}</div>
+                             <div v-if="field.explain" :style="{color:field.explainColor}">{{field.explain}}</div>
                              </transition>
                         </div>`,
         });
