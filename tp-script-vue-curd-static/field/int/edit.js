@@ -10,6 +10,9 @@ define([],function(){
                     return this.value;
                 },
                 set(val){
+                    if(val===null){
+                        val='';
+                    }
                     this.$emit('update:value',val.toString());
                 }
             }
