@@ -10,10 +10,12 @@ define([],function(){
         mounted(){
             this.$nextTick(e=>{
                 if(!this.field.multiple){
-                    this.val={
-                        value:this.value.toString(),
-                        label:valTitles[this.value.toString()]
-                    };
+                    if(this.value!==''){
+                        this.val={
+                            value:this.value.toString(),
+                            label:valTitles[this.value.toString()]
+                        };
+                    }
                 }else{
                     const arr=typeof this.value==='string'?this.value.split(','):this.value;
                     const vals=[];

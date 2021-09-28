@@ -80,7 +80,9 @@ class TreeSelect extends ModelField
         }
         foreach ($items as $k=>$v){
             $v['value']=(string)$v['value'];
+            $v['pvalue']=(string)$v['pvalue'];
             $items[$k]['value']=$v['value'];
+            $items[$k]['pvalue']=$v['pvalue'];
             isset($v['key'])||$items[$k]['key']=$v['value'];
         }
 
