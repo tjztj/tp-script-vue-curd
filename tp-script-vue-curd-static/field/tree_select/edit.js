@@ -64,7 +64,7 @@ define([],function(){
                         if(arr.length>0){
                             value=arr.join(',');
                         }
-                    }else if(typeof val.value!=='undefined'){
+                    }else if(val&&typeof val.value!=='undefined'){
                         value=val.value;
                     }
                     this.$emit('update:value',value);
