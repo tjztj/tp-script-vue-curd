@@ -104,7 +104,11 @@ define(['vueAdmin'], function (va) {
                     }
                     that.$post(url,{id:row.id}).then(res=>{
                         antd.message.success(res.msg);
-                        that.refreshTable();
+                        if(!res.data.refreshList&&that.refreshId){
+                            that.refreshId(row.id);
+                        }else{
+                            that.refreshTable();
+                        }
                         resolve();
                     }).catch(()=>{
                         reject()
