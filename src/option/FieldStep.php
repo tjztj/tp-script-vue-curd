@@ -7,7 +7,7 @@ namespace tpScriptVueCurd\option;
 
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 
@@ -209,30 +209,30 @@ class FieldStep
      */
     public function getAuthCheckAndCheckBeforeDefVal(){
         //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
-        return fn(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$baseInfo);
+        return fn(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$parentInfo);
     }
 
     /**
      * 验证是否有编辑当前步骤的权限
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @return bool
      */
-    public function authCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool{
+    public function authCheck(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):bool{
         //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
         if(!isset($this->authCheckAndCheckBefore)||is_null($this->authCheckAndCheckBefore)){
             $this->setAuthCheckAndCheckBefore(null);
         }
         $authCheckAndCheckBefore=$this->authCheckAndCheckBefore;
-        if(!$authCheckAndCheckBefore($info,$baseInfo,$fields,$this)){
+        if(!$authCheckAndCheckBefore($info,$parentInfo,$fields,$this)){
             return false;
         }
         if(!isset($this->auth)){
             return true;
         }
         $auth=$this->auth;
-        return $auth($info,$baseInfo,$fields,$this);
+        return $auth($info,$parentInfo,$fields,$this);
     }
 
 
@@ -255,18 +255,18 @@ class FieldStep
 
     /**
      * 编辑或添加显示时执行
-     * @param array|null $info
-     * @param BaseModel|null $baseInfo
+     * @param array $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @param bool $isStepNext
      */
-    public function doOnEditShow(?array $info,?BaseModel $baseInfo,FieldCollection $fields,bool $isStepNext): void
+    public function doOnEditShow(array $info,?BaseModel $parentInfo,FieldCollection $fields,bool $isStepNext): void
     {
         if(!isset($this->onEditShow)||is_null($this->onEditShow)){
             return;
         }
         $func=$this->onEditShow;
-        $func($info,$baseInfo,$fields,$isStepNext);
+        $func($info,$parentInfo,$fields,$isStepNext);
     }
 
     /**
@@ -290,18 +290,18 @@ class FieldStep
     /**
      * 步骤保存前执行
      * @param $saveData
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @return void
      */
-    public function doSaveBefore(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null): void
+    public function doSaveBefore(&$saveData,BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null): void
     {
         if(!isset($this->saveBefore)||is_null($this->saveBefore)){
             return;
         }
         $func=$this->saveBefore;
-        $func($saveData,$info,$baseInfo,$fields);
+        $func($saveData,$info,$parentInfo,$fields);
     }
 
 
@@ -327,19 +327,19 @@ class FieldStep
     /**
      * 步骤保存后执行
      * @param $saveData
-     * @param VueCurlModel|null $new
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $new
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
-     * @param VueCurlModel|null $before
+     * @param BaseModel|null $before
      * @return void
      */
-    public function doSaveAfter(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
+    public function doSaveAfter(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[]): void
     {
         if(!isset($this->saveAfter)||is_null($this->saveAfter)){
             return;
         }
         $func=$this->saveAfter;
-        $func($before,$new,$baseInfo,$fields,$saveData);
+        $func($before,$new,$parentInfo,$fields,$saveData);
     }
 
 
@@ -364,19 +364,19 @@ class FieldStep
     /**
      * 步骤保存后执行(Commit后)
      * @param $saveData
-     * @param VueCurlModel|null $new
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $new
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
-     * @param VueCurlModel|null $before
+     * @param BaseModel|null $before
      * @return void
      */
-    public function doSaveAfterCommited(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]): void
+    public function doSaveAfterCommited(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[]): void
     {
         if(!isset($this->saveAfterCommited)||is_null($this->saveAfterCommited)){
             return;
         }
         $func=$this->saveAfterCommited;
-        $func($before,$new,$baseInfo,$fields,$saveData);
+        $func($before,$new,$parentInfo,$fields,$saveData);
     }
 
 
@@ -510,23 +510,23 @@ class FieldStep
 
     /**
      * 列表数据设置执行
-     * @param VueCurlModel $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @return $this
      */
-    public function listRowDo(VueCurlModel $info,BaseModel $baseInfo=null,FieldCollection $fields=null):self{
+    public function listRowDo(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):self{
         if(!isset($this->listRowDo)||is_null($this->listRowDo)){
             return $this;
         }
         $func=$this->listRowDo;
-        $func($info,$baseInfo,$fields,$this);
+        $func($info,$parentInfo,$fields,$this);
         return $this;
     }
 
     /**
      * 列表数据每条会执行此处设置的方法
-     * 方法的参数  VueCurlModel $info,BaseModel $baseInfo=null,FieldCollection $fields=null,FieldStep $self
+     * 方法的参数  BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $self
      * @param callable $func
      * @return $this
      */

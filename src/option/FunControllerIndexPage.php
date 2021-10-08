@@ -10,7 +10,7 @@ class FunControllerIndexPage
      * 每页显示数量，为0，不分页
      * @var int
      */
-    public int $pageSize=0;
+    public int $pageSize=10;
 
 
     /**

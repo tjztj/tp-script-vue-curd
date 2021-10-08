@@ -4,7 +4,7 @@
 namespace tpScriptVueCurd\field;
 
 use app\common\constants\RegionConstant;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\RegionFilter;
 use tpScriptVueCurd\ModelField;
@@ -149,7 +149,7 @@ class RegionField extends ModelField
      * @param array $data 数据值集合
      * @return $this
      */
-    public function setSaveVal(array $data): self
+    public function setSaveVal(array $data,BaseModel $old): self
     {
         if($this->multiple){
             $name = $this->name();
@@ -209,7 +209,7 @@ class RegionField extends ModelField
                 $cRegionId = $data[$this->cField()];
             }
             if ($cRegionId) {
-                if($this->getRegionPid()){
+                if($this->isRegionField()){
                     return self::getRegionPid($cRegionId);
                 }
                 return $this->getTreeInfoPid($cRegionId);

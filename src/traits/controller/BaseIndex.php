@@ -6,17 +6,17 @@ namespace tpScriptVueCurd\traits\controller;
 
 use think\Collection;
 use think\db\Query;
+use think\db\Raw;
 use think\Request;
-use tpScriptVueCurd\base\controller\BaseChildController;
-use tpScriptVueCurd\base\model\BaseChildModel;
+use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\SelectField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 use tpScriptVueCurd\option\FieldStepCollection;
+use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
 
@@ -26,9 +26,7 @@ use tpScriptVueCurd\option\FunControllerListChildBtn;
  * @property Request $request
  * @property FunControllerIndexPage $indexPageOption
  * @property FieldCollection $fields
- * @property BaseChildModel|BaseModel $model
- * @property BaseModel $baseModel
- * @package tpScriptVueCurd\traits\controller
+ * @property BaseModel $model
  */
 trait BaseIndex
 {
@@ -44,9 +42,9 @@ trait BaseIndex
      */
     public function index(){
         //是否有父表
-        $baseInfo=null;
+        $parentInfo=null;
         try{
-            $this->indexBeforeSetBase($baseInfo);
+            $this->indexBeforeSetBase($parentInfo);
         }catch (\Exception $e){
             $this->error($e);
         }
@@ -54,22 +52,22 @@ trait BaseIndex
 
 
         if($this->request->isAjax()){
-            $model=$this->indexListModelWhere($this->model,$baseInfo);
+            $model=$this->indexListModelWhere(clone $this->model,$parentInfo);
             $model=$model->order($this->getListOrder());
             $option=$this->indexListSelect($model);
             $list=$option->sourceList;
 
-            $this->setListDataChildBaseInfo($baseInfo,$list);
+            $this->setListDataChildBaseInfo($parentInfo,$list);
 
-            $list=$this->setListDataStep($list,$baseInfo);
+            $list=$this->setListDataStep($list,$parentInfo);
             $list=$this->setListDataRowChildBtn($list);
-            $list=$this->setListDataRowAuth($list,$baseInfo);
+            $list=$this->setListDataRowAuth($list,$parentInfo);
 
 
 
             //字段钩子
             try{
-                if(is_array($baseInfo)){
+                if(is_array($parentInfo)){
                     $listArr=[];
                     foreach ($list as $v){
                         isset($listArr[$v[$this->model::parentField()]])||$listArr[$v[$this->model::parentField()]]=[];
@@ -77,13 +75,13 @@ trait BaseIndex
                     }
                     foreach ($listArr as $k=>$vs){
                         $cList=\think\model\Collection::make($vs);
-                        $bs=$baseInfo[$k]??null;
+                        $bs=$parentInfo[$k]??null;
                         $this->fields->each(function (ModelField $v)use($cList,$bs){$v->onIndexList($cList,$bs);});
                         FieldDo::doIndex($this->fields,$cList,$bs);
                     }
                 }else{
-                    $this->fields->each(function (ModelField $v)use($list,$baseInfo){$v->onIndexList($list,$baseInfo);});
-                    FieldDo::doIndex($this->fields,$list,$baseInfo);
+                    $this->fields->each(function (ModelField $v)use($list,$parentInfo){$v->onIndexList($list,$parentInfo);});
+                    FieldDo::doIndex($this->fields,$list,$parentInfo);
                 }
             }catch(\Exception $e){
                 $this->error($e);
@@ -95,7 +93,7 @@ trait BaseIndex
             foreach ($option->data as $k=>$v){
                 $this->fields->doShowData($option->data[$k]);
             }
-            $option->baseInfo=is_array($baseInfo)?null:$baseInfo;
+            $option->baseInfo=is_array($parentInfo)?null:$parentInfo;
 
 
             //控制器数据处理钩子
@@ -111,11 +109,11 @@ trait BaseIndex
 
 
         try{
-            $this->fields->each(function (ModelField $v)use($baseInfo){$v->onIndexShow($baseInfo);});
+            $this->fields->each(function (ModelField $v)use($parentInfo){$v->onIndexShow($parentInfo);});
             //要改fields，可以直接在 indexShowBefore 里面$this->fields
-            $this->indexShowBefore($baseInfo);
+            $this->indexShowBefore($parentInfo);
             //字段钩子触发
-            FieldDo::doIndexShow($this->fields,$baseInfo,$this);
+            FieldDo::doIndexShow($this->fields,$parentInfo,$this);
         }catch (\Exception $e){
             $this->error($e);
         }
@@ -124,7 +122,7 @@ trait BaseIndex
 
         //是否显示添加按钮
         try{
-            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(),$baseInfo,'add');
+            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(clone $this->model,$parentInfo),$parentInfo,'add');
         }catch (\Exception $e){
             $rowAuthAdd=false;
         }
@@ -143,8 +141,8 @@ trait BaseIndex
         $listColumns=array_values($this->fields->listShowItems()->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
         $data=[
-            'model'=>static::modelClassPath(),
-            'modelName'=>class_basename(static::modelClassPath()),
+            'model'=>get_class($this->model),
+            'modelName'=>class_basename($this->model),
             'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
@@ -152,32 +150,35 @@ trait BaseIndex
             'editUrl'=>url('edit')->build(),
             'showUrl'=>url('show')->build(),
             'delUrl'=>url('del')->build(),
-            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseInfo?$baseInfo->id:0])->build(),
-            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseInfo?$baseInfo->id:0])->build(),
-            'title'=>static::getTitle(),
+            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$parentInfo?$parentInfo->id:0])->build(),
+            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$parentInfo?$parentInfo->id:0])->build(),
+            'title'=>$this->title,
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$filterFields->getFilterShowData(),
             'filter_data'=>$filterData?:null,
             'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
+            'cWindow'=>$this->request->param('c_window/a'),
             'canEdit'=>$showTableTool,
             'canDel'=>$showTableTool,
             'auth'=>[
                 'add'=>true,
                 'edit'=>true,
                 'del'=>true,
-                'importExcelTpl'=>true,
-                'downExcelTpl'=>true,
-                'stepAdd'=>$this->getAuthAdd($baseInfo),
+                'importExcelTpl'=>false,
+                'downExcelTpl'=>false,
+                'stepAdd'=>$this->getAuthAdd(clone $this->model,$parentInfo),
                 'rowAuthAdd'=>$rowAuthAdd
             ],
-            'baseInfo'=>$baseInfo,
+            'baseInfo'=>$parentInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
 
-        if(self::type()==='base_have_child'){
+
+
+        if($this->childControllers){
             $this->indexFetchDoChild($data);
         }
 
@@ -193,20 +194,20 @@ trait BaseIndex
 
 
     /**
-     * BaseIndex 的列表中对$baseInfo赋值的逻辑
-     * @param BaseModel|null $baseInfo
+     * BaseIndex 的列表中对$parentInfo赋值的逻辑
+     * @param BaseModel|null $parentInfo
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    protected function indexBeforeSetBase(?BaseModel &$baseInfo): void
+    protected function indexBeforeSetBase(?BaseModel &$parentInfo): void
     {
-        if($baseInfo){
+        if($parentInfo){
             //如果有了，就不设置了
             return;
         }
-        if(empty($this->baseModel)){
+        if(empty($this->parentController)){
             //如果没有父表
             return;
         }
@@ -214,20 +215,20 @@ trait BaseIndex
         if(empty($baseId)){
             return;
         }
-        $baseInfo=$this->baseModel->find($baseId);
-        if(!$baseInfo){
+        $parentInfo=(clone $this->parentController->model)->find($baseId);
+        if(!$parentInfo){
             throw new \think\Exception('未能获取到相关父表信息');
         }
     }
 
     /**
      * 列表显示的where条件处理
-     * @param BaseModel|BaseChildModel $model
-     * @param BaseModel|null $baseInfo
-     * @return Query|BaseChildModel|BaseModel
+     * @param BaseModel $model
+     * @param BaseModel|null $parentInfo
+     * @return Query|BaseModel
      * @throws \think\Exception
      */
-    protected function indexListModelWhere($model,?BaseModel $baseInfo)
+    protected function indexListModelWhere(BaseModel $model,?BaseModel $parentInfo)
     {
         $filterFields=clone $this->fields;
         $filterData=$filterFields->getParamFilterData();
@@ -236,10 +237,10 @@ trait BaseIndex
         $this->setIndexFilterAddStep($filterFields,$filterData);
 
         return $model
-            ->where(function (Query $query)use($baseInfo){
+            ->where(function (Query $query)use($parentInfo){
                 $id=$this->request->param('id/d');
                 empty($id)||$query->where('id',$id);
-                $baseInfo === null || $query->where($this->model::parentField(),$baseInfo->id);
+                $parentInfo === null || $query->where($this->model::parentField(),$parentInfo->id);
             })
             ->where(function(Query $query){
                 //这里不应该抛出异常
@@ -254,10 +255,10 @@ trait BaseIndex
                 if(empty($childFilterData)){
                     return [];
                 }
-                if(static::type()==='base_have_child'){
-                    foreach (static::childModelObjs() as $childModel){
+                if($this->childControllers){
+                    foreach ($this->getChildModelObjs() as $childModel){
                         /**
-                         * @var BaseChildModel $childModel
+                         * @var BaseModel $childModel
                          */
                         $type=class_basename($childModel);
                         if(!empty($childFilterData[$type])){
@@ -268,6 +269,8 @@ trait BaseIndex
                         }
                     }
                 }
+
+
             })
             ->where($this->stepAuthWhere($filterFields));
     }
@@ -287,7 +290,7 @@ trait BaseIndex
             //如果已经有了，不需要再设值
             return;
         }
-        if(empty($this->baseModel)){
+        if(empty($this->parentController)){
             //如果当前没有父表
             return;
         }
@@ -296,45 +299,45 @@ trait BaseIndex
             return;
         }
 
-        $baseInfo=[];
+        $parentInfo=[];
         foreach ($childList as $v){
-            $baseInfo[$v[$this->model::parentField()]]=null;
+            $parentInfo[$v[$this->model::parentField()]]=null;
         }
-        foreach ($this->baseModel->where('id','in',array_keys($baseInfo))->select() as $val){
-            $baseInfo[$val->id]=$val;
+        foreach ((clone $this->parentController->model)->where('id','in',array_keys($parentInfo))->select() as $val){
+            $parentInfo[$val->id]=$val;
         }
-        $oldBaseInfo=$baseInfo;
+        $oldBaseInfo=$parentInfo;
     }
 
     /**
      * 设置列表数据步骤信息
      * @param Collection|\think\model\Collection $list
-     * @param null|array|BaseModel $baseInfo
+     * @param null|array|BaseModel $parentInfo
      * @return Collection|\think\model\Collection
      */
-    protected function setListDataStep($list,$baseInfo){
-        return $list->map(function(VueCurlModel $info)use($baseInfo){
+    protected function setListDataStep($list,$parentInfo){
+        return $list->map(function(BaseModel $info)use($parentInfo){
             if(!$this->fields->stepIsEnable()){
                 return $info;
             }
-            if(is_array($baseInfo)){
-                $baseInfo=$baseInfo[$info[$this->model::parentField()]]??null;
+            if(is_array($parentInfo)){
+                $parentInfo=$parentInfo[$info[$this->model::parentField()]]??null;
             }
 
 
-            $stepInfo=$this->fields->getCurrentStepInfo($info,$baseInfo);
+            $stepInfo=$this->fields->getCurrentStepInfo($info,$parentInfo);
             $stepInfo === null ||$stepInfo=clone $stepInfo;
-            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$baseInfo,$this->fields)->toArray():null;
+            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$parentInfo,$this->fields)->toArray():null;
 
-            $nextStepInfo=$this->fields->getNextStepInfo($info,$baseInfo);
+            $nextStepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
             $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $baseInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$baseInfo));
+            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo));
 
 
-            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$baseInfo):FieldCollection::make();
+            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
-            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $baseInfo, $stepFields);
+            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $parentInfo, $stepFields);
 
 
             return $info;
@@ -347,19 +350,20 @@ trait BaseIndex
      * @return Collection|\think\model\Collection
      */
     protected function setListDataRowChildBtn($list){
-        return $list->map(function(VueCurlModel $info){
-            if($this->type()!=='base_have_child'){
-                return $info;
-            }
+        return $list->map(function(BaseModel $info){
             $childBtns=[];
-            foreach (static::childControllerClassPathList() as $childControllerClass){
-                /* @var $childControllerClass BaseChildController|string */
+            foreach ($this->childControllers as $childControlle){
+                /* @var $childControlle Controller */
                 $btn=new FunControllerListChildBtn();
-                $childControllerClass::baseListBtnText($btn,$info);
+                $childControlle->baseListBtnText($btn,$info);
                 if(!isset($btn->url)||is_null($btn->url)){
-                    $btn->url=url(str_replace(['\\','._'],['.','.'],parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',$childControllerClass),'\\'))).'/index',['base_id'=>$info->id])->build();
+                    $btn->url=url(
+                        str_replace(['\\','._'],['.','.'],
+                            parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',get_class($childControlle)),'\\'))).'/index',
+                        ['base_id'=>$info->id,'show_filter'=>0,'c_window'=>['f'=>'auto','w'=>'50vw','h'=>'72vh']]
+                    )->build();
                 }
-                $childBtns[class_basename($childControllerClass::modelClassPath())]=$btn;
+                $childBtns[class_basename($childControlle->model)]=$btn;
             }
             $info->childBtns=$childBtns;
             return $info;
@@ -369,11 +373,11 @@ trait BaseIndex
     /**
      * 设置数据 __auth 的值，是否具有增删改的权限
      * @param Collection|\think\model\Collection $list
-     * @param null|array|BaseModel $baseInfo
+     * @param null|array|BaseModel $parentInfo
      * @return Collection|\think\model\Collection
      */
-    protected function setListDataRowAuth($list,$baseInfo){
-        return $list->map(fn(VueCurlModel $info)=>$info->rowSetAuth($this->fields,is_array($baseInfo)?($baseInfo[$info[$this->model::parentField()]]??null):$baseInfo,['show','edit','del']));
+    protected function setListDataRowAuth($list,$parentInfo){
+        return $list->map(fn(BaseModel $info)=>$info->rowSetAuth($this->fields,is_array($parentInfo)?($parentInfo[$info[$this->model::parentField()]]??null):$parentInfo,['show','edit','del']));
     }
 
     /**
@@ -461,4 +465,152 @@ trait BaseIndex
     protected function indexFilterBefore(FieldCollection &$filterFields,?array &$filterData,bool &$showFilter):void{
         //index筛选显示前
     }
+
+
+    /**
+     * 步骤--是否能添加
+     * @param BaseModel|null $info
+     * @param BaseModel|null $parentInfo
+     * @return bool
+     * @throws \think\Exception
+     */
+    protected function getAuthAdd(BaseModel $info,BaseModel $parentInfo=null):bool{
+        if(!$this->fields->stepIsEnable()){
+            return true;
+        }
+        $stepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
+        if($stepInfo){
+            $fields=$this->fields->getFilterStepFields($stepInfo,true,$info,$parentInfo);
+            return $fields->count()>0&&$stepInfo->authCheck($info,$parentInfo,$fields);
+        }
+        return false;
+    }
+
+    /**
+     * 获取添加时的字段信息
+     * @return FieldCollection
+     * @throws \think\Exception
+     */
+    protected function getRowAuthAddFields(BaseModel $info,BaseModel $parentInfo=null): FieldCollection
+    {
+        if(!$this->fields->stepIsEnable()){
+            return clone $this->fields;
+        }
+        $stepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
+        if($stepInfo){
+            $fields=$this->fields->getFilterStepFields($stepInfo,true,$info,$parentInfo);
+            $fields->saveStepInfo=$stepInfo;
+            return $fields;
+        }
+        return new FieldCollection();
+    }
+
+
+    /**
+     * 数据步骤查询权限
+     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
+     * @return array|\Closure
+     * @throws \think\Exception
+     */
+    protected function stepAuthWhere(FieldCollection $fields){
+        if(!$fields->stepIsEnable()){
+            return [];
+        }
+        /**
+         * @var FieldStep[] $steps
+         */
+        $steps=[];
+        $fields->each(function(ModelField $field)use(&$steps){
+            $stepList=$field->steps();
+            if($stepList===null||$stepList->isEmpty()){
+                return;
+            }
+            $stepList->each(function(FieldStep $step)use(&$steps){
+                isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step;
+            });
+        });
+
+        return function(Query $query)use($steps){
+            $query->whereOr(function (Query $query){
+                $this->stepAuthWhereOr($query);
+            });
+            if(empty($steps)){
+                return;
+            }
+            foreach ($steps as $v){
+                $where=$v->getAuthWhere();
+                if($where===null){
+                    continue;
+                }
+                $query->whereOr($where);
+            }
+        };
+    }
+
+    /**
+     * 步骤 or 条件，当角色不满足步骤时，却又要显示相关数据，可在此处加入条件
+     * @param Query $query
+     */
+    protected function stepAuthWhereOr(Query $query):void{}
+
+
+    /**
+     * index的列表数据查询
+     * @param Query|BaseModel $model
+     * @return FunControllerIndexData
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function indexListSelect($model):FunControllerIndexData{
+        $option=new FunControllerIndexData();
+        $option->model=clone $model;
+        if($this->indexPageOption->pageSize>0){
+            $pageSize=$this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize;
+            $list=$model->paginate($pageSize);
+            $option->currentPage=$list->currentPage();
+            $option->lastPage=$list->lastPage();
+            $option->perPage=$list->listRows();
+            $option->total=$list->total();
+            $option->sourceList=$list->getCollection();
+        }else{
+            $option->sourceList=$model->select();
+            $option->total=$option->sourceList->count();
+            $option->currentPage=1;
+            $option->lastPage=1;
+            $option->perPage=$option->total;
+        }
+        return $option;
+    }
+
+
+    /**
+     * 获取列表排序   Raw 是为了方便重写
+     * @return string|Raw
+     */
+    protected function getListOrder(){
+        $sortField=$this->request->param('sortField');
+        if($sortField){
+            $sortOrder=$this->request->param('sortOrder','');
+            switch (strtolower($sortOrder)){
+                case 'desc':
+                case 'asc':
+                    break;
+                case 'ascend':
+                    $sortOrder='ASC';
+                    break;
+                case 'descend':
+                    $sortOrder='DESC';
+                    break;
+                default:
+                    $sortOrder='DESC';
+            }
+            $order=$sortField.' '.$sortOrder;
+        }else{
+            $order='id DESC';
+        }
+        return $order;
+    }
+
+
 }

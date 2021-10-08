@@ -6,7 +6,7 @@ namespace tpScriptVueCurd\option;
 
 use think\db\Query;
 use think\Model;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\traits\field_where\FieldWhereDump;
@@ -159,20 +159,20 @@ class FieldWhere
     }
 
 
-    private function checkSelf($saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
+    private function checkSelf($saveDatas,bool $isSourceData,BaseModel $info):bool{
         if($this->field->name()===self::RETURN_FALSE_FIELD_NAME){
             return count($this->ands)>0;
         }
 
         if(!$isSourceData){
-            $isOldHave=!isset($saveDatas[$this->field->name()])&&$info&&isset($info[$this->field->name()]);
+            $isOldHave=!isset($saveDatas[$this->field->name()])&&isset($info[$this->field->name()]);
             if($this->field->required()){
                 $field=clone $this->field;
                 $field->required(false);
             }else{
                 $field= $this->field;
             }
-            $field->setSave($saveDatas);
+            $field->setSave($saveDatas,$info);
             $saveDatas[$this->field->name()]=$field->getSave();
             if($isOldHave&&$saveDatas[$this->field->name()]===$field->nullVal()){
                 $saveDatas[$this->field->name()]=$info[$this->field->name()];
@@ -227,11 +227,11 @@ class FieldWhere
      * 验证数据是否符合条件
      * @param array $saveDatas
      * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
-     * @param VueCurlModel|null $info  原数据
+     * @param BaseModel|null $info  原数据
      * @return bool
      * @throws \think\Exception
      */
-    public function check(array $saveDatas,bool $isSourceData,?VueCurlModel $info):bool{
+    public function check(array $saveDatas,bool $isSourceData,BaseModel $info):bool{
         $check=$this->checkSelf($saveDatas,$isSourceData,$info);
 
         if($check){

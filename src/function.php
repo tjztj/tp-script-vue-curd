@@ -1,5 +1,6 @@
 <?php
 
+use tpScriptVueCurd\base\model\BaseModel;
 
 
 /**
@@ -42,7 +43,7 @@ function vueCurdMergeArrays(array $old,array $new):array{
 
 /**
  * 获取最后一步的详细信息
- * @param array|string|\tpScriptVueCurd\base\model\VueCurlModel $stepOrInfo
+ * @param array|string|BaseModel $stepOrInfo
  * @return array|null
  */
 function endStep($stepOrInfo): ?array
@@ -59,7 +60,7 @@ function endStep($stepOrInfo): ?array
         return endStep(json_decode($stepOrInfo,true));
     }
 
-    if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+    if($stepOrInfo instanceof \tpScriptVueCurd\base\model\BaseModel){
         if(!$stepOrInfo::hasStepField()){
             return null;
         }
@@ -101,7 +102,7 @@ function endStepVal($stepOrInfo):?string{
         return $endStepInfoVal($stepOrInfo);
     }
 
-    if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+    if($stepOrInfo instanceof \tpScriptVueCurd\base\model\BaseModel){
         if($stepOrInfo::hasCurrentStepField()&&$stepOrInfo[$stepOrInfo::getCurrentStepField()]!=='') {
             return $stepOrInfo[$stepOrInfo::getCurrentStepField()];
         }
@@ -120,7 +121,7 @@ function endStepVal($stepOrInfo):?string{
 /**
  * 判断对象数据库存的当前步骤是否是 $step
  * @param string|\tpScriptVueCurd\option\FieldStep $step
- * @param  array|string|\tpScriptVueCurd\base\model\VueCurlModel $stepOrInfo
+ * @param  array|string|BaseModel $stepOrInfo
  * @return bool
  */
 function eqEndStep($step,$stepOrInfo): bool
@@ -137,13 +138,13 @@ function eqEndStep($step,$stepOrInfo): bool
 
 /**
  * 获取数据所有已完成的步骤，已退回的步骤不算在里面
- * @param string|\tpScriptVueCurd\base\model\VueCurlModel|array $stepOrInfo
+ * @param string|BaseModel|array $stepOrInfo
  * @return array
  */
 function getStepPasts($stepOrInfo):array{
     if(is_string($stepOrInfo)){
         $stepHistory=json_decode($stepOrInfo,true);
-    }else if($stepOrInfo instanceof \tpScriptVueCurd\base\model\VueCurlModel){
+    }else if($stepOrInfo instanceof BaseModel){
         $stepHistory=json_decode($stepOrInfo[$stepOrInfo::getStepField()],true);
     }else if(is_array($stepOrInfo)){
         $stepHistory=$stepOrInfo;
@@ -165,7 +166,7 @@ function getStepPasts($stepOrInfo):array{
 /**
  * 判断对象数据库存的步骤是否已经过了 $step，会自动去掉退回的一些步骤
  * @param string|\tpScriptVueCurd\option\FieldStep $step
- * @param string|\tpScriptVueCurd\base\model\VueCurlModel|array $stepOrInfo
+ * @param string|BaseModel|array $stepOrInfo
  * @return bool
  */
 function stepPast($step,$stepOrInfo):bool{

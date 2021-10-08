@@ -395,7 +395,7 @@ define(['vueAdmin'], function (va) {
                 openChildList(row,modelInfo,btn){
                     this.openBox({
                         title:modelInfo.title,
-                        offset:'rt',
+                        offset:btn.pageOffset,
                         content: btn.url,
                     }).end();
                 },

@@ -7,7 +7,6 @@ namespace tpScriptVueCurd;
 use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
@@ -99,13 +98,13 @@ class FieldCollection extends Collection
     /**
      * 设置保存的值
      * @param array $data
-     * @param VueCurlModel|null $old 原数据
+     * @param BaseModel|null $old 原数据
      * @param bool $isExcelDo 是否EXCEL添加
      * @param FieldCollection|null $saveFields  更新保存的字段
      * @return $this
      * @throws \think\Exception
      */
-    public function setSave(array $data,?VueCurlModel $old,bool $isExcelDo=false,self &$saveFields=null): self
+    public function setSave(array $data,BaseModel $old,bool $isExcelDo=false,self &$saveFields=null): self
     {
         if($isExcelDo){
             //先处理一遍数据
@@ -158,7 +157,7 @@ class FieldCollection extends Collection
             $v->setAttrValByWheres($data,false,$old);
             try{
                 if(is_null($notNullNames)||in_array($v->name(),$notNullNames,true)){
-                    $v->setSave($data);
+                    $v->setSave($data,$old);
                 }else{
                     $v->required(false);
                     $v->setSaveToNull();
@@ -246,19 +245,19 @@ class FieldCollection extends Collection
 
     /**
      * 查看页面过滤掉 隐藏的字段
-     * @param VueCurlModel $sourceData
+     * @param BaseModel $sourceData
      * @return $this
      */
-    public function filterHideFieldsByShow(VueCurlModel $sourceData):self{
+    public function filterHideFieldsByShow(BaseModel $sourceData):self{
         return $this->filterHideFieldsByData($sourceData->toArray(),$sourceData,true);
     }
 
     /**
      * 查看页面，显示的字段处理
-     * @param VueCurlModel $sourceData
+     * @param BaseModel $sourceData
      * @return $this
      */
-    public function whenShowSetAttrValByWheres(VueCurlModel $sourceData):self{
+    public function whenShowSetAttrValByWheres(BaseModel $sourceData):self{
         $this->each(function (ModelField $v)use($sourceData){
             $v->setAttrValByWheres($sourceData->toArray(),true,$sourceData);
         });
@@ -372,11 +371,11 @@ class FieldCollection extends Collection
     /**
      * 过滤掉【hideFields】不显示的字段
      * @param array $data       用户提交上来的数据
-     * @param VueCurlModel|null $old        原数据
+     * @param BaseModel|null $old        原数据
      * @param bool $isSourceData
      * @return $this
      */
-    private function filterHideFieldsByData(array $data, ?VueCurlModel $old, bool $isSourceData=true):self{
+    private function filterHideFieldsByData(array $data, BaseModel $old, bool $isSourceData=true):self{
         $fieldHideList=$this->getFiledHideListByData($data,$old,$isSourceData);
         if(empty($fieldHideList)){
             return $this;
@@ -395,21 +394,21 @@ class FieldCollection extends Collection
 
     /**
      * 获取显示中将会隐藏的字段信息
-     * @param VueCurlModel $info
+     * @param BaseModel $info
      * @return array
      */
-    public function getFiledHideList(VueCurlModel $info):array{
+    public function getFiledHideList(BaseModel $info):array{
         return $this->getFiledHideListByData($info->toArray(),$info,true);
     }
 
     /**
      * 获取将会隐藏的字段信息
      * @param array $data
-     * @param VueCurlModel|null $old 原数据
+     * @param BaseModel|null $old 原数据
      * @param bool $isSourceData
      * @return array
      */
-    private function getFiledHideListByData(array $data, ?VueCurlModel $old, bool $isSourceData=true):array{
+    private function getFiledHideListByData(array $data, BaseModel $old, bool $isSourceData=true):array{
         $arrHave= static function($arr, $val){
             if(is_string($arr)){
                 $arr=explode(',',$arr);
@@ -465,7 +464,7 @@ class FieldCollection extends Collection
                 $vValue=$checkVal;
                 if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
                     $fieldCopy=clone $field;
-                    $vValue=$fieldCopy->required(false)->setSave($data)->getSave();
+                    $vValue=$fieldCopy->required(false)->setSave($data,$old)->getSave();
                 }
                 //有值才显示
                 if(!is_null($vValue)&&$vValue!==''){
@@ -497,7 +496,7 @@ class FieldCollection extends Collection
                 $vValue=$checkVal;
                 if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
                     $fieldCopy=clone $field;
-                    $vValue=$fieldCopy->required(false)->setSave($data)->getSave();
+                    $vValue=$fieldCopy->required(false)->setSave($data,$old)->getSave();
                 }
 
 

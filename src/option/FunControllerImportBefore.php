@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd\option;
 
 
+use tpScriptVueCurd\base\model\BaseModel;
+
 class FunControllerImportBefore
 {
     /**
@@ -11,4 +13,6 @@ class FunControllerImportBefore
      * @var array
      */
     public array $saveArr=[];
+
+    public ?BaseModel $base=null;
 }

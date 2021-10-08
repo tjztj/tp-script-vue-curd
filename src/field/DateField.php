@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\DateFilter;
 use tpScriptVueCurd\ModelField;
@@ -86,7 +87,7 @@ class DateField extends ModelField
      * @return $this
      * @throws \think\Exception
      */
-    public function setSaveVal(array $data): self
+    public function setSaveVal(array $data,BaseModel $old): self
     {
         $name=$this->name();
         if(isset($data[$name])){

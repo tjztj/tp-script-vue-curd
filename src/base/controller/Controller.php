@@ -6,14 +6,22 @@ namespace tpScriptVueCurd\base\controller;
 
 use think\App;
 use think\db\Query;
+use think\helper\Str;
 use think\Request;
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\field\FilesField;
+use tpScriptVueCurd\option\FunControllerImportAfter;
+use tpScriptVueCurd\option\FunControllerImportBefore;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
+use tpScriptVueCurd\traits\controller\BaseDel;
+use tpScriptVueCurd\traits\controller\BaseEdit;
+use tpScriptVueCurd\traits\controller\BaseIndex;
+use tpScriptVueCurd\traits\controller\BaseShow;
+use tpScriptVueCurd\traits\controller\Childs;
+use tpScriptVueCurd\traits\controller\HaveChilds;
 use tpScriptVueCurd\traits\controller\Vue;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
-use tpScriptVueCurd\traits\controller\CurdFunc;
 use tpScriptVueCurd\traits\controller\Excel;
 use tpScriptVueCurd\traits\Func;
 
@@ -23,16 +31,24 @@ use tpScriptVueCurd\traits\Func;
  * @property APP $app
  * @property Request $request
  * @property string $guid
- * @package tpScriptVueCurd\base\controller
+ * @property FieldCollection $fields;
  */
 trait Controller
 {
-    use Func,Vue,CurdFunc,Excel{
+    use Func,Vue,BaseIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel{
         Vue::initialize as vueInitialize;
     }
 
-    protected string $tplPath='';
-    protected FunControllerIndexPage $indexPageOption;
+    public BaseModel $model;
+    public FieldCollection $fields;
+    public string $title='';
+
+
+    public bool $dontShowTpl=false;
+    public string $fetchPath;
+    public string $tplPath='';
+    public FunControllerIndexPage $indexPageOption;
+
 
     public function initialize()
     {
@@ -43,57 +59,31 @@ trait Controller
             $this->request=$this->app->request;
         }
         if(empty($this->guid)){
-            if (!function_exists('create_guid')) {
-                $charid = strtoupper(md5(uniqid(mt_rand(), true)));
-                $hyphen = chr(45);// "-"
-                $uuid = chr(123)// "{"
-                    . substr($charid, 0, 8) . $hyphen
-                    . substr($charid, 8, 4) . $hyphen
-                    . substr($charid, 12, 4) . $hyphen
-                    . substr($charid, 16, 4) . $hyphen
-                    . substr($charid, 20, 12)
-                    . chr(125);// "}"
-                $this->guid=$uuid;
-            }else{
-                $this->guid=create_guid();
-            }
+            $this->guid=create_guid();
         }
         $this->vueInitialize();
+        $this->init();
 
 
-        $indexPageOption=new FunControllerIndexPage;
-        static::setIndexPage($indexPageOption);
-        $this->indexPageOption=$indexPageOption;
+        if(isset($this->indexPageOption)){
+            $indexPageOption=new FunControllerIndexPage;
+            $this->indexPageOption=$indexPageOption;
+        }
+
+
+        isset($this->fields)||$this->fields=$this->model->fields();
 
 
         $this->tplPath=getVCurdDir().'tpl'.DIRECTORY_SEPARATOR;
         $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
     }
 
-    /**
-     * 控制器的标题
-     * @return string
-     */
-    abstract public static function getTitle():string;
 
     /**
-     * @return string|VueCurlModel
+     * 控制器初始化配置
      */
-    abstract public static function modelClassPath():string;
+    abstract public function init():void;
 
-
-    /**
-     * 控制器类型：base、child、base_have_child
-     * @return string
-     */
-    abstract public static function type():string;
-
-
-    /**
-     * 列表分页配置
-     * @return FunControllerIndexPage
-     */
-    abstract public static function setIndexPage(FunControllerIndexPage $indexPageOption):void;
 
 
     /**
@@ -103,7 +93,7 @@ trait Controller
     protected function indexListWhere(Query $query):void{
 
     }
-    protected function indexShowBefore(?BaseModel &$baseInfo):void{
+    protected function indexShowBefore(?BaseModel &$parentInfo):void{
         //要改fields，可以直接在 这里 $this->fields
         // 列表页面显示前处理，在indexFetch前
     }
@@ -114,16 +104,16 @@ trait Controller
         //列表数据处理钩子
     }
 
-    protected function addAfter(VueCurlModel $info): void
+    protected function addAfter(BaseModel $info): void
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
     }
-    protected function editAfter(VueCurlModel $info): void
+    protected function editAfter(BaseModel $info): void
     {
         // 数据修改钩子，方便之类处理（之类重写此方法）
     }
 
-    protected function createEditFetchDataBefore(FieldCollection $fields, ?VueCurlModel &$data,?BaseModel $baseModel):void
+    protected function createEditFetchDataBefore(FieldCollection $fields, BaseModel &$data,?BaseModel $baseModel):void
     {
         //（添加/编辑页面）生成解析数据前，处理数据（控制字段显示与否），$data为空代表是新增
     }
@@ -151,7 +141,68 @@ trait Controller
         //删除后
     }
 
+    public function importBefore(FunControllerImportBefore $option):void{
+        // 数据导入前，方便之类处理（之类重写此方法）
+    }
+
+    public function importAfter(FunControllerImportAfter $option):void{
+        // 数据导入后，方便之类处理（之类重写此方法）
+    }
+
+    protected function addBefore(array &$data,?BaseModel $parentInfo): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
+    }
+    protected function editBefore(array &$data,BaseModel $old,BaseModel $parentInfo): void
+    {
+        // 数据添加钩子，方便之类处理（之类重写此方法）
+    }
+
+    protected function showBefore(BaseModel $info,BaseModel $parentInfo,FieldCollection &$field){
+        //数据显示前
+    }
 
 
+    /**
+     * 显示模板内容
+     * @param string $file      直接在控制器下面的模板位置添加模板文件就可替换默认的模板，或者使用fetchPath
+     * @param $data
+     * @return mixed
+     */
+    protected function showTpl($file,$data){
+        FilesField::setShowFileInfos();
+        if($this->dontShowTpl){
+            $this->success($data);
+        }
+
+        if(isset($this->fetchPath)&&$this->fetchPath!==''){
+            return $this->fetch($this->fetchPath,$data);
+        }
+
+        $appName = $this->app->http->getName();
+        $view    = $this->app->view->getConfig('view_dir_name');
+        $depr =$this->app->view->getConfig('view_depr');
+
+        $path = $this->app->getAppPath() . $view . DIRECTORY_SEPARATOR;
+        if (!is_dir($this->app->getAppPath() . $view)&&$appName) {
+            $path .= $appName . DIRECTORY_SEPARATOR;
+        }
+        $controller = $this->app->request->controller();
+        if (strpos($controller, '.')) {
+            $pos        = strrpos($controller, '.');
+            $controller = substr($controller, 0, $pos) . '.' . Str::snake(substr($controller, $pos + 1));
+            $controller_name=Str::snake(substr($controller, $pos + 1));
+        } else {
+            $controller = Str::snake($controller);
+            $controller_name=$controller;
+        }
+        $template=$file?:Str::snake( $this->app->request->action());
+        $path .= str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . ($file ?: Str::snake($this->app->request->action())) . '.vue';
+        if(file_exists($path)){
+            return $this->fetch(str_replace('.', '/', $controller).'/'.$template,$data);
+        }
+        $tplPath=static::getTplPath();
+        return $this->fetch($tplPath.$file.'.vue',$data);
+    }
 
 }

@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\RadioFilter;
 use tpScriptVueCurd\ModelField;
@@ -48,7 +49,7 @@ class CheckboxField extends ModelField
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSaveVal(array $data): self
+    public function setSaveVal(array $data,BaseModel $old): self
     {
         $name=$this->name();
         if(isset($data[$name])){

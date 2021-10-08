@@ -6,7 +6,7 @@ namespace tpScriptVueCurd\option;
 
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 
@@ -39,27 +39,27 @@ abstract class FieldStepBase
 
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
-                fn(VueCurlModel $info = null, BaseModel $baseInfo = null, ModelField $field = null) => $this->beforeCheck($info, $baseInfo, $field),
-                fn(VueCurlModel $info = null, BaseModel $baseInfo = null, ModelField $field = null) => $this->check($info, $baseInfo, $field)
+                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->beforeCheck($info, $parentInfo, $field),
+                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->check($info, $parentInfo, $field)
             ),
             $config,
         )->auth(
-            fn(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null) => $this->auth($info, $baseInfo, $fields),
-            function (VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null,FieldStep $step){
+            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null) => $this->auth($info, $parentInfo, $fields),
+            function (BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step){
                 $fn=$step->getAuthCheckAndCheckBeforeDefVal();
-                if($fn($info,$baseInfo,$fields)){
+                if($fn($info,$parentInfo,$fields)){
                     $step->config['canEditReturn']=null;
                     return true;
                 }
-                $step->config['canEditReturn']=$this->canEdit($info,$baseInfo,$fields);
+                $step->config['canEditReturn']=$this->canEdit($info,$parentInfo,$fields);
                 return $step->config['canEditReturn'];
             },
         )->setListRowDo(
-            fn(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $baseInfo, $fields,$step)
+            fn(BaseModel $info,?BaseModel $parentInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $parentInfo, $fields,$step)
         )->saveBefore(
-            fn(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$baseInfo,$fields)
+            fn(&$saveData,BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$parentInfo,$fields)
         )->saveAfter(
-            fn(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$baseInfo,$fields,$saveData)
+            fn(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$parentInfo,$fields,$saveData)
         )->listDirectSubmit($this->listDirectSubmit)
             ->setAuthWhere(function(Query $query){
                 $this->authWhere($query);
@@ -96,22 +96,22 @@ abstract class FieldStepBase
 
     /**
      * 数据下一步是否当前步骤，判断
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @param ModelField|null $field
      * @return bool
      */
-    abstract protected function beforeCheck(VueCurlModel $info = null, BaseModel $baseInfo = null, ModelField $field = null): bool;
+    abstract protected function beforeCheck(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null): bool;
 
 
     /**
      * 数据是否具有提交这一步的权限（根据beforeAuthCheckFunc判断，这一步是【下一步提交】还是【当前步骤修改】）
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @return bool
      */
-    abstract protected function auth(VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):bool;
+    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):bool;
 
 
     /**
@@ -122,12 +122,12 @@ abstract class FieldStepBase
 
     /**
      * 验证数据是否符合当前步骤
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $old
+     * @param BaseModel|null $parentInfo
      * @param ModelField|null $field
      * @return mixed
      */
-    public function check(VueCurlModel $old = null, BaseModel $baseInfo = null, ModelField $field = null): bool
+    public function check(BaseModel $old, BaseModel $parentInfo = null, ModelField $field = null): bool
     {
         if (!$old || empty($old->id)) {
             return false;
@@ -138,12 +138,12 @@ abstract class FieldStepBase
 
     /**
      * 步骤是否可以编辑
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @return bool
      */
-    public function canEdit(VueCurlModel $info = null, BaseModel $baseInfo = null, FieldCollection $fields = null):bool{
+    public function canEdit(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null):bool{
         return false;
     }
 
@@ -151,13 +151,13 @@ abstract class FieldStepBase
 
     /**
      * 列表页面时，当为当前步骤时，会遍历执行此方法（子类重写）
-     * @param VueCurlModel $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection $fields
      * @param FieldStep $step           此条数据的当前步骤，可在这里设置步骤显示的一些东西  $step->setTags([new FieldStepTag('完成','blue')]);
      * @return void
      */
-    public function listRowDo(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $step):void{
+    public function listRowDo(BaseModel $info,?BaseModel $parentInfo,FieldCollection $fields,FieldStep $step):void{
 
     }
 
@@ -165,24 +165,24 @@ abstract class FieldStepBase
     /**
      * 数据保存前会执行（子类重写）
      * @param $saveData
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $info
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      */
-    public function saveBefore(&$saveData,VueCurlModel $info=null,BaseModel $baseInfo=null,FieldCollection $fields=null):void{
+    public function saveBefore(&$saveData,BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):void{
 
     }
 
 
     /**
      * 数据保存后会执行（子类重写）
-     * @param VueCurlModel|null $before
-     * @param VueCurlModel|null $new
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $before
+     * @param BaseModel|null $new
+     * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      * @param array $saveData
      */
-    public function saveAfter(?VueCurlModel $before,VueCurlModel $new,BaseModel $baseInfo=null,FieldCollection $fields=null,$saveData=[]):void{
+    public function saveAfter(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[]):void{
 
     }
 
@@ -211,10 +211,10 @@ abstract class FieldStepBase
             'listBtnUrl'=>__url('project.project/projectApprovalLeader')
         ])->auth(function(?self $info){
             return auth('project.project/projectApprovalLeader');
-        })->setListRowDo(function(VueCurlModel $info,?BaseModel $baseInfo,FieldCollection $fields,FieldStep $self){
+        })->setListRowDo(function(BaseModel $info,?BaseModel $parentInfo,FieldCollection $fields,FieldStep $self){
             //当前列表中步骤时执行
             $self->setTags([new FieldStepTag(...$info->project_approval_leader_result==1?['通过','success']:['不通过','error'])]);
-        })->saveBefore(function(&$saveData,VueCurlModel $info){
+        })->saveBefore(function(&$saveData,BaseModel $info){
             if($info[ProjectConstant::ESTIMATE_CAPITAL_FIELD]<ProjectConstant::TOWN_NEED_MEETING_MIN_MONEY){
                 //如果是10W以下，使用提交上来的交易方式
                 $saveData[ProjectConstant::TRANSACTION_MODE_FIELD]=$info[ProjectConstant::TRANSACTION_MODE_BEFORE_FIELD];

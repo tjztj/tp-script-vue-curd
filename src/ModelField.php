@@ -6,7 +6,6 @@ namespace tpScriptVueCurd;
 
 use think\Collection;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldDo;
@@ -488,10 +487,10 @@ abstract class ModelField
      * 验证数据是否符合条件
      * @param array $saveDatas
      * @param bool $isSourceData 是否数据为源数据，未经过字段的setSave处理
-     * @param VueCurlModel|null $info  原数据
+     * @param BaseModel|null $info  原数据
      * @return $this
      */
-    public function setAttrValByWheres(array $saveDatas,bool $isSourceData,?VueCurlModel $info):self{
+    public function setAttrValByWheres(array $saveDatas,bool $isSourceData,BaseModel $info):self{
         $def='--setAttrValByWheres--def--';
         foreach ($this->attrWhereValueList as $attr=>$valList){
             $value=$this->$attr??$def;
@@ -630,9 +629,9 @@ abstract class ModelField
      * @param array $data 数据值集合
      * @return $this
      */
-    final public function setSave(array $data): self
+    final public function setSave(array $data,BaseModel $old): self
     {
-        $this->setSaveVal($data);
+        $this->setSaveVal($data,$old);
         if (isset($this->save)) {
             $checkData = $data;
             $checkData[$this->name()] = $this->save;
@@ -681,7 +680,7 @@ abstract class ModelField
      * @return $this
      * @throws \think\Exception
      */
-    protected function setSaveVal(array $data): self
+    protected function setSaveVal(array $data,BaseModel $old): self
     {
         if (isset($data[$this->name()])) {
             $this->defaultCheckRequired($data[$this->name()]);
@@ -926,20 +925,20 @@ abstract class ModelField
         }
 
         $field->pushFieldDo()
-            ->setEditShowDo(function (?VueCurlModel &$info, ?BaseModel $base, ModelField $field, $isStepNext) use ($oldName) {
+            ->setEditShowDo(function (BaseModel &$info, ?BaseModel $base, ModelField $field, $isStepNext) use ($oldName) {
                 if (isset($info[$oldName])) {
                     $info[$field->name()] = $info[$oldName];
                 }
             })
-            ->setSaveBeforeCheckedDo(function (array &$postData, ?VueCurlModel $before, ?BaseModel $base, ModelField $field) use ($oldName) {
+            ->setSaveBeforeCheckedDo(function (array &$postData, BaseModel $before, ?BaseModel $base, ModelField $field) use ($oldName) {
                 if (isset($postData[$field->name()])) {
                     $postData[$oldName] = $postData[$field->name()];
                 }
-            })->setShowInfoBeforeDo(function (VueCurlModel $info, ?BaseModel $base, ModelField $field) use ($oldName) {
+            })->setShowInfoBeforeDo(function (BaseModel $info, ?BaseModel $base, ModelField $field) use ($oldName) {
                 if (isset($info[$oldName])) {
                     $info[$field->name()] = $info[$oldName];
                 }
-            })->setIndexRowDo(function (VueCurlModel $row, ?BaseModel $base, ModelField $field) use ($oldName) {
+            })->setIndexRowDo(function (BaseModel $row, ?BaseModel $base, ModelField $field) use ($oldName) {
                 if (isset($row[$oldName])) {
                     $row[$field->name()] = $row[$oldName];
                 }
@@ -952,40 +951,40 @@ abstract class ModelField
 
     /**
      * 子字段可重写
-     * @param VueCurlModel $data
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $data
+     * @param BaseModel|null $parentInfo
      * @return void
      */
-    public function onEditShow(VueCurlModel &$data,BaseModel &$baseInfo=null):void{}
+    public function onEditShow(BaseModel &$data,BaseModel &$parentInfo=null):void{}
     /**
      * 子字段可重写
      * @param array $postData
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $old
+     * @param BaseModel|null $parentInfo
      * @return void
      */
-    public function onEditSave(array &$postData,VueCurlModel &$old=null,BaseModel &$baseInfo=null):void{}
+    public function onEditSave(array &$postData,BaseModel &$old=null,BaseModel &$parentInfo=null):void{}
     /**
      * 子字段可重写
-     * @param VueCurlModel $data
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $data
+     * @param BaseModel|null $parentInfo
      * @return void
      */
-    public function onShow(VueCurlModel &$data,BaseModel &$baseInfo=null):void{}
+    public function onShow(BaseModel &$data,BaseModel &$parentInfo=null):void{}
 
     /**
      * 子字段可重写
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $parentInfo
      * @return void
      */
-    public function onIndexShow(BaseModel &$baseInfo=null):void{}
+    public function onIndexShow(BaseModel &$parentInfo=null):void{}
     /**
      * 子字段可重写
      * @param Collection $list
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $parentInfo
      * @return void
      */
-    public function onIndexList(Collection $list,BaseModel &$baseInfo=null):void{}
+    public function onIndexList(Collection $list,BaseModel &$parentInfo=null):void{}
 
 
     /**

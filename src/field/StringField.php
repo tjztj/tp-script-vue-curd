@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\LikeFilter;
 use tpScriptVueCurd\ModelField;
@@ -28,7 +29,7 @@ class StringField extends ModelField
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSaveVal(array $data): self
+    public function setSaveVal(array $data,BaseModel $old): self
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);

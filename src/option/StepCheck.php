@@ -5,7 +5,6 @@ namespace tpScriptVueCurd\option;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\ModelField;
 
 class StepCheck
@@ -28,30 +27,30 @@ class StepCheck
 
     /**
      * 验证数据
-     * @param VueCurlModel|null $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @param ModelField|null $field
      * @return mixed
      */
-    public function beforeCheck(VueCurlModel $info=null,BaseModel $baseInfo=null,ModelField $field=null){
+    public function beforeCheck(BaseModel $info,BaseModel $parentInfo=null,ModelField $field=null){
         $func=$this->beforeCheck;
-        return $func($info,$baseInfo,$field);
+        return $func($info,$parentInfo,$field);
     }
 
 
     /**
      * 验证数据是否符合当前步骤
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $old
+     * @param BaseModel|null $parentInfo
      * @param ModelField|null $field
      * @return mixed
      */
-    public function check(VueCurlModel $old=null,BaseModel $baseInfo=null,ModelField $field=null){
+    public function check(BaseModel $old,BaseModel $parentInfo=null,ModelField $field=null){
         if(!isset($this->check)||is_null($this->check)){
             throw new \think\Exception('未设置check');
         }
         $func=$this->check;
-        return $func($old,$baseInfo,$field);
+        return $func($old,$parentInfo,$field);
     }
 
 
@@ -62,8 +61,8 @@ class StepCheck
      */
     public function whenEmptyCheckSetByStep(string $step){
         if(!isset($this->check)||is_null($this->check)){
-            $this->check=function(VueCurlModel $old=null)use($step){
-                if(!$old||empty($old->id)){
+            $this->check=function(BaseModel $old)use($step){
+                if(empty($old->id)){
                     return false;
                 }
                 return eqEndStep($step,$old);

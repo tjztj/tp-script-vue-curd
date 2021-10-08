@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
@@ -111,7 +112,7 @@ class FilesField extends ModelField
      * @return $this
      * @throws \think\Exception
      */
-    protected function setSaveVal(array $data): self
+    protected function setSaveVal(array $data,BaseModel $old): self
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];

@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
@@ -78,7 +79,7 @@ class ImagesField extends ModelField
      * @param array $data  数据值集合
      * @return $this
      */
-    public function setSaveVal(array $data): self
+    public function setSaveVal(array $data,BaseModel $old): self
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];

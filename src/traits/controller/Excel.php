@@ -5,7 +5,8 @@ namespace tpScriptVueCurd\traits\controller;
 
 
 
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\controller\Controller;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
@@ -23,10 +24,24 @@ use tpScriptVueCurd\option\FunControllerImportBefore;
 trait Excel
 {
 
-    public VueCurlModel $model;
+    public BaseModel $model;
     public FieldCollection $fields;
 
+    private bool $baseAndChildImport=true;//是父表+子表 列表导入
+    /**
+     * @var BaseModel[]
+     */
+    private array $importBaseInfos;//当前父表导入的数据集合
 
+
+
+    protected function myExcelFields():FieldCollection{
+        if(is_null($this->parentController)){
+            return $this->fields;
+        }
+        //不需要村社，父表已经有村社了
+        return $this->fields->filter(fn(ModelField $v)=>!in_array($v->name(), [$this->model::getRegionField(), $this->model::getRegionPidField()], true));
+    }
 
 
     /**
@@ -34,7 +49,41 @@ trait Excel
      * @return FieldCollection
      */
     protected function excelFields():FieldCollection{
-        return $this->fields;
+        if(!$this->baseAndChildImport||empty($this->childControllers)){//只导入本表
+            return $this->myExcelFields();
+        }
+        //获取父表字段
+        $fields=$this->myExcelFields()->map(function(ModelField $field){
+            $field=clone $field;
+            $field->name('PARENT|'.$field->name());
+            $field->title($this->title.'|'.$field->title());
+            return $field;
+        });
+
+
+        //子表字段
+        foreach ($this->childControllers as $v){
+            /**
+             * @var Controller $v
+             * @var BaseModel $model
+             */
+            $model=$v->model;
+
+            $modelName=class_basename($model);
+            $fields=$fields->merge(
+                $model->fields()
+                    ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))
+                    ->map(function(ModelField $field)use($modelName,$v){
+                        $field=clone $field;
+                        $field->name($modelName.'|'.$field->name());
+                        $field->title($v->title.'|'.$field->title());
+                        return $field;
+                    })
+            );
+        }
+
+
+        return $fields;
     }
 
     /**
@@ -46,35 +95,135 @@ trait Excel
      * @throws \think\db\exception\ModelNotFoundException
      */
     protected function excelTilte():string{
-        return static::getTitle();
+        return $this->title;
     }
 
 
-    /**
-     * 执行添加逻辑，可继承然后重写
-     * @param $saveData
-     * @return VueCurlModel
-     */
-    protected function excelSave($saveData):VueCurlModel{
+    protected function myExcelSave(array $saveData):BaseModel{
         static $modelClassName;
         if(!isset($modelClassName)){
             $modelClassName=get_class($this->model);
         }
 
+        $this->excelBaseInfo=null;
+        if(!is_null($this->parentController)){
+            $baseId=$this->request->param('base_id/d');
+            if(empty($baseId)){
+                throw new \think\Exception('缺少父表参数');
+            }
+            $this->excelBaseInfo=(clone $this->parentController->model)->find($baseId);
+            if(empty($this->excelBaseInfo)){
+                throw new \think\Exception('未找到父表相关信息');
+            }
+        }
+
         $option=new FunControllerImportBefore();
         $option->saveArr=$saveData;
+        $option->base=$this->excelBaseInfo;
         $this->importBefore($option);
-        
+
         $model=new $modelClassName;
-        $info=$model->addInfo($option->saveArr,$this->fields,true);
+        $info=$model->addInfo($option->saveArr,$this->myExcelFields(),true);
 
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;
+        $optionAfter->base=$this->excelBaseInfo;
         $this->importAfter($optionAfter);
 
         return $info;
     }
 
+    /**
+     * 执行添加逻辑，可继承然后重写
+     * @param array $saveData
+     * @return BaseModel|array
+     * @throws \think\Exception
+     */
+    protected function excelSave(array $saveData){
+        if(!$this->baseAndChildImport||empty($this->childControllers)){//只导入本表
+            return $this->myExcelSave($saveData);
+        }
+
+        $datas=[];
+        foreach ($saveData as $k=>$v){
+            $arr=explode('|',$k);
+            isset($datas[$arr[0]])||$datas[$arr[0]]=[];
+            $datas[$arr[0]][$arr[1]]=$v;
+        }
+        $baseId=$this->getMainIdByImportData($datas['PARENT']);
+        $infos=[
+            get_class($this->model)=>$this->importBaseInfos[$baseId],
+        ];
+
+
+        //子表
+        /**
+         * @var Controller $childController
+         * @var BaseModel $model
+         * @var Controller[] $childControllerClassList
+         */
+        $childControllerClassList=[];
+        foreach ($this->childControllers as $childController){
+            $modelClass=get_class($childController->model);
+            $modelName=class_basename($modelClass);
+            if(isset($datas[$modelName])){
+                $model=new $modelClass;
+                $base=$this->getExcelBaseInfo($baseId);
+
+
+                $option=new FunControllerImportBefore();
+                $option->saveArr=$datas[$modelName];
+                $option->base=$base;
+                $childController->importBefore($option);
+                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,$model->fields(),true);
+
+                $optionAfter=new FunControllerImportAfter();
+                $optionAfter->saveObjects=$infos[$modelClass];
+                $optionAfter->base=$option->base;
+
+                $childController->importAfter($optionAfter);
+            }
+        }
+        return $infos;
+    }
+
+
+
+    ####################################################################################################################
+    /**
+     * 根据导入数据获取 导入的ID
+     * @param array $mainData
+     * @return mixed
+     */
+    private function getMainIdByImportData(array $mainData):int{
+        static $baseIds=[];
+
+        //父表字段的值一样将会视作同一条父数据
+        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->parentController->model,true)->getSave());
+        if(!isset($baseIds[$baseIdsKey])){
+            $parentInfo=$this->myExcelSave($mainData);
+            $baseIds[$baseIdsKey]=$parentInfo->id;
+            $this->setExcelBaseInfo($parentInfo);
+        }
+        return $baseIds[$baseIdsKey];
+    }
+    protected function getExcelBaseInfos():array{return $this->importBaseInfos?:[];}
+    protected function getExcelBaseInfo(int $baseId):BaseModel{
+        if(empty($baseId)){
+            throw new \think\Exception('父表ID错误');
+        }
+
+        if(!isset($this->importBaseInfos[$baseId])){
+            $this->importBaseInfos[$baseId]=$this->model->find($baseId);
+        }
+        if(empty($this->importBaseInfos[$baseId])){
+            throw new \think\Exception('未找到相关周信息');
+        }
+        return $this->importBaseInfos[$baseId];
+    }
+    private function setExcelBaseInfo(BaseModel $info):void{
+        $this->importBaseInfos[$info->id]=$info;
+    }
 
 
     ####################################################################################################################
@@ -161,7 +310,7 @@ trait Excel
             }
         }catch (\Exception $e){
             $this->model->rollback();
-            return $this->errorAndCode('Excel第'.$last_do_row.'行 '.$e->getMessage(),$e->getCode());
+            $this->errorAndCode('Excel第'.$last_do_row.'行 '.$e->getMessage(),$e->getCode());
         }
 
         $this->model->commit();
@@ -179,7 +328,8 @@ trait Excel
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    function downExcelTpl():void{
+    public function downExcelTpl():void{
+
         ['expCellName'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         $title=$this->getExcelTilte();
         $data = [
@@ -191,6 +341,33 @@ trait Excel
             'expTableData' => [$row],
         ];
         \tpScriptVueCurd\tool\Excel::exportExecl($data);
+    }
+
+    /**
+     * #title 仅本表导入模板下载
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function justDownBaseExcelTpl():void{
+        $this->baseAndChildImport=false;
+        $this->downExcelTpl();
+    }
+
+    /**
+     * #title 仅本表数据导入
+     * @return \think\response\Json|void
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    public function justImportBaseExcelTpl(){
+        $this->baseAndChildImport=false;
+        return $this->importExcelTpl();
     }
 
 

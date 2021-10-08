@@ -4,7 +4,7 @@ namespace tpScriptVueCurd\option\generate_table;
 
 use think\Collection;
 use think\facade\Db;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\traits\TableGetterSetter;
 
@@ -53,9 +53,9 @@ class GenerateTableOption extends Collection
         $this->engine = $engine;
     }
 
-    protected VueCurlModel $model;
+    protected BaseModel $model;
 
-    public function __construct(VueCurlModel $model)
+    public function __construct(BaseModel $model)
     {
         $this->model=clone $model;
         parent::__construct($this->generateItems());
@@ -113,8 +113,8 @@ class GenerateTableOption extends Collection
         $this->items = $this->convertToArray($this->generateItems());
 
 
-        $controll=$model::getControllerClass();
-        if($controll::type()==='child'){
+        $controll=$model->controller;
+        if($controll->parentController){
             $pf=new GenerateColumnOption($model::parentField());
             $pf->setTypeInt();
             $pf->setComment('父表ID');
@@ -149,7 +149,7 @@ class GenerateTableOption extends Collection
 
         $comment=$this->comment;
         if(empty($comment)){
-            $comment=$controll::getTitle();
+            $comment=$controll->title;
         }
 
 

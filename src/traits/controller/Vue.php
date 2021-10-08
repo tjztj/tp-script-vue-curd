@@ -60,7 +60,7 @@ trait Vue
     public function assign($name, $value = null)
     {
         if ($this->checkIsVueAction()) {
-            if (is_array($name) && is_null(null)) {
+            if (is_array($name) && is_null($value)) {
                 $this->vue_data = array_merge($this->vue_data, $name);
             } else {
                 $this->vue_data[$name] = $value;

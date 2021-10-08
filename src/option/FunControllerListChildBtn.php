@@ -33,4 +33,11 @@ class FunControllerListChildBtn
      */
     public ?string $url=null;
 
+
+    /**
+     * 打开页面显示位置  auto|rb|lt|lb
+     * @var string
+     */
+    public string $pageOffset='rt';
+
 }

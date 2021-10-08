@@ -115,18 +115,18 @@ trait ModelStep
 
 
     /**
-     * 使用 $info->getBackStepData($newStep,$baseInfo)
+     * 使用 $info->getBackStepData($newStep,$parentInfo)
      * @param FieldStep $newStep
-     * @param BaseModel|null $baseInfo 如果有父表，需要传入父表的
+     * @param BaseModel|null $parentInfo 如果有父表，需要传入父表的
      * @return array
      * @throws \think\Exception
      * @todo 步骤撤回的时候，删掉撤回的步骤的字段的值，不然统计可能出问题！！！  setSaveToNull，字段类型需设置
      * 获取要撤回的新的状态 $info->getBackStepData($step)  ;保存到数据库的操作需自己实现
      */
-    public function getBackStepData(FieldStep $newStep,BaseModel $baseInfo=null): array
+    public function getBackStepData(FieldStep $newStep,BaseModel $parentInfo=null): array
     {
-        $nowStepInfo=$this->fields()->getCurrentStepInfo($this,$baseInfo);
-        if(empty($nowStepInfo)){
+        $nowStepInfo=$this->fields()->getCurrentStepInfo($this,$parentInfo);
+        if($nowStepInfo === null){
             throw new \think\Exception('当前数据无步骤，不可撤回');
         }
 

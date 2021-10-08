@@ -4,9 +4,8 @@
 namespace tpScriptVueCurd\traits\model;
 
 
-use tpScriptVueCurd\base\model\BaseChildModel;
+
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
@@ -25,23 +24,23 @@ trait ModelSave
      * 修改数据
      * @param array $postData 要保存的数据
      * @param FieldCollection $fields
-     * @param BaseModel|null $baseInfo
-     * @param VueCurlModel $beforeInfo
+     * @param BaseModel|null $parentInfo
+     * @param BaseModel $beforeInfo
      * @param array $returnSaveData
      * @return $this
      * @throws \think\Exception
      */
-    public function saveInfo(array $postData,FieldCollection $fields,BaseModel $baseInfo=null,VueCurlModel $beforeInfo,array &$returnSaveData=[]): self
+    public function saveInfo(array $postData,FieldCollection $fields,BaseModel $parentInfo,BaseModel $beforeInfo,array &$returnSaveData=[]): self
     {
-        if($beforeInfo&&!empty($beforeInfo->id)&&!$beforeInfo->checkRowAuth($fields,$baseInfo,'edit')){
+        if($beforeInfo&&!empty($beforeInfo->id)&&!$beforeInfo->checkRowAuth($fields,$parentInfo,'edit')){
             throw new \think\Exception('您不能修改当前数据信息');
         }
-        FieldDo::doSaveBefore($fields,$postData,$beforeInfo,$baseInfo);
+        FieldDo::doSaveBefore($fields,$postData,$beforeInfo,$parentInfo);
 
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 
-        $data=$this->doSaveData($postData,$fields,false,$baseInfo,$beforeInfo,$saveFields);
+        $data=$this->doSaveData($postData,$beforeInfo,$fields,false,$parentInfo,$saveFields);
 
         if(empty($postData['id'])){
             throw new \think\Exception('缺少ID');
@@ -49,7 +48,7 @@ trait ModelSave
 
         $data['id']=$postData['id'];
 
-        FieldDo::doSaveBeforeChecked($saveFields,$data,$beforeInfo,$baseInfo);
+        FieldDo::doSaveBeforeChecked($saveFields,$data,$beforeInfo,$parentInfo);
 
 
         $haveDoStep=false;
@@ -113,17 +112,13 @@ trait ModelSave
         $info=clone $beforeInfo;
         $info->save($data);
 
-        FieldDo::doSaveAfter($saveFields,$data,$beforeInfo,$info,$baseInfo);
-        if($this instanceof BaseChildModel){
-            $this->onEditAfter($info,$data,$baseInfo,$beforeInfo);
-        }else{
-            $this->onEditAfter($info,$data,$beforeInfo);
-        }
+        FieldDo::doSaveAfter($saveFields,$data,$beforeInfo,$info,$parentInfo);
+        $this->onEditAfter($info,$data,$parentInfo,$beforeInfo);
 
         if($haveDoStep&&$saveStepInfo){
-            $saveStepInfo->doSaveAfter($beforeInfo,$info,$baseInfo,$fields,$data);
+            $saveStepInfo->doSaveAfter($beforeInfo,$info,$parentInfo,$fields,$data);
             if(static::hasNextStepField()){
-                $nestStep=$this->fields()->getNextStepInfo($info,$baseInfo);
+                $nestStep=$this->fields()->getNextStepInfo($info,$parentInfo);
                 $info[static::getNextStepField()]=$nestStep===null?'':$nestStep->getStep();
             }
         }
@@ -139,13 +134,13 @@ trait ModelSave
      * @param array $postData
      * @param FieldCollection|null $fields
      * @param bool $isExcelDo 是否excel操作
-     * @param BaseModel|null $baseInfo base表数据
-     * @param VueCurlModel|null $beforeInfo 数据之前的老值
+     * @param BaseModel|null $parentInfo base表数据
+     * @param BaseModel|null $beforeInfo 数据之前的老值
      * @param FieldCollection|null $saveFields 当前操作要保存到数据库的字段
      * @return array
      * @throws \think\Exception
      */
-    final protected function doSaveData(array $postData,FieldCollection $fields=null,bool $isExcelDo=false,BaseModel $baseInfo=null,VueCurlModel $beforeInfo=null,FieldCollection &$saveFields=null):array{
+    final protected function doSaveData(array $postData,BaseModel $beforeInfo,FieldCollection $fields=null,bool $isExcelDo=false,BaseModel $parentInfo=null,FieldCollection &$saveFields=null):array{
 
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
@@ -156,18 +151,10 @@ trait ModelSave
         $id=empty($postData['id'])?0:$postData['id'];
 
 
-        //切面
-        if($this instanceof BaseChildModel){
-            $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$baseInfo,$beforeInfo);
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
-            $this->doSaveDataAfter($saveData,$id,$baseInfo,$beforeInfo);
-        }else if($this instanceof BaseModel){
-            $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$beforeInfo);
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
-            $this->doSaveDataAfter($saveData,$id,$beforeInfo);
-        }else{
-            $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
-        }
+        $this->doSaveDataBefore($fields,$postData,$isExcelDo,$id,$parentInfo,$beforeInfo);
+        $saveData=$fields->setSave($postData,$beforeInfo,$isExcelDo,$saveFields)->getSave();
+        $this->doSaveDataAfter($saveData,$id,$parentInfo,$beforeInfo);
+
         return $saveData;
     }
 }

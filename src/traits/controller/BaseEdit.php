@@ -1,38 +1,17 @@
 <?php
 
-
 namespace tpScriptVueCurd\traits\controller;
 
-
-use think\db\Query;
-use think\db\Raw;
-use think\helper\Str;
-use tpScriptVueCurd\base\model\BaseChildModel;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
 use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\FieldCollection;
-use think\Request;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
-use tpScriptVueCurd\option\FunControllerIndexData;
 
-/**
- * Trait CurdFunc
- * @property Request $request
- * @property VueCurlModel $model
- * @property FieldCollection $fields
- * @package tpScriptVueCurd\traits\controller
- * @author tj 1079798840@qq.com
- */
-trait CurdFunc
+trait BaseEdit
 {
-
-    public string $fetchPath;
     protected bool $autoStepNext=false;
-    protected bool $dontShowTpl=false;
-
 
     private bool $saveStepNext;//编辑的时候，是否是下一步
     public bool $emptySaveStepNextUseRequest=false;//如果未设置saveStepNext，是否又获取到的参数[step-next]决定
@@ -49,21 +28,69 @@ trait CurdFunc
 
 
     /**
-     * @param FieldCollection|null $fields  要更改的字段信息
-     * @param VueCurlModel|null $model      更改到的模型
-     * @param VueCurlModel|null $baseModel  父表
+     * #title 添加与修改
      * @return mixed
      * @throws \think\Exception
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    protected function editFields(FieldCollection $fields=null,VueCurlModel $model=null,VueCurlModel $baseModel=null){
+    public function edit(){
+        return $this->editFields();
+    }
+
+
+    /**
+     * 自动判断下一步，并执行
+     * @return mixed
+     */
+    protected function stepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->autoStepNext=true;
+        return $this->edit();
+    }
+
+    /**
+     * 执行下一步
+     * @return mixed
+     */
+    protected function nextStepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->setSaveStepNext(true);
+        return $this->edit();
+    }
+
+
+
+    /**
+     * 编辑当前步骤
+     * @return mixed
+     */
+    protected function currentStepEdit(){
+        $this->assign('vueCurdAction','edit');
+        $this->setSaveStepNext(false);
+        return $this->edit();
+    }
+
+    /**
+     * @param FieldCollection|null $fields  要更改的字段信息
+     * @param BaseModel|null $model      更改到的模型
+     * @param BaseModel|null $baseModel  父表
+     * @return mixed
+     * @throws \think\Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function editFields(FieldCollection $fields=null,BaseModel $model=null,BaseModel $baseModel=null){
         if(is_null($fields)){
             $fields=$this->fields;
         }
         if(is_null($model)){
             $model=$this->model;
+        }
+        if(is_null($baseModel)&&$this->parentController){
+            $baseModel=clone $this->parentController->model;
         }
 
         if($this->request->isAjax()){
@@ -73,66 +100,54 @@ trait CurdFunc
             }
             $model->startTrans();
             $savedInfo=null;
-            $baseInfo=null;
-            $old=null;
+            $parentInfo=null;
             $returnSaveData=[];
             $isNext=false;
             try{
                 if(empty($data['id'])){
+                    $old=clone $model;
                     if($baseModel){
                         if(empty($data[$this->model::parentField()])){
                             throw new \think\Exception('缺少关键信息');
                         }
-
-                        $baseInfo=$baseModel->find($data[$model::parentField()]);
-                        if(is_null($baseInfo)){
+                        $parentInfo=$baseModel->find($data[$model::parentField()]);
+                        if(is_null($parentInfo)){
                             throw new \think\Exception('未找到所属数据');
                         }
-                        $this->addBefore($data,$baseInfo);
-                    }else{
-                        $this->addBefore($data);
                     }
-
+                    $this->addBefore($data,$parentInfo);
 
                     $isNext=true;
                     //步骤字段
-                    $fields=$fields->filterNextStepFields($old,$baseInfo,$stepInfo);
+                    $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
                     $fields->saveStepInfo=$stepInfo;
 
                     //步骤权限验证
-                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$baseInfo,$fields)===false){
+                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
                         return $this->error('您不能进行此操作-01');
                     }
 
 
-                    $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onEditSave($data,$baseInfo);});
-                    if($baseModel){
-                        $savedInfo=$model->addInfo($data,$baseInfo,$fields,false,$returnSaveData);
-                    }else{
-                        $savedInfo=$model->addInfo($data,$fields,false,$returnSaveData);
-                    }
-
+                    $fields->each(function (ModelField $v)use($data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
+                    $savedInfo=$model->addInfo($data,$parentInfo,$fields,false,$returnSaveData);
                     $this->addAfter($savedInfo);
                 }else{
-                    $old=$model->find($data['id']);
+                    $old=(clone $model)->find($data['id']);
                     if($baseModel){
-                        $baseInfo=$baseModel->find($old[$model::parentField()]);
-                        $this->editBefore($data,$old,$baseInfo);
-                    }else{
-                        $this->editBefore($data,$old);
+                        $parentInfo=$baseModel->find($old[$model::parentField()]);
                     }
-
+                    $this->editBefore($data,$old,$parentInfo);
 
 
                     //步骤
-                    $isNext=$this->autoGetSaveStepIsNext($fields,$old,$baseInfo);
+                    $isNext=$this->autoGetSaveStepIsNext($fields,$old,$parentInfo);
                     if(is_null($isNext)){
                         return $this->error('数据不满足当前步骤');
                     }
                     if($isNext){
-                        $fields=$fields->filterNextStepFields($old,$baseInfo,$stepInfo);
+                        $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
                     }else{
-                        $fields=$fields->filterCurrentStepFields($old,$baseInfo,$stepInfo);
+                        $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
                     }
                     if(!$this->checkEditUrl($fields,$stepInfo)){
                         return $this->error('您不能进行此操作-061');
@@ -141,11 +156,11 @@ trait CurdFunc
 
 
                     //步骤权限验证
-                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$baseInfo,$fields)===false){
+                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
                         return $this->error('您不能进行此操作-02');
                     }
-                    $fields->each(function (ModelField $v)use($data,$baseInfo,$old){$v->onEditSave($data,$old,$baseInfo,);});
-                    $savedInfo=$model->saveInfo($data,$fields,$baseInfo,$old,$returnSaveData);
+                    $fields->each(function (ModelField $v)use($data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
+                    $savedInfo=$model->saveInfo($data,$fields,$parentInfo,$old,$returnSaveData);
                     $this->editAfter($savedInfo);
                 }
             }catch (\Exception $e){
@@ -156,7 +171,7 @@ trait CurdFunc
 
             //提交后
             $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
-            $this->editCommitAfter($msg,$old,$savedInfo,$baseInfo,$returnSaveData);
+            $this->editCommitAfter($msg,$old,$savedInfo,$parentInfo,$returnSaveData);
 
             $refreshList=$this->request->refreshList??false;
             if($fields->stepIsEnable()&&$fields->saveStepInfo){
@@ -166,28 +181,28 @@ trait CurdFunc
             $this->success($msg,[
                 'data'=>$data,
                 'info'=>$savedInfo,
-                'baseInfo'=>$baseInfo,
+                'baseInfo'=>$parentInfo,
                 'refreshList'=> $refreshList,
             ]);
         }
 
         $id=$this->request->editId??$this->request->param('id/d');
         if($id){
-            $info=$model->find($id);
+            $info=(clone $model)->find($id);
             if($baseModel){
                 $base_id=$info[$model::parentField()];
-                $baseInfo=$baseModel->find($info[$model::parentField()]);
+                $parentInfo=$baseModel->find($info[$model::parentField()]);
             }else{
-                $baseInfo=null;
+                $parentInfo=null;
             }
         }else{
             $info=clone $model;
             if($baseModel){
                 $base_id=$this->request->param('base_id/d',0);
                 $base_id||$this->errorAndCode('缺少必要参数');
-                $baseInfo=$baseModel->find($base_id);
+                $parentInfo=$baseModel->find($base_id);
             }else{
-                $baseInfo=null;
+                $parentInfo=null;
             }
         }
 
@@ -201,15 +216,15 @@ trait CurdFunc
 
 
         try{
-            $this->createEditFetchDataBefore($fields,$info,$baseInfo);
+            $this->createEditFetchDataBefore($fields,$info,$parentInfo);
         }catch (\Exception $e){
             return $this->error($e);
         }
-        $fetchData=$this->createEditFetchData($fields,$info,$baseInfo);
+        $fetchData=$this->createEditFetchData($fields,$info,$parentInfo);
 
         if($baseModel){
             $fetchData['baseId']=$base_id;
-            $fetchData['baseInfo']=$baseInfo;
+            $fetchData['baseInfo']=$parentInfo;
             $fetchData['parentField']=$this->model::parentField();
             $fetchData['vueCurdAction']='childEdit';
         }
@@ -220,145 +235,15 @@ trait CurdFunc
         return $this->showTpl('edit',$fetchData);
     }
 
-
-    /**
-     * 步骤--是否能添加
-     * @param BaseModel|null $baseInfo
-     * @return bool
-     * @throws \think\Exception
-     */
-    protected function getAuthAdd(BaseModel $baseInfo=null):bool{
-        if(!$this->fields->stepIsEnable()){
-            return true;
-        }
-        $stepInfo=$this->fields->getNextStepInfo(null,$baseInfo);
-        if($stepInfo){
-            $fields=$this->fields->getFilterStepFields($stepInfo,true,null,$baseInfo);
-            return $fields->count()>0&&$stepInfo->authCheck(null,$baseInfo,$fields);
-        }
-        return false;
-    }
-
-    /**
-     * 获取添加时的字段信息
-     * @return FieldCollection
-     * @throws \think\Exception
-     */
-    protected function getRowAuthAddFields(): FieldCollection
-    {
-        if(!$this->fields->stepIsEnable()){
-            return clone $this->fields;
-        }
-        $stepInfo=$this->fields->getNextStepInfo();
-        if($stepInfo){
-            $fields=$this->fields->getFilterStepFields($stepInfo,true);
-            $fields->saveStepInfo=$stepInfo;
-            return $fields;
-        }
-        return new FieldCollection();
-    }
-
-
-    /**
-     * #title 详细页面
-     * @return mixed|void
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    function show(){
-        $id=$this->request->showId??$this->request->param('id/d');
-        if(empty($id)){
-            return $this->errorAndCode('缺少必要参数');
-        }
-        $data=$this->model->find($id);
-        if(empty($data)){
-            return $this->errorAndCode('未找到相关数据信息');
-        }
-
-
-        $baseInfo=null;
-        if($this->model instanceof BaseChildModel){
-            $baseInfo=$this->model::parentModelClassPath()::find($data[$this->model::parentField()]);
-        }
-
-        try{
-            //字段钩子
-            FieldDo::doShowBefore($this->fields,$data,$baseInfo);
-        }catch (\Exception $e){
-            return $this->error($e);
-        }
-
-
-        $fields=$this->fields->filterHideFieldsByShow($data)->whenShowSetAttrValByWheres($data)->filterShowStepFields($data,$baseInfo)->rendGroup();
-
-
-        try{
-            $canShow=$data->checkRowAuth($fields,$baseInfo,'show');
-        }catch (\Exception $exception){
-            return $this->errorAndCode($exception->getMessage());
-        }
-        if($canShow===false){
-            return $this->errorAndCode('您不能查看当前数据信息');
-        }
-
-
-        try{
-            $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onShow($data,$baseInfo);});
-            //字段钩子
-            FieldDo::doShow($fields,$data,$baseInfo);
-        }catch (\Exception $e){
-            return $this->error($e);
-        }
-
-
-        //控制器钩子
-        if($this->model instanceof BaseChildModel){
-            $this->showBefore($data,$baseInfo,$fields);
-        }else{
-            $this->showBefore($data,$fields);
-        }
-
-        $info=$data->toArray();
-        return $this->doShow(static::getTitle(),$info,$fields);
-    }
-
-    /**
-     * 方便可以调用其他模型的查看页面（项目开发中可能会用到）
-     * @param string $title
-     * @param array $info
-     * @param FieldCollection $fields
-     * @return mixed
-     */
-    protected function doShow(string $title,array $info,FieldCollection $fields){
-        $this->assign('thisAction','show');//使用它的js
-
-        $fields=$fields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
-
-
-        $fields->doShowData($info);
-        $fieldArr=array_values($fields->toArray());
-
-        return $this->showTpl('show',$this->showFetch([
-            'title'=>$title,
-            'fields'=>$fieldArr,
-            'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
-            'info'=>$info,
-            'fieldComponents'=>$fields->getComponents('show'),
-        ]));
-    }
-
-
-
     /**
      * 获取编辑界面显示需要的参数
      * @param FieldCollection $fields
-     * @param VueCurlModel|null $data
+     * @param BaseModel|null $data
      * @param BaseModel|null $baseModel
      * @return array
      * @throws \think\Exception
      */
-    protected function createEditFetchData(FieldCollection $fields,VueCurlModel $data,BaseModel $baseModel=null){
+    protected function createEditFetchData(FieldCollection $fields,BaseModel $data,BaseModel $baseModel=null){
         $fields->each(function (ModelField $v)use($data,$baseModel){$v->onEditShow($data,$baseModel);});
 
         $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
@@ -436,7 +321,7 @@ trait CurdFunc
 
         $fieldArr=array_values($fields->rendGroup()->toArray());
         return [
-            'title'=>static::getTitle(),
+            'title'=>$this->title,
             'fields'=>$fieldArr,
             'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
             'info'=>$info,
@@ -446,21 +331,20 @@ trait CurdFunc
         ];
     }
 
-
     /**
      * 添加/编辑 已经Commit 后执行
      * @param $msg
      * @param $old
      * @param $savedInfo
-     * @param $baseInfo
+     * @param $parentInfo
      * @param $returnSaveData
      */
-    public function editCommitAfter(&$msg,$old,$savedInfo,$baseInfo,$returnSaveData): void
+    public function editCommitAfter(&$msg,$old,$savedInfo,$parentInfo,$returnSaveData): void
     {
         if(isset($this->fields->saveStepInfo)&&!is_null($this->fields->saveStepInfo)&&$this->fields->stepIsEnable()){
             $this->model->startTrans();
             try{
-                $this->fields->saveStepInfo->doSaveAfterCommited($old,$savedInfo,$baseInfo,$this->fields,$returnSaveData);
+                $this->fields->saveStepInfo->doSaveAfterCommited($old,$savedInfo,$parentInfo,$this->fields,$returnSaveData);
             }catch (\Exception $e){
                 $this->model->rollback();
                 $msg.='，但：'.$e->getMessage();
@@ -471,98 +355,14 @@ trait CurdFunc
 
 
     /**
-     * 删除时
-     * @param VueCurlModel $model
-     * @param array $ids
-     * @return \think\response\Json|void
-     */
-    public function doDelect(VueCurlModel $model,array $ids){
-        $ids=$this->beforeDel($ids);
-        $list= $model->del($ids);
-        $this->afterDel($list);
-    }
-
-    /**
-     * 显示模板内容
-     * @param string $file      直接在控制器下面的模板位置添加模板文件就可替换默认的模板，或者使用fetchPath
-     * @param $data
-     * @return mixed
-     */
-    protected function showTpl($file,$data){
-        FilesField::setShowFileInfos();
-        if($this->dontShowTpl){
-            $this->success($data);
-        }
-
-        if(isset($this->fetchPath)&&$this->fetchPath!==''){
-            return $this->fetch($this->fetchPath,$data);
-        }
-
-        $appName = $this->app->http->getName();
-        $view    = $this->app->view->getConfig('view_dir_name');
-        $depr =$this->app->view->getConfig('view_depr');
-
-        $path = $this->app->getAppPath() . $view . DIRECTORY_SEPARATOR;
-        if (!is_dir($this->app->getAppPath() . $view)&&$appName) {
-            $path .= $appName . DIRECTORY_SEPARATOR;
-        }
-        $controller = $this->app->request->controller();
-        if (strpos($controller, '.')) {
-            $pos        = strrpos($controller, '.');
-            $controller = substr($controller, 0, $pos) . '.' . Str::snake(substr($controller, $pos + 1));
-            $controller_name=Str::snake(substr($controller, $pos + 1));
-        } else {
-            $controller = Str::snake($controller);
-            $controller_name=$controller;
-        }
-        $template=$file?:Str::snake( $this->app->request->action());
-        $path .= str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . ($file ?: Str::snake($this->app->request->action())) . '.vue';
-        if(file_exists($path)){
-            return $this->fetch(str_replace('.', '/', $controller).'/'.$template,$data);
-        }
-        $tplPath=static::getTplPath();
-        return $this->fetch($tplPath.$file.'.vue',$data);
-    }
-
-
-    /**
-     * 获取列表排序   Raw 是为了方便重写
-     * @return string|Raw
-     */
-    protected function getListOrder(){
-        $sortField=$this->request->param('sortField');
-        if($sortField){
-            $sortOrder=$this->request->param('sortOrder','');
-            switch (strtolower($sortOrder)){
-                case 'desc':
-                case 'asc':
-                    break;
-                case 'ascend':
-                    $sortOrder='ASC';
-                    break;
-                case 'descend':
-                    $sortOrder='DESC';
-                    break;
-                default:
-                    $sortOrder='DESC';
-            }
-            $order=$sortField.' '.$sortOrder;
-        }else{
-            $order='id DESC';
-        }
-        return $order;
-    }
-
-
-    /**
      * 自动判断是否下一步
      * @param FieldCollection $fields
-     * @param VueCurlModel|null $info
+     * @param BaseModel|null $info
      * @param BaseModel|null $base
      * @return bool|null
      * @throws \think\Exception
      */
-    protected function autoGetSaveStepIsNext(FieldCollection $fields,?VueCurlModel $info,?BaseModel $base):?bool{
+    protected function autoGetSaveStepIsNext(FieldCollection $fields,BaseModel $info,?BaseModel $base):?bool{
         if(!$fields->stepIsEnable()){
             //未启用
             return false;
@@ -694,116 +494,5 @@ trait CurdFunc
 
         return url('edit')->build()===$this->request->baseUrl()
             || url('edit',[],true,true)->build()===$this->request->baseUrl();
-    }
-
-    /**
-     * 自动判断下一步，并执行
-     * @return mixed
-     */
-    protected function stepEdit(){
-        $this->assign('vueCurdAction','edit');
-        $this->autoStepNext=true;
-        return $this->edit();
-    }
-
-    /**
-     * 执行下一步
-     * @return mixed
-     */
-    protected function nextStepEdit(){
-        $this->assign('vueCurdAction','edit');
-        $this->setSaveStepNext(true);
-        return $this->edit();
-    }
-
-
-
-    /**
-     * 编辑当前步骤
-     * @return mixed
-     */
-    protected function currentStepEdit(){
-        $this->assign('vueCurdAction','edit');
-        $this->setSaveStepNext(false);
-        return $this->edit();
-    }
-
-
-
-
-    /**
-     * 数据步骤查询权限
-     * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
-     * @return array|\Closure
-     * @throws \think\Exception
-     */
-    protected function stepAuthWhere(FieldCollection $fields){
-        if(!$fields->stepIsEnable()){
-            return [];
-        }
-        /**
-         * @var FieldStep[] $steps
-         */
-        $steps=[];
-        $fields->each(function(ModelField $field)use(&$steps){
-            $stepList=$field->steps();
-            if($stepList===null||$stepList->isEmpty()){
-                return;
-            }
-            $stepList->each(function(FieldStep $step)use(&$steps){
-                isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step;
-            });
-        });
-
-        return function(Query $query)use($steps){
-            $query->whereOr(function (Query $query){
-                $this->stepAuthWhereOr($query);
-            });
-            if(empty($steps)){
-                return;
-            }
-            foreach ($steps as $v){
-                $where=$v->getAuthWhere();
-                if($where===null){
-                    continue;
-                }
-                $query->whereOr($where);
-            }
-        };
-    }
-
-    /**
-     * 步骤 or 条件，当角色不满足步骤时，却又要显示相关数据，可在此处加入条件
-     * @param Query $query
-     */
-    protected function stepAuthWhereOr(Query $query):void{}
-
-
-    /**
-     * @param Query|BaseModel|BaseChildModel $model
-     * @return FunControllerIndexData
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    protected function indexListSelect($model):FunControllerIndexData{
-        $option=new FunControllerIndexData();
-        $option->model=clone $model;
-        if($this->indexPageOption->pageSize>0){
-            $pageSize=$this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize;
-            $list=$model->paginate($pageSize);
-            $option->currentPage=$list->currentPage();
-            $option->lastPage=$list->lastPage();
-            $option->perPage=$list->listRows();
-            $option->total=$list->total();
-            $option->sourceList=$list->getCollection();
-        }else{
-            $option->sourceList=$model->select();
-            $option->total=$option->sourceList->count();
-            $option->currentPage=1;
-            $option->lastPage=1;
-            $option->perPage=$option->total;
-        }
-        return $option;
     }
 }

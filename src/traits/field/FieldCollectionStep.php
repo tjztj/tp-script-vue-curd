@@ -5,7 +5,7 @@ namespace tpScriptVueCurd\traits\field;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldStep;
 
@@ -18,7 +18,7 @@ trait FieldCollectionStep
         //查看页面中，判断要显示哪些字段的类型
         //【fieldSort：根据字段排序来，当前步骤到了哪一个字段那里，那么它之前的字段全部显示】
         //【dataStepHistory：根据数据存储的步骤字段来显示哪些步骤】
-        //【可以自定义一个函数，参数是要显示的对象function($fields,$info,$baseInfo):void】
+        //【可以自定义一个函数，参数是要显示的对象function($fields,$info,$parentInfo):void】
         'showSortSteps'=>'dataStepHistory',
         'listFixed'=>'',//列表中，列是否浮动，'left'/'right'
         'width'=>0,//0为自动
@@ -74,15 +74,15 @@ trait FieldCollectionStep
      * 根据步骤筛选相关字段
      * @param FieldStep $fieldStep
      * @param bool $isNextStep
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $old
+     * @param BaseModel|null $parentInfo
      * @return \tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,VueCurlModel $old=null,BaseModel $baseInfo=null):self{
+    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,BaseModel $old,BaseModel $parentInfo=null):self{
         $hideFields=$old?$this->getFiledHideList($old):[];
-        $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$baseInfo){
-            return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$baseInfo){
+        $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$parentInfo){
+            return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$parentInfo){
                     if($val->getStep()!==$fieldStep->getStep()){
                         return false;
                     }
@@ -91,7 +91,7 @@ trait FieldCollectionStep
                         //不需要再验证
                         return true;
                     }
-                    return $isNextStep?$check->beforeCheck($old,$baseInfo,$v):$check->check($old,$baseInfo,$v);
+                    return $isNextStep?$check->beforeCheck($old,$parentInfo,$v):$check->check($old,$parentInfo,$v);
                 })->count()>0;
         });
 
@@ -118,16 +118,16 @@ trait FieldCollectionStep
 
     /**
      * 获取数据可自行的下一个步骤
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $old
+     * @param BaseModel|null $parentInfo
      * @return FieldStep|null
      * @throws \think\Exception
      */
-    public function getNextStepInfo(VueCurlModel $old=null,BaseModel $baseInfo=null):?FieldStep{
+    public function getNextStepInfo(BaseModel $old,BaseModel $parentInfo=null):?FieldStep{
         $nextFieldStep=null;
-        $this->each(function(ModelField $v)use(&$nextFieldStep,$old,$baseInfo){
-            $v->steps()->each(function(FieldStep $val)use($v,&$nextFieldStep,$old,$baseInfo){
-                if($val->getCheckFunc()->beforeCheck($old,$baseInfo,$v)===true){
+        $this->each(function(ModelField $v)use(&$nextFieldStep,$old,$parentInfo){
+            $v->steps()->each(function(FieldStep $val)use($v,&$nextFieldStep,$old,$parentInfo){
+                if($val->getCheckFunc()->beforeCheck($old,$parentInfo,$v)===true){
                     if(is_null($nextFieldStep)){
                         $nextFieldStep=$val;
                     }else if($nextFieldStep->getStep()!==$val->getStep()){
@@ -142,16 +142,16 @@ trait FieldCollectionStep
 
     /**
      * 获取数据当前满足的步骤
-     * @param VueCurlModel|null $old
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel|null $old
+     * @param BaseModel|null $parentInfo
      * @return null|FieldStep
      * @throws \think\Exception
      */
-    public function getCurrentStepInfo(VueCurlModel $old=null,BaseModel $baseInfo=null):?FieldStep{
+    public function getCurrentStepInfo(BaseModel $old,BaseModel $parentInfo=null):?FieldStep{
         $currentFieldStep=null;
-        $this->each(function(ModelField $v)use(&$currentFieldStep,$old,$baseInfo){
-            $v->steps()->each(function(FieldStep $val)use($v,&$currentFieldStep,$old,$baseInfo){
-                if($val->getCheckFunc()->check($old,$baseInfo,$v)===true){
+        $this->each(function(ModelField $v)use(&$currentFieldStep,$old,$parentInfo){
+            $v->steps()->each(function(FieldStep $val)use($v,&$currentFieldStep,$old,$parentInfo){
+                if($val->getCheckFunc()->check($old,$parentInfo,$v)===true){
                     if(is_null($currentFieldStep)){
                         $currentFieldStep=$val;
                     }else if($currentFieldStep->getStep()!==$val->getStep()){
@@ -168,13 +168,13 @@ trait FieldCollectionStep
 
     /**
      * 根据数据信息，过滤下一个步骤满足的字段
-     * @param VueCurlModel|null $old
+     * @param BaseModel $old
      * @param BaseModel|null $oldBaseInfo
      * @param FieldStep|null $stepInfo
      * @return $this|\tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function filterNextStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
+    public function filterNextStepFields(BaseModel $old,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
         if(!$this->stepIsEnable()){
             //未启用，不过滤
             return $this;
@@ -197,13 +197,13 @@ trait FieldCollectionStep
 
     /**
      * 根据数据信息，过滤当前步骤满足的字段
-     * @param VueCurlModel|null $old
+     * @param BaseModel|null $old
      * @param BaseModel|null $oldBaseInfo
      * @param FieldStep|null $stepInfo
      * @return $this|\tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function filterCurrentStepFields(VueCurlModel $old=null,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
+    public function filterCurrentStepFields(BaseModel $old,BaseModel $oldBaseInfo=null,&$stepInfo=null):self{
         if(!$this->stepIsEnable()){
             //未启用，不过滤
             return $this;
@@ -225,12 +225,12 @@ trait FieldCollectionStep
 
     /**
      * 步骤查看规则 fieldSort
-     * @param VueCurlModel $info
+     * @param BaseModel $info
      * @return $this
      * @throws \think\Exception
      */
-    public function showSortStepsFieldsFieldSort(VueCurlModel $info,BaseModel $baseInfo=null):self{
-        $stepInfo=$this->getCurrentStepInfo($info,$baseInfo);
+    public function showSortStepsFieldsFieldSort(BaseModel $info,BaseModel $parentInfo=null):self{
+        $stepInfo=$this->getCurrentStepInfo($info,$parentInfo);
         if(!$stepInfo){
             $this->items=[];
             return $this;
@@ -252,13 +252,13 @@ trait FieldCollectionStep
 
     /**
      * 步骤查看规则 dataStepHistory
-     * @param VueCurlModel $info
-     * @param BaseModel|null $baseInfo
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
      * @return $this
      * @throws \think\Exception
      */
-    public function showSortStepsFieldsDataStepHistory(VueCurlModel $info,BaseModel $baseInfo=null):self{
-        $stepInfo=$this->getCurrentStepInfo($info,$baseInfo);
+    public function showSortStepsFieldsDataStepHistory(BaseModel $info,BaseModel $parentInfo=null):self{
+        $stepInfo=$this->getCurrentStepInfo($info,$parentInfo);
         if(!$stepInfo){
             $this->items=[];
             return $this;
@@ -283,22 +283,22 @@ trait FieldCollectionStep
 
     /**
      * 获取步骤查看页面字段
-     * @param VueCurlModel $info
+     * @param BaseModel $info
      * @return \tpScriptVueCurd\FieldCollection|FieldCollectionStep
      * @throws \think\Exception
      */
-    public function filterShowStepFields(VueCurlModel $info,BaseModel $baseInfo=null){
+    public function filterShowStepFields(BaseModel $info,BaseModel $parentInfo=null){
         if(!$this->stepIsEnable()){
             return $this;
         }
         switch ($this->getStepConfig()['showSortSteps']){
             case 'fieldSort':
-                return $this->showSortStepsFieldsFieldSort($info,$baseInfo);
+                return $this->showSortStepsFieldsFieldSort($info,$parentInfo);
             case 'dataStepHistory':
-                return $this->showSortStepsFieldsDataStepHistory($info,$baseInfo);
+                return $this->showSortStepsFieldsDataStepHistory($info,$parentInfo);
             default:
                 if(is_callable($this->getStepConfig()['showSortSteps'])){
-                    $this->getStepConfig()['showSortSteps']($this,$info,$baseInfo);
+                    $this->getStepConfig()['showSortSteps']($this,$info,$parentInfo);
                     return $this;
                 }
                 throw new \think\Exception('参数错误');
