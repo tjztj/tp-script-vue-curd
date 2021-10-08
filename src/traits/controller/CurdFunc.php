@@ -105,7 +105,7 @@ trait CurdFunc
                     }
 
 
-                    $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onEditSave($data,$baseInfo);});
+                    $fields->each(function (ModelField $v)use($data,$baseInfo){$v->onEditSave($data,$old,$baseInfo);});
                     if($baseModel){
                         $savedInfo=$model->addInfo($data,$baseInfo,$fields,false,$returnSaveData);
                     }else{

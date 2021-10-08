@@ -209,7 +209,7 @@ class RegionField extends ModelField
                 $cRegionId = $data[$this->cField()];
             }
             if ($cRegionId) {
-                if($this->getRegionPid()){
+                if($this->isRegionField()){
                     return self::getRegionPid($cRegionId);
                 }
                 return $this->getTreeInfoPid($cRegionId);
