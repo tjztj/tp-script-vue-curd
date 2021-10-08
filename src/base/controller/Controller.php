@@ -62,20 +62,17 @@ trait Controller
             $this->guid=create_guid();
         }
         $this->vueInitialize();
-        $this->init();
 
 
-        if(isset($this->indexPageOption)){
-            $indexPageOption=new FunControllerIndexPage;
-            $this->indexPageOption=$indexPageOption;
-        }
-
-
-        isset($this->fields)||$this->fields=$this->model->fields();
-
-
+        $indexPageOption=new FunControllerIndexPage;
+        $this->indexPageOption=$indexPageOption;
         $this->tplPath=getVCurdDir().'tpl'.DIRECTORY_SEPARATOR;
         $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
+
+
+        $this->init();
+
+        $this->fields=$this->model->fields();
     }
 
 
@@ -84,6 +81,18 @@ trait Controller
      */
     abstract public function init():void;
 
+
+
+    /**
+     * 生成控制器对象
+     * @param BaseModel|null $model
+     * @return static
+     */
+    public static function make(BaseModel $model=null):self{
+        $return=new static(app());
+        is_null($model)||$return->model=$model;
+        return $return;
+    }
 
 
     /**
@@ -153,12 +162,12 @@ trait Controller
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
     }
-    protected function editBefore(array &$data,BaseModel $old,BaseModel $parentInfo): void
+    protected function editBefore(array &$data,BaseModel $old,?BaseModel $parentInfo): void
     {
         // 数据添加钩子，方便之类处理（之类重写此方法）
     }
 
-    protected function showBefore(BaseModel $info,BaseModel $parentInfo,FieldCollection &$field){
+    protected function showBefore(BaseModel $info,?BaseModel $parentInfo,FieldCollection &$field){
         //数据显示前
     }
 

@@ -7,7 +7,6 @@ namespace tpScriptVueCurd\option;
 
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 

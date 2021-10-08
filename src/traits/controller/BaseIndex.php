@@ -159,6 +159,7 @@ trait BaseIndex
             'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
             'cWindow'=>$this->request->param('c_window/a'),
+            'childTpl'=>$this->request->param('child_tpl/d',0),
             'canEdit'=>$showTableTool,
             'canDel'=>$showTableTool,
             'auth'=>[
@@ -360,7 +361,7 @@ trait BaseIndex
                     $btn->url=url(
                         str_replace(['\\','._'],['.','.'],
                             parse_name(ltrim(str_replace($this->app->getNamespace().'\\controller\\','',get_class($childControlle)),'\\'))).'/index',
-                        ['base_id'=>$info->id,'show_filter'=>0,'c_window'=>['f'=>'auto','w'=>'50vw','h'=>'72vh']]
+                        ['base_id'=>$info->id,'child_tpl'=>1,'show_filter'=>0,'c_window'=>['f'=>'auto','w'=>'50vw','h'=>'72vh']]
                     )->build();
                 }
                 $childBtns[class_basename($childControlle->model)]=$btn;

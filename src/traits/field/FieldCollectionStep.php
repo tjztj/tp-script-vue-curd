@@ -5,7 +5,6 @@ namespace tpScriptVueCurd\traits\field;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldStep;
 

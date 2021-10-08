@@ -976,3 +976,8 @@ a.red:hover,a.yellow:hover{
     margin-bottom: 2px;
 }
 /****************************************************************/
+.ant-table-thead>tr>th{
+    background-color: #f0f5ff;
+    font-weight: 600;
+}
+/****************************************************************/

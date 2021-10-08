@@ -44,8 +44,8 @@ trait HaveChilds
         foreach ($this->childControllers as $childController){
             /* @var $childController Controller */
             /* @var $childModel BaseModel */
-            $childModelClass=class_basename($childController->model);
-            $childModel=new $childModelClass;
+            $childModelClass=get_class($childController->model);
+            $childModel=$childController->model;
             $name=class_basename($childModelClass);
             $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField());
 

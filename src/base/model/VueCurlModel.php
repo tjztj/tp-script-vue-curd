@@ -46,7 +46,7 @@ abstract class VueCurlModel extends TimeModel
      * @param Controller $controller
      * @return VueCurlModel
      */
-    final public static function make($controller): VueCurlModel
+    public static function make($controller): VueCurlModel
     {
         static $model=[];
         isset($model[static::class])||$model[static::class]=(new static([],$controller));

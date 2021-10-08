@@ -1477,13 +1477,26 @@ define(requires, function (axios, Qs) {
                 let getY = async function () {
                     let h = undefined;
                     await Vue.nextTick(async function () {
-                        let parent = document.getElementById(id).parentNode;
-                        let elH = (parent.querySelector('.ant-table-body .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-tbody')).clientHeight;
-                        let theadH = (parent.querySelector('.ant-table-header .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-thead')).clientHeight;
-                        if (document.body.clientHeight > elH && (parent.clientHeight - theadH) > elH) {
-                            return;
-                        }
-                        h = parent.clientHeight - theadH;
+                        await new Promise(async function (resolve) {
+                            setTimeout(function (){
+                                let parent = document.getElementById(id).parentNode;
+                                let elH = (parent.querySelector('.ant-table-body .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-tbody')).clientHeight;
+                                let theadH = (parent.querySelector('.ant-table-header .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-thead')|| parent.querySelector('.ant-table-header .ant-table-thead')).clientHeight;
+                                let pageH=parent.querySelector('ul.ant-table-pagination')?parent.querySelector('ul.ant-table-pagination').clientHeight:0;
+                                if(pageH){
+                                    pageH+=32;
+                                }else{
+                                    pageH=0;
+                                }
+
+                                if (document.body.clientHeight > elH && (parent.clientHeight - theadH - pageH) > elH) {
+                                    resolve()
+                                    return;
+                                }
+                                h = parent.clientHeight - theadH - pageH;
+                                resolve()
+                            },40)
+                        })
                     })
                     return h;
                 };

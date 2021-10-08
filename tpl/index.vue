@@ -27,6 +27,40 @@
     letter-spacing: 0.08em;
 }
 </style>
+{if $childTpl}
+<style>
+.box {
+    background-color: #fff;
+    margin-left: -48px;
+    margin-right: -48px;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 25px);
+    width: calc(100% + 96px);
+}
+.box .head{
+    margin: 0 12px 12px 12px;
+    border-radius: 4px;
+}
+.box .body{
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 0;
+}
+.box .body .curd-table-box{
+    overflow: auto;
+    width: 100%;
+    flex: 1;
+    height: 0;
+}
+.childTitle{
+    color: rgba(0, 0, 0, .85);
+    font-size: 16px;
+}
+</style>
+{/if}
 {block name="style"}{/block}
 <div class="box">
 <div class="head" v-if="showFilter">
@@ -43,8 +77,14 @@
     <div class="ant-pro-table-list-toolbar" v-if="showTableTool">
         <div class="ant-pro-table-list-toolbar-container">
             <div class="ant-pro-table-list-toolbar-left">
-              {block name="toolTitleLeft"}{/block}
+                {block name="toolTitleLeft"}{/block}
+                {if $childTpl}
+                <div class="childTitle">详细列表</div>
+                {else/}
                 <div class="ant-pro-table-list-toolbar-title">{$title}</div>
+                {/if}
+
+
                 <template v-if="canDel&&delSelectedIds.length>0">
                     <div class="ant-space-item">
                         <a-divider type="vertical"></a-divider>
@@ -119,30 +159,31 @@
             </div>
         </div>
     </div>
-    <curd-table :data="data"
-                :pagination="pagination"
-                :loading="loading"
-                :list-columns="listColumns"
-                :childs="childs"
-                :can-edit="canEdit"
-                :can-del="canDel"
-                :action-width="actionWidth"
-                :row-selection="canDel?rowSelection:null"
-                :field-step-config="fieldStepConfig"
-                :action-def-width="actionDefWidth"
-                @refresh-table="refreshTable"
-                @change="handleTableChange"
-                @on-delete="deleteRow"
-                @open-edit="openEdit"
-                @open-next="openNext"
-                @open-show="openShow"
-                @open-child-list="openChildList"
-                ref="indexcurdtable">
-        <!--    配合actionWidth使用-->
-        {block name="tableSlot"}{/block}
+    <div class="curd-table-box">
+        <curd-table :data="data"
+                    :pagination="pagination"
+                    :loading="loading"
+                    :list-columns="listColumns"
+                    :childs="childs"
+                    :can-edit="canEdit"
+                    :can-del="canDel"
+                    :action-width="actionWidth"
+                    :row-selection="canDel?rowSelection:null"
+                    :field-step-config="fieldStepConfig"
+                    :action-def-width="actionDefWidth"
+                    @refresh-table="refreshTable"
+                    @change="handleTableChange"
+                    @on-delete="deleteRow"
+                    @open-edit="openEdit"
+                    @open-next="openNext"
+                    @open-show="openShow"
+                    @open-child-list="openChildList"
+                    ref="indexcurdtable">
+            <!--    配合actionWidth使用-->
+            {block name="tableSlot"}{/block}
 
-    </curd-table>
-
+        </curd-table>
+    </div>
 </div>
 <!--<div class="foot">-->
 

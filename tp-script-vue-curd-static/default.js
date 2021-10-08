@@ -170,6 +170,7 @@ define(['vueAdmin'], function (va) {
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
                     indexUrl:vueData.listUrl,
+                    cWindow:vueData.cWindow||{},
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -268,7 +269,8 @@ define(['vueAdmin'], function (va) {
                 openAdd(){
                     this.openBox({
                         title:'新增 '+vueData.title,
-                        offset:'rt',
+                        offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
+                        area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
                         content: vueData.editUrl,
                     }).end();
                 },
@@ -282,7 +284,8 @@ define(['vueAdmin'], function (va) {
                     }else{
                         this.openBox({
                             title:'修改 '+vueData.title,
-                            offset:'rt',
+                            offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
+                            area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
                             content: vueData.editUrl+'?id='+row.id,
                         }).end();
                     }
@@ -297,7 +300,8 @@ define(['vueAdmin'], function (va) {
                 openShow(row){
                     this.openBox({
                         title:'查看 '+vueData.title+' 相关信息',
-                        offset:'rt',
+                        offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
+                        area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
                         content: vueData.showUrl+'?id='+row.id,
                     }).end();
                 },
