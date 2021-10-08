@@ -979,5 +979,13 @@ a.red:hover,a.yellow:hover{
 .ant-table-thead>tr>th{
     background-color: #f0f5ff;
     font-weight: 600;
+    border-bottom: 1px solid #eaeaea;
+}
+.ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
+    border-bottom: 1px solid #eaeaea
+}
+
+.ant-table-bordered .ant-table-tbody>tr>td,.ant-table-bordered .ant-table-thead>tr>th {
+    border-right: 1px solid #eaeaea
 }
 /****************************************************************/
