@@ -277,13 +277,14 @@ trait CurdChild{
      * 列表显示的where条件处理
      * @param BaseChildModel $model
      * @param BaseModel $baseInfo
+     * @param string $searchIdKey
      * @return BaseChildModel
      */
-    protected function childIndexListModelWhere(BaseChildModel $model,BaseModel $baseInfo,bool $canSearchId=true){
+    protected function childIndexListModelWhere(BaseChildModel $model,BaseModel $baseInfo,string $searchIdKey='id'){
         return $model
-            ->where(function($query)use($canSearchId){
-                if($canSearchId){
-                    $id=$this->request->param('id/d');
+            ->where(function($query)use($searchIdKey){
+                if($searchIdKey){
+                    $id=$this->request->param($searchIdKey.'/d');
                     empty($id)||$query->where('id',$id);
                 }
             })
