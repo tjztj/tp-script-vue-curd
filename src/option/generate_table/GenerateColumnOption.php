@@ -42,6 +42,7 @@ class GenerateColumnOption
 
     public function __construct(string $name)
     {
+        $name=str_replace('__CLONE__','',$name);
         if(!self::checkName($name)){
             throw new \think\Exception('字段名称['.$name.']不符合规范（需小写字母开头，可包含a到z、_、0到9）');
         }
@@ -66,6 +67,8 @@ class GenerateColumnOption
      * @throws \think\Exception
      */
     public function getSql(string $type='',string $beforeField=''):string{
+        $beforeField=str_replace('__CLONE__','',$beforeField);
+
         $type=strtoupper($type);
         if($type!=='MODIFY'&&$type!=='ADD'&&$type!==''){
             throw new \think\Exception('GenerateColumnOption的getSql中$type不符合要求（MODIFY|ADD|\'\'）');
