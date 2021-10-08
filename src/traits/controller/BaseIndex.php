@@ -226,10 +226,11 @@ trait BaseIndex
      * 列表显示的where条件处理
      * @param BaseModel $model
      * @param BaseModel|null $parentInfo
+     * @param string $searchIdKey 是否可根据ID搜索
      * @return Query|BaseModel
      * @throws \think\Exception
      */
-    protected function indexListModelWhere(BaseModel $model,?BaseModel $parentInfo)
+    protected function indexListModelWhere(BaseModel $model,?BaseModel $parentInfo,string $searchIdKey='id')
     {
         $filterFields=clone $this->fields;
         $filterData=$filterFields->getParamFilterData();
@@ -238,9 +239,11 @@ trait BaseIndex
         $this->setIndexFilterAddStep($filterFields,$filterData);
 
         return $model
-            ->where(function (Query $query)use($parentInfo){
-                $id=$this->request->param('id/d');
-                empty($id)||$query->where('id',$id);
+            ->where(function (Query $query)use($parentInfo,$searchIdKey){
+                if($searchIdKey){
+                    $id=$this->request->param($searchIdKey.'/d');
+                    empty($id)||$query->where('id',$id);
+                }
                 $parentInfo === null || $query->where($this->model::parentField(),$parentInfo->id);
             })
             ->where(function(Query $query){
