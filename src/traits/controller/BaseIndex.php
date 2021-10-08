@@ -227,7 +227,7 @@ trait BaseIndex
      * @return Query|BaseChildModel|BaseModel
      * @throws \think\Exception
      */
-    protected function indexListModelWhere($model,?BaseModel $baseInfo)
+    protected function indexListModelWhere($model,?BaseModel $baseInfo,bool $canSearchId=true)
     {
         $filterFields=clone $this->fields;
         $filterData=$filterFields->getParamFilterData();
@@ -236,9 +236,11 @@ trait BaseIndex
         $this->setIndexFilterAddStep($filterFields,$filterData);
 
         return $model
-            ->where(function (Query $query)use($baseInfo){
-                $id=$this->request->param('id/d');
-                empty($id)||$query->where('id',$id);
+            ->where(function (Query $query)use($baseInfo,$canSearchId){
+                if($canSearchId){
+                    $id=$this->request->param('id/d');
+                    empty($id)||$query->where('id',$id);
+                }
                 $baseInfo === null || $query->where($this->model::parentField(),$baseInfo->id);
             })
             ->where(function(Query $query){

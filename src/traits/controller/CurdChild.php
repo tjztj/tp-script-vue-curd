@@ -279,11 +279,13 @@ trait CurdChild{
      * @param BaseModel $baseInfo
      * @return BaseChildModel
      */
-    protected function childIndexListModelWhere(BaseChildModel $model,BaseModel $baseInfo){
+    protected function childIndexListModelWhere(BaseChildModel $model,BaseModel $baseInfo,bool $canSearchId=true){
         return $model
-            ->where(function($query){
-                $id=$this->request->param('id/d');
-                empty($id)||$query->where('id',$id);
+            ->where(function($query)use($canSearchId){
+                if($canSearchId){
+                    $id=$this->request->param('id/d');
+                    empty($id)||$query->where('id',$id);
+                }
             })
             ->where($this->model::parentField(),$baseInfo->id)
             ->where(function (Query $query){
