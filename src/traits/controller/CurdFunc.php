@@ -675,7 +675,7 @@ trait CurdFunc
                 $urlArr=explode('/',$stepInfo->config['listBtnUrl']);
             }
             $urlArr=array_values(array_filter($urlArr));
-            if(app('http')->getName()){
+            if(app('http')->getName()&&count($urlArr)>3){
                 $listBtnUrlArr=[
                     $urlArr[0],$urlArr[1],current(explode('.',$urlArr[2]))
                 ];
