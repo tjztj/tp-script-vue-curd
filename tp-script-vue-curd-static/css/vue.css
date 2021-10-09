@@ -1006,9 +1006,28 @@ a.red:hover,a.yellow:hover{
     border-left: 0;
     border-collapse:collapse;
 }
+.curd-table .ant-table-ping-left .ant-table-tbody>tr>td.ant-table-cell-fix-left,
+.curd-table .ant-table-ping-right .ant-table-tbody>tr>td.ant-table-cell-fix-right{
+    border-left: 0;
+    border-right: 0;
+}
 .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left,
 .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
     background: #e4edff;
+    border-left: 0;
+    border-right: 0;
+}
+.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left+th.ant-table-cell-fix-left:before,
+.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right+th.ant-table-cell-fix-right:before{
+    bottom: -1px;
+    content: "";
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transform: translateX(-100%);
+    width: 1px;
+    background-color: #cfd7f1;
 }
 .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
     background: linear-gradient(to right, #d6e4ff, #e4edff);
