@@ -1501,8 +1501,22 @@ define(requires, function (axios, Qs) {
                     return h;
                 };
 
+                const columnsVals=Vue.ref(columns);
                 let onresize = () => {
                     scrollX.value = getX();
+                    columnsVals.value.forEach(col=>{
+                        if(typeof col.fixed!=='undefined'){
+                            if(scrollX.value===undefined){
+                                if(typeof col.fixedOld==='undefined'){
+                                    col.fixedOld=col.fixed;
+                                }
+                                col.fixed=false;
+                            }else if(typeof col.fixedOld!=='undefined'){
+                                col.fixed=col.fixedOld;
+                            }
+                        }
+                    })
+
                     getY().then(res => {
                         scrollY.value = res;
                     })
@@ -1520,7 +1534,7 @@ define(requires, function (axios, Qs) {
 
                 return {
                     actionW: newActionW,
-                    columns: Vue.ref(columns),
+                    columns: columnsVals,
                     isGroup,
                     titleItems,
                     scrollX,
