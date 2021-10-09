@@ -1004,6 +1004,9 @@ thead.ant-table-thead{
     font-weight: 600;
     border-bottom: 1px solid #fff;
 }
+.ant-table-bordered .ant-table-body>table, .ant-table-bordered .ant-table-fixed-left table, .ant-table-bordered .ant-table-fixed-right table, .ant-table-bordered .ant-table-header>table{
+    border-color: #fff;
+}
 .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left, .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
     background: #e4edff;
 }
