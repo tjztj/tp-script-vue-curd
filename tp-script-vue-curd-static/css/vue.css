@@ -977,8 +977,7 @@ a.red:hover,a.yellow:hover{
 }
 /****************************************************************/
 thead.ant-table-thead{
-    background: linear-gradient(to left, #f3f6ff,#d6e4ff);
-    color: #fff;
+    background: linear-gradient(to right,#d6e4ff, #f7f9ff);
 }
 .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
 .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
@@ -1002,10 +1001,10 @@ thead.ant-table-thead{
 .ant-table-thead>tr>th{
     background-color: transparent;
     font-weight: 600;
-    border-bottom: 1px solid #fff;
+    border-bottom: 1px solid #d6d9e3;
 }
 .ant-table-bordered .ant-table-body>table, .ant-table-bordered .ant-table-fixed-left table, .ant-table-bordered .ant-table-fixed-right table, .ant-table-bordered .ant-table-header>table{
-    border-color: #fff;
+    border-color: #d6d9e3;
 }
 .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left, .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
     background: #e4edff;
@@ -1014,12 +1013,15 @@ thead.ant-table-thead{
     background: linear-gradient(to right, #d6e4ff, #e4edff);
 }
 .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
-    background: linear-gradient(to right, #e4edff, #f3f6ff);
+    background: linear-gradient(to right, #e4edff, #f7f9ff);
 }
 .ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
-    border-bottom: 1px solid #fff
+    border-bottom: 1px solid #d6d9e3
 }
 .ant-table-bordered .ant-table-tbody>tr>td,.ant-table-bordered .ant-table-thead>tr>th {
-    border-right: 1px solid #fff
+    border-right: 1px solid #d6d9e3
+}
+.curd-table .ant-table-bordered .ant-table-tbody>tr>td:last-child{
+    border-right: 1px solid #d6d9e3;
 }
 /****************************************************************/
