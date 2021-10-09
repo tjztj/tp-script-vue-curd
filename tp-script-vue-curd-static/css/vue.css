@@ -976,52 +976,56 @@ a.red:hover,a.yellow:hover{
     margin-bottom: 2px;
 }
 /****************************************************************/
-thead.ant-table-thead{
+.curd-table thead.ant-table-thead{
     background: linear-gradient(to right,#d6e4ff, #f7f9ff);
 }
-.ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .ant-table-filter-icon,
-.ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .anticon-filter{
+.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .ant-table-filter-icon,
+.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .anticon-filter{
     background: linear-gradient(to right, rgba(255,255,255,.08), #cddfff);
 }
-.ant-table-thead>tr>th.ant-table-column-sort,
-.ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-sort,
-.ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-sort{
+.curd-table .ant-table-thead>tr>th.ant-table-column-sort,
+.curd-table .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-sort,
+.curd-table .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-sort{
     background: linear-gradient(to right, #a7c1ff, #d2e2ff);
 }
-.ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner{
+.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner{
     color: #a8a8a8;
 }
-.ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-down.on,
-.ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-up.on{
+.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-down.on,
+.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-up.on{
     color: #2f54eb;
 }
-.ant-table-thead>tr>th{
+.curd-table .ant-table-thead>tr>th{
     background-color: transparent;
     font-weight: 600;
-    border-bottom: 1px solid #d6d9e3;
 }
-.ant-table-bordered .ant-table-body>table, .ant-table-bordered .ant-table-fixed-left table, .ant-table-bordered .ant-table-fixed-right table, .ant-table-bordered .ant-table-header>table{
-    border-color: #d6d9e3;
+.curd-table .ant-table-bordered .ant-table-thead>tr>th{
+    border-bottom-color: #cfd7f1;
 }
-.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left, .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
+.curd-table .ant-table-bordered .ant-table-body>table,
+.curd-table .ant-table-bordered .ant-table-fixed-left table,
+.curd-table .ant-table-bordered .ant-table-fixed-right table,
+.curd-table .ant-table-bordered .ant-table-header>table{
+    border-color: #cfd7f1;
+    border-left: 0;
+}
+.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left,
+.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
     background: #e4edff;
 }
-.ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
+.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
     background: linear-gradient(to right, #d6e4ff, #e4edff);
 }
-.ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
+.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
     background: linear-gradient(to right, #e4edff, #f7f9ff);
 }
-.ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
-    border-bottom: 1px solid #d6d9e3
+.curd-table .ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
+    border-bottom: 1px solid #cfd7f1
 }
-.ant-table-bordered .ant-table-tbody>tr>td,.ant-table-bordered .ant-table-thead>tr>th {
-    border-right: 1px solid #d6d9e3
-}
-.curd-table .ant-table-bordered .ant-table-tbody>tr>td:last-child{
-    border-right: 1px solid #d6d9e3;
+.curd-table .ant-table-bordered .ant-table-thead>tr>th {
+    border-right: 1px solid #cfd7f1
 }
 /****************************************************************/
