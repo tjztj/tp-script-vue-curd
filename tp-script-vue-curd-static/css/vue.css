@@ -1011,6 +1011,7 @@ a.red:hover,a.yellow:hover{
 .curd-table .ant-table-bordered .ant-table-header>table{
     border-color: #cfd7f1;
     border-left: 0;
+    border-collapse:collapse;
 }
 .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left,
 .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
@@ -1026,6 +1027,10 @@ a.red:hover,a.yellow:hover{
     border-bottom: 1px solid #cfd7f1
 }
 .curd-table .ant-table-bordered .ant-table-thead>tr>th {
-    border-right: 1px solid #cfd7f1
+    border-right: 1px solid #cfd7f1;
+    border-left: 1px solid #cfd7f1;
+}
+.curd-table .ant-table-bordered .ant-table-thead>tr{
+    border-left: 1px solid #cfd7f1;
 }
 /****************************************************************/
