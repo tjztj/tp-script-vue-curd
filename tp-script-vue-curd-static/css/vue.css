@@ -969,6 +969,13 @@ a.red:hover,a.yellow:hover{
     opacity: .78;
 }
 /****************************************************************/
+.field-tips.field-tips-have-items{
+    padding-bottom: 1px;
+}
+.field-tips-item{
+    margin-bottom: 2px;
+}
+/****************************************************************/
 .curd-table thead.ant-table-thead{
     background: linear-gradient(to right, #f6f0ff, #dde0ff 18%, #f7f9ff);
 }
