@@ -118,7 +118,7 @@ trait BaseEdit
                             throw new \think\Exception('未找到所属数据');
                         }
                     }
-                    $this->editBefore($fields,null,$parentInfo,$data);
+                    $this->editBefore($fields,$old,$parentInfo,$data);
 
                     $isNext=true;
                     //步骤字段
