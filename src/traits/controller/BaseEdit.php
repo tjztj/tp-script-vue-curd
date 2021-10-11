@@ -118,7 +118,7 @@ trait BaseEdit
                             throw new \think\Exception('未找到所属数据');
                         }
                     }
-                    $this->addBefore($data,$parentInfo);
+                    $this->editBefore($fields,null,$parentInfo,$data);
 
                     $isNext=true;
                     //步骤字段
@@ -139,7 +139,7 @@ trait BaseEdit
                     if($baseModel){
                         $parentInfo=$baseModel->find($old[$model::parentField()]);
                     }
-                    $this->editBefore($data,$old,$parentInfo);
+                    $this->editBefore($fields,$old,$parentInfo,$data);
 
 
                     //步骤
@@ -210,6 +210,7 @@ trait BaseEdit
         }
 
 
+        $this->editBefore($fields,$info,$parentInfo,$data);
         if($baseModel){
             //子表的地区为父表的值
             $fields=$fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$model::getRegionField(),$model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
