@@ -969,8 +969,15 @@ a.red:hover,a.yellow:hover{
     opacity: .78;
 }
 /****************************************************************/
+.field-tips.field-tips-have-items{
+    padding-bottom: 1px;
+}
+.field-tips-item{
+    margin-bottom: 2px;
+}
+/****************************************************************/
 .curd-table thead.ant-table-thead{
-    background: linear-gradient(to right,#d6e4ff, #f7f9ff);
+    background: linear-gradient(to right, #f6f0ff, #dde0ff 18%, #f7f9ff);
 }
 .curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
 .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
@@ -1030,7 +1037,7 @@ a.red:hover,a.yellow:hover{
     background-color: #cfd7f1;
 }
 .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
-    background: linear-gradient(to right, #d6e4ff, #e4edff);
+    background: linear-gradient(to right, #f4f0ff,#d6e4ff);
 }
 .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
     background: linear-gradient(to right, #e4edff, #f7f9ff);
