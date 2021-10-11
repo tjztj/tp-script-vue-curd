@@ -2,10 +2,14 @@
 
 namespace tpScriptVueCurd\traits\controller;
 
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 
+/**
+ * @property BaseModel $md
+ */
 trait BaseShow
 {
     /**
@@ -20,13 +24,13 @@ trait BaseShow
         if(empty($id)){
             return $this->errorAndCode('缺少必要参数');
         }
-        $data=(clone $this->model)->find($id);
+        $data=(clone $this->md)->find($id);
         if(empty($data)){
             return $this->errorAndCode('未找到相关数据信息');
         }
 
 
-        $parentInfo=$this->parentController?(clone $this->parentController->model)::find($data[$this->model::parentField()]):null;
+        $parentInfo=$this->parentController?(clone $this->parentController->md)::find($data[$this->md::parentField()]):null;
 
         try{
             //字段钩子

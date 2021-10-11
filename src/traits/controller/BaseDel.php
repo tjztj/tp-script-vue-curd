@@ -5,6 +5,9 @@ namespace tpScriptVueCurd\traits\controller;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 
+/**
+ * @property BaseModel $md
+ */
 trait BaseDel
 {
     /**
@@ -16,7 +19,7 @@ trait BaseDel
         if(empty($ids)){
             return $this->error('请选择要删除的数据');
         }
-        $this->model->startTrans();
+        $this->md->startTrans();
         try{
 
             if($this->childControllers&&$this->request->param('delChilds/d')==1){
@@ -26,24 +29,24 @@ trait BaseDel
                      * @var Controller $v
                      */
                     $childIds=[];
-                    $parentField=$v->model::parentField();
-                    (clone $v->model)->where($parentField,'in',$ids)->field('id,'.$parentField)->select()->each(function($val)use(&$childIds,$parentField){
+                    $parentField=$v->md::parentField();
+                    (clone $v->md)->where($parentField,'in',$ids)->field('id,'.$parentField)->select()->each(function($val)use(&$childIds,$parentField){
                         isset($childIds[$val[$parentField]])||$childIds[$val[$parentField]]=[];
                         $childIds[$val[$parentField]][]=$val->id;
                     });
 
                     foreach ($childIds as $val){
-                        $v->doDelect(clone $v->model,$val);
+                        $v->doDelect(clone $v->md,$val);
                     }
                 }
             }
-            $this->doDelect(clone $this->model,$ids);
+            $this->doDelect(clone $this->md,$ids);
         }catch (\Exception $e){
-            $this->model->rollback();
+            $this->md->rollback();
             return $this->error($e);
         }
 
-        $this->model->commit();
+        $this->md->commit();
         $this->success('删除成功');
     }
 

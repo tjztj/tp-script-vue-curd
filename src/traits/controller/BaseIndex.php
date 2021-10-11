@@ -26,7 +26,7 @@ use tpScriptVueCurd\option\FunControllerListChildBtn;
  * @property Request $request
  * @property FunControllerIndexPage $indexPageOption
  * @property FieldCollection $fields
- * @property BaseModel $model
+ * @property BaseModel $md
  */
 trait BaseIndex
 {
@@ -52,7 +52,7 @@ trait BaseIndex
 
 
         if($this->request->isAjax()){
-            $model=$this->indexListModelWhere(clone $this->model,$parentInfo);
+            $model=$this->indexListModelWhere(clone $this->md,$parentInfo);
             $model=$model->order($this->getListOrder());
             $option=$this->indexListSelect($model);
             $list=$option->sourceList;
@@ -70,8 +70,8 @@ trait BaseIndex
                 if(is_array($parentInfo)){
                     $listArr=[];
                     foreach ($list as $v){
-                        isset($listArr[$v[$this->model::parentField()]])||$listArr[$v[$this->model::parentField()]]=[];
-                        $listArr[$v[$this->model::parentField()]][]=$v;
+                        isset($listArr[$v[$this->md::parentField()]])||$listArr[$v[$this->md::parentField()]]=[];
+                        $listArr[$v[$this->md::parentField()]][]=$v;
                     }
                     foreach ($listArr as $k=>$vs){
                         $cList=\think\model\Collection::make($vs);
@@ -122,7 +122,7 @@ trait BaseIndex
 
         //是否显示添加按钮
         try{
-            $rowAuthAdd=$this->model->checkRowAuth($this->getRowAuthAddFields(clone $this->model,$parentInfo),$parentInfo,'add');
+            $rowAuthAdd=$this->md->checkRowAuth($this->getRowAuthAddFields(clone $this->md,$parentInfo),$parentInfo,'add');
         }catch (\Exception $e){
             $rowAuthAdd=false;
         }
@@ -141,8 +141,8 @@ trait BaseIndex
         $listColumns=array_values($this->fields->listShowItems()->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
         $data=[
-            'model'=>get_class($this->model),
-            'modelName'=>class_basename($this->model),
+            'model'=>get_class($this->md),
+            'modelName'=>class_basename($this->md),
             'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
@@ -168,7 +168,7 @@ trait BaseIndex
                 'del'=>true,
                 'importExcelTpl'=>false,
                 'downExcelTpl'=>false,
-                'stepAdd'=>$this->getAuthAdd(clone $this->model,$parentInfo),
+                'stepAdd'=>$this->getAuthAdd(clone $this->md,$parentInfo),
                 'rowAuthAdd'=>$rowAuthAdd
             ],
             'baseInfo'=>$parentInfo,
@@ -216,7 +216,7 @@ trait BaseIndex
         if(empty($baseId)){
             return;
         }
-        $parentInfo=(clone $this->parentController->model)->find($baseId);
+        $parentInfo=(clone $this->parentController->md)->find($baseId);
         if(!$parentInfo){
             throw new \think\Exception('未能获取到相关父表信息');
         }
@@ -244,7 +244,7 @@ trait BaseIndex
                     $id=$this->request->param($searchIdKey.'/d');
                     empty($id)||$query->where('id',$id);
                 }
-                $parentInfo === null || $query->where($this->model::parentField(),$parentInfo->id);
+                $parentInfo === null || $query->where($this->md::parentField(),$parentInfo->id);
             })
             ->where(function(Query $query){
                 //这里不应该抛出异常
@@ -305,9 +305,9 @@ trait BaseIndex
 
         $parentInfo=[];
         foreach ($childList as $v){
-            $parentInfo[$v[$this->model::parentField()]]=null;
+            $parentInfo[$v[$this->md::parentField()]]=null;
         }
-        foreach ((clone $this->parentController->model)->where('id','in',array_keys($parentInfo))->select() as $val){
+        foreach ((clone $this->parentController->md)->where('id','in',array_keys($parentInfo))->select() as $val){
             $parentInfo[$val->id]=$val;
         }
         $oldBaseInfo=$parentInfo;
@@ -325,7 +325,7 @@ trait BaseIndex
                 return $info;
             }
             if(is_array($parentInfo)){
-                $parentInfo=$parentInfo[$info[$this->model::parentField()]]??null;
+                $parentInfo=$parentInfo[$info[$this->md::parentField()]]??null;
             }
 
 
@@ -367,7 +367,7 @@ trait BaseIndex
                         ['base_id'=>$info->id,'child_tpl'=>1,'show_filter'=>0,'c_window'=>['f'=>'auto','w'=>'50vw','h'=>'72vh']]
                     )->build();
                 }
-                $childBtns[class_basename($childControlle->model)]=$btn;
+                $childBtns[class_basename($childControlle->md)]=$btn;
             }
             $info->childBtns=$childBtns;
             return $info;
@@ -381,7 +381,7 @@ trait BaseIndex
      * @return Collection|\think\model\Collection
      */
     protected function setListDataRowAuth($list,$parentInfo){
-        return $list->map(fn(BaseModel $info)=>$info->rowSetAuth($this->fields,is_array($parentInfo)?($parentInfo[$info[$this->model::parentField()]]??null):$parentInfo,['show','edit','del']));
+        return $list->map(fn(BaseModel $info)=>$info->rowSetAuth($this->fields,is_array($parentInfo)?($parentInfo[$info[$this->md::parentField()]]??null):$parentInfo,['show','edit','del']));
     }
 
     /**
@@ -403,8 +403,8 @@ trait BaseIndex
                 });
             });
 
-            $nextStepFieldName=$this->model::getNextStepField();
-            if($nextStepFieldName&&in_array($nextStepFieldName,$this->model::getTableFields())){
+            $nextStepFieldName=$this->md::getNextStepField();
+            if($nextStepFieldName&&in_array($nextStepFieldName,$this->md::getTableFields())){
                 $nextStepField=SelectField::init($nextStepFieldName,'下一个步骤')->multiple(true)->items($steps);
                 $nextStepField->filter()->multiple(true);
                 $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
@@ -423,12 +423,12 @@ trait BaseIndex
 
 
 
-            if($this->model::hasCurrentStepField()){
+            if($this->md::hasCurrentStepField()){
                 $stepNameIsCurrentStep=true;
-                $stepFieldName=$this->model::getCurrentStepField();
+                $stepFieldName=$this->md::getCurrentStepField();
             }else{
                 $stepNameIsCurrentStep=false;
-                $stepFieldName=$this->model::getStepField();
+                $stepFieldName=$this->md::getStepField();
             }
 
 

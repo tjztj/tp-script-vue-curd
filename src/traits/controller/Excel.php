@@ -18,13 +18,12 @@ use tpScriptVueCurd\option\FunControllerImportBefore;
 /**
  * Trait Excel
  * @property Request $request
+ * @property BaseModel $md
  * @package tpScriptVueCurd\traits\controller
  * @author tj 1079798840@qq.com
  */
 trait Excel
 {
-
-    public BaseModel $model;
     public FieldCollection $fields;
 
     private bool $baseAndChildImport=true;//是父表+子表 列表导入
@@ -40,7 +39,7 @@ trait Excel
             return $this->fields;
         }
         //不需要村社，父表已经有村社了
-        return $this->fields->filter(fn(ModelField $v)=>!in_array($v->name(), [$this->model::getRegionField(), $this->model::getRegionPidField()], true));
+        return $this->fields->filter(fn(ModelField $v)=>!in_array($v->name(), [$this->md::getRegionField(), $this->md::getRegionPidField()], true));
     }
 
 
@@ -67,12 +66,12 @@ trait Excel
              * @var Controller $v
              * @var BaseModel $model
              */
-            $model=$v->model;
+            $model=$v->md;
 
             $modelName=class_basename($model);
             $fields=$fields->merge(
                 $model->fields()
-                    ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->model::getRegionField(),$this->model::getRegionPidField()]))
+                    ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->md::getRegionField(),$this->md::getRegionPidField()]))
                     ->map(function(ModelField $field)use($modelName,$v){
                         $field=clone $field;
                         $field->name($modelName.'|'.$field->name());
@@ -102,7 +101,7 @@ trait Excel
     protected function myExcelSave(array $saveData):BaseModel{
         static $modelClassName;
         if(!isset($modelClassName)){
-            $modelClassName=get_class($this->model);
+            $modelClassName=get_class($this->md);
         }
 
         $this->excelBaseInfo=null;
@@ -111,7 +110,7 @@ trait Excel
             if(empty($baseId)){
                 throw new \think\Exception('缺少父表参数');
             }
-            $this->excelBaseInfo=(clone $this->parentController->model)->find($baseId);
+            $this->excelBaseInfo=(clone $this->parentController->md)->find($baseId);
             if(empty($this->excelBaseInfo)){
                 throw new \think\Exception('未找到父表相关信息');
             }
@@ -152,7 +151,7 @@ trait Excel
         }
         $baseId=$this->getMainIdByImportData($datas['PARENT']);
         $infos=[
-            get_class($this->model)=>$this->importBaseInfos[$baseId],
+            get_class($this->md)=>$this->importBaseInfos[$baseId],
         ];
 
 
@@ -164,7 +163,7 @@ trait Excel
          */
         $childControllerClassList=[];
         foreach ($this->childControllers as $childController){
-            $modelClass=get_class($childController->model);
+            $modelClass=get_class($childController->md);
             $modelName=class_basename($modelClass);
             if(isset($datas[$modelName])){
                 $model=new $modelClass;
@@ -199,7 +198,7 @@ trait Excel
         static $baseIds=[];
 
         //父表字段的值一样将会视作同一条父数据
-        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->parentController->model,true)->getSave());
+        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->parentController->md,true)->getSave());
         if(!isset($baseIds[$baseIdsKey])){
             $parentInfo=$this->myExcelSave($mainData);
             $baseIds[$baseIdsKey]=$parentInfo->id;
@@ -214,7 +213,7 @@ trait Excel
         }
 
         if(!isset($this->importBaseInfos[$baseId])){
-            $this->importBaseInfos[$baseId]=$this->model->find($baseId);
+            $this->importBaseInfos[$baseId]=$this->md->find($baseId);
         }
         if(empty($this->importBaseInfos[$baseId])){
             throw new \think\Exception('未找到相关周信息');
@@ -285,7 +284,7 @@ trait Excel
         }
 
 
-        $this->model->startTrans();
+        $this->md->startTrans();
         $last_do_row=4;
         try{
             //因为$data排序已经乱了，所以我用while遍历
@@ -309,11 +308,11 @@ trait Excel
                 $last_do_row++;
             }
         }catch (\Exception $e){
-            $this->model->rollback();
+            $this->md->rollback();
             $this->errorAndCode('Excel第'.$last_do_row.'行 '.$e->getMessage(),$e->getCode());
         }
 
-        $this->model->commit();
+        $this->md->commit();
         $this->success('导入成功');
     }
 

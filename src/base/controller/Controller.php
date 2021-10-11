@@ -39,7 +39,10 @@ trait Controller
         Vue::initialize as vueInitialize;
     }
 
-    public BaseModel $model;
+    /**
+     * @var BaseModel
+     */
+    public $md;
     public FieldCollection $fields;
     public string $title='';
 
@@ -72,7 +75,7 @@ trait Controller
 
         $this->init();
 
-        $this->fields=$this->model->fields();
+        $this->fields=$this->md->fields();
     }
 
 
@@ -90,7 +93,7 @@ trait Controller
      */
     public static function make(BaseModel $model=null):self{
         $return=new static(app());
-        is_null($model)||$return->model=$model;
+        is_null($model)||$return->md=$model;
         return $return;
     }
 

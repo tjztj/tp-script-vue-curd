@@ -31,7 +31,7 @@ trait ModelDelTraits
         if($this->controller->childControllers){
             foreach ($this->controller->childControllers as $v){
                 /* @var Controller $v */
-                $haveChildDataBaseId=(clone $v->model)->where($v->model::parentField(),'in',$ids)->max($v->model::parentField());
+                $haveChildDataBaseId=(clone $v->md)->where($v->md::parentField(),'in',$ids)->max($v->md::parentField());
                 if($haveChildDataBaseId){
                     throw new \think\Exception('需先删除下面的'.$v->title.'数据',ErrorCode::DELETE_HAVE_CHILD);
                 }
@@ -56,7 +56,7 @@ trait ModelDelTraits
     {
         $parents=[];
         if( $this->controller->parentController){
-            (clone $this->controller->parentController->model)->where('id','in',$list->column(static::parentField()))->select()->each(function(BaseModel $v)use(&$parents){
+            (clone $this->controller->parentController->md)->where('id','in',$list->column(static::parentField()))->select()->each(function(BaseModel $v)use(&$parents){
                 $parents[$v->id]=$v;
             });
         }

@@ -9,6 +9,9 @@ use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 
+/**
+ * @property BaseModel $md
+ */
 trait BaseEdit
 {
     protected bool $autoStepNext=false;
@@ -87,10 +90,10 @@ trait BaseEdit
             $fields=$this->fields;
         }
         if(is_null($model)){
-            $model=$this->model;
+            $model=$this->md;
         }
         if(is_null($baseModel)&&$this->parentController){
-            $baseModel=clone $this->parentController->model;
+            $baseModel=clone $this->parentController->md;
         }
 
         if($this->request->isAjax()){
@@ -107,7 +110,7 @@ trait BaseEdit
                 if(empty($data['id'])){
                     $old=clone $model;
                     if($baseModel){
-                        if(empty($data[$this->model::parentField()])){
+                        if(empty($data[$this->md::parentField()])){
                             throw new \think\Exception('缺少关键信息');
                         }
                         $parentInfo=$baseModel->find($data[$model::parentField()]);
@@ -225,7 +228,7 @@ trait BaseEdit
         if($baseModel){
             $fetchData['baseId']=$base_id;
             $fetchData['baseInfo']=$parentInfo;
-            $fetchData['parentField']=$this->model::parentField();
+            $fetchData['parentField']=$this->md::parentField();
             $fetchData['vueCurdAction']='childEdit';
         }
 
@@ -342,14 +345,14 @@ trait BaseEdit
     public function editCommitAfter(&$msg,$old,$savedInfo,$parentInfo,$returnSaveData): void
     {
         if(isset($this->fields->saveStepInfo)&&!is_null($this->fields->saveStepInfo)&&$this->fields->stepIsEnable()){
-            $this->model->startTrans();
+            $this->md->startTrans();
             try{
                 $this->fields->saveStepInfo->doSaveAfterCommited($old,$savedInfo,$parentInfo,$this->fields,$returnSaveData);
             }catch (\Exception $e){
-                $this->model->rollback();
+                $this->md->rollback();
                 $msg.='，但：'.$e->getMessage();
             }
-            $this->model->commit();
+            $this->md->commit();
         }
     }
 

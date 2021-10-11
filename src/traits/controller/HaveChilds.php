@@ -7,6 +7,9 @@ use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\tool\ErrorCode;
 
+/**
+ * @property BaseModel $md
+ */
 trait HaveChilds
 {
     /**
@@ -24,7 +27,7 @@ trait HaveChilds
         if(empty($models)){
             //子表
             foreach ($this->childControllers as $childController){
-                $modelClass=class_basename($childController->model);
+                $modelClass=class_basename($childController->md);
                 $models[get_class($childController)]=new $modelClass();
             }
         }
@@ -44,8 +47,8 @@ trait HaveChilds
         foreach ($this->childControllers as $childController){
             /* @var $childController Controller */
             /* @var $childModel BaseModel */
-            $childModelClass=get_class($childController->model);
-            $childModel=$childController->model;
+            $childModelClass=get_class($childController->md);
+            $childModel=$childController->md;
             $name=class_basename($childModelClass);
             $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField());
 
