@@ -27,7 +27,7 @@ use tpScriptVueCurd\traits\Func;
  */
 trait Controller
 {
-    use Func,Vue,CurdFunc,Excel{
+    use Vue,CurdFunc,Excel{
         Vue::initialize as vueInitialize;
     }
 
