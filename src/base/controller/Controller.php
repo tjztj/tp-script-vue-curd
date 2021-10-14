@@ -35,7 +35,7 @@ use tpScriptVueCurd\traits\Func;
  */
 trait Controller
 {
-    use Func,Vue,BaseIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel{
+    use Vue,BaseIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel{
         Vue::initialize as vueInitialize;
     }
 

@@ -10,6 +10,7 @@ use think\Request;
 use tpScriptVueCurd\field\FilesField;
 use tpScriptVueCurd\middleware\FieldMiddleware;
 use tpScriptVueCurd\option\ConfirmException;
+use tpScriptVueCurd\traits\Func;
 
 /**
  * Trait Vue
@@ -20,6 +21,7 @@ use tpScriptVueCurd\option\ConfirmException;
  */
 trait Vue
 {
+    use Func;
     private $vue_data = [];
 
     /***
