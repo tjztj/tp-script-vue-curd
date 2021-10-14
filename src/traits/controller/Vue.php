@@ -40,6 +40,15 @@ trait Vue
         isset($this->middleware)||$this->middleware=[];
         $this->middleware[]=FieldMiddleware::class;
         parent::initialize();
+        if(empty($this->app)){
+            $this->app=app();
+        }
+        if(empty($this->request)){
+            $this->request=$this->app->request;
+        }
+        if(empty($this->guid)){
+            $this->guid=create_guid();
+        }
         if ($this->checkIsVueAction()) {
             $this->app->view->config(['view_suffix' => 'vue']);
             $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'default.vue');
