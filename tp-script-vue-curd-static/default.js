@@ -115,7 +115,7 @@ define(['vueAdmin'], function (va) {
 
     function setUrlParams(url,params){
         if(typeof params==='string'){
-            if(url.indexOf('?')!==-1){
+            if(url.indexOf('?')===-1){
                 url+='?'+params;
             }else{
                 url+='&'+params;
