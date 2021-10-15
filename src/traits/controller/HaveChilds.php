@@ -2,6 +2,7 @@
 
 namespace tpScriptVueCurd\traits\controller;
 
+use think\console\Input;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
@@ -15,7 +16,7 @@ trait HaveChilds
     /**
      * @var Controller[]
      */
-    private array $childControllers=[];
+    private array $childControllers;
 
 
     /**
@@ -23,19 +24,26 @@ trait HaveChilds
      * @param array|Controller[] $childControllers
      * @return $this
      */
-    public function setChildControllers(array $childControllers):self{
+    final public function setChildControllers(array $childControllers):self{
         foreach ($childControllers as $k=>$v){
-            $childControllers[$k]->setParentController($this,true);
+            $childControllers[$k]->setParentController($this);
         }
         $this->childControllers=$childControllers;
         return $this;
+    }
+
+    protected function childControllers():array{
+        return [];
     }
 
     /**
      * 获取当前控制器的子控制器集合
      * @return array|Controller[]
      */
-    public function getChildControllers():array{
+    final public function getChildControllers():array{
+        if(!isset($this->childControllers)){
+            $this->childControllers=$this->childControllers();
+        }
         return $this->childControllers;
     }
 
