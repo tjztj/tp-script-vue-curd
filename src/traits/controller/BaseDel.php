@@ -21,10 +21,10 @@ trait BaseDel
         }
         $this->md->startTrans();
         try{
-
-            if($this->childControllers&&$this->request->param('delChilds/d')==1){
+            $childControllers=$this->getChildControllers();
+            if($childControllers&&$this->request->param('delChilds/d')==1){
                 //先删除子数据再删除数据
-                foreach ($this->childControllers as $v){
+                foreach ($childControllers as $v){
                     /**
                      * @var Controller $v
                      */

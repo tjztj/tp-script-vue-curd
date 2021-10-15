@@ -30,7 +30,7 @@ trait BaseShow
         }
 
 
-        $parentInfo=$this->parentController?(clone $this->parentController->md)::find($data[$this->md::parentField()]):null;
+        $parentInfo=$this->getParentController()?(clone $this->getParentController()->md)::find($data[$this->md::parentField()]):null;
 
         try{
             //字段钩子

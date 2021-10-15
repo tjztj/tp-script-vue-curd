@@ -15,7 +15,30 @@ trait HaveChilds
     /**
      * @var Controller[]
      */
-    public array $childControllers=[];
+    private array $childControllers=[];
+
+
+    /**
+     * 设置当前控制器的子控制器集合
+     * @param array|Controller[] $childControllers
+     * @return $this
+     */
+    public function setChildControllers(array $childControllers):self{
+        foreach ($childControllers as $k=>$v){
+            $childControllers[$k]->setParentController($this,true);
+        }
+        $this->childControllers=$childControllers;
+        return $this;
+    }
+
+    /**
+     * 获取当前控制器的子控制器集合
+     * @return array|Controller[]
+     */
+    public function getChildControllers():array{
+        return $this->childControllers;
+    }
+
 
 
     /**
@@ -26,7 +49,7 @@ trait HaveChilds
         static $models=[];
         if(empty($models)){
             //子表
-            foreach ($this->childControllers as $childController){
+            foreach ($this->getChildControllers() as $childController){
                 $modelClass=class_basename($childController->md);
                 $models[get_class($childController)]=new $modelClass();
             }
@@ -44,7 +67,7 @@ trait HaveChilds
         $filterComponents=$fetch['filterComponents']??[];
 
         $fetch['childs']=[];
-        foreach ($this->childControllers as $childController){
+        foreach ($this->getChildControllers() as $childController){
             /* @var $childController Controller */
             /* @var $childModel BaseModel */
             $childModelClass=get_class($childController->md);

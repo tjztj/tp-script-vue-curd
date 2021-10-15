@@ -114,7 +114,7 @@ class GenerateTableOption extends Collection
 
 
         $controll=$model->controller;
-        if($controll->parentController){
+        if($controll->getParentController()){
             $pf=new GenerateColumnOption($model::parentField());
             $pf->setTypeInt();
             $pf->setComment('父表ID');

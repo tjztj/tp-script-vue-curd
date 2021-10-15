@@ -179,7 +179,7 @@ trait BaseIndex
 
 
 
-        if($this->childControllers){
+        if($this->getChildControllers()){
             $this->indexFetchDoChild($data);
         }
 
@@ -208,7 +208,7 @@ trait BaseIndex
             //如果有了，就不设置了
             return;
         }
-        if(empty($this->parentController)){
+        if($this->getParentController() === null){
             //如果没有父表
             return;
         }
@@ -216,7 +216,7 @@ trait BaseIndex
         if(empty($baseId)){
             return;
         }
-        $parentInfo=(clone $this->parentController->md)->find($baseId);
+        $parentInfo=(clone $this->getParentController()->md)->find($baseId);
         if(!$parentInfo){
             throw new \think\Exception('未能获取到相关父表信息');
         }
@@ -259,7 +259,7 @@ trait BaseIndex
                 if(empty($childFilterData)){
                     return [];
                 }
-                if($this->childControllers){
+                if($this->getChildControllers()){
                     foreach ($this->getChildModelObjs() as $childModel){
                         /**
                          * @var BaseModel $childModel
@@ -294,7 +294,7 @@ trait BaseIndex
             //如果已经有了，不需要再设值
             return;
         }
-        if(empty($this->parentController)){
+        if($this->getParentController() === null){
             //如果当前没有父表
             return;
         }
@@ -307,7 +307,7 @@ trait BaseIndex
         foreach ($childList as $v){
             $parentInfo[$v[$this->md::parentField()]]=null;
         }
-        foreach ((clone $this->parentController->md)->where('id','in',array_keys($parentInfo))->select() as $val){
+        foreach ((clone $this->getParentController()->md)->where('id','in',array_keys($parentInfo))->select() as $val){
             $parentInfo[$val->id]=$val;
         }
         $oldBaseInfo=$parentInfo;
@@ -356,7 +356,7 @@ trait BaseIndex
     protected function setListDataRowChildBtn($list){
         return $list->map(function(BaseModel $info){
             $childBtns=[];
-            foreach ($this->childControllers as $childControlle){
+            foreach ($this->getChildControllers() as $childControlle){
                 /* @var $childControlle Controller */
                 $btn=new FunControllerListChildBtn();
                 $childControlle->baseListBtnText($btn,$info);

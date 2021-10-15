@@ -35,7 +35,7 @@ trait Excel
 
 
     protected function myExcelFields():FieldCollection{
-        if(is_null($this->parentController)){
+        if(is_null($this->getParentController())){
             return $this->fields;
         }
         //不需要村社，父表已经有村社了
@@ -48,7 +48,7 @@ trait Excel
      * @return FieldCollection
      */
     protected function excelFields():FieldCollection{
-        if(!$this->baseAndChildImport||empty($this->childControllers)){//只导入本表
+        if(!$this->baseAndChildImport||empty($this->getChildControllers())){//只导入本表
             return $this->myExcelFields();
         }
         //获取父表字段
@@ -61,7 +61,7 @@ trait Excel
 
 
         //子表字段
-        foreach ($this->childControllers as $v){
+        foreach ($this->getChildControllers() as $v){
             /**
              * @var Controller $v
              * @var BaseModel $model
@@ -105,12 +105,12 @@ trait Excel
         }
 
         $this->excelBaseInfo=null;
-        if(!is_null($this->parentController)){
+        if(!is_null($this->getParentController())){
             $baseId=$this->request->param('base_id/d');
             if(empty($baseId)){
                 throw new \think\Exception('缺少父表参数');
             }
-            $this->excelBaseInfo=(clone $this->parentController->md)->find($baseId);
+            $this->excelBaseInfo=(clone $this->getParentController()->md)->find($baseId);
             if(empty($this->excelBaseInfo)){
                 throw new \think\Exception('未找到父表相关信息');
             }
@@ -139,7 +139,7 @@ trait Excel
      * @throws \think\Exception
      */
     protected function excelSave(array $saveData){
-        if(!$this->baseAndChildImport||empty($this->childControllers)){//只导入本表
+        if(!$this->baseAndChildImport||empty($this->getChildControllers())){//只导入本表
             return $this->myExcelSave($saveData);
         }
 
@@ -162,7 +162,7 @@ trait Excel
          * @var Controller[] $childControllerClassList
          */
         $childControllerClassList=[];
-        foreach ($this->childControllers as $childController){
+        foreach ($this->getChildControllers() as $childController){
             $modelClass=get_class($childController->md);
             $modelName=class_basename($modelClass);
             if(isset($datas[$modelName])){
@@ -198,7 +198,7 @@ trait Excel
         static $baseIds=[];
 
         //父表字段的值一样将会视作同一条父数据
-        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->parentController->md,true)->getSave());
+        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->getParentController()->md,true)->getSave());
         if(!isset($baseIds[$baseIdsKey])){
             $parentInfo=$this->myExcelSave($mainData);
             $baseIds[$baseIdsKey]=$parentInfo->id;

@@ -92,8 +92,8 @@ trait BaseEdit
         if(is_null($model)){
             $model=$this->md;
         }
-        if(is_null($baseModel)&&$this->parentController){
-            $baseModel=clone $this->parentController->md;
+        if(is_null($baseModel)&&$this->getParentController()){
+            $baseModel=clone $this->getParentController()->md;
         }
 
         if($this->request->isAjax()){

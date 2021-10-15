@@ -28,8 +28,9 @@ trait ModelDelTraits
      */
     final public function del(array $ids): \think\Collection
     {
-        if($this->controller->childControllers){
-            foreach ($this->controller->childControllers as $v){
+        $childControllers=$this->controller->getChildControllers();
+        if($childControllers){
+            foreach ($childControllers as $v){
                 /* @var Controller $v */
                 $haveChildDataBaseId=(clone $v->md)->where($v->md::parentField(),'in',$ids)->max($v->md::parentField());
                 if($haveChildDataBaseId){
@@ -55,8 +56,8 @@ trait ModelDelTraits
     final protected function delCheckRowAuth(\think\Collection $list,array $ids): void
     {
         $parents=[];
-        if( $this->controller->parentController){
-            (clone $this->controller->parentController->md)->where('id','in',$list->column(static::parentField()))->select()->each(function(BaseModel $v)use(&$parents){
+        if( $this->controller->getParentController()){
+            (clone $this->controller->getParentController()->md)->where('id','in',$list->column(static::parentField()))->select()->each(function(BaseModel $v)use(&$parents){
                 $parents[$v->id]=$v;
             });
         }

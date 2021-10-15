@@ -13,8 +13,29 @@ trait Childs
     /**
      * @var Controller|null $parentController
      */
-    public $parentController=null;
+    private $parentController=null;
 
+
+    /**
+     * 设置当前控制器的父控制器
+     * @param Controller $parentController
+     * @param bool $force 是否强制替换掉原有的父控制器
+     * @return $this
+     */
+    public function setParentController($parentController,bool $force=true):self{
+        if(is_null($this->parentController)||$force){
+            $this->parentController=$parentController;
+        }
+        return $this;
+    }
+
+    /**
+     * 获取当前控制器的父控制器
+     * @return Controller|null
+     */
+    public function getParentController(){
+        return $this->parentController;
+    }
 
 
     /**
