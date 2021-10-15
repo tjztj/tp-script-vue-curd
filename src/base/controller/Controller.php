@@ -161,7 +161,7 @@ trait Controller
         // 数据导入后，方便之类处理（之类重写此方法）
     }
 
-    protected function editBefore(FieldCollection &$fields,BaseModel $old,?BaseModel $parentInfo,?array &$data): void
+    protected function editBefore(FieldCollection &$fields,BaseModel $old,?BaseModel $parentInfo,?array &$data=null): void
     {
         // 数据添加或修改时，显示与提交都会执行此方法
     }
