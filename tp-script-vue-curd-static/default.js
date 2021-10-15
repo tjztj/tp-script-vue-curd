@@ -62,12 +62,7 @@ define(['vueAdmin'], function (va) {
     function getStepOpenConfig(row,stepInfo){
         let title=vueData.title;
         title+=' [ '+stepInfo.title+' ]';
-        let url=stepInfo.config.listBtnUrl;
-        if(url.indexOf('?')>-1){
-            url+='&id='+row.id;
-        }else{
-            url+='?id='+row.id;
-        }
+        let url=setUrlParams(stepInfo.config.listBtnUrl,{id:row.id});
         const config={
             title:title,
             area:[stepInfo.config.listBtnOpenWidth, stepInfo.config.listBtnOpenHeight],
@@ -96,12 +91,7 @@ define(['vueAdmin'], function (va) {
             icon:warnIcon('#faad14'),
             onOk:()=> {
                 return new Promise((resolve, reject) => {
-                    let url=row.nextStepInfo.config.listBtnUrl;
-                    if(url.indexOf('?')>-1){
-                        url+='&id='+row.id;
-                    }else{
-                        url+='?id='+row.id;
-                    }
+                    let url=setUrlParams(row.nextStepInfo.config.listBtnUrl,{id:row.id});
                     that.$post(url,{id:row.id}).then(res=>{
                         antd.message.success(res.msg);
                         if(!res.data.refreshList&&that.refreshId){
@@ -121,6 +111,22 @@ define(['vueAdmin'], function (va) {
         });
     }
 
+
+
+    function setUrlParams(url,params){
+        if(typeof params==='string'){
+            if(url.indexOf('?')!==-1){
+                url+='?'+params;
+            }else{
+                url+='&'+params;
+            }
+        }else{
+            for(let i in params){
+                url=setUrlParams(url,i+'='+params[i]);
+            }
+        }
+        return url;
+    }
 
 
     actions.index=function(){
@@ -286,7 +292,7 @@ define(['vueAdmin'], function (va) {
                             title:'修改 '+vueData.title,
                             offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
                             area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
-                            content: vueData.editUrl+'?id='+row.id,
+                            content: setUrlParams(vueData.editUrl,{'id':row.id}),
                         }).end();
                     }
                 },
@@ -302,7 +308,7 @@ define(['vueAdmin'], function (va) {
                         title:'查看 '+vueData.title+' 相关信息',
                         offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
                         area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
-                        content: vueData.showUrl+'?id='+row.id,
+                        content: setUrlParams(vueData.showUrl,{id:row.id}),
                     }).end();
                 },
                 delSelectedRows(e,delChilds){
@@ -592,241 +598,6 @@ define(['vueAdmin'], function (va) {
 
         }
     }
-
-
-
-    actions.childList=function(){
-        let rowSelecteds=Vue.ref([]);
-        const pagination={
-            pageSize: vueData.indexPageOption.pageSize,
-            sortField: '',
-            sortOrder: '',
-            showSizeChanger:vueData.indexPageOption.canGetRequestOption,
-        }
-        const infos={};
-        return {
-            setup(props,ctx){
-                return getThisActionOhterSetup(props,ctx);
-            },
-            data(){
-                return {
-                    dataOther:{},
-                    data:vueData.list,
-                    listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
-                    info:vueData.info,
-                    title:vueData.title,
-                    tableLoading:false,
-                    canDel:vueData.canDel&&vueData.auth.del,
-                    canEdit:vueData.auth.edit,
-                    auth:vueData.auth,
-                    pagination,
-                    rowSelection:{
-                        selectedRowKeys:rowSelecteds,
-                        onChange(selectedRowKeys) {
-                            rowSelecteds.value=selectedRowKeys;
-                        },
-                    },
-                    fieldStepConfig:vueData.fieldStepConfig,
-                    actionDefWidth:0,
-                    indexUrl:window.location.href,
-                    //其他配置
-                    ...getThisActionOhterData(),
-                }
-            },
-            mounted() {
-                this.pageIsInit();
-                this.fetch();
-            },
-            computed: {
-                ...getThisActionOhterComputeds(),
-                delSelectedIds(){
-                    const ids=[];
-                    this.rowSelection.selectedRowKeys.forEach(id=>{
-                        if(typeof infos[id]==='undefined'){
-                            return;
-                        }
-                        const record=infos[id];
-                        if(!this.$refs.indexcurdtable.isCanDel(record)){
-                            return;
-                        }
-                        if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
-                            ids.push(id)
-                        }
-                    })
-                    return ids;
-                }
-            },
-            watch:{
-                ...getThisActionOhterWatchs(),
-            },
-            methods:{
-                handleTableChange(pagination, filters, sorter) {
-                    if(!pagination.pageSize){
-                        return;
-                    }
-                    this.pagination=pagination;
-                    this.pagination.sortField=sorter.field;
-                    this.pagination.sortOrder=sorter.order;
-                    this.fetch();
-                },
-                fetch() {
-                    this.tableLoading = true;
-                    const where=this.getWhere();
-                    this.$get(this.indexUrl,where).then(data => {
-                        this.pagination.current=data.data.current_page;
-                        this.pagination.total = data.data.total;
-                        this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
-                        this.data = data.data.data
-                        data.data.data.forEach(item=>{
-                            infos[item.id]=item;
-                        })
-                        this.tableLoading = false;
-                        //列表加载完成
-                        this.refreshTableTirgger(this.indexUrl,where,data);//触发钩子
-                    }).catch(err=>{
-                        this.tableLoading = false;
-                    });
-                },
-                getWhere(){
-                    return {
-                        pageSize: this.pagination.pageSize,
-                        page:this.pagination.current,
-                        sortField:this.pagination.sortField,
-                        sortOrder:this.pagination.sortOrder,
-                    };
-                },
-                refreshTableTirgger(url,where,res){
-                    this.onDataLoad(url,where,res);//触发钩子
-                    //列表加载完成
-                    if(window.onListFetch){
-                        Vue.nextTick(()=>{
-                            window.onListFetch(this.data);
-                        })
-                    }
-                },
-                openAdd(){
-                    this.open()
-                },
-                openEdit(row){
-                    if(row.stepInfo&&row.stepInfo.title){
-                        const config=getStepOpenConfig(row,row.stepInfo);
-                        if(row.stepInfo.config.titleEdit!==''){
-                            config.title=row.stepInfo.config.titleEdit;
-                        }
-                        this.openBox(config).end();
-                    }else{
-                        this.open(row)
-                    }
-                },
-                openNext(row){
-                    if(row.nextStepInfo&&row.nextStepInfo.listDirectSubmit!==''){
-                        getStepJustDo(row,this)
-                    }else{
-                        this.openBox(getStepNextOpenConfig(row,'lt')).end();
-                    }
-                },
-                open(row){
-                    this.openBox({
-                        title:'<div style="font-size: 15px">'+(row?'修改':'新增')+' <span style="font-size: 14px;color: rgba(0,0,0,.55)">'+vueData.title+'</span> 单条数据</div>',
-                        offset: 'auto',
-                        area: ['50vw', '72vh'],
-                        content: vueData.editUrl+'?base_id='+this.info.id+'&id='+(row?row.id:''),
-                    }).end();
-                },
-                openShow(row){
-                    this.openBox({
-                        title:'查看 详情',
-                        offset: 'auto',
-                        area: ['50vw', '72vh'],
-                        content: vueData.showUrl+'?id='+row.id,
-                    }).end();
-                },
-                delSelectedRows(){
-                    this.tableLoading = true;
-                    this.$post(vueData.delUrl,{ids:this.delSelectedIds}).then(res=>{
-                        antd.message.success(res.msg);
-                        this.refreshTable();
-                        rowSelecteds.value=[];
-                    }).catch(err=>{
-                        this.tableLoading = false;
-                    })
-                },
-                deleteRow(row){
-                    this.tableLoading = true;
-                    this.$post(vueData.delUrl,{ids:[row.id]}).then(res=>{
-                        antd.message.success(res.msg);
-                        this.refreshTable();
-                    }).catch(err=>{
-                        this.tableLoading = false;
-                    })
-                },
-                refreshTable(){
-                    this.fetch();
-                },
-                refreshId(id){
-                    this.loading = true;
-                    const where=this.getWhere();
-                    where.id=id;
-                    where.page=1;
-                    this.$get(this.indexUrl,where).then(data => {
-                        if(!data.data.data[0]){
-                            this.loading = false;
-                            return;
-                        }
-                        //为了触发watch
-                        let rows=[],isChange=false;
-                        for(let i in this.data){
-                            if(this.data[i].id==id){
-                                rows.push(data.data.data[0])
-                                isChange=true;
-                            }else{
-                                rows.push(this.data[i])
-                            }
-                        }
-                        if(isChange===false){
-                            this.loading = false;
-                            return;
-                        }
-                        this.data=rows;
-                        //如果有才改变
-                        for(const n in data.data.other){
-                            this.dataOther[n]=data.data.other[n]
-                        }
-                        data.data.data.forEach(item=>{
-                            infos[item.id]=item;
-                        })
-                        this.loading = false;
-                        this.refreshTableTirgger(this.indexUrl,where,data);
-                    }).catch(()=>{
-                        this.loading = false;
-                    });
-                },
-                downExcelTpl(){
-                    window.open(vueData.downExcelTplUrl);
-                },
-                importExcelTpl(){
-                    this.uploadOneFile({
-                        url:vueData.importExcelTplUrl,
-                        accept:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
-                        success:res=> {
-                            antd.message.success(res.msg);
-                            this.refreshTable()
-                        }
-                    }).trigger();
-                },
-                onDataLoad(url,where,res){
-                    //数据获取完成钩子
-                },
-                actionWidth(row){
-                    return this.actionDefWidth
-                },
-                ////其他配置
-                ...getThisActionOhterMethods()
-            }
-
-        };
-    };
-
 
     actions.childEdit=function(){
         let returnData=actions.edit();

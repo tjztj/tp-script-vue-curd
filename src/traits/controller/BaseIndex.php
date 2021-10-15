@@ -140,6 +140,8 @@ trait BaseIndex
 
         $listColumns=array_values($this->fields->listShowItems()->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
+
+        $baseId=$parentInfo?$parentInfo->id:0;
         $data=[
             'model'=>get_class($this->md),
             'modelName'=>class_basename($this->md),
@@ -147,11 +149,11 @@ trait BaseIndex
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
             'listUrl'=>$this->request->url(),
-            'editUrl'=>url('edit')->build(),
-            'showUrl'=>url('show')->build(),
+            'editUrl'=>url('edit',['base_id'=>$baseId])->build(),
+            'showUrl'=>url('show',['base_id'=>$baseId])->build(),
             'delUrl'=>url('del')->build(),
-            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$parentInfo?$parentInfo->id:0])->build(),
-            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$parentInfo?$parentInfo->id:0])->build(),
+            'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseId])->build(),
+            'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseId])->build(),
             'title'=>$this->title,
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$filterFields->getFilterShowData(),
