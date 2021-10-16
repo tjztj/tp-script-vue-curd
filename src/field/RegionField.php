@@ -114,6 +114,10 @@ class RegionField extends ModelField
                 foreach ($field->getAboutRegions('child') as $v){
                     $v->canEdit($canEdit);
                 }
+            })->setSaveBeforeDo(function (array &$postData,BaseModel $before,?BaseModel $base,ModelField $field)use($canEdit){
+                foreach ($field->getAboutRegions('child') as $v){
+                    $v->canEdit($canEdit);
+                }
             });
         }
         return $this->doAttr('canEdit',$canEdit);
