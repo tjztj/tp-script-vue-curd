@@ -60,7 +60,8 @@ class RegionField extends ModelField
      * @param RegionField|null $parentField
      * @return RegionField
      */
-    public function parentField(self $parentField=null){
+    public function parentField(self $parentField=null): ?RegionField
+    {
         if(!is_null($parentField)){
             $parentField->filter(new \tpScriptVueCurd\filter\EmptyFilter());
             $parentField->pushFieldDo()->setEditShowDo(function (BaseModel &$info,?BaseModel $base,ModelField $field,bool $isStepNext){
@@ -75,7 +76,8 @@ class RegionField extends ModelField
      * @param RegionField|null $childField
      * @return RegionField
      */
-    public function childField(self $childField=null){
+    public function childField(self $childField=null): ?RegionField
+    {
         return $this->doAttr('childField', $childField);
     }
 

@@ -29,7 +29,7 @@ class RegionFilter extends ModelFilter
         }
     }
 
-    static public function componentUrl():string{
+    public static function componentUrl():string{
         return '/tp-script-vue-curd-static.php?filter/region.js';
     }
 }
