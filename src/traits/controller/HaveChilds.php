@@ -58,8 +58,7 @@ trait HaveChilds
         if(empty($models)){
             //子表
             foreach ($this->getChildControllers() as $childController){
-                $modelClass=class_basename($childController->md);
-                $models[get_class($childController)]=new $modelClass();
+                $models[get_class($childController)]=$childController->md;
             }
         }
         return $models;

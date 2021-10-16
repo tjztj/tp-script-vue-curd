@@ -38,14 +38,13 @@ class RegionField extends ModelField
     protected bool $canCheckParent=false;//是否可选中父级
     protected bool $multiple=false;//是否多选
 
-    protected string $pField = '';//父字段名
-    protected string $cField = '';//子字段名
+    protected ?self $parentField = null;//父字段
+    protected ?self $childField = null;//子字段
 
     protected $nullVal=0;//字段在数据库中为空时的值
 
-    protected bool $isRegionField=true;
-    protected string $pTitle='镇街';
-    protected string $cTitle='村社';
+    private bool $is_to_arr_do=false;
+
 
 
 
@@ -56,19 +55,30 @@ class RegionField extends ModelField
         parent::__construct();
     }
 
-    /**父字段名
-     * @param string|null $pField
-     * @return $this|string
+    /**
+     * 父地区字段
+     * @param RegionField|null $parentField
+     * @return RegionField
      */
-    public function pField(string $pField = null)
-    {
-        if (!is_null($pField)) {
-            if ($this->cField() === '' && $this->name() !== $pField) {
-                $this->cField($this->name());
-            }
+    public function parentField(self $parentField=null){
+        if(!is_null($parentField)){
+            $parentField->filter(new \tpScriptVueCurd\filter\EmptyFilter());
+            $parentField->pushFieldDo()->setEditShowDo(function (BaseModel &$info,?BaseModel $base,ModelField $field,bool $isStepNext){
+                $field->editShow(false);
+            });
         }
-        return $this->doAttr('pField', $pField);
+        return $this->doAttr('parentField', $parentField);
     }
+
+    /**
+     * 子地区字段
+     * @param RegionField|null $childField
+     * @return RegionField
+     */
+    public function childField(self $childField=null){
+        return $this->doAttr('childField', $childField);
+    }
+
 
     /**父字段名
      * @param bool|null $canCheckParent
@@ -90,35 +100,6 @@ class RegionField extends ModelField
     }
 
 
-    /**
-     * 是否镇村字段
-     * @param bool $isRegionField
-     * @return RegionField|bool
-     */
-    public function isRegionField(bool $isRegionField=null){
-        return $this->doAttr('isRegionField',$isRegionField);
-    }
-
-
-    /**
-     * @param string|null $pTitle
-     * @return $this|string
-     */
-    public function pTitle(string $pTitle = null)
-    {
-        return $this->doAttr('pTitle', $pTitle);
-    }
-
-    /**
-     * @param string|null $cTitle
-     * @return $this|string
-     */
-    public function cTitle(string $cTitle = null)
-    {
-        return $this->doAttr('cTitle', $cTitle);
-    }
-
-
 
     /**
      * 编辑页面是否可修改
@@ -126,22 +107,16 @@ class RegionField extends ModelField
      * @return RegionField|bool
      */
     public function canEdit(bool $canEdit=null){
+        if(!is_null($canEdit)){
+            $this->pushFieldDo()->setEditShowDo(function (BaseModel &$info,?BaseModel $base,ModelField $field,bool $isStepNext)use($canEdit){
+                foreach ($field->getAboutRegions('child') as $v){
+                    $v->canEdit($canEdit);
+                }
+            });
+        }
         return $this->doAttr('canEdit',$canEdit);
     }
 
-    /**子字段名
-     * @param string|null $cField
-     * @return $this|string
-     */
-    public function cField(string $cField = null)
-    {
-        if (!is_null($cField)) {
-            if ($this->pField() === '' && $this->name() !== $cField) {
-                $this->pField($this->name());
-            }
-        }
-        return $this->doAttr('cField', $cField);
-    }
 
 
     /**
@@ -156,8 +131,12 @@ class RegionField extends ModelField
             if (isset($data[$name])) {
                 $val = $data[$name];
                 if (is_array($val)) {
+                    foreach ($val as $v){
+                        $this->checkValIsCheckParentErr($v);
+                    }
                     $this->save = implode(',',$val);
                 } else {
+                    $this->checkValIsCheckParentErr($val);
                     $this->save = $val;
                 }
             } else {
@@ -165,58 +144,33 @@ class RegionField extends ModelField
             }
 
         }else{
-            if ($this->pField() === '') {
-                throw new \think\Exception('地区字段未配置 pField');
-            }
-
             $name = $this->name();
             if (isset($data[$name])) {
-                if ($this->name === $this->pField()) {
-                    $this->save = $this->getSystemRegionPidBySetSave($data[$name], $data);
-                } else {
-                    $val = $data[$name];
-                    if (is_array($val)) {
-                        $this->save = end($val);
-                    } else {
-                        $this->save = $val;
+                $val = $data[$name];
+                is_array($val)||$val=explode(',',$val);
+                if(count($val)===1){
+                    $this->save = current($val);
+                    $this->checkValIsCheckParentErr($this->save);
+                }else{
+                    $regionNames=[];
+                    $regions=$this->getAboutRegions();
+                    foreach ($regions as $k=>$v){
+                        $data[$v->name()]=$val[count($val)-count($regions)+$k];
+                        $v->save= $data[$v->name()];
                     }
+                    if(!isset($this->save)||empty($this->save)){
+                        $this->save = $this->nullVal();
+                    }
+                    $this->checkValIsCheckParentErr($this->save);
                 }
             } else {
-                if ($this->name === $this->pField()) {
-                    $this->save = $this->getSystemRegionPidBySetSave('', $data);
-                } else {
-                    $this->save = $this->nullVal();
-                }
+                $this->save = $this->nullVal();
             }
         }
         $this->defaultCheckRequired($this->save);
         return $this;
     }
 
-
-
-    private function getSystemRegionPidBySetSave($val, $data)
-    {
-        if ($this->cField() === '') {
-            throw new \think\Exception('地区字段未配置 cField');
-        }
-
-        if (isset($data[$this->cField()])) {//如果是镇街
-            $cRegionId = 0;
-            if (is_array($data[$this->cField()])) {
-                $cRegionId = end($data[$this->cField()]);
-            } else if (is_numeric($data[$this->cField()])) {
-                $cRegionId = $data[$this->cField()];
-            }
-            if ($cRegionId) {
-                if($this->isRegionField()){
-                    return self::getRegionPid($cRegionId);
-                }
-                return $this->getTreeInfoPid($cRegionId);
-            }
-        }
-        return $val;
-    }
 
 
     /**
@@ -244,22 +198,14 @@ class RegionField extends ModelField
             }
 
             if(!$this->multiple){
-                if($this->isRegionField()){
-                    $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
-                }else{
-                    $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??$this->getTreeInfoName($dataBaseData[$name]);
-                }
+                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
                 return;
             }
 
             $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
 
             foreach ($arr as $k=>$v){
-                if($this->isRegionField()){
-                    $arr[$k]=self::getRegionName($v)?:$v;
-                }else{
-                    $arr[$k]=$this->getTreeInfoName($v)?:$v;
-                }
+                $arr[$k]=self::getRegionName($v)?:$v;
             }
             $dataBaseData[$name]=implode('，',$arr);
         }
@@ -277,67 +223,63 @@ class RegionField extends ModelField
                 if(!isset($v['pid'])){
                     $v['pid']=is_null($pid)?'':(string)$pid;
                 }
-
-                $list[$v['value']]=$v;
+                isset($list[$this->guid()])||$list[$this->guid()]=[];
+                $list[$this->guid()][$v['value']]=$v;
                 if(!empty($v['children'])){
                     $func($v['children'],$v['value']);
                 }
             }
         };
-        if(empty($list)){
+        if(!isset($list[$this->guid()])){
             $func($this->regionTree);
         }
-        return $list;
+        return $list[$this->guid()];
     }
 
-
-    public static function getRegionPid(int $cRegionId): string
-    {
-        static $regions = null;
-        if (is_null($regions)) {
-            $regions = array_column(SystemRegion::getAll(), 'pid', 'id');
-        }
-        return $regions[$cRegionId] ?? '';
-    }
-
-    public static function getRegionName(int $cRegionId): string
-    {
-        static $regions = null;
-        if (is_null($regions)) {
-            $regions = array_column(SystemRegion::getAll(), 'name', 'id');
-        }
-        return $regions[$cRegionId] ?? '';
-    }
-
-
-    private function getTreeInfoPid(int $cRegionId){
-        return $this->getTreeToList()[$cRegionId]['pid']??'';
-    }
-
-    private function getTreeInfoName(int $cRegionId){
-        return $this->getTreeToList()[$cRegionId]['label']??'';
-    }
 
     /** 可以是 桐君街道 或 阆苑村 或 桐君街道-阆苑村
      * @param string $region_name
-     * @return string
+     * @return array|null
      * @throws \think\db\exception\DataNotFoundException
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    public static function getRegionId(string $region_name): string
+    private function getRegionByName(string $region_name): ?array
     {
         static $regions = null;
         if (is_null($regions)) {
+            $level=count($this->getAboutRegions());
+
+            $childs=[];
+            $infos=[];
             foreach (SystemRegion::getAll() as $v) {
-                $regions[$v['name']] = $v['id'];
-                $pName = self::getRegionName($v['pid']);
-                if ($pName) {
-                    $regions[$pName . '-' . $v['name']] = $v['id'];
+                isset($childs[$v['pid']])||$childs[$v['pid']]=[];
+                $childs[$v['pid']][]=$v;
+                $infos[$v['id']]=$v;
+            }
+
+            $regions=[];
+            if($level>1){
+                $titles=function ($info,$lv,$titleArr)use($level,$childs,&$titles,&$regions){
+                    $titleArr[]=$info['name'];
+                    if($level>$lv&&isset($childs[$info['id']])){
+                        foreach ($childs[$info['id']] as $val){
+                            $titles($val,$lv+1,$titleArr);
+                        }
+                    }elseif($level===$lv){
+                        $regions[implode('-',$titleArr)]=$info;
+                    }
+                };
+                foreach ($childs as $k=>$v){
+                    isset($infos[$k])&&$titles($infos[$k],1,[]);
+                }
+            }else{
+                foreach (SystemRegion::getAll() as $v) {
+                    $regions[$v['name']]=$v;
                 }
             }
         }
-        return $regions[$region_name] ?? '';
+        return $regions[$region_name] ?? null;
     }
 
 
@@ -359,7 +301,7 @@ class RegionField extends ModelField
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
     {
-        $excelFieldTpl->explain = "填入：$this->pField-$this->cField,需和\n" . url('index/showRegionPage', [], true, true)->build() . "\n中的名称对应";
+        $excelFieldTpl->explain = "填入：地区名称,需和\n" . url('index/showRegionPage', [], true, true)->build() . "\n中的名称对应";
         $excelFieldTpl->width = 40;
         $excelFieldTpl->wrapText = true;
     }
@@ -372,78 +314,87 @@ class RegionField extends ModelField
      */
     public function excelSaveDoData(array &$save): void
     {
-        if ($this->cField() === '') {
-            throw new \think\Exception('地区字段未配置 cField');
-        }
-
-        if ($this->pField() === '') {
-            throw new \think\Exception('地区字段未配置 pField');
-        }
-
-        if (!isset($save[$this->cField()])) {
+        $regions=$this->getAboutRegions();
+        if(!isset($save[$this->name()])){
             return;
         }
 
-        if($this->pField()===$this->name()){
-            return;
-        }
-
-        if (!is_numeric($save[$this->cField()])) {
-            $regions = explode('-', $save[$this->cField()]);
-
-            if($this->canCheckParent()&&count($regions)===1){
-                $save[$this->cField()]=self::getRegionId($regions[0]);
-                if($this->isRegionField()){
-                    if(!empty(self::getRegionPid($save[$this->cField()]))){
-                        throw new \think\Exception('填写格式不正确-001');
-                    }
-                }else{
-                    if(!empty($this->getTreeInfoPid($save[$this->cField()]))){
-                        throw new \think\Exception('填写格式不正确-002');
-                    }
+        if (!is_numeric($save[$this->name()])) {
+            $titles=[];
+            foreach ($regions as $v){
+                if(!isset($save[$v->name()])){
+                    throw new \think\Exception('缺少'.$v->title());
                 }
+                $titles[]=$save[$v->name()];
+            }
+            $lastRegionInfo= $this->getRegionByName(implode('-',$titles));
+            if(empty($lastRegionInfo)){
+                throw new \think\Exception('未找到相关地区[ '.implode('-',$titles).' ]');
+            }
+            $ids=explode(',',$lastRegionInfo['pids']);
+            $ids[]=$lastRegionInfo['id'];
 
-                $save[$this->pField()]=0;
+            $idsI=count($ids)-count($regions);
+            foreach ($regions as $v){
+                $save[$v->name()]=$ids[$idsI];
+                $idsI++;
+            }
+        }else{
+            if(empty($save[$this->name()])){
                 return;
             }
-
-
-            if (empty($regions[0]) || empty($regions[1])) {
-                throw new \think\Exception('填写格式不正确');
+            $list=$this->getTreeToList();
+            if(!isset($list[$save[$this->name()]])){
+                throw new \think\Exception('地区值不正确');
             }
+            $info=$list[$save[$this->name()]];
 
-            $save[$this->cField()] = self::getRegionId($regions[1]);
-            if ($save[$this->cField()] === '') {
-                throw new \think\Exception('没有找到村社：' . $regions[1]);
-            }
-        }
-        if($this->isRegionField()){
-            $save[$this->pField()] = self::getRegionPid($save[$this->cField()]);
-        }else{
-            $save[$this->pField()] =$this->getTreeInfoPid($save[$this->cField()]);
-        }
+            $ids=explode(',',$info['pids']);
+            $ids[]=$info['id'];
 
-
-        if(empty($save[$this->cField()]) || empty($save[$this->pField()]) ){
-            throw new \think\Exception('未获取到正确的村社-001');
-        }
-        if(!$this->canCheckParent()&&$save[$this->pField()] == RegionConstant::FIRST_PID){
-            throw new \think\Exception('未获取到正确的村社-002');
-        }
-
-        if($this->isRegionField()){
-            if (self::getRegionPid($save[$this->cField()]) != $save[$this->pField()]) {
-                throw new \think\Exception($this->pField.'[' . self::getRegionName($save[$this->pField()]) . ']下未找到' . self::getRegionName($save[$this->cField()]));
-            }
-        }else{
-            if ($this->getTreeInfoPid($save[$this->cField()]) != $save[$this->pField()]) {
-                throw new \think\Exception($this->pField.'[' . $this->getTreeInfoName($save[$this->pField()]) . ']下未找到' . $this->getTreeInfoName($save[$this->cField()]));
+            $idsI=count($ids)-count($regions);
+            foreach ($regions as $v){
+                if(!isset($save[$v->name()])||(int)$save[$v->name()]!==(int)$ids[$idsI]){
+                    throw new \think\Exception('地区值不正确（'.$v->title().':'.$save[$v->name()].'）');
+                }
+                if($v->guid()===$this->guid()){
+                    break;
+                }
+                $idsI++;
             }
         }
-
-
     }
 
+
+    /**
+     * 获取所有的父地区-自己-子地区
+     * @return self[]|RegionField[]
+     */
+    public function getAboutRegions(string $thisIsParent=''){
+        static $return=[];
+        if(!isset($return[$this->guid()],$return[$this->guid()][$thisIsParent])){
+            $getRegions=function (self $field,string $thisIsParent='')use(&$getRegions){
+                $ps=[];
+                $cs=[];
+                if($thisIsParent!=='parent'&&$field->parentField()){
+                    $ps=$getRegions($field->parentField(),'child');
+                    $ps[]=$field->parentField();
+                }
+                if($thisIsParent!=='child'&&$field->childField()){
+                    $cs=$getRegions($field->childField(),'parent');
+                    $cs[]=$field->childField();
+                }
+                return [
+                    ... $ps,
+                    ...($thisIsParent?[]:[$field]),
+                    ...  $cs,
+                ];
+            };
+            isset($return[$this->guid()])||$return[$this->guid()]=[];
+            $return[$this->guid()][$thisIsParent]=$getRegions($this,$thisIsParent);
+        }
+        return $return[$this->guid()][$thisIsParent];
+    }
 
     public static function componentUrl(): FieldTpl
     {
@@ -466,6 +417,42 @@ class RegionField extends ModelField
         }else{
             $option->setTypeInt();
         }
-
     }
+
+    private function checkValIsCheckParentErr(int $val):void{
+        if(empty($val)||$this->canCheckParent()){
+            return;
+        }
+        $regions=$this->getAboutRegions();
+        foreach ($regions as $k=>$v){
+            if($v->guid()===$this->guid()&&isset($regions[$k+1])){
+                return ;
+            }
+        }
+
+        $list= $this->getTreeToList();
+        if(!isset($list[$val])){
+            throw new \think\Exception('值'.$val.'不可选中');
+        }
+        if(!empty($list[$val]['children'])){
+            throw new \think\Exception('不可选中父级['.$list[$val]['name'].']');
+        }
+    }
+
+    public function toArray(): array
+    {
+        $aboutRegions=[];
+        if($this->is_to_arr_do!==true){
+            foreach ($this->getAboutRegions() as $v){
+                $v->is_to_arr_do=true;
+                $v->objWellToArr=false;
+                $aboutRegions[]=$v->toArray();
+
+            }
+        }
+        $data=parent::toArray();
+        $data['aboutRegions']=$aboutRegions;
+        return $data;
+    }
+
 }

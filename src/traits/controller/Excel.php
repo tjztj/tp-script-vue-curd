@@ -122,7 +122,7 @@ trait Excel
         $this->importBefore($option);
 
         $model=new $modelClassName;
-        $info=$model->addInfo($option->saveArr,$this->myExcelFields(),true);
+        $info=$model->addInfo($option->saveArr,null,$this->myExcelFields(),true);
 
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;

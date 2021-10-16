@@ -1,6 +1,6 @@
 define([],function(){
     let regions={},regionValues={},textValues={};
-    let level=1;
+    let level=0;
 
     function getDataTree(field){
         if(!field.multiple){
@@ -31,39 +31,23 @@ define([],function(){
         props:['field','value','validateStatus','form','info'],
         setup(props,ctx){
             let justOne=true;
-            props.field.regionTree.forEach(v=>{
-                regions[parseInt(v.value)]=v;
-                regionValues[parseInt(v.value)]=[parseInt(v.value)];
-                textValues['/'+v.name]=regionValues[parseInt(v.value)];
-                if(v.children){
-                    if(v.children.length>1){
-                        justOne=false;
+            function regionInit(tree,panme,pvals){
+                level++;
+                panme=panme||'';
+                pvals=pvals||[];
+                tree.forEach(v=>{
+                    val=parseInt(v.value);
+                    regions[val]=v;
+                    regionValues[val]=[...pvals,val];
+                    textValues[panme+'/'+v.name]=regionValues[val];
+                    if(v.children&&v.children.length>0){
+                        if(v.children.length>1) justOne=false;
+                        regionInit(v.children,panme+'/'+v.name,regionValues[val])
                     }
-                    v.children.forEach(val=>{
-                        if(level===1){
-                            level=2;
-                        }
-                        regions[parseInt(val.value)]=val;
-                        regionValues[parseInt(val.value)]=[parseInt(v.value),parseInt(val.value)];
-                        textValues[v.name+'/'+val.name]=regionValues[parseInt(val.value)];
-                        if(val.children){
-                            if(val.children.length>1){
-                                justOne=false;
-                            }
-                            val.children.forEach(vo=>{
-                                if(level!==3){
-                                    level=3;
-                                }
-                                regions[parseInt(vo.value)]=vo;
-                                regionValues[parseInt(vo.value)]=[parseInt(v.value),parseInt(val.value),parseInt(vo.value)];
-                                textValues[val.name+'/'+vo.name]=regionValues[parseInt(vo.value)];
-                                level_3=true;
-                            })
-                        }
-                    })
-                }
-            })
-
+                })
+            }
+            regionInit(props.field.regionTree);
+            level=level||1;
 
             if(!props.field.readOnly&&props.field.editShow===true&&props.field.required===true&&!props.form.id&&!props.value){
                 //如果是添加，且是必填，且为空
@@ -125,11 +109,13 @@ define([],function(){
                         return this.value.toString().split(',').map(v=>regions[parseInt(v)]);
                     }else{
                         let str='';
-                        if(level>1&&this.field.pField&&this.form[this.field.pField]){
-                            str+=this.form[this.field.pField];
+                        for(let i in field.aboutRegions){
+                            str+=field.aboutRegions[i].name
+                            if(field.aboutRegions[i+1]){
+                                str+='/';
+                            }
                         }
-                        str+='/'+(this.field.cField?this.form[[this.field.cField]]:this.value);
-                        return textValues[str];
+                        return textValues[str]||0;
                     }
                 }
             },
@@ -138,11 +124,8 @@ define([],function(){
         template:`<div class="field-box">
                    <template v-if="showSelected">
                         <div class="l">
-                            <template v-if="field.cField">
-                                <span v-if="field.pField&&info[field.pField]">{{info[field.pField]}}/</span>{{info[field.cField]}}
-                            </template>
-                            <template v-else>
-                                {{info[field.name]}}
+                            <template v-for="(item,index) in field.aboutRegions">
+                                 {{info[item.name]}}<template v-if="field.aboutRegions[index+1]">/</template>
                             </template>
                         </div>
                     </template>
