@@ -122,27 +122,6 @@ if (!function_exists('getModelDefaultDeleteLoginUserField')) {
 
 
 
-if (!function_exists('getModelDefaultRegionField')) {
-    /**
-     * 所属地区ID字段，为空字符串，表示不记录（所有表初始默认）
-     * @return string
-     */
-    function getModelDefaultRegionField():string{
-        return '';
-    }
-}
-
-if (!function_exists('getModelDefaultRegionPidField')) {
-    /**
-     * 所属地区父ID字段，为空字符串，表示不记录（所有表初始默认）
-     * @return string
-     */
-    function getModelDefaultRegionPidField():string{
-        return '';
-    }
-}
-
-
 if (!function_exists('getModelDefaultStepField')) {
     /**
      * 字段步骤默认名称
