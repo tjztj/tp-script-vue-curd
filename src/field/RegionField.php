@@ -441,6 +441,26 @@ class RegionField extends ModelField
         }
     }
 
+    /**
+     * 多级初始化
+     * @param ...$regions
+     * @return self[]
+     */
+    public static function tree(...$regions):array{
+        /**
+         * @var self[] $regions
+         */
+        foreach ($regions as $k=>$v){
+            if($k>0){
+                $v->parentField($regions[$k-1]);
+            }
+            if(isset($regions[$k+1])){
+                $v->childField($regions[$k+1]);
+            }
+        }
+        return $regions;
+    }
+
     public function toArray(): array
     {
         $aboutRegions=[];

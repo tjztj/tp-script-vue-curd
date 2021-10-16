@@ -4,6 +4,7 @@ namespace tpScriptVueCurd\traits\controller;
 
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\FilesField;
+use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
@@ -212,7 +213,7 @@ trait BaseEdit
         $this->editBefore($fields,$info,$parentInfo);
         if($baseModel){
             //子表的地区为父表的值
-            $fields=$fields->filter(fn(ModelField $v)=>!in_array($v->name(),[$model::getRegionField(),$model::getRegionPidField()])||$v->canEdit()===false);//不编辑地区
+            $fields=$fields->filter(fn(ModelField $v)=>!$v instanceof RegionField);//不编辑地区
         }
 
 
@@ -277,7 +278,7 @@ trait BaseEdit
         //data可能在上面改变为有值
         $info=$data->toArray();
         //只处理地区
-        $fields->filter(fn(ModelField $v)=> (in_array($v->name(), [$data::getRegionField(), $data::getRegionPidField()]) && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
+        $fields->filter(fn(ModelField $v)=> ($v instanceof RegionField && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
         //原信息
         $info['sourceData']=$data;
 

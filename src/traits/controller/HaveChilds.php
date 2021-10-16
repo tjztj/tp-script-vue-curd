@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\traits\controller;
 use think\console\Input;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\tool\ErrorCode;
 
@@ -80,7 +81,7 @@ trait HaveChilds
             $childModelClass=get_class($childController->md);
             $childModel=$childController->md;
             $name=class_basename($childModelClass);
-            $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$v->name()!==$childModel::getRegionField()&&$v->name()!==$childModel::getRegionPidField());
+            $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>!$v instanceof RegionField);
 
 
             $fetch['childs'][]=[

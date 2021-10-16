@@ -8,6 +8,7 @@ namespace tpScriptVueCurd\traits\controller;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -39,7 +40,7 @@ trait Excel
             return $this->fields;
         }
         //不需要村社，父表已经有村社了
-        return $this->fields->filter(fn(ModelField $v)=>!in_array($v->name(), [$this->md::getRegionField(), $this->md::getRegionPidField()], true));
+        return $this->fields->filter(fn(ModelField $v)=>!$v instanceof RegionField);
     }
 
 
@@ -71,7 +72,7 @@ trait Excel
             $modelName=class_basename($model);
             $fields=$fields->merge(
                 $model->fields()
-                    ->filter(fn(ModelField $v)=>!in_array($v->name(),[$this->md::getRegionField(),$this->md::getRegionPidField()]))
+                    ->filter(fn(ModelField $v)=>!$v instanceof RegionField)
                     ->map(function(ModelField $field)use($modelName,$v){
                         $field=clone $field;
                         $field->name($modelName.'|'.$field->name());

@@ -6,6 +6,7 @@ namespace tpScriptVueCurd\traits\model;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
@@ -36,7 +37,7 @@ trait ModelSave
         #########################################################################################
 
         if($parentInfo){
-            $fields=$fields->filter(fn(ModelField $v)=>$v->name()!==static::getRegionField()&&$v->name()!==static::getRegionPidField());
+            $fields=$fields->filter(fn(ModelField $v)=>!$v instanceof RegionField);
         }
 
         if(!$this->checkRowAuth($fields,$parentInfo,'add')){
@@ -91,8 +92,12 @@ trait ModelSave
 
         if($parentInfo){
             $data[static::parentField()]=$parentInfo->id;
-            static::getRegionField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionField())->isEmpty()||$data[static::getRegionField()]=$parentInfo[static::getRegionField()];
-            static::getRegionPidField()===''||$this->fields()->filter(fn($v)=>$v->name()===static::getRegionPidField())->isEmpty()||$data[static::getRegionPidField()]=$parentInfo[static::getRegionPidField()];
+            $allFields=static::getTableFields();
+            $this->fields()->each(function (ModelField $v)use($allFields,&$data){
+                if($v instanceof RegionField&&isset($parentInfo[$v->name()])&&in_array($v->name(),$allFields,true)){
+                    $data[$v->name()]=$parentInfo[$v->name()];
+                }
+            });
         }
 
         if(static::getCreateLoginUserField()){
@@ -195,18 +200,13 @@ trait ModelSave
         if(static::getDeleteLoginUserField()){
             unset($data[static::getDeleteLoginUserField()]);
         }
-        if(static::getRegionPidField()){
-            $fs=$fields->filter(fn(ModelField $v)=>$v->name()===static::getRegionPidField());
-            if($fs->count()===0||$fs->findByName(static::getRegionPidField())->canEdit()===false){
-                unset($data[static::getRegionPidField()]);
+
+        //地区处理
+        $fields->each(function (ModelField $v)use(&$data){
+            if($v instanceof RegionField&&$v->canEdit()===false){
+                unset($data[$v->name()]);
             }
-        }
-        if(static::getRegionField()){
-            $fs=$fields->filter(fn(ModelField $v)=>$v->name()===static::getRegionField());
-            if($fs->count()===0||$fs->findByName(static::getRegionField())->canEdit()===false){
-                unset($data[static::getRegionField()]);
-            }
-        }
+        });
 
         //onEditBefore请用doSaveDataAfter
         $info=clone $beforeInfo;

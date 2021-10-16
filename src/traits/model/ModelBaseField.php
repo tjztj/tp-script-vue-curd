@@ -38,23 +38,5 @@ trait ModelBaseField
         return getModelDefaultDeleteLoginUserField();
     }
 
-
-
-    /**
-     * 所属地区ID字段，为空字符串，表示不记录
-     * @return string
-     */
-    public static function getRegionField():string{
-        return getModelDefaultRegionField();
-    }
-
-
-    /**
-     * 所属地区父ID字段，为空字符串，表示不记录
-     * @return string
-     */
-    public static function getRegionPidField():string{
-        return getModelDefaultRegionPidField();
-    }
     
 }
