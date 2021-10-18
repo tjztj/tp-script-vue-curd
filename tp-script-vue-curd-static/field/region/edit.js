@@ -144,7 +144,7 @@ define([],function(){
                                  style="width: 100%"
                                  tree-checkable
                                  tree-check-strictly
-                                 :placeholder="field.placeholder||'请选择'+field.cTitle"
+                                 :placeholder="field.placeholder||'请选择'+field.title"
                                  :dropdown-style="{ maxHeight: '350px', overflow: 'auto' }"
                             >
                             
@@ -152,7 +152,7 @@ define([],function(){
                             <a-cascader v-else
                                 v-model:value="modelVal"
                                 :options="dataTree"
-                                :placeholder="field.placeholder||'请选择'+field.cTitle"
+                                :placeholder="field.placeholder||'请选择'+field.title"
                                 show-search
                                 :disabled="field.readOnly"
                                 :change-on-select="field.canCheckParent"
