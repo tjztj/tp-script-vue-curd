@@ -160,6 +160,7 @@ trait BaseIndex
             'filter_data'=>$filterData?:null,
             'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
+            'tableThemIsColor'=>tableThemIsColor(),
             'canEdit'=>$showTableTool,
             'canDel'=>$showTableTool,
             'auth'=>[

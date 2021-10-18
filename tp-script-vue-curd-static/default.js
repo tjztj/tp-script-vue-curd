@@ -170,6 +170,7 @@ define(['vueAdmin'], function (va) {
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
                     indexUrl:vueData.listUrl,
+                    tableThemIsColor:vueData.tableThemIsColor,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -625,6 +626,7 @@ define(['vueAdmin'], function (va) {
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
                     indexUrl:window.location.href,
+                    tableThemIsColor:vueData.tableThemIsColor,
                     //其他配置
                     ...getThisActionOhterData(),
                 }

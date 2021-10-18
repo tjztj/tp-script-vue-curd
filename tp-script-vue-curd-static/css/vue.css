@@ -976,56 +976,56 @@ a.red:hover,a.yellow:hover{
     margin-bottom: 2px;
 }
 /****************************************************************/
-.curd-table thead.ant-table-thead{
+.table-color-them .curd-table thead.ant-table-thead{
     background: linear-gradient(to right, #f6f0ff, #dde0ff 18%, #f7f9ff);
 }
-.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
-.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .ant-table-filter-icon,
-.curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .anticon-filter{
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.table-color-them .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.table-color-them .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-has-actions.ant-table-column-has-sorters:hover,
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .ant-table-filter-icon,
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-column-has-actions.ant-table-column-has-sorters:hover .anticon-filter{
     background: linear-gradient(to right, rgba(255,255,255,.08), #cddfff);
 }
-.curd-table .ant-table-thead>tr>th.ant-table-column-sort,
-.curd-table .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-sort,
-.curd-table .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-sort{
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-column-sort,
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-cell-fix-left.ant-table-column-sort,
+.table-color-them .curd-table .ant-table-thead>tr>th.ant-table-cell-fix-right.ant-table-column-sort{
     background: linear-gradient(to right, #a7c1ff, #d2e2ff);
 }
-.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner{
+.table-color-them .curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner{
     color: #a8a8a8;
 }
-.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-down.on,
-.curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-up.on{
+.table-color-them .curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-down.on,
+.table-color-them .curd-table .ant-table-thead>tr>th .ant-table-column-sorter .ant-table-column-sorter-inner .ant-table-column-sorter-up.on{
     color: #2f54eb;
 }
-.curd-table .ant-table-thead>tr>th{
+.table-color-them .curd-table .ant-table-thead>tr>th{
     background-color: transparent;
     font-weight: 600;
 }
-.curd-table .ant-table-bordered .ant-table-thead>tr>th{
+.table-color-them .curd-table .ant-table-bordered .ant-table-thead>tr>th{
     border-bottom-color: #cfd7f1;
 }
-.curd-table .ant-table-bordered .ant-table-body>table,
-.curd-table .ant-table-bordered .ant-table-fixed-left table,
-.curd-table .ant-table-bordered .ant-table-fixed-right table,
-.curd-table .ant-table-bordered .ant-table-header>table{
+.table-color-them .curd-table .ant-table-bordered .ant-table-body>table,
+.table-color-them .curd-table .ant-table-bordered .ant-table-fixed-left table,
+.table-color-them .curd-table .ant-table-bordered .ant-table-fixed-right table,
+.table-color-them .curd-table .ant-table-bordered .ant-table-header>table{
     border-color: #cfd7f1;
     border-left: 0;
     border-collapse:collapse;
 }
-.curd-table .ant-table-ping-left .ant-table-tbody>tr>td.ant-table-cell-fix-left,
-.curd-table .ant-table-ping-right .ant-table-tbody>tr>td.ant-table-cell-fix-right{
+.table-color-them .curd-table .ant-table-ping-left .ant-table-tbody>tr>td.ant-table-cell-fix-left,
+.table-color-them .curd-table .ant-table-ping-right .ant-table-tbody>tr>td.ant-table-cell-fix-right{
     border-left: 0;
     border-right: 0;
 }
-.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left,
-.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
+.table-color-them .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left,
+.table-color-them .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right{
     background: #e4edff;
     border-left: 0;
     border-right: 0;
 }
-.curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left+th.ant-table-cell-fix-left:before,
-.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right+th.ant-table-cell-fix-right:before{
+.table-color-them .curd-table .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left+th.ant-table-cell-fix-left:before,
+.table-color-them .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right+th.ant-table-cell-fix-right:before{
     bottom: -1px;
     content: "";
     left: 0;
@@ -1036,20 +1036,21 @@ a.red:hover,a.yellow:hover{
     width: 1px;
     background-color: #cfd7f1;
 }
-.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,.ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
+.table-color-them .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:first-child,
+.table-color-them .ant-table-ping-left .ant-table-thead>tr>th.ant-table-cell-fix-left:first-child{
     background: linear-gradient(to right, #f4f0ff,#d6e4ff);
 }
-.curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
+.table-color-them .curd-table .ant-table-ping-right .ant-table-thead>tr>th.ant-table-cell-fix-right:last-child{
     background: linear-gradient(to right, #e4edff, #f7f9ff);
 }
-.curd-table .ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
+.table-color-them .curd-table .ant-table-bordered .ant-table-thead>tr:not(:last-child)>th {
     border-bottom: 1px solid #cfd7f1
 }
-.curd-table .ant-table-bordered .ant-table-thead>tr>th {
+.table-color-them .curd-table .ant-table-bordered .ant-table-thead>tr>th {
     border-right: 1px solid #cfd7f1;
     border-left: 1px solid #cfd7f1;
 }
-.curd-table .ant-table-bordered .ant-table-thead>tr{
+.table-color-them .curd-table .ant-table-bordered .ant-table-thead>tr{
     border-left: 1px solid #cfd7f1;
 }
 /****************************************************************/

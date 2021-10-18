@@ -111,6 +111,7 @@
             :field-step-config="fieldStepConfig"
             :action-width="actionWidth"
             :action-def-width="actionDefWidth"
+            :class="{'table-color-them':tableThemIsColor}"
             @refresh-table="refreshTable"
             @change="handleTableChange"
             @open-show="openShow"

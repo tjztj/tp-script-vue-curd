@@ -120,6 +120,7 @@ trait CurdChild{
             'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseInfo->id])->build(),
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseInfo->id])->build(),
             'title'=>static::getTitle(),
+            'tableThemIsColor'=>tableThemIsColor(),
             'canDel'=>true,
             'auth'=>[
                 'add'=>true,

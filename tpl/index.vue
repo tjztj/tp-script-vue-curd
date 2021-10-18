@@ -130,6 +130,7 @@
                 :row-selection="canDel?rowSelection:null"
                 :field-step-config="fieldStepConfig"
                 :action-def-width="actionDefWidth"
+                :class="{'table-color-them':tableThemIsColor}"
                 @refresh-table="refreshTable"
                 @change="handleTableChange"
                 @on-delete="deleteRow"
