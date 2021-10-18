@@ -156,8 +156,13 @@ class RegionField extends ModelField
                 $val = $data[$name];
                 is_array($val)||$val=explode(',',$val);
                 if(count($val)===1){
-                    $this->save = current($val);
-                    $this->checkValIsCheckParentErr($this->save);
+                    if(empty(current($val))){
+                        $this->save = $this->nullVal();
+                    }else{
+                        $this->save = current($val);
+                        $this->checkValIsCheckParentErr($this->save);
+                    }
+
                 }else{
                     $regions=$this->getAboutRegions();
                     foreach ($regions as $k=>$v){
