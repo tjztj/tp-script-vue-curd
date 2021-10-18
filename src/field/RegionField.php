@@ -204,14 +204,14 @@ class RegionField extends ModelField
             }
 
             if(!$this->multiple){
-                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??self::getRegionName($dataBaseData[$name]);
+                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??$this->getRegionName($dataBaseData[$name]);
                 return;
             }
 
             $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
 
             foreach ($arr as $k=>$v){
-                $arr[$k]=self::getRegionName($v)?:$v;
+                $arr[$k]=$this->getRegionName($v)?:$v;
             }
             $dataBaseData[$name]=implode('，',$arr);
         }
@@ -286,6 +286,18 @@ class RegionField extends ModelField
             }
         }
         return $regions[$region_name] ?? null;
+    }
+
+
+    public function getRegionName(int $id):string{
+        static $regionNames=null;
+        if(is_null($regionNames)){
+            $regionNames=[];
+            foreach (SystemRegion::getAll() as $v){
+                $regionNames[$v['id']]=$v['name'];
+            }
+        }
+        return $regionNames[$id]??'';
     }
 
 
