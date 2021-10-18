@@ -124,11 +124,12 @@ class RegionField extends ModelField
     }
 
 
-
     /**
      * 设置保存的值
      * @param array $data 数据值集合
+     * @param BaseModel $old
      * @return $this
+     * @throws \think\Exception
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {
@@ -161,7 +162,7 @@ class RegionField extends ModelField
                     $regionNames=[];
                     $regions=$this->getAboutRegions();
                     foreach ($regions as $k=>$v){
-                        $data[$v->name()]=$val[count($val)-count($regions)+$k];
+                        $data[$v->name()]=$val[count($val)-count($regions)+$k]??0;
                         $v->save= $data[$v->name()];
                     }
                     if(!isset($this->save)||empty($this->save)){
@@ -222,7 +223,7 @@ class RegionField extends ModelField
      * 获取当前选项的列表
      * @return array
      */
-    public function getTreeToList(){
+    public function getTreeToList():array{
         static $list=[];
         $func=function($tree,$pid=null)use(&$list,&$func){
             foreach ($tree as $v){
@@ -239,7 +240,7 @@ class RegionField extends ModelField
         if(!isset($list[$this->guid()])){
             $func($this->regionTree);
         }
-        return $list[$this->guid()];
+        return $list[$this->guid()]??[];
     }
 
 
