@@ -175,6 +175,7 @@ define(['vueAdmin'], function (va) {
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
+                    tableThemIsColor:vueData.tableThemIsColor,
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
                     //其他配置

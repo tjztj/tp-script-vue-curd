@@ -159,7 +159,7 @@
             </div>
         </div>
     </div>
-    <div class="curd-table-box">
+    <div :class="{'curd-table-box':true,'table-color-them':tableThemIsColor}">
         <curd-table :data="data"
                     :pagination="pagination"
                     :loading="loading"

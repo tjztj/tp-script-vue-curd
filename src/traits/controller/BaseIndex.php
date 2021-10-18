@@ -160,6 +160,7 @@ trait BaseIndex
             'filter_data'=>$filterData?:null,
             'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
+            'tableThemIsColor'=>tableThemIsColor(),
             'cWindow'=>$this->request->param('c_window/a'),
             'childTpl'=>$this->request->param('child_tpl/d',0),
             'canEdit'=>$showTableTool,
