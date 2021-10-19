@@ -490,6 +490,7 @@ class RegionField extends ModelField
                 $v->is_to_arr_do=true;
                 $v->objWellToArr=false;
                 $aboutRegions[]=$v->toArray();
+                $v->is_to_arr_do=false;
 
             }
         }

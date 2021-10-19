@@ -199,7 +199,7 @@ trait Excel
         static $baseIds=[];
 
         //父表字段的值一样将会视作同一条父数据
-        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->getParentController()->md,true)->getSave());
+        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->md,true)->getSave());
         if(!isset($baseIds[$baseIdsKey])){
             $parentInfo=$this->myExcelSave($mainData);
             $baseIds[$baseIdsKey]=$parentInfo->id;
@@ -378,9 +378,26 @@ trait Excel
     private function getTHeadExpFields():array{
         $expFields = [];
         $this->getExcelFields()->each(function(ModelField $v)use(&$expFields){
-            if(!$v->editShow()||!$v->canExcelImport()){
-                return ;
+            if(!$v->canExcelImport()){
+                return;
             }
+
+            if(!$v->editShow()){
+                if(!$v instanceof RegionField){
+                    return;
+                }
+                $hasShow=false;
+                foreach ($v->getAboutRegions() as $val){
+                    if($val->editShow()){
+                        $hasShow=true;
+                        break;
+                    }
+                }
+                if(!$hasShow){
+                    return;
+                }
+            }
+
             $excelFieldTpl=new ExcelFieldTpl($v->name(),$v->title());
             $v->excelTplExplain($excelFieldTpl);
             $ext=$v->ext();

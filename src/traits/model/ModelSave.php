@@ -93,7 +93,7 @@ trait ModelSave
         if($parentInfo){
             $data[static::parentField()]=$parentInfo->id;
             $allFields=static::getTableFields();
-            $this->fields()->each(function (ModelField $v)use($allFields,&$data){
+            $this->fields()->each(function (ModelField $v)use($allFields,$parentInfo,&$data){
                 if($v instanceof RegionField&&isset($parentInfo[$v->name()])&&in_array($v->name(),$allFields,true)){
                     $data[$v->name()]=$parentInfo[$v->name()];
                 }
