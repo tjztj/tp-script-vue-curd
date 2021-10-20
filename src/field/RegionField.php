@@ -133,7 +133,7 @@ class RegionField extends ModelField
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {
-        if(!$this->canEdit()){
+        if(!empty($old->id)&&!$this->canEdit()){
             return $this;
         }
         if($this->multiple){
@@ -345,12 +345,24 @@ class RegionField extends ModelField
     public function excelSaveDoData(array &$save): void
     {
         $regions=$this->getAboutRegions();
+        $parentPer='PARENT|';
+        foreach ($regions as $v){
+            if(strpos($v->name(),$parentPer)===0){
+                $realNm=substr($v->name(),strlen($parentPer));
+                if(isset($save[$realNm])){
+                    $save[$v->name()]=&$save[$realNm];
+                }else{
+                    $save[$realNm]=&$save[$v->name()];
+                }
+            }
+        }
+
+
         if(!isset($save[$this->name()])){
             return;
         }
         if (!is_numeric($save[$this->name()])) {
             $titles=[];
-
             foreach ($regions as $v){
                 if(!isset($save[$v->name()])){
                     throw new \think\Exception('缺少'.$v->title());
@@ -383,13 +395,19 @@ class RegionField extends ModelField
             $ids=explode(',',$info['pids']);
             $ids[]=$info['id'];
 
-            $idsI=count($ids)-count($regions);
+
+            $parentRegions=[];
             foreach ($regions as $v){
-                if(!isset($save[$v->name()])||(int)$save[$v->name()]!==(int)$ids[$idsI]){
-                    throw new \think\Exception('地区值不正确（'.$v->title().':'.$save[$v->name()].'）');
-                }
+                $parentRegions[]=$v;
                 if($v->guid()===$this->guid()){
                     break;
+                }
+            }
+
+            $idsI=count($ids)-count($parentRegions);
+            foreach ($parentRegions as $v){
+                if(!isset($save[$v->name()])||(int)$save[$v->name()]!==(int)$ids[$idsI]){
+                    throw new \think\Exception('地区值不正确（'.$v->title().':'.$save[$v->name()].'）');
                 }
                 $idsI++;
             }
