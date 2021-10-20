@@ -139,7 +139,7 @@ class ImagesField extends ModelField
         if(!isset($save[$name])){
             return;
         }
-        $save[$name]=empty($save[$name])?'':implode('|',array_map(fn($vo)=>str_replace(public_path(), request()->domain().DIRECTORY_SEPARATOR, $vo),$save[$name]));
+        $save[$name]=empty($save[$name])?'':implode('|',array_map(static fn($vo)=>str_replace([public_path(),DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR], DIRECTORY_SEPARATOR, $vo),$save[$name]));
     }
 
     public static function componentUrl(): FieldTpl
