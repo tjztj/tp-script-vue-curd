@@ -133,6 +133,9 @@ class RegionField extends ModelField
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {
+        if(!$this->canEdit()){
+            return $this;
+        }
         if($this->multiple){
             $name = $this->name();
             if (isset($data[$name])) {
@@ -156,13 +159,17 @@ class RegionField extends ModelField
                 $val = $data[$name];
                 is_array($val)||$val=explode(',',$val);
                 if(count($val)===1){
-                    if(empty(current($val))){
+                    $saveVal=current($val);
+                    if(empty($saveVal)){
                         $this->save = $this->nullVal();
                     }else{
-                        $this->save = current($val);
-                        $this->checkValIsCheckParentErr($this->save);
+                        if(is_numeric($saveVal)){
+                            $this->save = $saveVal;
+                            $this->checkValIsCheckParentErr($this->save);
+                        }else{
+                            $this->setRegionValsByRegionNames($data);
+                        }
                     }
-
                 }else{
                     $regions=$this->getAboutRegions();
                     foreach ($regions as $k=>$v){
@@ -341,9 +348,9 @@ class RegionField extends ModelField
         if(!isset($save[$this->name()])){
             return;
         }
-
         if (!is_numeric($save[$this->name()])) {
             $titles=[];
+
             foreach ($regions as $v){
                 if(!isset($save[$v->name()])){
                     throw new \think\Exception('缺少'.$v->title());
@@ -351,6 +358,7 @@ class RegionField extends ModelField
                 $titles[]=$save[$v->name()];
             }
             $lastRegionInfo= $this->getRegionByName(implode('-',$titles));
+
             if(empty($lastRegionInfo)){
                 throw new \think\Exception('未找到相关地区[ '.implode('-',$titles).' ]');
             }
@@ -391,6 +399,7 @@ class RegionField extends ModelField
 
     /**
      * 获取所有的父地区-自己-子地区
+     * @param string $thisIsParent  child|parent
      * @return self[]|RegionField[]
      */
     public function getAboutRegions(string $thisIsParent=''){
@@ -404,8 +413,7 @@ class RegionField extends ModelField
                     $ps[]=$field->parentField();
                 }
                 if($thisIsParent!=='child'&&$field->childField()){
-                    $cs=$getRegions($field->childField(),'parent');
-                    $cs[]=$field->childField();
+                    $cs=[$field->childField(),...$getRegions($field->childField(),'parent')];
                 }
                 return [
                     ... $ps,
@@ -439,6 +447,31 @@ class RegionField extends ModelField
             $option->setTypeText();
         }else{
             $option->setTypeInt();
+        }
+    }
+
+
+    private function setRegionValsByRegionNames(array &$save):void{
+        $regions=$this->getAboutRegions();
+        $titles=[];
+        foreach ($regions as $v){
+            if(!isset($save[$v->name()])){
+                throw new \think\Exception('缺少'.$v->title());
+            }
+            $titles[]=is_numeric($save[$v->name()])?$this->getRegionName($save[$v->name()]):$save[$v->name()];
+        }
+        $lastRegionInfo= $this->getRegionByName(implode('-',$titles));
+
+        if(empty($lastRegionInfo)){
+            throw new \think\Exception('未找到相关地区[ '.implode('-',$titles).' ]');
+        }
+        $ids=explode(',',$lastRegionInfo['pids']);
+        $ids[]=$lastRegionInfo['id'];
+
+        $idsI=count($ids)-count($regions);
+        foreach ($regions as $v){
+            $save[$v->name()]=$ids[$idsI];
+            $idsI++;
         }
     }
 
