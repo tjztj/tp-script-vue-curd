@@ -163,11 +163,11 @@ class TreeSelect extends ModelField
         $values=[];
         foreach ($list as $v){
             $keys=[];
-            foreach ($v['parents'] as $v){
-                if(!isset($list[$v])){
+            foreach ($v['parents'] as $val){
+                if(!isset($list[$val])){
                     continue;
                 }
-                $keys[]=$list[$v]['title'];
+                $keys[]=$list[$val]['title'];
             }
             $keys[]=$v['title'];
             $values[implode('-',$keys)]=$v['value'];
