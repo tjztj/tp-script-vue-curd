@@ -124,7 +124,7 @@ class ImagesField extends ModelField
      * @return void
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
-        $excelFieldTpl->explain="插入相关图片，可插入多张；\n请将插入的图片缩小到单元格内；\n竖向合并单元格的行将共用图片；\n Excel中请设置不压缩文件中的图像\n或取消保存时自动执行基本压缩；";
+        $excelFieldTpl->explain="插入相关图片，可插入多张；\n请将插入的图片缩小到单元格内；\n竖向合并单元格的行将共用图片；\n必看！！".url('index/imgExplain',[],true,true)->build().'；';
         $excelFieldTpl->wrapText=true;
         $excelFieldTpl->width=42;
     }
