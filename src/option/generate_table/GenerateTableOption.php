@@ -112,6 +112,9 @@ class GenerateTableOption extends Collection
        //重新设置字段
         $this->items = $this->convertToArray($this->generateItems());
 
+       if(empty($model->controller)){
+           return '';
+       }
 
         $controll=$model->controller;
         if($controll->getParentController()){
