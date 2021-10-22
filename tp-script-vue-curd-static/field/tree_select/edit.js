@@ -124,7 +124,7 @@ define([],function(){
   :label-in-value="true"
   :tree-checkable="field.multiple"
   :tree-check-strictly="field.multiple&&field.treeCheckStrictly"
-  show-checked-strategy="SHOW_ALL"
+  :show-checked-strategy="field.showCheckedStrategy"
   :filter-tree-node="filterTreeNode"
  >
  
