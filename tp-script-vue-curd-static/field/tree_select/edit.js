@@ -1,11 +1,12 @@
 define([],function(){
-    const valTitles={};
+    const infos={};
     return {
         props:['field','value','validateStatus','form','info'],
         data(){
-          return {
-              val:undefined,
-          }
+            return {
+                val:undefined,
+                treeExpandedKeys:[],
+            }
         },
         mounted(){
             this.$nextTick(e=>{
@@ -13,17 +14,18 @@ define([],function(){
                     if(this.value!==''){
                         this.val={
                             value:this.value.toString(),
-                            label:valTitles[this.value.toString()]
+                            label:infos[this.value.toString()]?infos[this.value.toString()].title:'',
                         };
                     }
                 }else{
                     const arr=typeof this.value==='string'?this.value.split(','):this.value;
                     const vals=[];
+
                     arr.forEach(v=>{
                         if(v.toString()!==''){
                             vals.push({
                                 value:v.toString(),
-                                label:valTitles[v.toString()]
+                                label:infos[v.toString()]?infos[v.toString()].title:'',
                             })
                         }
                     })
@@ -34,9 +36,9 @@ define([],function(){
         },
         computed:{
             treeData(){
-                 const doTreeItem=(arr)=>{
+                const doTreeItem=(arr)=>{
                     arr.map(item=>{
-                        valTitles[item.value]=item.title;
+                        infos[item.value]=item;
                         if(item.children){
                             item.selectable=this.field.canCheckParent;
                             item.disableCheckbox=!this.field.canCheckParent;
@@ -67,6 +69,9 @@ define([],function(){
                     }else if(val&&typeof val.value!=='undefined'){
                         value=val.value;
                     }
+                    setTimeout(v=>{
+                        this.setExpandedKeys(value);
+                    },300)
                     this.$emit('update:value',value);
                 },
                 deep:true
@@ -79,12 +84,35 @@ define([],function(){
                     return true;
                 }
                 return treeNode.props.title.indexOf(inputValue)!==-1;
+            },
+            setExpandedKeys(val){
+                function setExpanded(val,arr){
+                    val=val.toString();
+                    arr=arr||[];
+                    if(!infos[val]){
+                        return;
+                    }
+                    if(infos[infos[val].pvalue]&&!arr.includes(infos[val].pvalue)){
+                        arr.push(infos[val].pvalue);
+                        setExpanded(infos[val].pvalue,arr);
+                    }
+                }
+                if(val){
+                    const treeExpandedKeys=[];
+                    val.split(',').forEach(v=>{
+                        setExpanded(v,treeExpandedKeys);
+                    })
+                    this.treeExpandedKeys=treeExpandedKeys;
+                }else{
+                    this.treeExpandedKeys=[];
+                }
             }
         },
         template:`<div class="field-box">
  <div class="l">
  <a-tree-select
  v-model:value="val"
+ v-model:tree-expanded-keys="treeExpandedKeys"
  :tree-data="treeData"
  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
  :placeholder="field.placeholder||'请选择'+field.title"
