@@ -114,12 +114,10 @@ class FieldDo
             });
         });
         //另外再遍历，为了方便前面那个遍历后得到的东西在下面使用
-        $list->each(static function(VueCurlModel $row)use($field,$base,$list){
-            $field->each(static function(ModelField $field)use($base,$row,$list){
-                foreach ($field->getFieldDoList() as $fieldDo){
-                    $fieldDo->doIndexListDo($list,$row,$base,$field);
-                }
-            });
+        $field->each(static function(ModelField $field)use($base,$list){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doIndexListDo($list,$base,$field);
+            }
         });
     }
 
@@ -132,10 +130,10 @@ class FieldDo
         $this->indexListDo=$func;
         return $this;
     }
-    public function doIndexListDo(Collection $list,VueCurlModel $row,?BaseModel $base,ModelField $field): self
+    public function doIndexListDo(Collection $list,?BaseModel $base,ModelField $field): self
     {
         $func=$this->indexListDo?? static function(){};
-        $func($list,$row,$base,$field);
+        $func($list,$base,$field);
         return $this;
     }
 
