@@ -264,9 +264,20 @@ class RegionField extends ModelField
      */
     private function getRegionByName(string $region_name): ?array
     {
-        static $regions = null;
-        if (is_null($regions)) {
-            $level=count($this->getAboutRegions());
+        return self::regionNameInfos()[$region_name] ?? null;
+    }
+
+
+    private function regionNameInfos(){
+        static $regions = [];
+        $keys=[];
+        $aboutRegions=$this->getAboutRegions();
+        foreach ($aboutRegions as $v){
+            $keys[]=$v->name();
+        }
+        $static_key=$this->guid().'-'.implode('-',$keys);
+        if(!isset($regions[$static_key])){
+            $level=count($aboutRegions);
 
             $childs=[];
             $infos=[];
@@ -276,16 +287,16 @@ class RegionField extends ModelField
                 $infos[$v['id']]=$v;
             }
 
-            $regions=[];
+            $regions[$static_key]=[];
             if($level>1){
-                $titles=function ($info,$lv,$titleArr)use($level,$childs,&$titles,&$regions){
+                $titles=function ($info,$lv,$titleArr)use($level,$childs,&$titles,&$regions,$static_key){
                     $titleArr[]=$info['name'];
                     if($level>$lv&&isset($childs[$info['id']])){
                         foreach ($childs[$info['id']] as $val){
                             $titles($val,$lv+1,$titleArr);
                         }
                     }elseif($level===$lv){
-                        $regions[implode('-',$titleArr)]=$info;
+                        $regions[$static_key][implode('-',$titleArr)]=$info;
                     }
                 };
                 foreach ($childs as $k=>$v){
@@ -293,11 +304,12 @@ class RegionField extends ModelField
                 }
             }else{
                 foreach (SystemRegion::getAll() as $v) {
-                    $regions[$v['name']]=$v;
+                    $regions[$static_key][$v['name']]=$v;
                 }
             }
         }
-        return $regions[$region_name] ?? null;
+
+        return $regions[$static_key];
     }
 
 
@@ -346,7 +358,8 @@ class RegionField extends ModelField
     {
         $regions=$this->getAboutRegions();
         $parentPer='PARENT|';
-        foreach ($regions as $v){
+        $notCanImportLevels=[];
+        foreach ($regions as $k=>$v){
             if(strpos($v->name(),$parentPer)===0){
                 $realNm=substr($v->name(),strlen($parentPer));
                 if(isset($save[$realNm])){
@@ -355,7 +368,29 @@ class RegionField extends ModelField
                     $save[$realNm]=&$save[$v->name()];
                 }
             }
+            if($v->canExcelImport()===false){
+                $notCanImportLevels[]=(int)$k;
+            }
         }
+
+        if($notCanImportLevels){
+            $regionInfosByName=[];
+            foreach (self::regionNameInfos() as $k=>$v){
+                $keys=[];
+                foreach (explode('-',$k) as $key=>$val){
+                    if(in_array($key,$notCanImportLevels,true)){
+                        $keys[]='';
+                    }else{
+                        $keys[]=$val;
+                    }
+                }
+                $regionInfosByName[implode('-',$keys)]=$v;
+            }
+        }else{
+            $regionInfosByName= self::regionNameInfos();
+        }
+
+
 
 
         if(!isset($save[$this->name()])){
@@ -365,11 +400,15 @@ class RegionField extends ModelField
             $titles=[];
             foreach ($regions as $v){
                 if(!isset($save[$v->name()])){
-                    throw new \think\Exception('缺少'.$v->title());
+                    if($v->canExcelImport()===false){
+                        $save[$v->name()]='';
+                    }else{
+                        throw new \think\Exception('缺少'.$v->title());
+                    }
                 }
                 $titles[]=$save[$v->name()];
             }
-            $lastRegionInfo= $this->getRegionByName(implode('-',$titles));
+            $lastRegionInfo= $regionInfosByName[implode('-',$titles)]??null;
 
             if(empty($lastRegionInfo)){
                 throw new \think\Exception('未找到相关地区[ '.implode('-',$titles).' ]');
