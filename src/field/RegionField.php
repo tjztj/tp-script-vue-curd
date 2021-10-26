@@ -343,7 +343,7 @@ class RegionField extends ModelField
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
     {
-        $excelFieldTpl->explain = "填入：地区名称,需和\n" . url('index/showRegionPage', [], true, true)->build() . "\n中的名称对应";
+        $excelFieldTpl->explain = "填入：地区名称";
         $excelFieldTpl->width = 40;
         $excelFieldTpl->wrapText = true;
     }
