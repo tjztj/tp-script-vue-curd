@@ -112,6 +112,9 @@ class CheckboxField extends ModelField
         if(!isset($save[$name])){
             return;
         }
+        if(trim($save[$name])===''&&$this->required()===false){
+            return;
+        }
         $arr=explode("\n",$save[$name]);
         $values=$this->getItemsTextValues();
         foreach ($arr as $k=>$v){

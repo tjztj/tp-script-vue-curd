@@ -113,6 +113,9 @@ class RadioField extends ModelField
         if(!isset($save[$name])){
             return;
         }
+        if(trim($save[$name])===''&&$this->required()===false){
+            return;
+        }
         $values=$this->getItemsTextValues();
 
         if(!isset($values[$save[$name]])){
