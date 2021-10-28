@@ -78,6 +78,7 @@
         <div class="ant-pro-table-list-toolbar-container">
             <div class="ant-pro-table-list-toolbar-left">
                 {block name="toolTitleLeft"}{/block}
+                {block name="toolTitleMid"}
                 {if $childTpl}
                 <div class="childTitle">详细列表</div>
                 {else/}
@@ -102,6 +103,7 @@
                         </div>
                     </a-popconfirm>
                 </template>
+                {/block}
                 {block name="toolTitleRight"}{/block}
             </div>
             <div class="ant-pro-table-list-toolbar-right">
