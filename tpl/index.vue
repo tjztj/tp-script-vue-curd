@@ -84,7 +84,7 @@
                 {else/}
                 <div class="ant-pro-table-list-toolbar-title">{$title}</div>
                 {/if}
-
+                {/block}
 
                 <template v-if="canDel&&delSelectedIds.length>0">
                     <div class="ant-space-item">
@@ -103,7 +103,6 @@
                         </div>
                     </a-popconfirm>
                 </template>
-                {/block}
                 {block name="toolTitleRight"}{/block}
             </div>
             <div class="ant-pro-table-list-toolbar-right">
