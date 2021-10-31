@@ -151,6 +151,25 @@ class TreeSelect extends ModelField
         if($this->multiple()){
             $excelFieldTpl->explain.='多个用“|”分隔';
         }
+
+
+
+        if(!isset($this->lists)){
+            //为了防止导入的时候占用太多内存
+            $this->lists=self::treeToList($this->items(),'value','children');
+        }
+        foreach ($this->lists as $v){
+            $keys=[];
+            foreach ($v['parents'] as $val){
+                if(!isset($this->lists[$val])){
+                    continue;
+                }
+                $keys[]=$this->lists[$val]['title'];
+            }
+            $keys[]=$v['title'];
+            $excelFieldTpl->explain.="\n". implode('-',$keys);
+        }
+
     }
 
     public function excelSaveDoData(array &$save): void
@@ -169,7 +188,7 @@ class TreeSelect extends ModelField
             $this->lists=self::treeToList($this->items(),'value','children');
         }
         $list=$this->lists;
-        $values=[];
+        $items=[];
         foreach ($list as $v){
             $keys=[];
             foreach ($v['parents'] as $val){
@@ -179,8 +198,9 @@ class TreeSelect extends ModelField
                 $keys[]=$list[$val]['title'];
             }
             $keys[]=$v['title'];
-            $values[implode('-',$keys)]=$v['value'];
+            $items[implode('-',$keys)]=$v['value'];
         }
+
 
         $newValues=[];
         foreach ($values as $v){
@@ -188,10 +208,10 @@ class TreeSelect extends ModelField
             if($v===''){
                 continue;
             }
-            if(!isset($values[$v])){
+            if(!isset($items[$v])){
                 throw new \think\Exception('未找到可选值'.$v);
             }
-            $newValues[]=$values[$v];
+            $newValues[]=$items[$v];
         }
         $save[$this->name()]=implode(',',$newValues);
     }
