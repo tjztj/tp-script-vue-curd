@@ -219,10 +219,10 @@ class GenerateTableOption extends Collection
 
 
             $sql="CREATE TABLE `$tableName`  ( `id` int NOT NULL AUTO_INCREMENT, \n ".implode(" ,\n ",$cols).", \n 
-  `create_time` int(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
+  `create_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
   `create_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
-  `update_time` int(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
-  `delete_time` int(10) NOT NULL DEFAULT 0 COMMENT '删除时间',
+  `update_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
+  `delete_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '删除时间',
   `delete_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
   `update_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
   PRIMARY KEY (`id`)

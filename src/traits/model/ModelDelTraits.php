@@ -4,6 +4,8 @@
 namespace tpScriptVueCurd\traits\model;
 
 
+use think\facade\Db;
+use think\Model;
 use think\model\Collection;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
@@ -91,7 +93,28 @@ trait ModelDelTraits
         $list=$this->where('id','in',array_unique($ids))->select();
         $this->delCheckRowAuth($list,$ids);
         $this->onDelBefore($list);
-        foreach ($list as $result){$result->delete();}
+
+        $modelFields=[];
+        $modelIds=[];
+        $user=tpScriptVueCurdGetLoginData();
+        foreach ($list as $result){
+            /**
+             * @var $result Model
+             */
+            //设置当前删除人
+            if($user&&!empty($user['id'])){
+                $class=get_class($result);
+                isset($modelFields[$class])||$modelFields[$class]=$result->getFields();
+                if(isset($modelFields[$class]['delete_system_admin_id'])){
+                    isset($modelIds[$class])||$modelIds[$class]=[];
+                    $modelIds[$class][]=$result->id;
+                }
+            }
+            $result->delete();
+        }
+        foreach ($modelIds as $md=>$mdIds){
+            Db::name(class_basename($md))->whereIn('id',$mdIds)->update(['delete_system_admin_id'=>$user['id']]);
+        }
         $this->onDelAfter($list);
         return $list;
     }

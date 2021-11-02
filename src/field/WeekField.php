@@ -136,6 +136,6 @@ class WeekField extends ModelField
      * @return void
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
-        $option->setTypeInt(10);
+        $option->setTypeBigInt(10);
     }
 }
