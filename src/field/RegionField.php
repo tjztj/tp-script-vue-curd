@@ -173,10 +173,26 @@ class RegionField extends ModelField
                 }else{
                     $regions=$this->getAboutRegions();
                     foreach ($regions as $k=>$v){
-                        $data[$v->name()]=$val[count($val)-count($regions)+$k]??0;
+                        $key=count($val)-count($regions)+$k;
+                        $keyVals=[];
+                        if($key<0&&!isset($val[$key])){
+                            $info=$this->getRegionInfoById($val[0]);
+                            if(is_null($info)){
+                                $keyVals[$key]=0;
+                            }else{
+                                $pids=explode(',',$info['pids']);
+                                $keyVals[$key]=0;
+                                for($n=count($pids)-1;$n>=0;$n--){
+                                    $keyVals[$key-$n]=$pids[count($pids)-$n-1];
+                                }
+                            }
+                        }
+                        $data[$v->name()]=$val[$key]??$keyVals[$key]??0;
                         $v->save= $data[$v->name()];
                     }
+
                     if(!isset($this->save)||empty($this->save)){
+                        dd($val);
                         $this->save = $this->nullVal();
                     }
                     $this->checkValIsCheckParentErr($this->save);
@@ -267,6 +283,16 @@ class RegionField extends ModelField
         return self::regionNameInfos()[$region_name] ?? null;
     }
 
+
+    private function getRegionInfoById(int $id):?array{
+        static $infos=null;
+        if($infos===null){
+            foreach (SystemRegion::getAll() as $v){
+                $infos[$v['id']]=$v;
+            }
+        }
+        return $infos[$id]??null;
+    }
 
     private function regionNameInfos(){
         static $regions = [];

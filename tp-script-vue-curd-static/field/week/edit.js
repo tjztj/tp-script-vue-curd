@@ -4,12 +4,19 @@ define([],function(){
         computed:{
             val:{
                 get(){
+                    if(this.value===0||this.value==='0'){
+                        return '';
+                    }
                     if(/^\d+$/g.test(this.value.toString())){
                         return parseTime(this.value,'{y}-{m}-{d}');
                     }
                     return this.value
                 },
                 set(val){
+                    if(val===null){
+                        this.$emit('update:value', '');
+                        return;
+                    }
                     this.$emit('update:value', val);
                 }
             }

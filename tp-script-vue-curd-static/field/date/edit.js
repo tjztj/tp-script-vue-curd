@@ -4,6 +4,9 @@ define([], function () {
         computed: {
             dateDefaultValue: {
                 get() {
+                    if(this.value===0||this.value==='0'){
+                        return '';
+                    }
                     if (!this.value) {
                         this.$emit('update:value', '');
                         return null;
@@ -19,6 +22,10 @@ define([], function () {
                     return moment(val);
                 },
                 set(val) {
+                    if(val===null){
+                        this.$emit('update:value', '');
+                        return;
+                    }
                     this.$emit('update:value', val.format(this.field.showTime ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD'));
                 },
             },
