@@ -122,8 +122,11 @@ trait Excel
         $option->base=$this->excelBaseInfo;
         $this->importBefore($option);
 
+        /**
+         * @var BaseModel $model
+         */
         $model=new $modelClassName;
-        $info=$model->addInfo($option->saveArr,null,$this->myExcelFields(),true);
+        $info=$model->addInfo($option->saveArr, $option->base,$this->myExcelFields(),true);
 
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;
