@@ -130,6 +130,14 @@ define(['vueAdmin'], function (va) {
 
 
     actions.index=function(){
+        const fieldObjs={};
+        for(let i in vueData.groupGroupColumns){
+            vueData.groupGroupColumns[i].forEach(v=>{
+                fieldObjs[v.name]=v;
+            })
+        }
+
+
 
         const infos={};
         return {
@@ -178,6 +186,7 @@ define(['vueAdmin'], function (va) {
                     tableThemIsColor:vueData.tableThemIsColor,
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
+                    showCreateTime:fieldObjs.create_time?fieldObjs.create_time.listShow:true,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
