@@ -75,4 +75,17 @@ trait ColumnGetterSetter
     {
         $this->comment = $comment;
     }
+
+
+    /**
+     * 是否要设置编码
+     * @param bool $chart
+     */
+    public function setChart(bool $chart):void{
+        $this->chart=$chart?'CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci':'';
+    }
+
+    public function getChart():string{
+        return $this->chart;
+    }
 }

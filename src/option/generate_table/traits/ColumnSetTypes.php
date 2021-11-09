@@ -23,6 +23,7 @@ trait ColumnSetTypes
         if (!is_null($default)) {
             $this->default = $default;
         }
+        $this->setChart(false);
         return $this;
     }
 
@@ -41,6 +42,7 @@ trait ColumnSetTypes
         if (!is_null($default)) {
             $this->default = $default;
         }
+        $this->setChart(false);
         return $this;
     }
 
@@ -59,6 +61,7 @@ trait ColumnSetTypes
         if (!is_null($default)) {
             $this->default = $default;
         }
+        $this->setChart(true);
         return $this;
     }
 
@@ -79,6 +82,7 @@ trait ColumnSetTypes
         if (!is_null($default)) {
             $this->default = $default;
         }
+        $this->setChart(false);
         return $this;
     }
 
@@ -100,6 +104,7 @@ trait ColumnSetTypes
         if (!is_null($default)) {
             $this->default = $default;
         }
+        $this->setChart(false);
         return $this;
     }
 
@@ -112,6 +117,7 @@ trait ColumnSetTypes
     {
         $this->type = 'text';
         $this->length = null;
+        $this->setChart(true);
         return $this;
     }
 
@@ -123,6 +129,7 @@ trait ColumnSetTypes
     {
         $this->type = 'longtext';
         $this->length = null;
+        $this->setChart(true);
         return $this;
     }
 
@@ -134,6 +141,7 @@ trait ColumnSetTypes
     {
         $this->type = 'json';
         $this->length = null;
+        $this->setChart(false);
         return $this;
     }
 }

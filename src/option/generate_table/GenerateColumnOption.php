@@ -39,6 +39,11 @@ class GenerateColumnOption
      */
     protected string $comment = '';
 
+    /**
+     * @var string 编码
+     */
+    protected string $chart='';
+
 
     public function __construct(string $name)
     {
@@ -98,7 +103,7 @@ class GenerateColumnOption
             $type.=' COLUMN ';
         }
 
-        return $type."`$this->name` ".$this->getTypeStr()." NOT NULL $default COMMENT '$comment' $beforeField";
+        return $type."`$this->name` ".$this->getTypeStr()." ".$this->getChart()." NOT NULL $default COMMENT '$comment' $beforeField";
     }
 
 
@@ -261,10 +266,6 @@ class GenerateColumnOption
                 }
                 break;
         }
-
-
-
-
     }
 
 }
