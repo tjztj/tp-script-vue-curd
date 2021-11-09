@@ -84,7 +84,7 @@ trait BaseShow
 
 
         $fields->doShowData($info);
-        $fieldArr=array_values($fields->toArray());
+        $fieldArr=array_values($fields->fieldToArrayPageType('show')->toArray());
 
         return $this->showTpl('show',$this->showFetch([
             'title'=>$title,

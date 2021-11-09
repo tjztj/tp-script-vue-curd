@@ -138,7 +138,7 @@ trait BaseIndex
 
 
 
-        $listColumns=array_values($this->fields->listShowItems()->toArray());
+        $listColumns=array_values($this->fields->listShowItems()->fieldToArrayPageType('listColumns')->toArray());
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
 
         $baseId=$parentInfo?$parentInfo->id:0;

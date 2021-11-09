@@ -236,6 +236,7 @@ trait BaseEdit
 
         $fetchData=$id?$this->beforeEditShow($fetchData):$this->beforeAddShow($fetchData);
 
+
         return $this->showTpl('edit',$fetchData);
     }
 
@@ -323,7 +324,7 @@ trait BaseEdit
         }
 
 
-        $fieldArr=array_values($fields->rendGroup()->toArray());
+        $fieldArr=array_values($fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
         return [
             'title'=>$this->title,
             'fields'=>$fieldArr,

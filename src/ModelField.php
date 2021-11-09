@@ -75,6 +75,14 @@ abstract class ModelField
     protected array $attrWhereValueList=[];
     protected bool $generateColumn=true;
 
+    /**
+     * @var string 调用toArray的时候，toArray自行根据此值判断处理，防止多余的数据到前台，影响性能
+     * listColumns  列表中表头
+     * edit 边界
+     * show 显示
+     */
+    public string $toArrayPageType='';
+    protected $toArrayBefore=null;
 
     public function __construct()
     {
@@ -586,8 +594,34 @@ abstract class ModelField
         return $this;
     }
 
+
+    /**
+     * 有时候数据太多，传到了前台，影响性能，可用此函数处理，根据toArrayPageType判断以什么方式处理
+     * @param callable $func
+     * @return $this
+     */
+    public function setToArrayBefore(callable $func):self{
+        $this->toArrayBefore=$func;
+        return $this;
+    }
+
     public function toArray(): array
     {
+        $field=clone $this;
+
+        $data = [];
+
+        $func=$field->toArrayBefore;
+        if($func){
+//            $field->toArrayPageType;
+            //里面可动态改变$data
+            $funcReturn=$func($field,$data);
+            if(!is_null($funcReturn)&&is_array($funcReturn)){
+                //如果有返回值，且返回数组，就直接返回当前
+                return $funcReturn;
+            }
+        }
+
         $toArr=function (&$arr)use(&$toArr){
             foreach ($arr as $arrK=>$arrV){
                 if(is_array($arrV)){
@@ -598,31 +632,29 @@ abstract class ModelField
             }
         };
 
-        $data = [];
+
         foreach (get_class_vars(static::class) as $k => $v) {
-            if (method_exists($this, $k)) {
-                $data[$k] = $this->$k();
-            } elseif (!isset($this->$k)) {
+            if (method_exists($field, $k)) {
+                $data[$k] = $field->$k();
+            } elseif (!isset($field->$k)) {
                 continue;
             } else {
-                $data[$k] = $this->$k;
+                $data[$k] = $field->$k;
             }
 
             if (is_array($data[$k])) {
-                if($this->objWellToArr){
+                if($field->objWellToArr){
                     $toArr($data[$k]);
                 }
             } else if (is_object($data[$k])) {
                 if (method_exists($data[$k], 'toArray')) {
-                    if ($this->objWellToArr) {
+                    if ($field->objWellToArr) {
                         $data[$k] = $data[$k]->toArray();
                     } else {
                         unset($data[$k]);
                     }
                 }
             }
-
-
         }
         return $data;
     }

@@ -86,6 +86,16 @@ class FieldCollection extends Collection
         return $this->filter(fn($v)=>$v->listShow());
     }
 
+    /**
+     * 设置字段到toArrayPageType
+     * （调用toArray的时候，toArray自行根据此值判断处理，防止多余的数据到前台，影响性能）
+     * @param string $toArrayPageType
+     * @return $this
+     */
+    public function fieldToArrayPageType(string $toArrayPageType):self{
+        $this->each(function (ModelField $v)use($toArrayPageType){$v->toArrayPageType=$toArrayPageType;});
+        return $this;
+    }
 
 
     public function toArray(): array{
