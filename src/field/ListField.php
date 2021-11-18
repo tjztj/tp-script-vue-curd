@@ -56,6 +56,7 @@ class ListField extends ModelField
             return $this->fields;
         }
         $this->fields=$fields;
+        $this->fieldPushAttrByWhere('fields',$fields);
         return $this;
     }
 
