@@ -1508,7 +1508,7 @@ define(requires, function (axios, Qs) {
                         const tablePath='#' + id+'>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
                         if(!document.querySelector('#' + id)
                         ||!document.querySelector('#' + id),document.querySelector(tablePath)){
-                            if(!document.querySelector('#' + id+'>.curd-table .ant-table-default  .ant-table-body table')){
+                            if(!document.querySelector('#' + id+'>.curd-table table')){
                                 setTimeout(()=>{
                                     onresize();
                                 },40)
