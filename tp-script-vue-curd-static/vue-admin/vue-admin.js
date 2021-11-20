@@ -1538,7 +1538,11 @@ define(requires, function (axios, Qs) {
                 };
                 Vue.nextTick(function (){
                     onresize();
-                    window.onresize = onresize;
+                    const oldResize=window.onresize||function (){};
+                    window.onresize = (e)=>{
+                        oldResize(e);
+                        onresize();
+                    };
                 })
 
 
