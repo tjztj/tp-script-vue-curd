@@ -186,7 +186,7 @@ define(['vueAdmin'], function (va) {
                     tableThemIsColor:vueData.tableThemIsColor,
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
-                    showCreateTime:fieldObjs.create_time?fieldObjs.create_time.listShow:true,
+                    showCreateTime:!!vueData.createTimeField,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
