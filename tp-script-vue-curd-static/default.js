@@ -171,7 +171,7 @@ define(['vueAdmin'], function (va) {
                     actionDefWidth:0,
                     indexUrl:vueData.listUrl,
                     tableThemIsColor:vueData.tableThemIsColor,
-                    showCreateTime:!!vueData.createTimeField,
+                    showCreateTime:!vueData.createTimeField,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
