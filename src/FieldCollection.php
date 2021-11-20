@@ -214,23 +214,31 @@ class FieldCollection extends Collection
     /**
      * 根据字段name获取字段信息
      * @param string $name
+     * @param bool $notFoundErrors
      * @return ModelField
+     * @throws \think\Exception
      */
-    public function findByName(string $name):ModelField{
+    public function findByName(string $name,bool $notFoundErrors=true):?ModelField{
         foreach ($this->items as $item) {
             if($item->name()===$name){
                 return $item;
             }
         }
-        throw new \think\Exception('未找到字段:'.$name);
+        if($notFoundErrors){
+            throw new \think\Exception('未找到字段:'.$name);
+        }
+        return null;
     }
+
     /**
      * 根据字段name获取字段信息
      * @param string $name
-     * @return ModelField
+     * @param bool $notFoundErrors
+     * @return ModelField|null
+     * @throws \think\Exception
      */
-    public function getFieldByNmae(string $name):ModelField{
-        return $this->findByName($name);
+    public function getFieldByNmae(string $name,bool $notFoundErrors=true):?ModelField{
+        return $this->findByName($name,$notFoundErrors);
     }
 
 
