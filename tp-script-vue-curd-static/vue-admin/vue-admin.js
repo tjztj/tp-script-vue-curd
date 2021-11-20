@@ -1504,6 +1504,21 @@ define(requires, function (axios, Qs) {
                 const columnsVals=Vue.ref(columns);
                 let onresize = () => {
                     scrollX.value = getX();
+                    if(scrollX.value===undefined){
+                        const tablePath='#' + id+'>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
+                        if(!document.querySelector('#' + id)
+                        ||!document.querySelector('#' + id),document.querySelector(tablePath)){
+                            if(!document.querySelector('#' + id+'>.curd-table table')){
+                                setTimeout(()=>{
+                                    onresize();
+                                },40)
+                            }
+                        }else{
+                            scrollX.value=document.querySelector('#' + id).clientWidth;
+                        }
+                    }
+
+
                     columnsVals.value.forEach(col=>{
                         if(typeof col.fixed!=='undefined'){
                             if(scrollX.value===undefined){
@@ -1521,8 +1536,14 @@ define(requires, function (axios, Qs) {
                         scrollY.value = res;
                     })
                 };
-                onresize();
-                window.onresize = onresize;
+                Vue.nextTick(function (){
+                    onresize();
+                    const oldResize=window.onresize||function (){};
+                    window.onresize = ()=>{
+                        oldResize();
+                        onresize();
+                    };
+                })
 
 
                 let childsObjs = {};

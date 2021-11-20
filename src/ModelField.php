@@ -7,6 +7,7 @@ namespace tpScriptVueCurd;
 use think\Collection;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\base\model\VueCurlModel;
+use tpScriptVueCurd\field\ListField;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\option\FieldDo;
@@ -462,8 +463,8 @@ abstract class ModelField
      * @return $this
      */
     public function pushAttrByWhere(string $attr,$val,?FieldWhere $where):self{
-        if(!is_string($val)&&!is_integer($val)&&!is_float($val)&&!is_bool($val)&&!is_null($val)){
-            throw new \think\Exception('不能使用pushAttrByWhere设置'.$attr.'为'.gettype($attr).'类型的值');
+        if(!is_string($val) && !is_int($val) && !is_float($val) && !is_bool($val) && !is_null($val) && !($this instanceof ListField && $attr === 'fields' && $val instanceof FieldCollection)) {
+            throw new \think\Exception('不能使用pushAttrByWhere设置'.$attr.'为'.gettype($val).'类型的值');
         }
         if($attr==='name'||$attr==='type'||$attr==='guid'||$attr==='group'){
             throw new \think\Exception($attr.'不能通过pushAttrByWhere改变');
