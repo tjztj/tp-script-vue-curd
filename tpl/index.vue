@@ -173,6 +173,7 @@
                     :field-step-config="fieldStepConfig"
                     :action-def-width="actionDefWidth"
                     :show-create-time="showCreateTime"
+                    :set-scroll-y="!!childTpl"
                     @refresh-table="refreshTable"
                     @change="handleTableChange"
                     @on-delete="deleteRow"

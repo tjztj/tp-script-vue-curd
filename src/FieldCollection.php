@@ -654,4 +654,27 @@ class FieldCollection extends Collection
     }
 
 
+    /**
+     * 过滤掉非导入的字段
+     * @return $this
+     */
+    public function excelFilter():self{
+        return $this->filter(function(ModelField $v)use(&$expFields){
+            if(!$v->canExcelImport()){
+                return false;
+            }
+            if($v->editShow()){
+                return true;
+            }
+            if(!$v instanceof RegionField){
+                return false;
+            }
+            foreach ($v->getAboutRegions() as $val){
+                if($val->editShow()){
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
 }

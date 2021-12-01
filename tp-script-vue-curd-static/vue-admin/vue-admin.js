@@ -1352,7 +1352,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1488,8 +1488,7 @@ define(requires, function (axios, Qs) {
                                 }else{
                                     pageH=0;
                                 }
-
-                                if (document.body.clientHeight > elH && (parent.clientHeight - theadH - pageH) > elH) {
+                                if (document.body.clientHeight >= elH && (parent.clientHeight - theadH - pageH) >= elH) {
                                     resolve()
                                     return;
                                 }
@@ -1508,13 +1507,13 @@ define(requires, function (axios, Qs) {
                         const tablePath='#' + id+'>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
                         if(!document.querySelector('#' + id)
                         ||!document.querySelector('#' + id),document.querySelector(tablePath)){
-                            if(!document.querySelector('#' + id+'>.curd-table table')){
+                            if(!document.querySelector('#' + id+'>.curd-table table')||!document.querySelector('#' + id+'>.curd-table .ant-table-body')){
                                 setTimeout(()=>{
                                     onresize();
                                 },40)
                             }
                         }else{
-                            scrollX.value=document.querySelector('#' + id).clientWidth;
+                            scrollX.value=document.querySelector('#' + id + ' .ant-table-body').clientWidth;
                         }
                     }
 
@@ -1532,9 +1531,11 @@ define(requires, function (axios, Qs) {
                         }
                     })
 
-                    getY().then(res => {
-                        scrollY.value = res;
-                    })
+                    if(props.setScrollY){
+                        getY().then(res => {
+                            scrollY.value = res;
+                        })
+                    }
                 };
                 Vue.nextTick(function (){
                     onresize();

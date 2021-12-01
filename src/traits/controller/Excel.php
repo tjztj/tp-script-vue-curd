@@ -126,7 +126,7 @@ trait Excel
          * @var BaseModel $model
          */
         $model=new $modelClassName;
-        $info=$model->addInfo($option->saveArr, $option->base,$this->myExcelFields(),true);
+        $info=$model->addInfo($option->saveArr, $option->base,$this->myExcelFields()->excelFilter(),true);
 
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;
@@ -178,7 +178,7 @@ trait Excel
                 $option->saveArr=$datas[$modelName];
                 $option->base=$base;
                 $childController->importBefore($option);
-                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,$model->fields(),true);
+                $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,$childController->myExcelFields()->excelFilter(),true);
 
                 $optionAfter=new FunControllerImportAfter();
                 $optionAfter->saveObjects=$infos[$modelClass];
@@ -202,7 +202,9 @@ trait Excel
         static $baseIds=[];
 
         //父表字段的值一样将会视作同一条父数据
-        $baseIdsKey=serialize($this->myExcelFields()->setSave($mainData,clone $this->md,true)->getSave());
+        $baseIdsKey=serialize($this->myExcelFields()
+            ->excelFilter()
+            ->setSave($mainData,clone $this->md,true)->getSave());
         if(!isset($baseIds[$baseIdsKey])){
             $parentInfo=$this->myExcelSave($mainData);
             $baseIds[$baseIdsKey]=$parentInfo->id;
