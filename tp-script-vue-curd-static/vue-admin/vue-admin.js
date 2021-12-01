@@ -1574,10 +1574,13 @@ define(requires, function (axios, Qs) {
                     this.getActionWidthByProps()
                 },
                 data(data) {
-                    this.getActionWidthByProps()
                     Vue.nextTick( ()=>{
                         this.onresize();
+                        setTimeout(()=>{
+                            this.onresize();
+                        },40)
                     })
+                    this.getActionWidthByProps()
                 }
             },
             methods: {
