@@ -1513,7 +1513,7 @@ define(requires, function (axios, Qs) {
                                 },40)
                             }
                         }else{
-                            scrollX.value=document.querySelector('#' + id + ' .ant-table-body').clientWidth;
+                            scrollX.value=document.querySelector('#' + id).clientWidth;
                         }
                     }
 
@@ -1566,6 +1566,7 @@ define(requires, function (axios, Qs) {
                     listFieldComponents,
                     fieldObjs,
                     childsObjs,
+                    onresize
                 }
             },
             watch: {
@@ -1574,6 +1575,9 @@ define(requires, function (axios, Qs) {
                 },
                 data(data) {
                     this.getActionWidthByProps()
+                    Vue.nextTick( ()=>{
+                        this.onresize();
+                    })
                 }
             },
             methods: {
