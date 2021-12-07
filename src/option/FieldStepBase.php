@@ -45,7 +45,7 @@ abstract class FieldStepBase
                     }
                     $currStep=endStepVal($info);
                     foreach ($funcs as $k=>$v){
-                        if($k::name()===$currStep){
+                        if($k&&$k::name()===$currStep){
                             return $v($info, $parentInfo, $field);
                         }
                     }
