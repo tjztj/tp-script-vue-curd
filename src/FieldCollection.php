@@ -8,6 +8,7 @@ use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\PasswordField;
+use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
@@ -659,20 +660,20 @@ class FieldCollection extends Collection
      * @return $this
      */
     public function excelFilter():self{
-        return $this->filter(function(ModelField $v)use(&$expFields){
+        return $this->filter(function(ModelField $v){
+            if($v instanceof RegionField){
+                foreach ($v->getAboutRegions() as $val){
+                    if($val->editShow()){
+                        return true;
+                    }
+                }
+                return false;
+            }
             if(!$v->canExcelImport()){
                 return false;
             }
             if($v->editShow()){
                 return true;
-            }
-            if(!$v instanceof RegionField){
-                return false;
-            }
-            foreach ($v->getAboutRegions() as $val){
-                if($val->editShow()){
-                    return true;
-                }
             }
             return false;
         });

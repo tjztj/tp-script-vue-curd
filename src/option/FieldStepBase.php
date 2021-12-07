@@ -38,7 +38,20 @@ abstract class FieldStepBase
 
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
-                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->beforeCheck($info, $parentInfo, $field),
+                function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){
+                    $funcs=$this->beforeCheck();
+                    if(empty($info)||empty($info->id)){
+                        return isset($funcs[''])&&$funcs['']($info, $parentInfo, $field);
+                    }
+                    $currStep=endStepVal($info);
+                    foreach ($funcs as $k=>$v){
+                        if($k::name()===$currStep){
+                            return true;
+                        }
+                    }
+                    return false;
+                },
+//                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->beforeCheck($info, $parentInfo, $field),
                 fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->check($info, $parentInfo, $field)
             ),
             $config,
@@ -95,12 +108,9 @@ abstract class FieldStepBase
 
     /**
      * 数据下一步是否当前步骤，判断
-     * @param BaseModel $info
-     * @param BaseModel|null $parentInfo
-     * @param ModelField|null $field
-     * @return bool
+     * @return callable[]   [stepclass=>function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){}]
      */
-    abstract protected function beforeCheck(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null): bool;
+    abstract protected function beforeCheck(): array;
 
 
     /**
