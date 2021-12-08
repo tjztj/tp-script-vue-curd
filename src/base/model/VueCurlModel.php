@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\base\model;
 
 
 
+use think\Model;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\traits\model\GenerateTable;
@@ -35,6 +36,15 @@ abstract class VueCurlModel extends TimeModel
         $this->doGenerateTable();
     }
 
+
+    public function newInstance(array $data = [], $where = null): Model
+    {
+        $md=parent::newInstance($data, $where);
+        if($this->controller){
+            $md->controller=$this->controller;
+        }
+        return $md;
+    }
 
     abstract public function fields():FieldCollection;
 
