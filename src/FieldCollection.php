@@ -344,7 +344,7 @@ class FieldCollection extends Collection
                 return [];
             }
         }
-        if($myFilter){
+        if($myFilter&&is_string($myFilter)){
             $myFilter=json_decode($myFilter,true);
         }
 
