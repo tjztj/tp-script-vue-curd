@@ -16,7 +16,7 @@ use tpScriptVueCurd\traits\field\FieldCollectionStep;
 use tpScriptVueCurd\traits\Func;
 
 /**
- * 字段集合test
+ * 字段集合
  * Class FieldCollection
  * @package tpScriptVueCurd
  * @author tj 1079798840@qq.com
