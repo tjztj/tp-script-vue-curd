@@ -5,7 +5,7 @@ namespace tpScriptVueCurd\option\generate_table\traits;
 trait ColumnGetterSetter
 {
     /**
-     * 获取字段名
+     * 获取字段名test
      * @return string
      */
     public function getName(): string
