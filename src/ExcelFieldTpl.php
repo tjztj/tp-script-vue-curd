@@ -17,6 +17,9 @@ class ExcelFieldTpl
     public string $explain='填写任意字符';//字段导出备注信息
     public bool $wrapText=false;//单元格内是否可换行
     public bool $isText=false;//该列是否文本格式
+    public array $items=[];//下拉选项
+    public string $type='';//字段类型
+    public ?ModelField $field=null;
 
 
 

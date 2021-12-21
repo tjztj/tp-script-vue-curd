@@ -306,4 +306,30 @@ class TreeSelect extends ModelField
         return $list;
     }
 
+    /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems()
+    {
+        if($this->multiple())
+            return [];
+        if(!isset($this->lists)){
+            //为了防止导入的时候占用太多内存
+            $this->lists=self::treeToList($this->items(),'value','children');
+        }
+        $values=[];
+        foreach ($this->lists as $v){
+            $keys=[];
+            foreach ($v['parents'] as $val){
+                if(!isset($this->lists[$val])){
+                    continue;
+                }
+                $keys[]=$this->lists[$val]['title'];
+            }
+            $keys[]=$v['title'];
+            $values[]=implode('-',$keys);
+        }
+        return $values;
+    }
 }

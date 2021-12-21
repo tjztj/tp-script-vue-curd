@@ -155,4 +155,14 @@ class RadioField extends ModelField
             $option->setTypeVarchar(64);
         }
     }
+
+
+    /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems()
+    {
+        return array_column($this->items(),'text');
+    }
 }

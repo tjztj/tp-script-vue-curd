@@ -614,5 +614,37 @@ class RegionField extends ModelField
         $data['aboutRegions']=$aboutRegions;
         return $data;
     }
+    /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems()
+    {
+//        $regions=$this->getAboutRegions();
+//        foreach ($regions as $k=>$v){
+//            if($v->name()===$this->name()){
+//                $list=[];
+//                $k=(int)$k;
+//                $getTitles=function ($list,int $level,string $parents)use($k,&$getTitles){
+//                    $titles=[];
+//                    foreach ($list as $v){
+//                        if($level<$k){
+//                            if(!empty($v['children'])){
+//                                array_push($titles,...$getTitles($v['children'],$level+1,$parents.$v['name'].'-'));
+//                            }
+//                        }else if($level===$k){
+//                            $titles[]=$parents.$v['name'];
+//                        }else{
+//                            break;
+//                        }
+//                    }
+//                    return array_values(array_unique($titles));
+//                };
+//
+//                return $getTitles($this->getRegionTree(),0,'');
+//            }
+//        }
+        return [];
+    }
 
 }

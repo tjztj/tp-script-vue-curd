@@ -151,4 +151,13 @@ class CheckboxField extends ModelField
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeVarchar();
     }
+
+    /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems()
+    {
+        return [];
+    }
 }

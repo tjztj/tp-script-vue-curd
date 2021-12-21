@@ -5,6 +5,12 @@ namespace tpScriptVueCurd\traits\controller;
 
 
 
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\NamedRange;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls\CellDataValidation;
+use \tpScriptVueCurd\tool\excel_out\ExportCell;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
@@ -15,6 +21,9 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use think\Request;
 use tpScriptVueCurd\option\FunControllerImportAfter;
 use tpScriptVueCurd\option\FunControllerImportBefore;
+use tpScriptVueCurd\tool\excel_out\ExportExcel;
+use tpScriptVueCurd\tool\excel_out\ExportOperation;
+use tpScriptVueCurd\tool\excel_out\ExportThCell;
 
 /**
  * Trait Excel
@@ -259,14 +268,14 @@ trait Excel
         $options = ['img_save_path' => $base_path.'/'. \tpScriptVueCurd\tool\Time::unixtimeToDate('Ymd') . '/', 'format' => []];
         is_dir($options['img_save_path']) || mkdir($options['img_save_path']);
         try{
-            $data = \tpScriptVueCurd\tool\Excel::importExecl($file->getRealPath(), 0, 0, $options);
+            $data = \tpScriptVueCurd\tool\excel_in\Excel::importExecl($file->getRealPath(), 0, 0, $options);
         }catch (\Exception $e){
             return $this->error($e);
         }
 
 
 
-        ['expCellName'=>$expCellName,'row'=>$row]=$this->parseExpFields();
+        ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         //判断标题是否一致，有些表字段一样的，防止导错
         if(preg_replace('/\s+/','',current($data[1]))!==preg_replace('/\s+/','',$this->getExcelTilte())){
             return $this->errorAndCode('模版错误，请重新下载最新的模版-001');
@@ -276,10 +285,10 @@ trait Excel
         $names=[];
         foreach ($expCellName as $k => $v) {
             //对比模版，老模版提示错误
-            if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v[1])||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v[0]])) {
+            if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v['name']])) {
                 return $this->errorAndCode('模版错误，请重新下载最新的模版-002');
             }
-            $names[key($data[2])]=$v[0];
+            $names[key($data[2])]=$v['name'];
             next($data[2]);
             next($data[3]);
         }
@@ -335,17 +344,32 @@ trait Excel
      */
     public function downExcelTpl():void{
 
-        ['expCellName'=>$expCellName,'row'=>$row]=$this->parseExpFields();
+        ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
+        $emptyItem=[];
+        foreach ($expCellName as $k=>$v){
+            $expCellName[$k]['fontSize']=13;
+            $cell=['name'=>$v['name'],'value'=>$row[$v['name']]?:'','wrapText'=>true,'fontBold'=>false];
+            if(isset($v['format'])){
+                $cell['format']=$v['format'];
+            }
+            $expCellName[$k]['childs']=[$cell];
+            //空数据
+            $emptyItem[$v['name']]='';
+        }
+        $list=[];
+        //生成200条空数据
+        for($i=0;$i<200;$i++){
+            $list[]=$emptyItem;
+        }
         $title=$this->getExcelTilte();
-        $data = [
-            'title' => $title,
-            'expTitle' => $this->getExcelFieldName(),
-            'title_horizontal' => Alignment::HORIZONTAL_LEFT,
-            'freezePane' => 4,
-            'expCellName' => $expCellName,
-            'expTableData' => [$row],
-        ];
-        \tpScriptVueCurd\tool\Excel::exportExecl($data);
+        $excel=ExportExcel::make($title);
+        $excel->title->alignmentHorizontal=Alignment::HORIZONTAL_LEFT;
+        $excel->title->wrapText=true;
+        $excel->title->height=60;
+        $excel->setThead($expCellName);
+        $excel->fileName=$this->getExcelFieldName();
+        $excel->setData($list);
+        $excel->out();
     }
 
     /**
@@ -413,6 +437,9 @@ trait Excel
                 }
                 $excelFieldTpl->explain.="（{$ext}）";
             }
+            $excelFieldTpl->items=$v->excelSelectItems();
+            $excelFieldTpl->type=$v->getType();
+            $excelFieldTpl->field=$v;
             $expFields[]=$excelFieldTpl;
         });
         return $expFields;
@@ -427,21 +454,201 @@ trait Excel
         $expCellName=[];
         $row=[];
         foreach ($expFields as $v){
-            $th=[$v->name,$v->title];
+            $th=['name'=>$v->name,'value'=>$v->title];
             if($v->width){
                 $th['width']=$v->width;
             }
             if($v->wrapText){
-                $th['wrap_text']=$v->wrapText;
+                $th['wrapText']=$v->wrapText;
             }
             if($v->isText){
-                $th['is_text']=$v->isText;
+                $th['formatText']=$v->isText;
             }
-            $row[$v->name]=$v->explain;
+            if($v->items){
+                $th['format']=function ($row,ExportCell $cell)use($v){
+                    $cell->do=function (Spreadsheet $excel, ExportCell $cell)use($v){
+                        //如果是表头
+                        if($cell instanceof ExportThCell||empty($v->items)){
+                            return;
+                        }
+                        $checkSheet=$excel->getSheetByName('选项');
+                        if(empty($checkSheet)){
+                            $checkSheet=new Worksheet($excel,'选项');
+                            $excel->addSheet($checkSheet);
+                        }
+
+                        if($v->type==='RegionField'){
+                            static $regionChilds=null;
+                            static $regionNameobj=[];
+                            static $regionFields=null;
+                            if(is_null($regionChilds)){
+                                $regionLevelObj=[];
+                                $pKey=null;
+                                $regionFields=$v->field->getAboutRegions();
+                                foreach ($v->field->getAboutRegions() as $key=>$val){
+                                    if($val->canExcelImport()){
+                                        if(is_null($pKey)){
+                                            $regionLevelObj[$key+1]=[
+                                                'level'=>$key+1,
+                                                'plevel'=>0,
+                                                'pname'=>'',
+                                                'name'=>$val->name()
+                                            ];
+                                        }else{
+                                            $regionLevelObj[$key+1]=[
+                                                'level'=>$key+1,
+                                                'plevel'=>$pKey+1,
+                                                'pname'=>$regionFields[$pKey]->name(),
+                                                'name'=>$val->name()
+                                            ];
+                                        }
+                                        $regionNameobj[$val->name()]=$regionLevelObj[$key+1];
+                                        $pKey=$key;
+                                    }
+                                }
+
+                                $regionChilds=[];
+                                $regionArr=$v->field->getTreeToList();
+                                foreach ($regionArr as $val){
+                                    $pIds=explode(',',$val['pids']);
+                                    $titles=[];
+                                    foreach ($pIds as $pid){
+                                        empty($regionArr[$pid])||$titles[]=$regionArr[$pid]['name'];
+                                    }
+                                    if($titles){
+                                        $pKey=count($titles);
+                                        $cKey=$pKey+1;
+                                        if(!isset($regionLevelObj[$cKey])){
+                                            //如果没有本级（本级不导出）
+                                            continue;
+                                        }
+                                        $titleStrArr=$titles;
+                                        if(!isset($regionLevelObj[$pKey])){
+                                            for($i=$pKey;$i--;$i>=0){
+                                                unset($titleStrArr[$i]);
+                                                if(isset($regionLevelObj[$i])){
+                                                    $pKey=$i;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        $pTitleStr=implode('-',$titleStrArr);
+                                        if(isset($regionLevelObj[$pKey])){
+                                            $pname=$regionLevelObj[$pKey]['name'];
+                                            isset($regionChilds[$pname])||$regionChilds[$pname]=[];
+                                            isset($regionChilds[$pname][$pTitleStr])||$regionChilds[$pname][$pTitleStr]=[];
+                                            $regionChilds[$pname][$pTitleStr][]=$val['name'];
+                                        }
+//                                        $cTitleStr=$pTitleStr?($pTitleStr.'-'.$val['name']):$val['name'];
+//                                        $cname=$regionLevelObj[$cKey]['name'];
+//                                        isset($regionChilds[$cname])||$regionChilds[$cname]=[];
+//                                        isset($regionChilds[$cname][$cTitleStr])||$regionChilds[$cname][$cTitleStr]=[];
+                                    }
+                                }
+                            }
+
+                            if(isset($regionNameobj[$v->name])){
+                                if(empty($regionNameobj[$v->name]['pname'])){
+                                    $items=array_keys($regionChilds[$v->name]);
+                                    $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
+                                    $prompt='';
+                                }else{
+                                    static $isInit=[];
+                                    if(!isset($isInit[$v->name])){
+                                        $isInit[$v->name]=true;
+                                        $childIndexs=[];
+                                        $childIndex=0;
+                                        $items=[];
+                                        $pname=$regionNameobj[$v->name]['pname'];
+
+//                                        $i=1;
+                                        foreach ($regionChilds[$pname] as $key=>$vals){
+                                            $pTitles=[];
+                                            $npname=$pname;
+                                            while (!empty($regionNameobj[$npname]['pname'])){
+                                                $npname=$regionNameobj[$npname]['pname'];
+                                                if(isset($regionChilds[$npname])){
+                                                    foreach ($regionChilds[$npname] as $kk=>$vv){
+                                                        if(in_array($key,$vv,true)){
+                                                            array_unshift($pTitles,$kk);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            $pTitles[]=$key;
+//                                            if($v->name==='system_region_id')dd($cell->col.($childIndex+1).':'.$cell->col.($childIndex+=count($vals)));
+                                            $excel->addNamedRange(new NamedRange(str_replace('-','',implode('-',$pTitles))
+                                                ,$checkSheet
+                                                ,$cell->col.($childIndex+1).':'.$cell->col.($childIndex+=count($vals))
+                                            ));
+//                                            $checkSheet->getCell('AA'.$cell->col .$i)->setValue($val);
+//                                            $i++;
+                                            array_push($items,...$vals);
+                                        }
+                                    }
+                                    $col=$cell->col;
+                                    $pCols=[];
+                                    $lastKK=-1;
+                                    foreach ($regionFields as $kk=>$vv){
+                                        if(!$vv->canExcelImport()){
+                                            continue;
+                                        }
+                                        if($vv->name()===$v->name){
+                                            $prompt=isset($regionFields[$lastKK])?'需先选择'.$regionFields[$lastKK]->title():'';
+                                            break;
+                                        }
+                                        $col=ExportOperation::operationSub($col,1);
+                                        array_unshift($pCols,'$'.$col.'$'.$cell->row);
+                                        $lastKK=$kk;
+                                    }
+                                    $formula1='=INDIRECT('.implode('&',$pCols).')';
+//                                    if(count($pCols)>1)dd($formula1);
+                                }
+                            }else{
+                                $items=[];
+                                $formula1='""';
+                                $prompt='';
+                            }
+
+                        }else{
+                            $items=$v->items ;
+                            $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
+                            $prompt='';
+                        }
+
+
+                        if(!$checkSheet->getCell($cell->col .'1')->getValue()){
+                            foreach ($items as $key=>$val){
+                                $checkSheet->getCell($cell->col .($key+1))->setValue($val);
+                            }
+                        }
+
+                        //设置选项
+                        $excel->setActiveSheetIndex(0);
+                        $excel->getActiveSheet()->getCell($cell->col . $cell->row)
+                            ->getDataValidation()
+                            -> setType(DataValidation::TYPE_LIST)
+                            -> setErrorStyle(DataValidation::STYLE_INFORMATION)
+                            -> setAllowBlank(true)//允许空白
+                            -> setShowInputMessage(true)
+                            -> setShowErrorMessage(true)
+                            -> setShowDropDown(true)
+                            -> setErrorTitle('输出错误')
+                            -> setError('您输入的值不在下拉框列表内.')
+                            -> setPromptTitle('请选择')
+                            -> setPrompt($prompt)
+                            -> setFormula1($formula1);
+//                        dd($cell->value);
+                    };
+                };
+            }
+
             $expCellName[]=$th;
+            $row[$v->name]=$v->explain;
         }
 
-        return ['expCellName'=>$expCellName,'row'=>$row];
+        return ['cell'=>$expCellName,'row'=>$row];
     }
 
 

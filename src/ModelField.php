@@ -311,6 +311,14 @@ abstract class ModelField
     }
 
     /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems(){
+        return [];
+    }
+
+    /**
      * 字段在添加修改时是否显示
      * @param bool|null $editShow
      * @return $this|bool

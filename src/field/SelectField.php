@@ -183,4 +183,14 @@ class SelectField extends ModelField
         }
 
     }
+    /**
+     * Excel 模版中的下拉选项
+     * @return array
+     */
+    public function excelSelectItems()
+    {
+        if($this->multiple())
+            return [];
+        return array_column($this->items(),'text');
+    }
 }
