@@ -460,6 +460,9 @@ define(['vueAdmin'], function (va) {
             form.id=vueData.info.id;
         }
         return {
+            setup(props,ctx){
+                return getThisActionOhterSetup(props,ctx);
+            },
             data() {
                 return {
                     loading:false,
@@ -470,6 +473,7 @@ define(['vueAdmin'], function (va) {
                     form:form,
                     info:vueData.info||{},
                     fieldHideList:{},
+                    ...getThisActionOhterData(),
                 }
             },
             computed:{
@@ -487,7 +491,11 @@ define(['vueAdmin'], function (va) {
                         }
                     }
                     return false;
-                }
+                },
+                ...getThisActionOhterComputeds(),
+            },
+            watch:{
+                ...getThisActionOhterWatchs(),
             },
             methods:{
                 onSubmit(option){
@@ -554,6 +562,7 @@ define(['vueAdmin'], function (va) {
                     }
                     return false;
                 },
+                ...getThisActionOhterMethods()
             }
         }
     };
