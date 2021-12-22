@@ -216,7 +216,9 @@ trait BaseIndex
             //如果没有父表
             return;
         }
-        $baseId=$this->request->param('base_id/d',0);
+        //可以在外面赋值
+        $baseId=$this->request->get('base_id/d',0);
+        $baseId||$baseId=$this->request->param('base_id/d',0);
         if(empty($baseId)){
             return;
         }

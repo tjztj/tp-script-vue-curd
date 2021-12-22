@@ -115,7 +115,9 @@ trait Excel
 
         $this->excelBaseInfo=null;
         if(!is_null($this->getParentController())){
-            $baseId=$this->request->param('base_id/d');
+            //可以在外面赋值
+            $baseId=$this->request->get('base_id/d',0);
+            $baseId||$baseId=$this->request->param('base_id/d',0);
             if(empty($baseId)){
                 throw new \think\Exception('缺少父表参数');
             }
