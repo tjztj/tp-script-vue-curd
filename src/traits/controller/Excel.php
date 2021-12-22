@@ -357,8 +357,9 @@ trait Excel
             $emptyItem[$v['name']]='';
         }
         $list=[];
-        //生成200条空数据
-        for($i=0;$i<200;$i++){
+        //生成5000条空数据
+        ini_set('memory_limit','-1');
+        for($i=0;$i<5000;$i++){
             $list[]=$emptyItem;
         }
         $title=$this->getExcelTilte();
@@ -464,13 +465,13 @@ trait Excel
             if($v->isText){
                 $th['formatText']=$v->isText;
             }
-            if($v->items){
+            if($v->items||$v->type==='RegionField'){
                 $th['format']=function ($row,ExportCell $cell)use($v){
+                    if($cell instanceof ExportThCell){
+                        return '';
+                    }
                     $cell->do=function (Spreadsheet $excel, ExportCell $cell)use($v){
                         //如果是表头
-                        if($cell instanceof ExportThCell||empty($v->items)){
-                            return;
-                        }
                         $checkSheet=$excel->getSheetByName('选项');
                         if(empty($checkSheet)){
                             $checkSheet=new Worksheet($excel,'选项');
