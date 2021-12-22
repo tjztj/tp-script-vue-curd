@@ -357,9 +357,9 @@ trait Excel
             $emptyItem[$v['name']]='';
         }
         $list=[];
-        //生成5000条空数据
+        //生成2000条空数据
         ini_set('memory_limit','-1');
-        for($i=0;$i<5000;$i++){
+        for($i=0;$i<2000;$i++){
             $list[]=$emptyItem;
         }
         $title=$this->getExcelTilte();
