@@ -8,7 +8,6 @@ namespace tpScriptVueCurd\traits\controller;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\NamedRange;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xls\CellDataValidation;
 use tpScriptVueCurd\tool\excel_out\ExportCell;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use tpScriptVueCurd\base\controller\Controller;
