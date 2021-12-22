@@ -469,7 +469,7 @@ trait Excel
                     if($cell instanceof ExportThCell){
                         return '';
                     }
-                    $cell->do=function (Spreadsheet $excel, ExportCell $cell)use($v){
+                    $cell->do= static function (Spreadsheet $excel, ExportCell $cell)use($v){
                         //如果是表头
                         $checkSheet=$excel->getSheetByName('选项');
                         if(empty($checkSheet)){
@@ -487,7 +487,7 @@ trait Excel
                                 $regionLevelObj=[];
                                 $pKey=null;
                                 $regionFields=$v->field->getAboutRegions();
-                                foreach ($v->field->getAboutRegions() as $key=>$val){
+                                foreach ($regionFields as $key=>$val){
                                     if($val->canExcelImport()){
                                         $fName=explode('|',$val->name());
                                         $fName=end($fName);
@@ -557,7 +557,7 @@ trait Excel
                                         }
                                         $titleStrArr=$titles;
                                         if(!isset($regionLevelObj[$pKey])){
-                                            for($i=$pKey;$i--;$i>=0){
+                                            for($i=$pKey;$i>=0;$i--){
                                                 unset($titleStrArr[$i]);
                                                 if(isset($regionLevelObj[$i])){
                                                     $pKey=$i;
@@ -586,7 +586,6 @@ trait Excel
                                     static $isInit=[];
                                     if(!isset($isInit[$fieldName])){
                                         $isInit[$fieldName]=true;
-                                        $childIndexs=[];
                                         $childIndex=0;
                                         $items=[];
                                         $pname=$regionNameobj[$fieldName]['pname'];
