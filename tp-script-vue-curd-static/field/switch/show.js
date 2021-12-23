@@ -8,7 +8,7 @@ define([],function(){
             },
         },
         template:`<div>
-                    <a-switch :checked="checked" :checked-children="field.items[1].title" :un-checked-children="field.items[0].title" :disabled="true"/>
+                    <a-switch :checked="checked()" :checked-children="field.items[1].title" :un-checked-children="field.items[0].title" :disabled="true"/>
                     <span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
                 </div>`,
     }

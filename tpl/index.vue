@@ -26,6 +26,15 @@
     color: rgba(0, 0, 0, .95);
     letter-spacing: 0.08em;
 }
+
+@media screen and (max-width: 820px) {
+  .curd-filter-box .filter-box-div{
+    grid-template-columns: auto;
+  }
+  .curd-filter-box .filter-item-box {
+    padding-left: 24px !important;
+  }
+}
 </style>
 {if $childTpl}
 <style>
