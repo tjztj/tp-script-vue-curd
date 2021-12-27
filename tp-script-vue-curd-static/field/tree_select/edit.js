@@ -14,7 +14,7 @@ define([],function(){
                     if(this.value!==''){
                         this.val={
                             value:this.value.toString(),
-                            label:infos[this.value.toString()]?infos[this.value.toString()].title:'',
+                            label:this.infos[this.value.toString()]?this.infos[this.value.toString()].title:'',
                         };
                     }
                 }else{
@@ -25,7 +25,7 @@ define([],function(){
                         if(v.toString()!==''){
                             vals.push({
                                 value:v.toString(),
-                                label:infos[v.toString()]?infos[v.toString()].title:'',
+                                label:this.infos[v.toString()]?this.infos[v.toString()].title:'',
                             })
                         }
                     })
@@ -38,7 +38,7 @@ define([],function(){
             treeData(){
                 const doTreeItem=(arr)=>{
                     arr.map(item=>{
-                        infos[item.value]=item;
+                        this.infos[item.value]=item;
                         if(item.children){
                             item.selectable=this.field.canCheckParent;
                             item.disableCheckbox=!this.field.canCheckParent;
@@ -86,15 +86,16 @@ define([],function(){
                 return treeNode.props.title.indexOf(inputValue)!==-1;
             },
             setExpandedKeys(val){
+                let that=this;
                 function setExpanded(val,arr){
                     val=val.toString();
                     arr=arr||[];
-                    if(!infos[val]){
+                    if(!that.infos[val]){
                         return;
                     }
-                    if(infos[infos[val].pvalue]&&!arr.includes(infos[val].pvalue)){
-                        arr.push(infos[val].pvalue);
-                        setExpanded(infos[val].pvalue,arr);
+                    if(that.infos[that.infos[val].pvalue]&&!arr.includes(that.infos[val].pvalue)){
+                        arr.push(that.infos[val].pvalue);
+                        setExpanded(that.infos[val].pvalue,arr);
                     }
                 }
                 if(val){
