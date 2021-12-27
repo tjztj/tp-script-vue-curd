@@ -64,7 +64,7 @@ define(requires, function (axios, Qs) {
         if (res.code == 1) {
             return res
         }
-        if (res.confirm.show) {
+        if (res.confirm&&res.confirm.show) {
             return await new Promise((resolve, reject) => {
                 antd.Modal.confirm({
                     content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
