@@ -365,6 +365,7 @@ trait Excel
         }
         $title=$this->getExcelTilte();
         $excel=ExportExcel::make($title);
+        $excel->defFormatText=true;
         $excel->title->alignmentHorizontal=Alignment::HORIZONTAL_LEFT;
         $excel->title->wrapText=true;
         $excel->title->height=60;

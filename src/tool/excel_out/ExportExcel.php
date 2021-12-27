@@ -6,21 +6,21 @@ namespace tpScriptVueCurd\tool\excel_out;
 /**
  *示例
 $heads=[
-    ['name'=>'type','value'=>'类别',],
-    ['name'=>'project_name','value'=>'项目名称',],
-    ['name'=>'inspection_num_sum','value'=>'检查次数',],
-    ['name'=>'count_val','value'=>'发现问题数',],
-    ['name'=>'pp_count','value'=>'处置总人数',],
-    ['value'=>'第一种形态处置人数','childs'=>[
-        ['value'=>'不含诫勉谈话','format'=>fn($v)=>'bbb'],
-            ['value'=>'子列表2','childs'=>[
-                ['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
-                ['name'=>'admonish_val_count','value'=>'子列表2--B',],
-            ]],
-        ]
-    ],
-    ['name'=>'discipline_count','value'=>'党纪政务处分人数',],
-    ['name'=>'proposal_yes_count','value'=>'发放监察建议书',],
+['name'=>'type','value'=>'类别',],
+['name'=>'project_name','value'=>'项目名称',],
+['name'=>'inspection_num_sum','value'=>'检查次数',],
+['name'=>'count_val','value'=>'发现问题数',],
+['name'=>'pp_count','value'=>'处置总人数',],
+['value'=>'第一种形态处置人数','childs'=>[
+['value'=>'不含诫勉谈话','format'=>fn($v)=>'bbb'],
+['value'=>'子列表2','childs'=>[
+['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
+['name'=>'admonish_val_count','value'=>'子列表2--B',],
+]],
+]
+],
+['name'=>'discipline_count','value'=>'党纪政务处分人数',],
+['name'=>'proposal_yes_count','value'=>'发放监察建议书',],
 ];
 ExportExcel::make('“五项监督”子库一览表')->setThead($heads)->setData($list)->out();
  */
@@ -42,6 +42,8 @@ class ExportExcel
     public string $fileName='';//保存名称
 
     public bool $freezePane=true;//冻结表头
+
+    public bool $defFormatText=false;//是否设置默认为文本格式
 
     /**
      * @var ExportCell[]
@@ -249,6 +251,10 @@ class ExportExcel
         if($this->fontName){
             $this->excel->getDefaultStyle()->getFont()->setName($this->fontName);
         }
+        //设置默认为文本格式
+        if($this->defFormatText){
+            $this->excel->getDefaultStyle()->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+        }
 
 
         $maxH=[];
@@ -257,6 +263,7 @@ class ExportExcel
             /**
              * @var ExportCell $v
              */
+
             $style=$this->excel->getActiveSheet()->getStyle($v->col.$v->row);
             isset($v->fontSize)&&$style->getFont()->setSize($v->fontSize);
             isset($v->fontName)&&$style->getFont()->setName($v->fontName);
@@ -290,6 +297,7 @@ class ExportExcel
                 //处理excel对函数
                 ($v->do)($this->excel,$v);
             }
+
         }
 
         foreach ($maxH as $row=>$v){
