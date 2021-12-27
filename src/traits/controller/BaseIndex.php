@@ -146,7 +146,7 @@ trait BaseIndex
             'model'=>static::modelClassPath(),
             'modelName'=>class_basename(static::modelClassPath()),
             'indexPageOption'=>$this->indexPageOption,
-            'createTimeField'=>$this->fields->findByName('create_time',true),
+            'createTimeField'=>$this->fields->findByName('create_time',false),
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
             'listUrl'=>$this->request->url(),
