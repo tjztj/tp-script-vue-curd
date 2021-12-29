@@ -1054,3 +1054,7 @@ a.red:hover,a.yellow:hover{
     border-left: 1px solid #cfd7f1;
 }
 /****************************************************************/
+.curd-table .ant-table-row-expand-icon+div{
+    display: inline;
+}
+/****************************************************************/

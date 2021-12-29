@@ -99,6 +99,9 @@ trait BaseIndex
             //控制器数据处理钩子
             try{
                 $this->indexData($option);
+                if($this->isTreeIndex()){
+                    $option->data=$this->listToTree($option->data);
+                }
             }catch(\Exception $e){
                 $this->error($e);
             }
@@ -180,6 +183,17 @@ trait BaseIndex
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
+
+
+        if($this->isTreeIndex()){
+            //树形结构的列名
+            $data['childrenColumnName']=$this->childrenColumnName;
+            $data['indentSize']=$this->indentSize;
+        }else{
+            //展示树形数据时，每层缩进的宽度，以 px 为单位
+            $data['childrenColumnName']='---无';
+            $data['indentSize']=15;
+        }
 
 
 
@@ -575,7 +589,7 @@ trait BaseIndex
     protected function indexListSelect($model):FunControllerIndexData{
         $option=new FunControllerIndexData();
         $option->model=clone $model;
-        if($this->indexPageOption->pageSize>0){
+        if($this->indexPageOption->pageSize>0&&!$this->isTreeIndex()){
             $pageSize=$this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize;
             $list=$model->paginate($pageSize);
             $option->currentPage=$list->currentPage();
@@ -623,4 +637,11 @@ trait BaseIndex
     }
 
 
+    /**
+     * 是否树形列表
+     * @return bool
+     */
+    final public function isTreeIndex(){
+        return isset($this->treePidField)&&$this->treePidField!=='';
+    }
 }

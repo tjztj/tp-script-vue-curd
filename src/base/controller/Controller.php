@@ -20,6 +20,7 @@ use tpScriptVueCurd\traits\controller\BaseIndex;
 use tpScriptVueCurd\traits\controller\BaseShow;
 use tpScriptVueCurd\traits\controller\Childs;
 use tpScriptVueCurd\traits\controller\HaveChilds;
+use tpScriptVueCurd\traits\controller\TreeIndex;
 use tpScriptVueCurd\traits\controller\Vue;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\traits\controller\Excel;
@@ -35,7 +36,7 @@ use tpScriptVueCurd\traits\Func;
  */
 trait Controller
 {
-    use Vue,BaseIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel{
+    use Vue,BaseIndex,TreeIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel{
         Vue::initialize as vueInitialize;
     }
 

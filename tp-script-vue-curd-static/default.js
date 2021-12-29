@@ -187,6 +187,8 @@ define(['vueAdmin'], function (va) {
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
                     showCreateTime:!vueData.createTimeField,
+                    childrenColumnName:vueData.childrenColumnName,
+                    indentSize:vueData.indentSize,
                     //其他配置
                     ...getThisActionOhterData(),
                 }

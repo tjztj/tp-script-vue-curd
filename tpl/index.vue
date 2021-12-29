@@ -183,6 +183,8 @@
                     :action-def-width="actionDefWidth"
                     :show-create-time="showCreateTime"
                     :set-scroll-y="!!childTpl"
+                    :children-column-name="childrenColumnName"
+                    :indent-size="indentSize"
                     @refresh-table="refreshTable"
                     @change="handleTableChange"
                     @on-delete="deleteRow"

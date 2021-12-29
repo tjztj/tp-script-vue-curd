@@ -1352,7 +1352,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1708,6 +1708,8 @@ define(requires, function (axios, Qs) {
                             :bordered="isGroup"
                             :scroll="{ x: scrollX ,y:scrollY}"
                             :row-selection="rowSelection"
+                            :children-column-name="childrenColumnName"
+                            :indent-size="indentSize"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
