@@ -192,10 +192,12 @@ trait BaseIndex
             //树形结构的列名
             $data['childrenColumnName']=$this->childrenColumnName;
             $data['indentSize']=$this->indentSize;
+            $data['defaultExpandAllRows']=$this->defaultExpandAllRows;
         }else{
             //展示树形数据时，每层缩进的宽度，以 px 为单位
             $data['childrenColumnName']='---无';
             $data['indentSize']=15;
+            $data['defaultExpandAllRows']=false;
         }
 
 

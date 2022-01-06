@@ -23,6 +23,11 @@ trait TreeIndex
     public int $indentSize=15;
 
     /**
+     * @var bool 初始时，是否展开所有行
+     */
+    public bool $defaultExpandAllRows=false;
+
+    /**
      * 普通列表数据转换为树形列表
      * @param array $list
      * @return array

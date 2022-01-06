@@ -196,6 +196,7 @@
                     :set-scroll-y="!!childTpl"
                     :children-column-name="childrenColumnName"
                     :indent-size="indentSize"
+                    :default-expand-all-rows="defaultExpandAllRows"
                     @refresh-table="refreshTable"
                     @change="handleTableChange"
                     @on-delete="deleteRow"
