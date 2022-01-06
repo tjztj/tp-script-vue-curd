@@ -85,6 +85,23 @@ class RadioField extends ModelField
         }
         $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],false);
     }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        $name=$this->name();
+        if(!isset($data[$name])){
+            return '';
+        }
+        //如果值等于0，并且选项中没有等于0的选项，设置显示为空
+        if(($data[$name]===0||$data[$name]==='0')&&!$this->haveZeroValue()){
+            return '';
+        }
+        return $this->getShowText($data[$name],false);
+    }
 
     /**
      * 模板导入备注

@@ -13,9 +13,9 @@ $heads=[
     ['name'=>'pp_count','value'=>'处置总人数',],
     ['value'=>'第一种形态处置人数','childs'=>[
         ['value'=>'不含诫勉谈话','format'=>fn($v)=>'bbb'],
-            ['value'=>'子列表2','childs'=>[
-                ['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
-                ['name'=>'admonish_val_count','value'=>'子列表2--B',],
+        ['value'=>'子列表2','childs'=>[
+            ['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
+            ['name'=>'admonish_val_count','value'=>'子列表2--B',],
             ]],
         ]
     ],
@@ -30,7 +30,9 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class ExportExcel
@@ -42,6 +44,13 @@ class ExportExcel
     public string $fileName='';//保存名称
 
     public bool $freezePane=true;//冻结表头
+
+    public bool $defFormatText=false;//是否设置默认为文本格式
+
+    public bool $showColBorder=false;//是否显示单元格边框
+    public bool $showTableBorder=false;//是否显示表格外边框
+
+    public ?string $thBgColor=null;//表头要设置的颜色 ARGB类型（ARGB 头两位是透明度，00是全然透明，ff是全然不透明，后6位是RGB值）
 
     /**
      * @var ExportCell[]
@@ -249,14 +258,20 @@ class ExportExcel
         if($this->fontName){
             $this->excel->getDefaultStyle()->getFont()->setName($this->fontName);
         }
+        //设置默认为文本格式
+        if($this->defFormatText){
+            $this->excel->getDefaultStyle()->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+        }
 
 
         $maxH=[];
         $maxW=[];
+        $lastColRow=['A',($this->thMaxRow+1)];
         foreach ($this->items as $v){
             /**
              * @var ExportCell $v
              */
+
             $style=$this->excel->getActiveSheet()->getStyle($v->col.$v->row);
             isset($v->fontSize)&&$style->getFont()->setSize($v->fontSize);
             isset($v->fontName)&&$style->getFont()->setName($v->fontName);
@@ -279,7 +294,7 @@ class ExportExcel
                 $mergeCellsRow=empty($v->mergeCellsRow)?0:$v->mergeCellsRow;
                 $this->excel->getActiveSheet()->mergeCells($v->col . $v->row . ':' . (ExportOperation::operationAdd($v->col,$mergeCellsCol)) . bcadd($v->row,$mergeCellsRow));
             }
-            if(isset($v->formatText)&&$v->formatText===true){
+            if((isset($v->formatText)?$v->formatText:$this->defFormatText)===true){
                 $style->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
                 $this->excel->getActiveSheet()->setCellValueExplicit($v->col . $v->row,$v->value,DataType::TYPE_STRING);
             }else{
@@ -290,7 +305,48 @@ class ExportExcel
                 //处理excel对函数
                 ($v->do)($this->excel,$v);
             }
+            $lastColRow=[$v->col , $v->row];
         }
+
+        //是否显示边框
+        if($this->showColBorder){
+            $this->excel->getActiveSheet()->getStyle('A2:'.$lastColRow[0] .$this->thMaxRow)->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN, //细边框
+                        'color'=>['argb' => 'FF595959']
+                    ]
+                ]
+            ]);
+            $this->excel->getActiveSheet()->getStyle("A" . ($this->thMaxRow+1).':'.$lastColRow[0].$lastColRow[1])->applyFromArray([
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN, //细边框
+                        'color'=>['argb' => 'FF999999']
+                    ]
+                ]
+            ]);
+        }
+        if($this->showTableBorder){
+            $this->excel->getActiveSheet()->getStyle('A1:'.$lastColRow[0].$lastColRow[1])->applyFromArray([
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THICK,
+//                        'color'=>['argb' => 'FF8C8C8C']
+                    ]
+                ]
+            ]);
+        }
+        //设置表头颜色
+        if($this->thBgColor){
+            $this->excel->getActiveSheet()->getStyle('A2:'.$lastColRow[0] .$this->thMaxRow)->applyFromArray([
+                'fill' => array(
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['argb' => $this->thBgColor]
+                )
+            ]);
+        }
+
 
         foreach ($maxH as $row=>$v){
             $this->excel->getActiveSheet()->getRowDimension($row)->setRowHeight($v);

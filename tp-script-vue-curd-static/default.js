@@ -187,6 +187,8 @@ define(['vueAdmin'], function (va) {
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
                     showCreateTime:!vueData.createTimeField,
+                    childrenColumnName:vueData.childrenColumnName,
+                    indentSize:vueData.indentSize,
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -234,6 +236,8 @@ define(['vueAdmin'], function (va) {
                 fetch() {
                     this.loading = true;
                     const where=this.getWhere();
+                    where.pageGuid=VUE_CURD.GUID;
+                    where.refreshId=0;
                     this.$get(this.indexUrl,where).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
@@ -374,6 +378,8 @@ define(['vueAdmin'], function (va) {
                     const where=this.getWhere();
                     where.id=id;
                     where.page=1;
+                    where.pageGuid=VUE_CURD.GUID;
+                    where.refreshId=1;
                     this.$get(this.indexUrl,where).then(data => {
                         if(!data.data.data[0]){
                             this.loading = false;
@@ -432,6 +438,24 @@ define(['vueAdmin'], function (va) {
                         }
                     }).trigger();
                 },
+                exportData(){
+                    const url=setUrlParams(vueData.exportUrl,{pageGuid:VUE_CURD.GUID})
+                    if(this.pagination.total<10000){
+                        window.open(url);
+                        return;
+                    }
+                    //如果数据大于1万条，提出警告
+                    antd.Modal.confirm({
+                        title: '导出提示',
+                        icon:warnIcon('#faad14'),
+                        content: '当前结果数据较多，可能会发生不能正确导出数据的情况，建议筛选后再导出',
+                        okText: '仍然导出',
+                        cancelText: '取消导出',
+                        onOk() {
+                            window.open(url);
+                        }
+                    });
+                },
                 actionWidth(row){
                     return this.actionDefWidth
                 },
@@ -460,6 +484,9 @@ define(['vueAdmin'], function (va) {
             form.id=vueData.info.id;
         }
         return {
+            setup(props,ctx){
+                return getThisActionOhterSetup(props,ctx);
+            },
             data() {
                 return {
                     loading:false,
@@ -470,6 +497,7 @@ define(['vueAdmin'], function (va) {
                     form:form,
                     info:vueData.info||{},
                     fieldHideList:{},
+                    ...getThisActionOhterData(),
                 }
             },
             computed:{
@@ -487,7 +515,11 @@ define(['vueAdmin'], function (va) {
                         }
                     }
                     return false;
-                }
+                },
+                ...getThisActionOhterComputeds(),
+            },
+            watch:{
+                ...getThisActionOhterWatchs(),
             },
             methods:{
                 onSubmit(option){
@@ -554,6 +586,7 @@ define(['vueAdmin'], function (va) {
                     }
                     return false;
                 },
+                ...getThisActionOhterMethods()
             }
         }
     };

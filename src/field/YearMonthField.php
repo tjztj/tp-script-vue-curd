@@ -57,6 +57,19 @@ class YearMonthField extends ModelField
     }
 
     /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        if (!isset($data[$this->name])) {
+            return '';
+        }
+        return self::monthToStr($data[$this->name]);
+    }
+
+    /**
      * EXCEL导入时，对数据的处理
      * @param array $save
      */

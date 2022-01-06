@@ -109,8 +109,19 @@ class SwitchField extends ModelField
             $dataBaseData[$name]=$this->getShowText($dataBaseData[$name],false);
         }
     }
-
-
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        $name=$this->name();
+        if(!isset($data[$name])){
+           return '';
+        }
+        return $this->getShowText($data[$name],false);
+    }
 
 
     /**

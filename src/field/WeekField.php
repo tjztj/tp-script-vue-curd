@@ -67,6 +67,15 @@ class WeekField extends ModelField
             $dataBaseData[$this->name] = empty($dataBaseData[$this->name]) ? '' : self::getWeekStr($dataBaseData[$this->name]);
         }
     }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        return empty($data[$this->name]) ? '' : self::getWeekStr($data[$this->name]);
+    }
 
 
     /**

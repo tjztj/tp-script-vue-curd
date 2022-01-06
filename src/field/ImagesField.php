@@ -30,6 +30,7 @@ class ImagesField extends ModelField
      */
     protected $imgFieldShowUrlDo=null;
 
+    protected bool $canExport=false;//不能导出此字段数据
 
     /**最小值
      * @param string|null $url

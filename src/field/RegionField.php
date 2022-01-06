@@ -214,35 +214,54 @@ class RegionField extends ModelField
      */
     public function doShowData(array &$dataBaseData): void
     {
-        $name = $this->name();
-        if (isset($dataBaseData[$name])) {
-            if($this->multiple){
-                if(!is_numeric(str_replace(',','',$dataBaseData[$name]))){
-                    return;
-                }
-            }else{
-                if(!is_numeric($dataBaseData[$name])){
-                    return;
-                }
-            }
+        $val=$this->getTextByData($dataBaseData);
+        is_null($val)||$dataBaseData[$this->name()]=$val;
+    }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        $val=$this->getTextByData($data);
+        return is_null($val)?'':$val;
+    }
 
-            if( empty($dataBaseData[$name])){
-                $dataBaseData[$name]=$this->getTreeToList()[$dataBaseData[$name]]['label']??'';
-                return;
-            }
-
-            if(!$this->multiple){
-                $dataBaseData[$name] = $this->getTreeToList()[$dataBaseData[$name]]['label']??$this->getRegionName($dataBaseData[$name]);
-                return;
-            }
-
-            $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
-
-            foreach ($arr as $k=>$v){
-                $arr[$k]=$this->getRegionName($v)?:$v;
-            }
-            $dataBaseData[$name]=implode('，',$arr);
+    /**
+     * 根据数据获取显示的信息
+     * @param array $dataBaseData
+     * @return string|null
+     */
+    private function getTextByData(array $dataBaseData):?string{
+        $name=$this->name();
+        if (!isset($dataBaseData[$name])) {
+            return null;
         }
+        if($this->multiple){
+            if(!is_numeric(str_replace(',','',$dataBaseData[$name]))){
+                return null;
+            }
+        }else{
+            if(!is_numeric($dataBaseData[$name])){
+                return null;
+            }
+        }
+
+        if( empty($dataBaseData[$name])){
+            return $this->getTreeToList()[$dataBaseData[$name]]['label']??'';
+        }
+
+        if(!$this->multiple){
+            return $this->getTreeToList()[$dataBaseData[$name]]['label']??$this->getRegionName($dataBaseData[$name]);
+        }
+
+        $arr=is_array($dataBaseData[$name])?$dataBaseData[$name]:explode(',',$dataBaseData[$name]);
+
+        foreach ($arr as $k=>$v){
+            $arr[$k]=$this->getRegionName($v)?:$v;
+        }
+        return implode('，',$arr);
     }
 
 

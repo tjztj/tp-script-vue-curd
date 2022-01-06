@@ -134,6 +134,18 @@ class DateField extends ModelField
             }
         }
     }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        if(empty($data[$this->name()])){
+            return '';
+        }
+        return \tpScriptVueCurd\tool\Time::unixtimeToDate($this->showTime()?'Y-m-d H:i:s':'Y-m-d',$data[$this->name()]);
+    }
 
 
     /**
@@ -171,5 +183,6 @@ class DateField extends ModelField
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeBigInt(10);
     }
+
 
 }

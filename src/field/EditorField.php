@@ -79,11 +79,28 @@ class EditorField extends ModelField
         return $this->doAttr('toolbar',$toolbar);
     }
 
+    /**
+     * 数据显示时处理
+     * @param array $dataBaseData
+     * @return void
+     */
     public function doShowData(array &$dataBaseData): void
     {
         if(isset($dataBaseData[$this->name()])){
             $dataBaseData[$this->name()]=htmlspecialchars_decode($dataBaseData[$this->name()]);
         }
+    }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        if(!isset($data[$this->name()])){
+            return '';
+        }
+        return strip_tags(htmlspecialchars_decode($data[$this->name()]));
     }
 
 
@@ -124,4 +141,7 @@ class EditorField extends ModelField
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeText();
     }
+
+
+
 }

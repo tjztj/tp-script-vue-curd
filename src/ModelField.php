@@ -84,6 +84,9 @@ abstract class ModelField
     public string $toArrayPageType='';
     protected $toArrayBefore=null;
 
+
+    protected bool $canExport=true;//是否可以导出本字段数据
+
     public function __construct()
     {
         $this->guid = create_guid();
@@ -1046,5 +1049,25 @@ abstract class ModelField
      * @return void
      */
     abstract public function getGenerateColumnConfig(GenerateColumnOption $option):void;
+
+
+    /**
+     * 是否可以导出本字段数据
+     * @param bool|null $canExport
+     * @return $this|bool
+     */
+    public function canExport(bool $canExport = null)
+    {
+        return $this->doAttr('canExport', $canExport);
+    }
+
+    /**
+     * 获取导出数据时文本
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data):string{
+        return $data[$this->name()]??'';
+    }
 
 }

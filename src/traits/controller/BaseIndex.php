@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\traits\controller;
 use think\Collection;
 use think\db\Query;
 use think\db\Raw;
+use think\facade\Cache;
 use think\Request;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
@@ -99,6 +100,9 @@ trait BaseIndex
             //控制器数据处理钩子
             try{
                 $this->indexData($option);
+                if($this->isTreeIndex()){
+                    $option->data=$this->listToTree($option->data);
+                }
             }catch(\Exception $e){
                 $this->error($e);
             }
@@ -155,6 +159,7 @@ trait BaseIndex
             'delUrl'=>url('del')->build(),
             'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseId])->build(),
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseId])->build(),
+            'exportUrl'=>url('export',['base_id'=>$baseId])->build(),
             'title'=>$this->title,
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$filterFields->getFilterShowData(),
@@ -172,14 +177,26 @@ trait BaseIndex
                 'del'=>true,
                 'importExcelTpl'=>false,
                 'downExcelTpl'=>false,
+                'export'=>false,
                 'stepAdd'=>$this->getAuthAdd(clone $this->md,$parentInfo),
-                'rowAuthAdd'=>$rowAuthAdd
+                'rowAuthAdd'=>$rowAuthAdd,
             ],
             'baseInfo'=>$parentInfo,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
         ];
+
+
+        if($this->isTreeIndex()){
+            //树形结构的列名
+            $data['childrenColumnName']=$this->childrenColumnName;
+            $data['indentSize']=$this->indentSize;
+        }else{
+            //展示树形数据时，每层缩进的宽度，以 px 为单位
+            $data['childrenColumnName']='---无';
+            $data['indentSize']=15;
+        }
 
 
 
@@ -216,7 +233,9 @@ trait BaseIndex
             //如果没有父表
             return;
         }
-        $baseId=$this->request->param('base_id/d',0);
+        //可以在外面赋值
+        $baseId=$this->request->get('base_id/d',0);
+        $baseId||$baseId=$this->request->param('base_id/d',0);
         if(empty($baseId)){
             return;
         }
@@ -571,9 +590,15 @@ trait BaseIndex
      * @throws \think\db\exception\ModelNotFoundException
      */
     protected function indexListSelect($model):FunControllerIndexData{
+        $indexGuid=$this->request->param('pageGuid');
+        if($indexGuid){
+            //记录导出url
+            Cache::tag('indexExportSql')->set('indexExportSql-'.$indexGuid,(clone $model)->fetchSql(true)->select(),60*60*24);
+        }
+
         $option=new FunControllerIndexData();
         $option->model=clone $model;
-        if($this->indexPageOption->pageSize>0){
+        if($this->indexPageOption->pageSize>0&&!$this->isTreeIndex()){
             $pageSize=$this->indexPageOption->canGetRequestOption?$this->request->param('pageSize/d',$this->indexPageOption->pageSize):$this->indexPageOption->pageSize;
             $list=$model->paginate($pageSize);
             $option->currentPage=$list->currentPage();
@@ -621,4 +646,11 @@ trait BaseIndex
     }
 
 
+    /**
+     * 是否树形列表
+     * @return bool
+     */
+    final public function isTreeIndex(){
+        return isset($this->treePidField)&&$this->treePidField!=='';
+    }
 }

@@ -23,6 +23,7 @@ class FilesField extends ModelField
 
     protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
     protected bool $canExcelImport=false;//不能使用excel导入数据
+    protected bool $canExport=false;//不能导出此字段数据
     protected string $accept='';//上传文件类型
     protected bool $multiple=true;//是否可多选
 

@@ -115,6 +115,15 @@ class MonthField extends ModelField
             $dataBaseData[$name] = empty($dataBaseData[$name]) ? '' : \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',$dataBaseData[$name]);
         }
     }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        return empty($data[$name]) ? '' : \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',$data[$name]);
+    }
 
     /**
      * 模板导入备注
@@ -147,4 +156,5 @@ class MonthField extends ModelField
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeBigInt(10);
     }
+
 }

@@ -25,6 +25,7 @@ class ListField extends ModelField
     protected string $defaultFilterClass=EmptyFilter::class;
 
     protected bool $canExcelImport=false;//不能使用excel导入数据
+    protected bool $canExport=false;//不能导出此字段数据
     protected FieldCollection $fields;//字段集合
     protected $nullVal='null';//字段在数据库中为空时的值
 

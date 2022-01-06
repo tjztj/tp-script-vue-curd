@@ -332,4 +332,47 @@ class TreeSelect extends ModelField
         }
         return $values;
     }
+    /**
+     * 导出到excel时数据处理
+     * @param array $data
+     * @return string
+     */
+    public function getExportText(array $data): string
+    {
+        if(!isset($data[$this->name()])){
+            return '';
+        }
+        if($this->multiple()){
+            $values=explode(',',$data[$this->name()]);
+        }else{
+            $values=[$data[$this->name()]];
+        }
+
+        if(!isset($this->lists)){
+            //为了防止导入的时候占用太多内存
+            $this->lists=self::treeToList($this->items(),'value','children');
+        }
+        $list=$this->lists;
+        $items=[];
+        foreach ($list as $v){
+            $findKey=array_search($v['value'],$values);
+            if($findKey===false){
+                continue;
+            }
+            $keys=[];
+            foreach ($v['parents'] as $val){
+                if(!isset($list[$val])){
+                    continue;
+                }
+                $keys[]=$list[$val]['title'];
+            }
+            $keys[]=$v['title'];
+            $items[$v['value']]=implode('-',$keys);
+            unset($values[$findKey]);
+            if(empty($values)){
+                break;
+            }
+        }
+        return implode('|',$items);
+    }
 }

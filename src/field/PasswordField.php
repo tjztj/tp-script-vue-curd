@@ -25,6 +25,8 @@ class PasswordField extends ModelField
     protected string $defaultFilterClass=EmptyFilter::class;
     protected bool $listShow=false;
 
+    protected bool $canExport=false;//不能导出此字段数据
+
 
     /**
      * 是否在后台列表中显示出来

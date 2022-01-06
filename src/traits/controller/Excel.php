@@ -8,8 +8,7 @@ namespace tpScriptVueCurd\traits\controller;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\NamedRange;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xls\CellDataValidation;
-use \tpScriptVueCurd\tool\excel_out\ExportCell;
+use tpScriptVueCurd\tool\excel_out\ExportCell;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
@@ -116,7 +115,9 @@ trait Excel
 
         $this->excelBaseInfo=null;
         if(!is_null($this->getParentController())){
-            $baseId=$this->request->param('base_id/d');
+            //可以在外面赋值
+            $baseId=$this->request->get('base_id/d',0);
+            $baseId||$baseId=$this->request->param('base_id/d',0);
             if(empty($baseId)){
                 throw new \think\Exception('缺少父表参数');
             }
@@ -357,13 +358,14 @@ trait Excel
             $emptyItem[$v['name']]='';
         }
         $list=[];
-        //生成5000条空数据
+        //生成2000条空数据
         ini_set('memory_limit','-1');
-        for($i=0;$i<5000;$i++){
+        for($i=0;$i<2000;$i++){
             $list[]=$emptyItem;
         }
         $title=$this->getExcelTilte();
         $excel=ExportExcel::make($title);
+        $excel->defFormatText=true;
         $excel->title->alignmentHorizontal=Alignment::HORIZONTAL_LEFT;
         $excel->title->wrapText=true;
         $excel->title->height=60;
@@ -470,7 +472,7 @@ trait Excel
                     if($cell instanceof ExportThCell){
                         return '';
                     }
-                    $cell->do=function (Spreadsheet $excel, ExportCell $cell)use($v){
+                    $cell->do= static function (Spreadsheet $excel, ExportCell $cell)use($v){
                         //如果是表头
                         $checkSheet=$excel->getSheetByName('选项');
                         if(empty($checkSheet)){
@@ -482,34 +484,67 @@ trait Excel
                             static $regionChilds=null;
                             static $regionNameobj=[];
                             static $regionFields=null;
+                            $fieldName=explode('|',$v->name);
+                            $fieldName=end($fieldName);
                             if(is_null($regionChilds)){
                                 $regionLevelObj=[];
                                 $pKey=null;
                                 $regionFields=$v->field->getAboutRegions();
-                                foreach ($v->field->getAboutRegions() as $key=>$val){
+                                foreach ($regionFields as $key=>$val){
                                     if($val->canExcelImport()){
+                                        $fName=explode('|',$val->name());
+                                        $fName=end($fName);
                                         if(is_null($pKey)){
                                             $regionLevelObj[$key+1]=[
                                                 'level'=>$key+1,
                                                 'plevel'=>0,
                                                 'pname'=>'',
-                                                'name'=>$val->name()
+                                                'name'=>$fName
                                             ];
                                         }else{
+                                            $pfName=explode('|',$regionFields[$pKey]->name());
+                                            $pfName=end($pfName);
                                             $regionLevelObj[$key+1]=[
                                                 'level'=>$key+1,
                                                 'plevel'=>$pKey+1,
-                                                'pname'=>$regionFields[$pKey]->name(),
-                                                'name'=>$val->name()
+                                                'pname'=>$pfName,
+                                                'name'=>$fName
                                             ];
                                         }
-                                        $regionNameobj[$val->name()]=$regionLevelObj[$key+1];
+
+                                        $regionNameobj[$fName]=$regionLevelObj[$key+1];
                                         $pKey=$key;
                                     }
                                 }
 
                                 $regionChilds=[];
                                 $regionArr=$v->field->getTreeToList();
+
+                                $needAddPSelectIds=[];
+                                foreach ($regionArr as $val){
+                                    $pIds=array_filter(explode(',',$val['pids']));
+                                    foreach ($regionLevelObj as $kk=>$vv){
+                                        if(isset($pIds[$kk+1])&&!isset($regionArr[$kk+1])){
+                                            $needAddPSelectIds[]=$pIds[$kk+1];
+                                        }
+                                    }
+                                }
+                                if($needAddPSelectIds){
+                                    $allRegionInfos=\app\admin\model\SystemRegion::getAll();
+                                    $allRegions = [];
+                                    foreach ($allRegionInfos as $key => $data) $allRegions[$data['id']] =& $allRegionInfos[$key];
+                                    foreach ($allRegionInfos as $key => $data) {
+                                        // 判断是否存在parent
+                                        if (isset($allRegions[$data['pid']])) {
+                                            isset($allRegions[$data['pid']]['children'])||$allRegions[$data['pid']]['children']=[];
+                                            $allRegions[$data['pid']]['children'][$data['id']] =& $allRegions[$data['id']];
+                                        }
+                                    }
+                                    $needAddPSelectIds=array_unique($needAddPSelectIds);
+                                    foreach ($needAddPSelectIds as $vv){
+                                        isset($allRegions[$vv])&&$regionArr[$vv]=$allRegions[$vv];
+                                    }
+                                }
                                 foreach ($regionArr as $val){
                                     $pIds=explode(',',$val['pids']);
                                     $titles=[];
@@ -525,7 +560,7 @@ trait Excel
                                         }
                                         $titleStrArr=$titles;
                                         if(!isset($regionLevelObj[$pKey])){
-                                            for($i=$pKey;$i--;$i>=0){
+                                            for($i=$pKey;$i>=0;$i--){
                                                 unset($titleStrArr[$i]);
                                                 if(isset($regionLevelObj[$i])){
                                                     $pKey=$i;
@@ -540,29 +575,24 @@ trait Excel
                                             isset($regionChilds[$pname][$pTitleStr])||$regionChilds[$pname][$pTitleStr]=[];
                                             $regionChilds[$pname][$pTitleStr][]=$val['name'];
                                         }
-//                                        $cTitleStr=$pTitleStr?($pTitleStr.'-'.$val['name']):$val['name'];
-//                                        $cname=$regionLevelObj[$cKey]['name'];
-//                                        isset($regionChilds[$cname])||$regionChilds[$cname]=[];
-//                                        isset($regionChilds[$cname][$cTitleStr])||$regionChilds[$cname][$cTitleStr]=[];
                                     }
                                 }
                             }
 
-                            if(isset($regionNameobj[$v->name])){
-                                if(empty($regionNameobj[$v->name]['pname'])){
-                                    $items=array_keys($regionChilds[$v->name]);
+
+                            if(isset($regionNameobj[$fieldName])){
+                                if(empty($regionNameobj[$fieldName]['pname'])){
+                                    $items=array_keys($regionChilds[$fieldName]);
                                     $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
                                     $prompt='';
                                 }else{
                                     static $isInit=[];
-                                    if(!isset($isInit[$v->name])){
-                                        $isInit[$v->name]=true;
-                                        $childIndexs=[];
+                                    if(!isset($isInit[$fieldName])){
+                                        $isInit[$fieldName]=true;
                                         $childIndex=0;
                                         $items=[];
-                                        $pname=$regionNameobj[$v->name]['pname'];
+                                        $pname=$regionNameobj[$fieldName]['pname'];
 
-//                                        $i=1;
                                         foreach ($regionChilds[$pname] as $key=>$vals){
                                             $pTitles=[];
                                             $npname=$pname;
@@ -578,13 +608,10 @@ trait Excel
                                                 }
                                             }
                                             $pTitles[]=$key;
-//                                            if($v->name==='system_region_id')dd($cell->col.($childIndex+1).':'.$cell->col.($childIndex+=count($vals)));
                                             $excel->addNamedRange(new NamedRange(str_replace('-','',implode('-',$pTitles))
                                                 ,$checkSheet
                                                 ,$cell->col.($childIndex+1).':'.$cell->col.($childIndex+=count($vals))
                                             ));
-//                                            $checkSheet->getCell('AA'.$cell->col .$i)->setValue($val);
-//                                            $i++;
                                             array_push($items,...$vals);
                                         }
                                     }
@@ -595,7 +622,9 @@ trait Excel
                                         if(!$vv->canExcelImport()){
                                             continue;
                                         }
-                                        if($vv->name()===$v->name){
+                                        $fName=explode('|',$vv->name());
+                                        $fName=end($fName);
+                                        if($fName===$fieldName){
                                             $prompt=isset($regionFields[$lastKK])?'需先选择'.$regionFields[$lastKK]->title():'';
                                             break;
                                         }
@@ -604,7 +633,6 @@ trait Excel
                                         $lastKK=$kk;
                                     }
                                     $formula1='=INDIRECT('.implode('&',$pCols).')';
-//                                    if(count($pCols)>1)dd($formula1);
                                 }
                             }else{
                                 $items=[];

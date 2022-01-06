@@ -202,7 +202,9 @@ trait BaseEdit
         }else{
             $info=clone $model;
             if($baseModel){
-                $base_id=$this->request->param('base_id/d',0);
+                //可以在外面赋值
+                $base_id=$this->request->get('base_id/d',0);
+                $base_id||$base_id=$this->request->param('base_id/d',0);
                 $base_id||$this->errorAndCode('缺少必要参数');
                 $parentInfo=$baseModel->find($base_id);
             }else{
