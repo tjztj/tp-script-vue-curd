@@ -1583,7 +1583,7 @@ define(requires, function (axios, Qs) {
                         },40)
                     });
                     this.getActionWidthByProps();
-                    let expandedRowKeys=[];
+                    const expandedRowKeys=[];
                     if(this.expandAllRows){
                         data.forEach(v=>{
                             if(v[this.childrenColumnName]&&v[this.childrenColumnName].length>0){
@@ -1705,7 +1705,20 @@ define(requires, function (axios, Qs) {
                 },
                 isCanDel(row) {
                     return this.canDel && (!row.__auth || typeof row.__auth.del === 'undefined' || row.__auth.del === true)
-                }
+                },
+                onExpand (expanded, record) {
+                    if (expanded) {
+                        // 设置展开窗Key，代表展开操作
+                        this.expandedRowKeys.push(record.id)
+                    } else {
+                        // 代表折叠操作
+                        if (this.expandedRowKeys.length) {
+                            this.expandedRowKeys = this.expandedRowKeys.filter(v => {
+                                return v !== record.id
+                            })
+                        }
+                    }
+                },
             },
             template: `<div :id="id">
                         <a-table
@@ -1721,7 +1734,8 @@ define(requires, function (axios, Qs) {
                             :row-selection="rowSelection"
                             :children-column-name="childrenColumnName"
                             :indent-size="indentSize"
-                            :expanded-row-keys="expandedRowKeys"
+                            v-model:expanded-row-keys="expandedRowKeys"
+                            @expand="onExpand"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
