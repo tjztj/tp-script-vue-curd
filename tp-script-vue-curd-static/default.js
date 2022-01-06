@@ -189,7 +189,8 @@ define(['vueAdmin'], function (va) {
                     showCreateTime:!vueData.createTimeField,
                     childrenColumnName:vueData.childrenColumnName,
                     indentSize:vueData.indentSize,
-                    defaultExpandAllRows:vueData.defaultExpandAllRows,
+                    expandAllRows:vueData.expandAllRows,
+                    isTreeIndex:vueData.isTreeIndex,
                     //其他配置
                     ...getThisActionOhterData(),
                 }

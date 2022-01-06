@@ -1353,7 +1353,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize','defaultExpandAllRows'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize','expandAllRows','isTreeIndex'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1567,7 +1567,8 @@ define(requires, function (axios, Qs) {
                     listFieldComponents,
                     fieldObjs,
                     childsObjs,
-                    onresize
+                    onresize,
+                    expandedRowKeys:Vue.ref([]),
                 }
             },
             watch: {
@@ -1580,8 +1581,17 @@ define(requires, function (axios, Qs) {
                         setTimeout(()=>{
                             this.onresize();
                         },40)
-                    })
-                    this.getActionWidthByProps()
+                    });
+                    this.getActionWidthByProps();
+                    let expandedRowKeys=[];
+                    if(this.expandAllRows){
+                        data.forEach(v=>{
+                            if(v[this.childrenColumnName]&&v[this.childrenColumnName].length>0){
+                                expandedRowKeys.push(v.id);
+                            }
+                        })
+                    }
+                    this.expandedRowKeys=expandedRowKeys;
                 }
             },
             methods: {
@@ -1702,7 +1712,7 @@ define(requires, function (axios, Qs) {
                             :row-key="record => record.id"
                             :columns="columns"
                             :data-source="data"
-                            :pagination="pagination&&pagination.pageSize?pagination:false"
+                            :pagination="pagination&&(!isTreeIndex)&&pagination.pageSize?pagination:false"
                             :loading="loading"
                             @change="handleTableChange"
                             class="curd-table"
@@ -1711,7 +1721,7 @@ define(requires, function (axios, Qs) {
                             :row-selection="rowSelection"
                             :children-column-name="childrenColumnName"
                             :indent-size="indentSize"
-                            :default-expand-all-rows="defaultExpandAllRows"
+                            :expanded-row-keys="expandedRowKeys"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
