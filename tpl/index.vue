@@ -146,7 +146,7 @@
 
                     <template v-if="auth.downExcelTpl">
                         <div class="ant-space-item">
-                            <a-button class="info" @click="downExcelTpl">
+                            <a-button type="info" @click="downExcelTpl">
                                 <download-outlined></download-outlined>
                                 <span> Excel模板下载</span>
                             </a-button>
