@@ -35,14 +35,19 @@ define([],function(){
                 level++;
                 panme=panme||'';
                 pvals=pvals||[];
+                if(tree.length>1) justOne=false;
                 tree.forEach(v=>{
                     val=parseInt(v.value);
                     regions[val]=v;
                     regionValues[val]=[...pvals,val];
                     textValues[panme+'/'+v.name]=regionValues[val];
-                    if(v.children&&v.children.length>0){
-                        if(v.children.length>1) justOne=false;
-                        regionInit(v.children,panme+'/'+v.name,regionValues[val])
+                    if(v.children){
+                        if(v.children.length>0){
+                            if(v.children.length>1) justOne=false;
+                            regionInit(v.children,panme+'/'+v.name,regionValues[val])
+                        }else{
+                            v.children=undefined;
+                        }
                     }
                 })
             }
