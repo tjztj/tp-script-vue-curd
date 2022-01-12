@@ -63,8 +63,8 @@ class WeekField extends ModelField
      */
     public function doShowData(array &$dataBaseData): void
     {
-        if (isset($dataBaseData[$this->name])) {
-            $dataBaseData[$this->name] = empty($dataBaseData[$this->name]) ? '' : self::getWeekStr($dataBaseData[$this->name]);
+        if (isset($dataBaseData[$this->name()])) {
+            $dataBaseData[$this->name()] = empty($dataBaseData[$this->name()]) ? '' : self::getWeekStr($dataBaseData[$this->name()]);
         }
     }
     /**
@@ -74,7 +74,7 @@ class WeekField extends ModelField
      */
     public function getExportText(array $data): string
     {
-        return empty($data[$this->name]) ? '' : self::getWeekStr($data[$this->name]);
+        return empty($data[$this->name()]) ? '' : self::getWeekStr($data[$this->name()]);
     }
 
 

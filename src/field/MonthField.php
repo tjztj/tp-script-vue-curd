@@ -122,7 +122,7 @@ class MonthField extends ModelField
      */
     public function getExportText(array $data): string
     {
-        return empty($data[$name]) ? '' : \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',$data[$name]);
+        return empty($data[$this->name()]) ? '' : \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m',$data[$this->name()]);
     }
 
     /**

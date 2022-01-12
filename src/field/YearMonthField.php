@@ -51,8 +51,8 @@ class YearMonthField extends ModelField
      */
     public function doShowData(array &$dataBaseData): void
     {
-        if (isset($dataBaseData[$this->name])) {
-            $dataBaseData[$this->name]=self::monthToStr($dataBaseData[$this->name]);
+        if (isset($dataBaseData[$this->name()])) {
+            $dataBaseData[$this->name()]=self::monthToStr($dataBaseData[$this->name()]);
         }
     }
 
@@ -63,10 +63,10 @@ class YearMonthField extends ModelField
      */
     public function getExportText(array $data): string
     {
-        if (!isset($data[$this->name])) {
+        if (!isset($data[$this->name()])) {
             return '';
         }
-        return self::monthToStr($data[$this->name]);
+        return self::monthToStr($data[$this->name()]);
     }
 
     /**
