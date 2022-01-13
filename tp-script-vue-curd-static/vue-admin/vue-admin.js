@@ -1588,11 +1588,15 @@ define(requires, function (axios, Qs) {
                     this.getActionWidthByProps();
                     const expandedRowKeys=[];
                     if(this.expandAllRows){
-                        data.forEach(v=>{
-                            if(v[this.childrenColumnName]&&v[this.childrenColumnName].length>0){
-                                expandedRowKeys.push(v.id);
-                            }
-                        })
+                        const setPids= list=>{
+                            list.forEach(v=>{
+                                if(v[this.childrenColumnName]&&v[this.childrenColumnName].length>0){
+                                    expandedRowKeys.push(v.id);
+                                    setPids(v[this.childrenColumnName])
+                                }
+                            })
+                        }
+                        setPids(data);
                     }
                     this.expandedRowKeys=expandedRowKeys;
                 }
