@@ -26,16 +26,23 @@ class TreeSelect extends ModelField
     protected array $items=[];
 
 
+    private array $sourceItems=[];//源数据
 
 
     /**
      * 父字段名
      * @param bool|null $canCheckParent
      * @return $this|string
+     * @throws \think\Exception
      */
     public function canCheckParent(bool $canCheckParent = null)
     {
-        return $this->doAttr('canCheckParent', $canCheckParent);
+        $return=$this->doAttr('canCheckParent', $canCheckParent);
+        if(!is_null($canCheckParent)&&!empty($this->sourceItems)){
+            //需要重新对items赋值
+            $this->items($this->sourceItems);
+        }
+        return $return;
     }
 
 
@@ -84,9 +91,12 @@ class TreeSelect extends ModelField
             return $this->items;
         }
         if(empty($items)){
+            $this->sourceItems=[];
             $this->items=[];
             return $this;
         }
+        $this->sourceItems=$items;
+
         foreach ($items as $k=>$v){
             $v['value']=(string)$v['value'];
             $v['pvalue']=(string)$v['pvalue'];
@@ -95,7 +105,7 @@ class TreeSelect extends ModelField
             isset($v['key'])||$items[$k]['key']=$v['value'];
         }
 
-        $this->items=self::listToTree($items,'value','pvalue');
+        $this->items=self::listToTree($items,'value','pvalue','children',!$this->canCheckParent);
         if(empty($this->items)){
             throw new \think\Exception($this->name.'设置的items格式错误');
         }
@@ -246,26 +256,30 @@ class TreeSelect extends ModelField
      * @param  string  $pkName    主键
      * @param  string  $pIdName   父节点名称
      * @param  string  $childName 子节点名称
-     *
+     * @param   bool    $unsetFirst 去掉最顶级的一项
      * @return array  转换后的树
      */
-    public static function listToTree(array $dataArr,string $pkName = 'id',string $pIdName = 'pid',string $childName = 'children'): array
+    public static function listToTree(array $dataArr,string $pkName = 'id',string $pIdName = 'pid',string $childName = 'children',$unsetFirst=true): array
     {
         $data = [];
         foreach ($dataArr as $row){
             $data[$row[$pkName]]=$row;
         }
         foreach($dataArr as $row) {
-            $data[$row[$pIdName]]['children'][$row[$pkName]] = & $data[$row[$pkName]];
+            if(!isset($row[$pkName])||!isset($row[$pIdName])||(string)$row[$pkName]!==(string)$row[$pIdName]){
+                $data[$row[$pIdName]]['children'][$row[$pkName]] = & $data[$row[$pkName]];
+            }
         }
 
         $tree=[];
         foreach ($data as $v){
-            if(!isset($v[$pIdName])||!isset($data[$v[$pIdName]])){
+            if(isset($v[$pkName])&&isset($v[$pIdName])&&(string)$v[$pkName]===(string)$v[$pIdName]){
+                $tree[]=$v;
+            }else if(!isset($v[$pIdName])||!isset($data[$v[$pIdName]])){
                 $tree[]=$v;
             }
         }
-        if(count($tree)===1){
+        if(count($tree)===1&&$unsetFirst){
             $first=current($tree);
             if(isset($first[$childName])){
                 $tree=$first[$childName];
@@ -301,7 +315,6 @@ class TreeSelect extends ModelField
                     }
                 }
             }
-
         }
         return $list;
     }
