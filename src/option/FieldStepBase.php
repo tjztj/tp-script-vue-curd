@@ -39,14 +39,17 @@ abstract class FieldStepBase
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
                 function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){
-                    $funcs=$this->beforeCheck();
+                    $funcs=$this->getBeforeCheck();
                     if(empty($info)||empty($info->id)){
-                        return isset($funcs[''])&&$funcs['']($info, $parentInfo, $field);
+                        if(!isset($funcs[''])){
+                            return false;
+                        }
+                        return ($funcs['']->func)($info, $parentInfo, $field);
                     }
                     $currStep=endStepVal($info);
                     foreach ($funcs as $k=>$v){
                         if($k&&$k::name()===$currStep){
-                            return $v($info, $parentInfo, $field);
+                            return ($v->func)($info, $parentInfo, $field);
                         }
                     }
                     return false;
@@ -76,6 +79,13 @@ abstract class FieldStepBase
             ->setAuthWhere(function(Query $query){
                 $this->authWhere($query);
             });
+
+
+        $this->step->getBeforeChecks=function (){
+            return $this->getBeforeCheck();
+        };
+        $this->step->stepClass=static::class;
+
 
         foreach ($fields as $v){
             $v->steps($this->step);
@@ -108,9 +118,23 @@ abstract class FieldStepBase
 
     /**
      * 数据下一步是否当前步骤，判断
-     * @return callable[]   [stepclass=>function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){}]
+     * @return callable[]|FieldStepBeforeCheck[]   [stepclass=>function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){}]
      */
     abstract protected function beforeCheck(): array;
+
+    /**
+     * 获取步骤上一步的配置，FieldStepBeforeCheck 方式
+     * @return FieldStepBeforeCheck[]
+     */
+    public function getBeforeCheck():array{
+        $beforeChecks=$this->beforeCheck();
+        $return=[];
+        foreach ($beforeChecks as $k=>$v){
+            $info=is_callable($v)?FieldStepBeforeCheck::make($v):$v;
+            $return[$k]=$info;
+        }
+        return $return;
+    }
 
 
     /**

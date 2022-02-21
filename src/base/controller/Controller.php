@@ -18,6 +18,7 @@ use tpScriptVueCurd\traits\controller\BaseDel;
 use tpScriptVueCurd\traits\controller\BaseEdit;
 use tpScriptVueCurd\traits\controller\BaseIndex;
 use tpScriptVueCurd\traits\controller\BaseShow;
+use tpScriptVueCurd\traits\controller\Bpmn;
 use tpScriptVueCurd\traits\controller\Childs;
 use tpScriptVueCurd\traits\controller\Export;
 use tpScriptVueCurd\traits\controller\HaveChilds;
@@ -37,7 +38,7 @@ use tpScriptVueCurd\traits\Func;
  */
 trait Controller
 {
-    use Vue,BaseIndex,TreeIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel,Export{
+    use Vue,BaseIndex,TreeIndex,BaseShow,BaseEdit,BaseDel,HaveChilds,Childs,Excel,Export,Bpmn{
         Vue::initialize as vueInitialize;
     }
 
