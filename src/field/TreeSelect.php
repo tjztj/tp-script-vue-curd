@@ -300,6 +300,9 @@ class TreeSelect extends ModelField
 
     public static function treeToList(array $tree,string $pkName,string $childName = 'children',$parents=[]):array
     {
+        if(count($tree)===1&&isset($tree[0][$childName])&&!isset($tree[0][$pkName])){
+            $tree=$tree[0][$childName];
+        }
         $list = [];
         foreach ($tree as $val) {
             $val['parents']=$parents;
