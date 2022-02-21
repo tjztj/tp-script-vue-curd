@@ -294,7 +294,11 @@ class TreeSelect extends ModelField
             return array_values($arr);
         };
 
-        return $setKey($tree);
+        $tree=$setKey($tree);
+        if(count($tree)===1&&isset($tree[0][$childName])&&!isset($tree[0][$pkName])){
+            $tree=$tree[0][$childName];
+        }
+        return $tree;
     }
 
 
