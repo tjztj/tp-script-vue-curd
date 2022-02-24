@@ -93,5 +93,5 @@ abstract class ModelFilter
      * 组件地址
      * @return string
      */
-    abstract static public function componentUrl():string;
+    abstract public static function componentUrl():string;
 }
