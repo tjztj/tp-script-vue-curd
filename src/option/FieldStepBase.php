@@ -65,11 +65,14 @@ abstract class FieldStepBase
                 $this->authWhere($query);
             });
 
+
+        $this->stepSetting();
         foreach ($fields as $v){
             $v->steps($this->step);
         }
 
         $this->fields = FieldCollection::make($fields);
+        $this->inited();
     }
 
 
@@ -192,6 +195,13 @@ abstract class FieldStepBase
         return $this->fields;
     }
 
+    /**
+     * 初始化结束后操作
+     * @return void
+     */
+    public function inited():void{
+
+    }
 
 
 
