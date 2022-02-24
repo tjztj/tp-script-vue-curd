@@ -137,9 +137,9 @@ class RadioField extends ModelField
 
         if(!isset($values[$save[$name]])){
             throw new \think\Exception($save[$name].' 不在可选中');
-        }else{
-            $save[$name]=$values[$save[$name]];
         }
+
+        $save[$name]=$values[$save[$name]];
     }
 
 

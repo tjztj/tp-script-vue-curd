@@ -133,16 +133,16 @@ class GenerateColumnOption
     {
         if(!isset($this->default)||is_null($this->default)){
             return null;
-        }else{
-            if($this->type==='varchar'){
-                $default=(string)$this->default;
-            }else if(strpos($this->default,'.')){
-                $default=(float)$this->default;
-            }else{
-                $default=(int)$this->default;
-            }
-            return $default;
         }
+
+        if($this->type==='varchar'){
+            $default=(string)$this->default;
+        }else if(strpos($this->default,'.')){
+            $default=(float)$this->default;
+        }else{
+            $default=(int)$this->default;
+        }
+        return $default;
     }
 
     /**

@@ -27,8 +27,10 @@ class YearMonthField extends ModelField
 
     /**
      * 设置保存的值
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
+     * @param BaseModel $old
      * @return $this
+     * @throws \think\Exception
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {
@@ -72,6 +74,7 @@ class YearMonthField extends ModelField
     /**
      * EXCEL导入时，对数据的处理
      * @param array $save
+     * @throws \think\Exception
      */
     public function excelSaveDoData(array &$save):void{
         $name=$this->name();

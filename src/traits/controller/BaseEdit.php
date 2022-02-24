@@ -434,9 +434,9 @@ trait BaseEdit
 
                 if($curUrl===$nextUrl){
                     throw new \think\Exception('['.$nextStepInfo->getStep().']同时满足修改与下一步，且修改与下一步执行地址都'.($curUrl?'符合':'不符合').'步骤');
-                }else{
-                    return !$curUrl;
                 }
+
+                return !$curUrl;
             }
             return true;
         }

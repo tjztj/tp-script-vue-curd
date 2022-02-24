@@ -26,7 +26,6 @@ use tpScriptVueCurd\traits\controller\TreeIndex;
 use tpScriptVueCurd\traits\controller\Vue;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\traits\controller\Excel;
-use tpScriptVueCurd\traits\Func;
 
 /**
  * Trait Controller

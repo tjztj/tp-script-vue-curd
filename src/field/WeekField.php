@@ -4,7 +4,6 @@
 namespace tpScriptVueCurd\field;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
-use tpScriptVueCurd\filter\DateFilter;
 use tpScriptVueCurd\filter\WeekFilter;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
@@ -96,10 +95,10 @@ class WeekField extends ModelField
             if($last_day_num>=$day){
                 //那么这是上一月的
                 return self::getWeekStr(\tpScriptVueCurd\tool\Time::dateToUnixtime(\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-01',$time))-1);
-            }else{
-                $num=ceil(bcdiv(bcsub($day,$last_day_num),7,1)); //向上取整
-                $month=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y年m月',$time);
             }
+
+            $num=ceil(bcdiv(bcsub($day,$last_day_num),7,1)); //向上取整
+            $month=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y年m月',$time);
         }else{
             $num=ceil(bcdiv($day,7,1)); //向上取整
             $month=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y年m月',$time);

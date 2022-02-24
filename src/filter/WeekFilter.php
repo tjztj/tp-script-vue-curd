@@ -43,7 +43,7 @@ class WeekFilter extends ModelFilter
      * @throws \think\Exception
      */
     public function getDefaultItems():array{
-        $now_w_start_time=$this->getWeekStart(time());
+        $now_w_start_time= self::getWeekStart(time());
         $now_w_start=\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $now_w_start_time);
 
         return [

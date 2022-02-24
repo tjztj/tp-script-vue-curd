@@ -32,7 +32,8 @@ class FieldCollection extends Collection
         parent::__construct($items);
     }
 
-    private function setGroupItems(array $items){
+    private function setGroupItems(array $items): void
+    {
         $groupItems=self::groupListByItems($items);
         if(count($groupItems)>1){
             $this->groupItems=$groupItems;
@@ -321,9 +322,10 @@ class FieldCollection extends Collection
     private function getFilterWhereData(array $myFilter=null):array{
         if(is_null($myFilter)){
             $myFilter=$this->getParamFilterData();
-        }else if(is_string($myFilter)){
-            $myFilter=json_decode($myFilter,true);
         }
+//        if(is_string($myFilter)){
+//            $myFilter=json_decode($myFilter,true);
+//        }
         if(empty($myFilter)){
             return [];
         }

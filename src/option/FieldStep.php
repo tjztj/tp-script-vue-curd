@@ -437,7 +437,9 @@ class FieldStep
                 $v['back']=count($keyArrs)-$findIndex-1;
                 if($v['back']<0){
                     continue;
-                }else if($v['back']===0){
+                }
+
+                if($v['back']===0){
                     //已存在且步骤紧挨，代表步骤并没有改变
                     unset($stepsArr[$k]);
                     continue;
@@ -543,10 +545,10 @@ class FieldStep
     public function listDirectSubmit(string $listDirectSubmit=null){
         if(is_null($listDirectSubmit)){
             return $this->listDirectSubmit;
-        }else{
-            $this->listDirectSubmit=$listDirectSubmit;
-            return $this;
         }
+
+        $this->listDirectSubmit=$listDirectSubmit;
+        return $this;
     }
 
 

@@ -83,7 +83,8 @@ class ExportExcel
     }
 
 
-    public static function make(string $title){
+    public static function make(string $title): ExportExcel
+    {
         return new self($title);
     }
 

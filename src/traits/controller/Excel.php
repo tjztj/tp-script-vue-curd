@@ -97,10 +97,6 @@ trait Excel
     /**
      * 导入关键参数(excel标题)，可继承然后重写
      * @return string
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
      */
     protected function excelTilte():string{
         return $this->title;
@@ -203,10 +199,12 @@ trait Excel
 
 
     ####################################################################################################################
+
     /**
      * 根据导入数据获取 导入的ID
      * @param array $mainData
      * @return mixed
+     * @throws \think\Exception
      */
     private function getMainIdByImportData(array $mainData):int{
         static $baseIds=[];
@@ -284,7 +282,7 @@ trait Excel
 
 
         $names=[];
-        foreach ($expCellName as $k => $v) {
+        foreach ($expCellName as $v) {
             //对比模版，老模版提示错误
             if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v['name']])) {
                 return $this->errorAndCode('模版错误，请重新下载最新的模版-002');
@@ -468,7 +466,7 @@ trait Excel
                 $th['formatText']=$v->isText;
             }
             if($v->items||$v->type==='RegionField'){
-                $th['format']=function ($row,ExportCell $cell)use($v){
+                $th['format']= static function ($row, ExportCell $cell)use($v){
                     if($cell instanceof ExportThCell){
                         return '';
                     }
@@ -533,7 +531,7 @@ trait Excel
                                     $allRegionInfos=\app\admin\model\SystemRegion::getAll();
                                     $allRegions = [];
                                     foreach ($allRegionInfos as $key => $data) $allRegions[$data['id']] =& $allRegionInfos[$key];
-                                    foreach ($allRegionInfos as $key => $data) {
+                                    foreach ($allRegionInfos as $data) {
                                         // 判断是否存在parent
                                         if (isset($allRegions[$data['pid']])) {
                                             isset($allRegions[$data['pid']]['children'])||$allRegions[$data['pid']]['children']=[];

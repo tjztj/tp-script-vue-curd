@@ -417,7 +417,8 @@ trait BaseIndex
      * @param array|null $filterData
      * @throws \think\Exception
      */
-    protected function setIndexFilterAddStep(FieldCollection $filterFields,?array $filterData){
+    protected function setIndexFilterAddStep(FieldCollection $filterFields,?array $filterData): void
+    {
         if($filterFields->stepIsEnable()&&$filterFields->getStepConfig()['showFilter']){
             $steps=[];
             $filterFields->each(function (ModelField $v)use(&$steps){

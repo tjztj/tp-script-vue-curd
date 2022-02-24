@@ -26,15 +26,16 @@ trait Bpmn
                 if(isset($steps[$v->getStep()])||!isset($v->getBeforeChecks)){
                     continue;
                 }
+                $stepName=$v->getStep();
                 $befores=[];
                 foreach (($v->getBeforeChecks)() as $key=>$val){
                     $befores[$key]=[
                         'remark'=>$val->remark
                     ];
                 }
-                $steps[$v->stepClass??$v->getStep()]=[
+                $steps[$v->stepClass??$stepName]=[
                     'title'=>$v->getTitle(),
-                    'name'=>$v->getStep(),
+                    'name'=>$stepName,
                     'befores'=>$befores,
                 ];
             }

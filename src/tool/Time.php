@@ -9,7 +9,8 @@ namespace tpScriptVueCurd\tool;
  */
 class Time
 {
-    public static function unixtimeToDate($format,$unixtime=null, $timezone = 'PRC') {
+    public static function unixtimeToDate($format,$unixtime=null, $timezone = 'PRC'): string
+    {
         if(is_null($unixtime)){
             $unixtime=time();
         }
@@ -21,7 +22,6 @@ class Time
         if(empty($date)){
             throw new \think\Exception('传入时间参数为空了');
         }
-        $datetime= new \DateTime($date, new \DateTimeZone($timezone));
-        return $datetime->format('U');
+        return (new \DateTime($date, new \DateTimeZone($timezone)))->format('U');
     }
 }

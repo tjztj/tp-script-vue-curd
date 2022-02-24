@@ -17,7 +17,11 @@ class LikeFilter extends ModelFilter
     public function config():array{
         return [];
     }
-    public function generateWhere(Query $query,$value):void{
+
+    /**
+     * @throws \Think\Exception
+     */
+    public function generateWhere(Query $query, $value):void{
         if($value||$value===0||$value==='0'){
             if(is_string($value)){
                 $value=trim($value);

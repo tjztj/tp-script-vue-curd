@@ -23,6 +23,9 @@ class BetweenFilter extends ModelFilter
     //]
 
 
+    /**
+     * @throws \think\Exception
+     */
     protected function config():array{
         if(empty($this->items)){
             throw new \think\Exception('字段[ '.$this->field->name().' ]未设置【筛选】默认选项');

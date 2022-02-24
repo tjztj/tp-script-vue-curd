@@ -299,7 +299,7 @@ class RegionField extends ModelField
      */
     private function getRegionByName(string $region_name): ?array
     {
-        return self::regionNameInfos()[$region_name] ?? null;
+        return $this->regionNameInfos()[$region_name] ?? null;
     }
 
 
@@ -420,7 +420,7 @@ class RegionField extends ModelField
 
         if($notCanImportLevels){
             $regionInfosByName=[];
-            foreach (self::regionNameInfos() as $k=>$v){
+            foreach ($this->regionNameInfos() as $k=> $v){
                 $keys=[];
                 foreach (explode('-',$k) as $key=>$val){
                     if(in_array($key,$notCanImportLevels,true)){
@@ -432,7 +432,7 @@ class RegionField extends ModelField
                 $regionInfosByName[implode('-',$keys)]=$v;
             }
         }else{
-            $regionInfosByName= self::regionNameInfos();
+            $regionInfosByName= $this->regionNameInfos();
         }
 
 

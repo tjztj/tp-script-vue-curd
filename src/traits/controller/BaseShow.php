@@ -19,7 +19,7 @@ trait BaseShow
      * @throws \think\db\exception\DbException
      * @throws \think\db\exception\ModelNotFoundException
      */
-    function show(){
+    public function show(){
         $id=$this->request->showId??$this->request->param('id/d');
         if(empty($id)){
             return $this->errorAndCode('缺少必要参数');

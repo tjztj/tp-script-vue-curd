@@ -7,6 +7,7 @@ trait FieldWhereDump
 
     /**
      * 获取当前不包括and与or的where结构
+     * @param bool $dumpIsHtml
      * @return string
      */
     private function getDump(bool $dumpIsHtml=false):string{
@@ -161,7 +162,7 @@ trait FieldWhereDump
 
             $showK=($parentType==='or'&&$allCount>1)
                 ||($parentType==='and'&&$parentorCount>0&&$allCount>1)
-                ||($orCount>0&&$parentAllCount>0&&$allCount>1);;
+                ||($orCount>0&&$parentAllCount>0&&$allCount>1);
 
             $str='';
             if($showK){

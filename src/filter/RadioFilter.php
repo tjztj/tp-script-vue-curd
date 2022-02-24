@@ -25,6 +25,9 @@ class RadioFilter extends ModelFilter
 
     protected array $items=[];
 
+    /**
+     * @throws \think\Exception
+     */
     public function config():array{
         if(empty($this->items)){
             if(method_exists($this->field,'items')){

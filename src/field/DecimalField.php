@@ -7,7 +7,6 @@ use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\BetweenFilter;
 use tpScriptVueCurd\ModelField;
 use think\facade\Validate;
-use think\validate\ValidateRule;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;

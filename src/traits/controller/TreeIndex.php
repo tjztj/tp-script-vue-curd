@@ -39,7 +39,6 @@ trait TreeIndex
 
         $curRow=current($list);
         $pidField=isset($curRow['_Original_'.$this->treePidField])?'_Original_'.$this->treePidField:$this->treePidField;
-        $tree=TreeSelect::listToTree($list,'id',$pidField,$this->childrenColumnName);
-        return $tree;
+        return TreeSelect::listToTree($list,'id',$pidField,$this->childrenColumnName);
     }
 }

@@ -283,7 +283,7 @@ class FieldWhere
                     }
                 });
             }
-            return $query->whereFindInSet($name,current($this->valueData));;
+            return $query->whereFindInSet($name,current($this->valueData));
         }
 
         if(is_null($this->valueData[0])){
@@ -322,7 +322,7 @@ class FieldWhere
                     }
                 }
                 foreach ($this->ands as $v){
-                    $query=$v->toQuery($query);
+                    $v->toQuery($query);
                 }
                 return $query;
             };

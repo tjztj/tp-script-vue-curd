@@ -14,11 +14,14 @@ class FieldStepBeforeCheck
      * 逻辑处理
      * @var callable
      */
-    public $func=null;
+    public $func;
 
 
-
-    public function __construct(callable $func,string $remark='')
+    /**
+     * @param string $remark 当前步骤必须要写说明，方便阅读
+     * @param callable $func
+     */
+    public function __construct(string $remark,callable $func)
     {
         $this->remark=$remark;
         $this->func=$func;
@@ -30,8 +33,8 @@ class FieldStepBeforeCheck
      * @param string $remark 逻辑说明
      * @return FieldStepBeforeCheck
      */
-    public static function make(callable $func,string $remark=''){
-        $self=new self($func,$remark);
-        return $self;
+    public static function make(string $remark,callable $func): FieldStepBeforeCheck
+    {
+        return new self($remark,$func);
     }
 }

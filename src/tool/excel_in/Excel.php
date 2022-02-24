@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use tpScriptVueCurd\tool\Time;
 
 /**
  * Class Excel
@@ -170,7 +171,7 @@ class Excel
                     }
                 }
 
-                if (isset($format) && 'm/d/yyyy' == $format) {
+                if (isset($format) && 'm/d/yyyy' === $format) {
                     /* 日期格式翻转处理 */
                     $cell->getStyle()->getNumberFormat()->setFormatCode('yyyy/mm/dd');
                 }
@@ -195,7 +196,7 @@ class Excel
                         $val = $currSheet->getCell($cellId)->getCalculatedValue();
                         if ((preg_match('/^\-\"(\d+\.?\d*)\"$/u', $data[$_row][$cellName]) > 0 && is_numeric($val))
                             || (is_numeric($val) && $data[$_row][$cellName] === ('"' . $val . '"'))) {
-                            $data[$_row][$cellName] = $data[$_row][$cellName] = $val;
+                            $data[$_row][$cellName] = $val;
                         }
                     }
                     $isNull = false;

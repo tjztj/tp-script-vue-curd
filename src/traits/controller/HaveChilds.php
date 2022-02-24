@@ -2,7 +2,6 @@
 
 namespace tpScriptVueCurd\traits\controller;
 
-use think\console\Input;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\RegionField;

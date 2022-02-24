@@ -51,8 +51,10 @@ class IntField extends ModelField
 
     /**
      * 设置保存的值
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
+     * @param BaseModel $old
      * @return $this
+     * @throws \think\Exception
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {

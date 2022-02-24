@@ -21,6 +21,7 @@ class CascaderFilter extends ModelFilter
     public function setValueName(string $valueName): self
     {
         $this->valueName = $valueName;
+        return $this;
     }
     /**
      * @param string $pvalueName
@@ -29,6 +30,7 @@ class CascaderFilter extends ModelFilter
     public function setPvalueName(string $pvalueName): self
     {
         $this->pvalueName = $pvalueName;
+        return $this;
     }
     /**
      * @param string $childrenName
@@ -37,6 +39,7 @@ class CascaderFilter extends ModelFilter
     public function setChildrenName(string $childrenName): self
     {
         $this->childrenName = $childrenName;
+        return $this;
     }
 
 
@@ -52,10 +55,8 @@ class CascaderFilter extends ModelFilter
     }
 
     public function getItems(){
-        if(empty($this->items)){
-            if(method_exists($this->field,'items')){
-                $this->setItems($this->field->items());
-            }
+        if(empty($this->items) && method_exists($this->field, 'items')) {
+            $this->setItems($this->field->items());
         }
         return $this->items;
     }
@@ -83,17 +84,15 @@ class CascaderFilter extends ModelFilter
                         }
                     });
                 }
+            }else if($canCheckParent){
+                $query->where($this->field->name(),$value);
             }else{
-                if($canCheckParent){
-                    $query->where($this->field->name(),$value);
-                }else{
-                    $query->whereIn($this->field->name(),$this->lists[$value]['childLastVals']?:[$value]);
-                }
+                $query->whereIn($this->field->name(),$this->lists[$value]['childLastVals']?:[$value]);
             }
         }
     }
 
-    static public function componentUrl():string{
+    public static function componentUrl():string{
         return '/tp-script-vue-curd-static.php?filter/cascader.js';
     }
 }

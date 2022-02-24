@@ -54,13 +54,13 @@ class DateFilter extends ModelFilter
     }
 
 
-
     /**获取时间筛选 配置 的key
      * @param string $dateType
      * @param bool $accurateTime 结束时间精确到秒
-     * @return string
+     * @return array
+     * @throws \think\Exception
      */
-    public function getFilterConfigDateStr(string $dateType, $accurateTime = false)
+    public function getFilterConfigDateStr(string $dateType, bool $accurateTime = false): array
     {
         $now_m = \tpScriptVueCurd\tool\Time::unixtimeToDate('m');
         $now_y = \tpScriptVueCurd\tool\Time::unixtimeToDate('Y');

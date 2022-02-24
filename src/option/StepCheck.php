@@ -20,7 +20,8 @@ class StepCheck
     }
 
 
-    public static function make(callable $beforeCheck,$check=null){
+    public static function make(callable $beforeCheck,$check=null): StepCheck
+    {
         return new self($beforeCheck,$check);
     }
 

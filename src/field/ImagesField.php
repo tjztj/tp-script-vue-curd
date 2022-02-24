@@ -67,11 +67,12 @@ class ImagesField extends ModelField
                 return tpScriptVueCurdImageRemoveMissings();
             }
             return $this->removeMissings;
-        }else{//设置
-            $this->removeMissings=$removeMissings;
-            $this->fieldPushAttrByWhere('removeMissings',$this->removeMissings);
-            return $this;
         }
+
+        //设置
+        $this->removeMissings=$removeMissings;
+        $this->fieldPushAttrByWhere('removeMissings',$this->removeMissings);
+        return $this;
     }
 
 
