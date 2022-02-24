@@ -66,7 +66,6 @@ abstract class FieldStepBase
             });
 
 
-        $this->stepSetting();
         foreach ($fields as $v){
             $v->steps($this->step);
         }
