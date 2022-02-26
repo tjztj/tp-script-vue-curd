@@ -118,7 +118,7 @@ abstract class FieldStepBase
 
     /**
      * 数据下一步是否当前步骤，判断
-     * @return FieldStepBeforeCheck[]   [stepclass=>function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){}]
+     * @return FieldStepBeforeCheck[]  [stepclass=>FieldStepBeforeCheck::make('',function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){})]
      */
     abstract protected function beforeCheck(): array;
 
