@@ -173,7 +173,6 @@ define(['vueAdmin','g6'], function (va,G6) {
                     graph.render(); // 渲染图
                 },
                 addSize(){
-                    console.log(graph.getZoom());
                     this.size++;
                     graph.changeSize(...this.getSize());
                     graph.render();

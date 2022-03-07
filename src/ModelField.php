@@ -807,7 +807,7 @@ abstract class ModelField
         if (is_null($filter)) {
             return $this;
         }
-        $func($filter);
+        $func($filter,$this);
         return $this;
     }
 

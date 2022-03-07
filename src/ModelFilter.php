@@ -20,6 +20,8 @@ abstract class ModelFilter
     protected ModelField $field;
     protected string $type;
     protected bool $show=true;//默认显示
+    protected ?string $title=null;
+    protected ?string $group=null;
 
     public function __construct(ModelField $field=null){
         if(static::class===EmptyFilter::class){
@@ -45,13 +47,51 @@ abstract class ModelFilter
     public function getConfig():array{
         $config=$this->config();
         $config['name']=$this->field->name();
-        $config['title']=$this->field->title();
+        $config['title']=$this->getTitle();
         $config['fieldType']=$this->field->getType();
-        $config['group']=$this->field->group();
+        $config['group']=$this->getGroup();
         $config['type']=$this->getType();
         $config['show']=$this->getShow();
         return $config;
     }
+
+    /**
+     * 设置显示的标题
+     * @param string|null $newTitle
+     * @return $this
+     */
+    public function setTitle(?string $newTitle):self{
+        $this->title=$newTitle;
+        return $this;
+    }
+
+    /**
+     * 获取显示的标题
+     * @return string
+     */
+    public function getTitle():string{
+        return is_null($this->title)?$this->field->title():$this->title;
+    }
+
+
+    /**
+     * 设置显示的分组
+     * @param string|null $newGroup
+     * @return $this
+     */
+    public function setGroup(?string $newGroup):self{
+        $this->group=$newGroup;
+        return $this;
+    }
+
+    /**
+     * 获取显示的分组
+     * @return string
+     */
+    public function getGroup():string{
+        return is_null($this->group)?$this->field->group():$this->group;
+    }
+
 
     public function getType():string{
         return $this->type;
