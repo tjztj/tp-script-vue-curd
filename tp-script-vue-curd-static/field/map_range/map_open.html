@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择范围</title>
+    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css" media="all">
+    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css" media="all">
+    <style>
+        body{
+            height: 100vh;
+        }
+        #app{
+            height: 100%;
+            width: 100%;
+            padding: 0!important;
+        }
+        .page-container{
+            height: 100%;
+            width: 100%;
+            display: flex;
+            flex-direction:column;
+        }
+        .body{
+            flex: 1;
+        }
+        #map-container{
+            height: 100%;
+            width: 100%;
+        }
+        .amap-logo{
+            display: none!important; /*去掉高德地图logo*/
+        }
+        .amap-copyright {
+            opacity:0!important; /*去掉高德的版本号*/
+        }
+        .top{
+            padding: 12px 0px;
+        }
+        .msg-box{
+            padding-bottom: 6px;
+        }
+        .foot{
+            padding: 12px 0px;
+            display: flex;
+        }
+        .foot-m{
+            flex: 1;
+            text-align: center;
+        }
+        #app-loading {
+            position: fixed;
+            z-index: 100000000;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            width: 3.3em;
+            height: 3.3em;
+        }
+
+        #app-loading svg {
+            width: 100%;
+            transform-origin: center;
+            animation: rotate 2s linear infinite;
+        }
+
+        #app-loading circle {
+            fill: none;
+            stroke: #2196f3;
+            stroke-width: 2;
+            stroke-dasharray: 1, 200;
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dasharray: 1, 200;
+                stroke-dashoffset: 0;
+            }
+            50% {
+                stroke-dasharray: 90, 200;
+                stroke-dashoffset: -35px;
+            }
+            100% {
+                stroke-dashoffset: -125px;
+            }
+        }
+        .hide{
+            display: none!important;
+        }
+        .search-rel {
+            position: absolute;
+            z-index: 999999;
+            background-color: #fff;
+            left: 24px;
+            right: 24px;
+            border-left: 1px solid #d9d9d9;
+            border-right: 1px solid #d9d9d9;
+            border-bottom-left-radius: 2px;
+            border-bottom-right-radius: 2px;
+            box-shadow: 0 3px 12px 0 rgba(0, 0, 0, .2);
+        }
+
+        .search-rel ul.search-rel-list {
+            padding: 0;
+            margin: 0 0 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .search-rel .search-rel-list li {
+            list-style: none;
+            padding: 6px 12px;
+            cursor: pointer;
+            color: #8c8c8c;
+        }
+
+        .search-rel .search-rel-list li + li {
+            border-top: 1px dashed #efefef;
+        }
+
+        .search-rel .search-rel-list li:hover {
+            background-color: #fafafa;
+        }
+
+        .search-rel .search-rel-list li b {
+            padding-right: 12px;
+            color: #000;
+        }
+
+        .search-rel .ant-pagination {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+<div id="app-loading">
+    <svg viewBox="25 25 50 50">
+        <circle cx="50" cy="50" r="20"></circle>
+    </svg>
+</div>
+<div id="app" style="display: none">
+    <div class="page-container">
+        <div class="top">
+            <div class="msg-box"><a-alert message="请先在地图范围类点击三个点以此生成多边形，长按多边形白色的点进行拖动，改变其形状。其中不透明的点，点击时会删除！鼠标滚轮放大缩小地图。" type="warning" show-icon ></a-alert></div>
+            <div class="input-box" @click="relShow=true">
+                <a-input type="text" id="map-select-search-input" placeholder="输入关键字查找地区" v-model:value="searchValue"
+                         @press-enter="doSearch">
+                    <template #prefix>
+                        <search-outlined type="user"></search-outlined>
+                    </template>
+                </a-input>
+            </div>
+            <div class="search-rel" v-show="searchValue&&searchValue!==''&&relShow">
+                <div v-if="list.length>0">
+                    <ul class="search-rel-list">
+                        <li v-for="item in list" @click="selectRel(item)"><b>{{ item.name }}</b>{{ item.address }}</li>
+                    </ul>
+                    <a-pagination size="small" v-model:current="page" :page-size="pageSize" :total="count"
+                                  @change="pageChange"/>
+                </div>
+                <div v-else style="color: #d9d9d9;padding: 16px 24px">
+                    (未找到相关信息)
+                </div>
+            </div>
+
+        </div>
+        <div class="body">
+            <div id="map-container"></div>
+        </div>
+        <div class="foot">
+            <div class="foot-l">
+                <a-button type="danger" @click="clearDraw">清除绘制</a-button>
+            </div>
+            <div class="foot-m">
+                <a-button type="link" @click="recallDraw" :disabled="!canRecall">
+                    <span role="img" aria-label="fast-backward" class="anticon anticon-fast-backward"><svg class="" data-icon="fast-backward" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="0 0 1024 1024" focusable="false"><path d="M517.6 273.5L230.2 499.3a16.14 16.14 0 000 25.4l287.4 225.8c10.7 8.4 26.4.8 26.4-12.7V286.2c0-13.5-15.7-21.1-26.4-12.7zm320 0L550.2 499.3a16.14 16.14 0 000 25.4l287.4 225.8c10.7 8.4 26.4.8 26.4-12.7V286.2c0-13.5-15.7-21.1-26.4-12.7zm-620-25.5h-51.2c-3.5 0-6.4 2.7-6.4 6v516c0 3.3 2.9 6 6.4 6h51.2c3.5 0 6.4-2.7 6.4-6V254c0-3.3-2.9-6-6.4-6z"></path></svg></span>
+                    后退
+                </a-button>
+                &nbsp;
+                <a-button type="link" @click="forwardDraw" :disabled="!canForward">
+                    <span role="img" aria-label="fast-forward" class="anticon anticon-fast-forward"><svg class="" data-icon="fast-forward" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="0 0 1024 1024" focusable="false"><path d="M793.8 499.3L506.4 273.5c-10.7-8.4-26.4-.8-26.4 12.7v451.6c0 13.5 15.7 21.1 26.4 12.7l287.4-225.8a16.14 16.14 0 000-25.4zm-320 0L186.4 273.5c-10.7-8.4-26.4-.8-26.4 12.7v451.5c0 13.5 15.7 21.1 26.4 12.7l287.4-225.8c4.1-3.2 6.2-8 6.2-12.7 0-4.6-2.1-9.4-6.2-12.6zM857.6 248h-51.2c-3.5 0-6.4 2.7-6.4 6v516c0 3.3 2.9 6 6.4 6h51.2c3.5 0 6.4-2.7 6.4-6V254c0-3.3-2.9-6-6.4-6z"></path></svg></span>
+                    前进
+                </a-button>
+            </div>
+            <div class="foot-r">
+                <a-button type="primary" shape="check" @click="submit"><check-outlined></check-outlined> 确定</a-button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js" charset="utf-8"></script>
+<script>
+    window.map=null;
+    window.polygon=null;
+    window.polyEditor=null;
+    window.markers=[];
+    window.placeSearch=null;
+
+
+    //定义一些常量
+    let x_PI = 3.14159265358979324 * 3000.0 / 180.0;
+    let PI = 3.1415926535897932384626;
+    let a = 6378245.0;
+    let ee = 0.00669342162296594323;
+    function transformlat(lng, lat) {
+        lat = +lat;
+        lng = +lng;
+        let ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
+        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
+        ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0;
+        return ret
+    };
+    function transformlng(lng, lat) {
+        lat = +lat;
+        lng = +lng;
+        let ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
+        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
+        ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
+        ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0;
+        return ret
+    };
+    /**
+     * GCJ02 转换为 WGS84
+     * @param lng
+     * @param lat
+     * @returns {*[]}
+     */
+    function gcj02towgs84(lng, lat) {
+        lat = +lat;
+        lng = +lng;
+        let dlat = transformlat(lng - 105.0, lat - 35.0);
+        let dlng = transformlng(lng - 105.0, lat - 35.0);
+        let radlat = lat / 180.0 * PI;
+        let magic = Math.sin(radlat);
+        magic = 1 - ee * magic * magic;
+        let sqrtmagic = Math.sqrt(magic);
+        dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
+        dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
+        let mglat = lat + dlat;
+        let mglng = lng + dlng;
+        return [lng * 2 - mglng, lat * 2 - mglat]
+    };
+    const option = {
+        setup(props, ctx) {
+        },
+        data() {
+            return {
+                searchValue:null,
+                lastSearch:null,
+                oldPolygonPaths:[],
+                nowPolygonPathsIndex:-1,
+                list:[],
+                page:1,
+                pageSize:10,
+                count:0,
+                relShow:false,
+                marker:null,
+            }
+        },
+        computed:{
+            canRecall(){
+                return this.nowPolygonPathsIndex>0&&this.oldPolygonPaths[this.nowPolygonPathsIndex-1];
+            },
+            canForward(){
+                return this.oldPolygonPaths[this.nowPolygonPathsIndex+1];
+            },
+        },
+        mounted(){
+            window.mapInit=()=>{
+                const checkHaveObjs=setInterval(()=>{
+                    if(typeof T!=='undefined'&&typeof T.Map!=='undefined'){
+                        clearInterval(checkHaveObjs);
+                        if (document.getElementById('app')) document.getElementById('app').style.display = 'block'
+                        if (document.getElementById('app-loading')) document.getElementById('app-loading').style.display = 'none'
+                        this.initMap();
+                    }
+                },20)
+            }
+
+            let jsapi = document.createElement('script'),jsapi2=document.createElement('script');
+            jsapi2.src = 'https://webapi.amap.com/maps?v=1.4.15&key=2c89c6178dc817d34ad9783867366c14&callback=mapInit&plugin=AMap.DistrictSearch';
+            jsapi.src='https://api.tianditu.gov.cn/api?v=4.0&tk=dd78fa8009cfc85f584b62039a504a61';
+            document.head.appendChild(jsapi2);
+            document.head.appendChild(jsapi);
+            document.addEventListener('click',e=>{
+                if(e.target.closest('.search-rel')||e.target.matches('.search-rel')||e.target.closest('.input-box')||e.target.matches('.input-box')){
+                    return;
+                }
+                this.relShow=false;
+            })
+        },
+        watch:{
+            searchValue(){
+                this.doSearch()
+            },
+        },
+
+        methods: {
+            initMap(){
+                const imageURL = "http://t0.tianditu.gov.cn/img_w/wmts?" +
+                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
+                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
+                //创建自定义图层对象
+                const lay = new T.TileLayer(imageURL, {minZoom: 1, maxZoom: 18});
+
+                const imageURL2 = "http://t0.tianditu.gov.cn/cia_w/wmts?" +
+                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
+                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
+                const lay2 = new T.TileLayer(imageURL2, {
+                    minZoom: 1,
+                    maxZoom: 18
+                });
+                const config = {layers: [lay, lay2]};
+                //初始化地图对象
+                window.map = new T.Map("map-container", config);
+                // window.map.addLayer(new T.TileLayer.WMS("http://t0.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={x}&TILECOL={y}&tk=dd78fa8009cfc85f584b62039a504a61"))
+                //设置显示地图的中心点和级别
+                window.map.centerAndZoom(new T.LngLat(120.12, 30.19), 9);
+                //允许鼠标滚轮缩放地图
+                window.map.enableScrollWheelZoom();
+
+
+                const windowInit=()=>{
+                    this.drawBounds();
+                    this.mapInput();
+                };
+                if(window.isWindowSuccessInit){
+                    Vue.nextTick(windowInit);
+                }else{
+                    window.windowSuccessInit=()=>{
+                        Vue.nextTick(windowInit);
+                    }
+                }
+
+
+            },
+            drawBounds(){
+                //点击事件
+                const addPolygonFun=params=>{
+                    if(Object.keys(window.polygon.getLngLats()).length>0&&Object.keys(window.polygon.getLngLats()[0]).length>0){
+                        return;
+                    }
+                    if(window.markers.length>1){
+                        const polygonArr= [new T.LngLat(params.lnglat.lng, params.lnglat.lat)];
+                        window.markers.forEach((v)=>{
+                            polygonArr.push(v.getLngLat())
+                            window.map.removeOverLay(v);
+                        })
+                        window.markers=[];
+                        this.setLngLats(polygonArr);
+                        // this.pushOldPolygonPaths(window.polygon.getLngLats())
+                    }else{
+                        // 创建点覆盖物
+                        const marker = new T.Marker(new T.LngLat(params.lnglat.lng, params.lnglat.lat)); // 创建点
+                        window.map.addOverLay(marker);
+                        window.markers.push(marker)
+                    }
+                };
+
+                //设置初始化选中
+                const initSet=(setCenter)=>{
+                    setCenter=typeof setCenter==='undefined'?true:!!setCenter;
+                    const polygonLngLatArr=window.mapRangeSelectedPaths?JSON.parse(window.mapRangeSelectedPaths):[];
+                    const polygonLngLat=[];
+                    if(polygonLngLatArr.length>0){
+                        polygonLngLatArr.forEach(v=>{
+                            polygonLngLat.push(new T.LngLat(v[0],v[1]))
+                        })
+                    }
+                    window.polygon =new T.Polygon(polygonLngLat,{
+                        color: "#096dd9",
+                        weight: 1.5,
+                        opacity: 0.9,
+                        fillColor: "#69c0ff",
+                        fillOpacity: 0.3
+                    });
+                    window.map.addOverLay(window.polygon);
+                    if(polygonLngLat.length>0){
+                        //显示最佳比例尺
+                        window.map.setViewport(polygonLngLat);
+                    }else if(window.mapCenter&&setCenter){
+                        window.map.centerAndZoom(new T.LngLat(window.mapCenter[0], window.mapCenter[1]), 13);
+                    }
+
+                    setInterval(()=>{
+                        const lngLats=window.polygon.getLngLats();
+                        if(lngLats[0]&&lngLats[0].length>3){
+                            this.pushOldPolygonPaths(lngLats[0])
+                        }
+                    },20)
+                }
+
+                if(window.mapDistrict){
+                    //加载行政区划插件
+                    let district = new AMap.DistrictSearch({
+                        subdistrict: 0,   //获取边界不需要返回下级行政区
+                        extensions: 'all',  //返回行政区边界坐标组等具体信息
+                        level: 'city'  //查询行政级别为 市
+                    });
+                    //行政区查询
+                    district.setLevel('city');
+                    district.search(window.mapDistrict,(status, result)=> {
+                        if(!result.districtList||!result.districtList[0]||!result.districtList[0].boundaries||result.districtList[0].boundaries.length===0){
+                            antd.notification.error({message: '无相关范围', duration: 0});
+                            //点击事件
+                            window.map.addEventListener("click", addPolygonFun);
+                            initSet();
+                            return;
+                        }
+                        const pointsArr=[];
+                        for(let i in result.districtList[0].boundaries){
+                            const regionLngLats=[];
+                            result.districtList[0].boundaries[i].forEach(lnglatObj=>{
+                                const arr=gcj02towgs84(lnglatObj.R,lnglatObj.Q);
+                                const lnglat= new T.LngLat(arr[0], arr[1]);
+                                regionLngLats.push(lnglat);
+                                pointsArr.push(lnglat);
+                            });
+
+                            //创建面对象
+                            const polygonBg = new T.Polygon(regionLngLats,{color: "#d3adf7", weight: 3, opacity: 0.9, fillColor: "#d3adf7", fillOpacity: 0});
+                            //向地图上添加行政区划面
+                            window.map.addOverLay(polygonBg);
+                            //点击事件
+                            polygonBg.addEventListener("click", addPolygonFun);
+                        }
+                        //显示最佳比例尺
+                        window.map.setViewport(pointsArr);
+                        initSet(false);
+                    });
+                }else{
+                    //点击事件
+                    window.map.addEventListener("click", addPolygonFun);
+                    initSet();
+                }
+            },
+            mapInput(){
+                //创建搜索对象
+                window.placeSearch = new T.LocalSearch(window.map, {
+                    pageCapacity: 10,	//每页显示的数量
+                    onSearchComplete: result=>{
+                        this.count=result.getCount();
+                        this.page= window.placeSearch.getPageIndex()
+                        this.list=result.getPois()||[];
+                        this.relShow=true;
+
+                    },//接收数据的回调函数
+                });
+            },
+            doSearch(){
+                if(this.searchValue.replace(/\n/g,'')===''){
+                    return;
+                }
+                window.placeSearch.search(this.searchValue,1);
+            },
+            pageChange(page){
+                window.placeSearch.gotoPage(page)
+            },
+            pushOldPolygonPaths(paths){
+                let pathArr=[];
+                for(let i in paths){
+                    pathArr.push([paths[i].lng, paths[i].lat]);
+                }
+                if(this.oldPolygonPaths[this.nowPolygonPathsIndex]&&pathArr.toString()===this.oldPolygonPaths[this.nowPolygonPathsIndex].toString()){
+                    //没有改变
+                    return;
+                }
+                this.nowPolygonPathsIndex++;
+                this.oldPolygonPaths[this.nowPolygonPathsIndex]=pathArr;
+                if(this.canForward){
+                    for(let i=(this.nowPolygonPathsIndex+1);i<this.oldPolygonPaths.length;i++){
+                        this.oldPolygonPaths.splice(i,1)
+                    }
+                }
+            },
+            clearDraw(){
+                this.setLngLats([])
+                this.pushOldPolygonPaths([]);
+            },
+            recallDraw(){
+                if(!this.canRecall){
+                    return;
+                }
+                this.nowPolygonPathsIndex--;
+                let paths=[];
+                this.oldPolygonPaths[this.nowPolygonPathsIndex].forEach(v=>{
+                    paths.push(new T.LngLat(v[0], v[1]))
+                })
+                this.setLngLats(paths)
+            },
+            forwardDraw(){
+                if(!this.canForward){
+                    return;
+                }
+                this.nowPolygonPathsIndex++;
+                let paths=[];
+                this.oldPolygonPaths[this.nowPolygonPathsIndex].forEach(v=>{
+                    paths.push(new T.LngLat(v[0], v[1]))
+                })
+                this.setLngLats(paths)
+            },
+            setLngLats(paths){
+                window.polygon.disableEdit();
+                window.polygon.setLngLats(paths);
+                setTimeout(()=>{
+                    window.polygon.enableEdit();
+                },50)
+            },
+            selectRel(rel){
+                const arr=rel.lonlat.split(' ');
+                const lngLat=new T.LngLat(arr[0], arr[1]);
+                if(!this.marker){
+                    this.marker = new T.Marker(lngLat); // 创建点
+                    // const icon=this.marker.getIcon();
+                    const icon=new T.Icon({
+                        iconUrl:'https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png',
+                        iconAnchor:new T.Point(9,32)
+                    })
+                    this.marker.setIcon(icon)
+                    // icon.setIconUrl('https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png');
+                    window.map.addOverLay(this.marker);
+                }else{
+                    this.marker.setLngLat(lngLat)
+                }
+                window.map.centerAndZoom(lngLat,18);
+                this.relShow=false;
+
+            },
+            submit(){
+                if(!window.polygon){
+                    this.$message.warning('请先绘制一个区域')
+                    return;
+                }
+                const lngLats=window.polygon.getLngLats();
+                if(!lngLats[0]||lngLats[0].length<3){
+                    this.$message.warning('请先绘制一个区域')
+                    return;
+                }
+                let pathArr=[];
+                for(let i in lngLats[0]){
+                    pathArr.push([lngLats[0][i].lng, lngLats[0][i].lat]);
+                }
+                if(pathArr.length===0){
+                    this.$message.warning('请先绘制一个区域')
+                    return;
+                }
+                window.onMapRangeSelected(pathArr);
+            },
+        }
+    };
+
+    window.app = Vue.createApp(option)
+    app.use(antd)
+    app.component('SearchOutlined', {
+        template: `<span role="img" aria-label="search" class="anticon anticon-search"><svg class="" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span>`
+    })
+    app.mount('#app')
+</script>
+</body>
+</html>
