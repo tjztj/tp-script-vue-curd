@@ -28,7 +28,7 @@ class CoordinateField extends ModelField
     }
 
 
-    /**地图中心坐标
+    /**地图中心坐标(https://map.tianditu.gov.cn/)
      * @param LngLat|null $center
      * @return $this|LngLat
      */
