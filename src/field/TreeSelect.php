@@ -263,6 +263,7 @@ class TreeSelect extends ModelField
         $data = [];
         foreach ($dataArr as $row){
             $data[$row[$pkName]]=$row;
+            unset($data[$row[$pkName]][$childName]);
         }
         foreach($dataArr as $row) {
             if(!isset($row[$pkName])||!isset($row[$pIdName])||(string)$row[$pkName]!==(string)$row[$pIdName]){
