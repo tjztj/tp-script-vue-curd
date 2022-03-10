@@ -1318,7 +1318,7 @@ define(requires, function (axios, Qs) {
                     if (this.field.tips.length === 0) {
                         return [];
                     }
-                    return field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                    return this.field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
                 },
             },
             methods: {
