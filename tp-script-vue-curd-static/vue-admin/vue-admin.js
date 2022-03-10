@@ -982,6 +982,7 @@ define(requires, function (axios, Qs) {
                             if (!field.items || field.items.length === 0) {
                                 return;
                             }
+                            //TODO::未完成对TreeSelect的支持
                             field.items.forEach(v => {
                                 if (!v.showItemBy) {
                                     delete v.showItem;
@@ -991,7 +992,7 @@ define(requires, function (axios, Qs) {
                                     v.showItem = true;
                                 } else {
                                     if (formVal[field.name] !== undefined && formVal[field.name] !== '') {
-                                        if (field.type === 'CheckboxField' || (field.type === 'SelectField' && field.multiple)) {
+                                        if (field.type === 'CheckboxField' || ((field.type === 'SelectField'||field.type === 'TreeSelect') && field.multiple)) {
                                             let newVals = [];
                                             formVal[field.name].toString().split(',').forEach(val => {
                                                 if (val !== v.value.toString()) {

@@ -409,4 +409,19 @@ class TreeSelect extends ModelField
         }
         return implode('|',$items);
     }
+
+
+    public function toArray():array{
+        $data=parent::toArray();
+        foreach ($this->items as $k=>$v){
+            if(isset($v['showItemBy'])&&is_object($v['showItemBy'])){
+                if($this->objWellToArr){
+                    $data['items'][$k]['showItemBy']=$v['showItemBy']->toArray();
+                }else{
+                    unset($data['items'][$k]['showItemBy']);
+                }
+            }
+        }
+        return $data;
+    }
 }

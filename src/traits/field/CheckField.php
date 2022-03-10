@@ -177,7 +177,7 @@ trait CheckField
         return false;
     }
 
-    function toArray():array{
+    public function toArray():array{
         $data=parent::toArray();
         foreach ($this->items as $k=>$v){
             if(isset($v['showItemBy'])&&is_object($v['showItemBy'])){
