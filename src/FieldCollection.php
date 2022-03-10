@@ -7,8 +7,11 @@ namespace tpScriptVueCurd;
 use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\field\CheckboxField;
 use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\field\RegionField;
+use tpScriptVueCurd\field\SelectField;
+use tpScriptVueCurd\field\TreeSelect;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
@@ -136,16 +139,16 @@ class FieldCollection extends Collection
                 return;
             }
             $items=[];
-            foreach ($v->items() as $key=>$val){
+           foreach ($v instanceof TreeSelect?$v->getSourceItems():$v->items() as $key=>$val){
                 $items[$key]=$val;
                 if(empty($val['showItemBy'])){
                     continue;
                 }
                 if(!$val['showItemBy']->check($data,true,$old)){
                     if(isset($data[$v->name()])&&$data[$v->name()]!==''){
-                        if($v->getType()==='CheckboxField'||($v->getType()==='SelectField'&&$v->multiple())){
+                        if($v instanceof CheckboxField||(($v instanceof SelectField||$v instanceof TreeSelect)&&$v->multiple())){
                             $valArr=is_array($data[$v->name()])?$data[$v->name()]:explode(',',$data[$v->name()]);
-                            $data[$v->name()]=implode(',',array_filter($valArr,fn($vv)=>$vv!=(string)$val['value']));
+                            $data[$v->name()]=implode(',',array_filter($valArr, static fn($vv)=>(string)$vv!==(string)$val['value']));
                         }else if((string)$data[$v->name()]===(string)$val['value']){
                             $data[$v->name()]='';
                         }

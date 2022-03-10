@@ -84,7 +84,21 @@ class TreeSelect extends ModelField
         return $this->doAttr('showCheckedStrategy',$showCheckedStrategy);
     }
 
+    /**
+     * 获取源选项数据
+     * @return array
+     */
+    public function getSourceItems():array{
+        return $this->sourceItems;
+    }
 
+
+    /**
+     * 设置选项
+     * @param array|null $items
+     * @return $this|array
+     * @throws \think\Exception
+     */
     public function items(array $items=null){
         if(is_null($items)){
             return $this->items;
