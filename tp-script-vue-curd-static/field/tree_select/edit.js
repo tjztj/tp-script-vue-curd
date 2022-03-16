@@ -38,6 +38,7 @@ define([],function(){
             if(!item){
                 return;
             }
+            item.style.cursor='not-allowed';
             let clseItem=item.querySelector('.ant-select-selection-item-remove');
             if(clseItem){
                 item.removeChild(clseItem)
