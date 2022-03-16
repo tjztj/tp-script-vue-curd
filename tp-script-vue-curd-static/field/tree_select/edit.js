@@ -39,6 +39,7 @@ define([],function(){
                 return;
             }
             item.style.cursor='not-allowed';
+            item.style.opacity='0.75';
             let clseItem=item.querySelector('.ant-select-selection-item-remove');
             if(clseItem){
                 item.removeChild(clseItem)
