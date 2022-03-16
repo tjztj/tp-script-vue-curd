@@ -256,7 +256,7 @@ class TreeSelect extends ModelField
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         if($this->multiple()){
-            $option->setTypeVarchar(500);
+            $option->setTypeText();
         }else{
             $option->setTypeVarchar(80);
         }
