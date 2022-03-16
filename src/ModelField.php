@@ -17,7 +17,10 @@ use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FieldTip;
 use tpScriptVueCurd\option\FieldWhere;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
+use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
 use tpScriptVueCurd\traits\Func;
 
 /**
@@ -87,6 +90,8 @@ abstract class ModelField
 
     protected bool $canExport=true;//是否可以导出本字段数据
 
+    protected FieldTpl $componentTpls;
+
     public function __construct()
     {
         $this->guid = create_guid();
@@ -94,6 +99,7 @@ abstract class ModelField
         if ($this->defaultFilterClass) {
             $this->filter(new $this->defaultFilterClass($this));
         }
+        $this->componentTpls=static::componentUrl();
     }
 
     /**
@@ -1068,6 +1074,44 @@ abstract class ModelField
      */
     public function getExportText(array $data):string{
         return $data[$this->name()]??'';
+    }
+
+
+    /**
+     * 设置字段的模板
+     * @param string|null $key
+     * @param string|Index|Show|Edit $url
+     * @return $this|FieldTpl
+     */
+    public function componentTpls(string $key=null,$url=null){
+        if(is_null($key)){
+            return $this->componentTpls;
+        }
+        switch ($key){
+            case 'index':
+                if(is_string($url)){
+                    $this->componentTpls->index->jsUrl=$url;
+                }else if($url instanceof Index){
+                    $this->componentTpls->index=$url;
+                }
+
+                break;
+            case 'show':
+                if(is_string($url)){
+                    $this->componentTpls->show->jsUrl=$url;
+                }else if($url instanceof Show){
+                    $this->componentTpls->show=$url;
+                }
+                break;
+            case 'edit':
+                if(is_string($url)){
+                    $this->componentTpls->edit->jsUrl=$url;
+                }else if($url instanceof Edit){
+                    $this->componentTpls->edit=$url;
+                }
+                break;
+        }
+        return $this;
     }
 
 }

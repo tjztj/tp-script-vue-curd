@@ -616,7 +616,7 @@ class FieldCollection extends Collection
             if(!in_array($type,['index','show','edit'])){
                 return;
             }
-            $tpl=$field::componentUrl();
+            $tpl=$field->componentTpls();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
             if($field->getType()==='ListField'||$field->getType()==='TableField'){
                 foreach ($field->fields()->getComponents($type) as $k=>$v){
