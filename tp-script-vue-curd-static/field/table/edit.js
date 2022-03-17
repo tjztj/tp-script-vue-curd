@@ -41,23 +41,27 @@ max-height: 92%;
                 isInit.value=true;
             }
 
+            
+            let list=Vue.ref(null);
+            Vue.watchEffect(()=>{
+                console.log(1)
 
-            let list = props.info[props.field.name+'List']||props.info[props.field.name+'Arr']||null;
-            if(list===null){
-                list=props.info[props.field.name];
-            }
-            if(typeof list==='string'){
-                list=JSON.parse(list);
-            }
-            if(!list){
-                list=[];
-            }
-
+                list.value = props.info[props.field.name+'List']||props.info[props.field.name+'Arr']||null;
+                if(list.value===null){
+                    list.value=props.info[props.field.name];
+                }
+                if(typeof list.value==='string'){
+                    list.value=JSON.parse(list);
+                }
+                if(!list.value){
+                    list.value=[];
+                }
+            })
 
 
 
             return {
-                list:Vue.ref(list),
+                list:list,
                 tableLoading:Vue.ref(false),
                 showLook:Vue.ref(false),
                 editShow:Vue.ref(false),
