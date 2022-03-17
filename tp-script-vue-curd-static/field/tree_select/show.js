@@ -37,10 +37,23 @@ define([],function(){
                 if(val===undefined||val===''){
                     return [];
                 }
-                const vals=[];
+                let vals=[];
                 val.toString().split(',').forEach(v=>{
                     vals.push(getText(this.field.items,v,''))
                 })
+
+                vals = vals.map((v) => {
+                    if (this.field.justShowLast) {
+                        const arr = v.split('|=|');
+                        return arr[arr.length - 1];
+                    }
+                    return v.replace(/\|=\|/g, '/');
+                });
+
+                vals.filter(v => {
+                    return v !== '';
+                })
+
 
                 return vals;
 

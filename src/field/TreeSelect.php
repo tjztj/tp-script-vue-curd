@@ -23,7 +23,7 @@ class TreeSelect extends ModelField
     protected bool $treeCheckStrictly=false;//多选的时候才会有效，checkable 状态下节点选择完全受控（父子节点选中状态不再关联）
     protected string $showCheckedStrategy='SHOW_ALL';//SHOW_CHILD、SHOW_PARENT、SHOW_ALL。定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). SHOW_CHILD只显示子节点.
     protected array $items=[];
-
+    protected bool $justShowLast=false;
 
     private array $sourceItems=[];//源数据
 
@@ -75,6 +75,16 @@ class TreeSelect extends ModelField
         return $this->doAttr('treeCheckStrictly',$treeCheckStrictly);
     }
 
+    /**
+     * 展示的时候是否只展示最底级
+     * @param bool|null $justShowLast
+     * @return TreeSelect
+     */
+    public function justShowLast(bool $justShowLast=null){
+        return $this->doAttr('justShowLast',$justShowLast);
+    }
+
+    
     /**
      * 定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). 默认只显示子节点.
      * @param string|null $showCheckedStrategy
