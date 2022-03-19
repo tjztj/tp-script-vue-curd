@@ -91,7 +91,7 @@ define([],function(){
         computed:{
             values:{
                 set(val){
-                    if(this.val){
+                    if(this.field.multiple&&this.val){
                         //获取差集
                         let valKeys=[];
                         if(val){

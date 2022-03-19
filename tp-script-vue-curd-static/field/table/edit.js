@@ -44,8 +44,6 @@ max-height: 92%;
             
             let list=Vue.ref(null);
             Vue.watchEffect(()=>{
-                console.log(1)
-
                 list.value = props.info[props.field.name+'List']||props.info[props.field.name+'Arr']||null;
                 if(list.value===null){
                     list.value=props.info[props.field.name];
