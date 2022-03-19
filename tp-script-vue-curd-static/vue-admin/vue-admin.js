@@ -1865,7 +1865,7 @@ define(requires, function (axios, Qs) {
                                     </slot>
                                     
                                     
-                                    <template v-if="isCanAddChildren()">
+                                    <template v-if="isCanAddChildren(record)">
                                         <a-divider type="vertical"></a-divider>
                                         <a @click="openAddChildren(record)" style="color:#08979c">{{addChildrenBtnText(record)}}</a>
                                     </template>
