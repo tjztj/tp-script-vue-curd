@@ -210,6 +210,10 @@ trait BaseEdit
             }else{
                 $parentInfo=null;
             }
+
+            if($this->treePidField&&$this->request->param('pid')){
+                $info[$this->treePidField]=$this->request->param('pid');
+            }
         }
 
         $this->editBefore($fields,$info,$parentInfo);

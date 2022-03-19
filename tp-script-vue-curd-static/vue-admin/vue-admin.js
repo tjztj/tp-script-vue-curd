@@ -1357,7 +1357,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize','expandAllRows','isTreeIndex'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns','canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize','expandAllRows','isTreeIndex'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1625,6 +1625,10 @@ define(requires, function (axios, Qs) {
                             }
                         }
 
+                        let childAddW=0;
+                        if(this.isCanAddChildren(record)){
+                            childAddW = this.getTextWidthByBtn(this.addChildrenBtnText(record))
+                        }
 
                         let showW = 0;
                         if (this.isCanShowInfo(record)) {
@@ -1643,7 +1647,7 @@ define(requires, function (axios, Qs) {
                         }
 
 
-                        const btnW = stepWidth + childW + showW + editW + delW - 14;//要删掉一个间隔
+                        const btnW = stepWidth + childW + childAddW + showW + editW + delW - 14;//要删掉一个间隔
                         if (btnW > btnWidth) {
                             btnWidth = btnW;
                         }
@@ -1663,6 +1667,9 @@ define(requires, function (axios, Qs) {
                 },
                 handleTableChange(pagination, filters, sorter) {
                     this.$emit('change', pagination, filters, sorter, this.data)
+                },
+                openAddChildren(row) {
+                    this.$emit('openAddChildren', row)
                 },
                 openEdit(row) {
                     this.$emit('openEdit', row)
@@ -1685,6 +1692,9 @@ define(requires, function (axios, Qs) {
                 getTextWidthByBtn(text) {
                     text = text || '';
                     return 17 + (text.split('').length * 14);
+                },
+                addChildrenBtnText(row){
+                    return '添加下级';
                 },
                 showBtnText(row) {
                     return '详情'
@@ -1713,6 +1723,9 @@ define(requires, function (axios, Qs) {
                 },
                 isCanDel(row) {
                     return this.canDel && (!row.__auth || typeof row.__auth.del === 'undefined' || row.__auth.del === true)
+                },
+                isCanAddChildren(row){
+                    return this.isTreeIndex&&this.canAdd;
                 },
                 onExpand (expanded, record) {
                     if (expanded) {
@@ -1851,6 +1864,11 @@ define(requires, function (axios, Qs) {
                                         </template>
                                     </slot>
                                     
+                                    
+                                    <template v-if="isCanAddChildren">
+                                        <a-divider type="vertical"></a-divider>
+                                        <a @click="openAddChildren(record)" style="color:#08979c">{{addChildrenBtnText(record)}}</a>
+                                    </template>
                                     
                                     <slot name="do-after" :record="record">
                                      

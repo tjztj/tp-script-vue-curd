@@ -118,7 +118,7 @@
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
                     {block name="toolBtnLeft"}{/block}
 
-                    <template v-if="auth.add&&auth.stepAdd&&auth.rowAuthAdd">
+                    <template v-if="canAdd">
                         {block name="toolAddBtn"}
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">
@@ -186,6 +186,7 @@
                     :loading="loading"
                     :list-columns="listColumns"
                     :childs="childs"
+                    :can-add="canAdd"
                     :can-edit="canEdit"
                     :can-del="canDel"
                     :action-width="actionWidth"
@@ -202,6 +203,7 @@
                     @change="handleTableChange"
                     @on-delete="deleteRow"
                     @open-edit="openEdit"
+                    @open-add-children="openAddChildren"
                     @open-next="openNext"
                     @open-show="openShow"
                     @open-child-list="openChildList"

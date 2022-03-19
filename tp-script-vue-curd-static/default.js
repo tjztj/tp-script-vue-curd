@@ -200,6 +200,9 @@ define(['vueAdmin'], function (va) {
                 this.fetch();
             },
             computed:{
+                canAdd(){
+                  return this.auth.add&&this.auth.stepAdd&&this.auth.rowAuthAdd;
+                },
                 ...getThisActionOhterComputeds(),
                 delSelectedIds(){
                     const ids=[];
@@ -287,6 +290,14 @@ define(['vueAdmin'], function (va) {
                             window.onListFetch(this.data);
                         })
                     }
+                },
+                openAddChildren(row){
+                    this.openBox({
+                        title:'新增 '+vueData.title,
+                        offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
+                        area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
+                        content: setUrlParams(vueData.editUrl,{'pid':row.id}),
+                    }).end();
                 },
                 openAdd(){
                     this.openBox({
