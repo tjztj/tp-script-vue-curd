@@ -2,9 +2,12 @@ define([],function(){
     function getValToString(val){
         let value='';
         if(Array.isArray(val)){
-            const arr=[];
+            const arr=[],haved={};
             val.forEach(v=>{
-                arr.push(v.value);
+                if(!haved[v.value]){
+                    arr.push(v.value);
+                    haved[v.value]=true;
+                }
             })
             if(arr.length>0){
                 value=arr.join(',');
