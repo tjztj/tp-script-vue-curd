@@ -158,6 +158,7 @@ class TreeSelect extends ModelField
             $saveVals=[];
             foreach ($vals as $v){
                 $v=trim($v);
+                if($v==='')continue;
                 if(!isset($list[$v])){
                     throw new \think\Exception('值'.$v.'不在可选中');
                 }
