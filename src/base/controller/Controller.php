@@ -50,6 +50,7 @@ trait Controller
 
 
     public bool $dontShowTpl=false;
+    public bool $dontShowTplAndGetData=false;
     public string $fetchPath;
     public string $tplPath='';
     public FunControllerIndexPage $indexPageOption;
@@ -181,6 +182,9 @@ trait Controller
      */
     protected function showTpl($file,$data){
         FilesField::setShowFileInfos();
+        if($this->dontShowTplAndGetData){
+            return $data;
+        }
         if($this->dontShowTpl){
             $this->success($data);
         }
