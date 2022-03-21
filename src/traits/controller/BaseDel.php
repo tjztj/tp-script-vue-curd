@@ -2,6 +2,7 @@
 
 namespace tpScriptVueCurd\traits\controller;
 
+use think\Exception;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 
@@ -58,6 +59,16 @@ trait BaseDel
      * @return \think\response\Json|void
      */
     public function doDelect(BaseModel $model,array $ids){
+        if($this->treePidField){
+            $childId=$model->whereIn($this->treePidField,$ids)->value('id');
+            if($childId){
+                if(count($ids)>1){
+                    throw new Exception('请先删除第'.(array_search((string)$childId, array_map('strval',$ids), true) +1).'条数据的下级数据');
+                }else{
+                    throw new Exception('请先删除下级数据');
+                }
+            }
+        }
         $ids=$this->beforeDel($ids);
         $list= $model->del($ids);
         $this->afterDel($list);
