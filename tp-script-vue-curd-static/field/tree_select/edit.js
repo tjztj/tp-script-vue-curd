@@ -159,7 +159,7 @@ define([],function(){
                 if(inputValue===''){
                     return true;
                 }
-                return treeNode.props.title.indexOf(inputValue)!==-1;
+                return treeNode.props.customTitle.indexOf(inputValue)!==-1;
             },
             setExpandedKeys(val){
                 const that=this;
