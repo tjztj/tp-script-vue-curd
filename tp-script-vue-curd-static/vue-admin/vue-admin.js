@@ -1716,7 +1716,7 @@ define(requires, function (axios, Qs) {
                     return null;
                 },
                 isCanShowInfo(row) {
-                    return !row.__auth || typeof row.__auth.show === 'undefined' || row.__auth.show === true;
+                    return typeof row.__auth === 'undefined' || typeof row.__auth.show === 'undefined' || row.__auth.show === true;
                 },
                 isCanEdit(row) {
                     return this.canEdit !== false && (!row.__auth || typeof row.__auth.edit === 'undefined' || row.__auth.edit === true) && (!this.fieldStepConfig || !this.fieldStepConfig.enable || (row.stepFields && row.stepFields.length > 0 && row.stepCanEdit))
