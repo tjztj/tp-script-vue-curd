@@ -13,7 +13,11 @@ define([],function(){
         },
         methods:{
             change(val){
-                this.modelVal=val?parseFloat(Number(val).toFixed(this.field.precision)).toString():'';
+                if(val===null||val===this.field.nullVal){
+                    this.modelVal='';
+                }else{
+                    this.modelVal=parseFloat(Number(val).toFixed(this.field.precision)).toString();
+                }
                 this.$emit('update:value',this.modelVal);
             }
         },
