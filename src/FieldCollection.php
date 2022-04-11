@@ -525,7 +525,11 @@ class FieldCollection extends Collection
                 $vValue=$checkVal;
                 if(!$isSourceData&&!is_null($checkVal)){//因为我可能强制设了 $vValue 为null,不让它显示
                     $fieldCopy=clone $field;
-                    $vValue=$fieldCopy->required(false)->setSave($data,$old)->getSave();
+                    try{
+                        $vValue=$fieldCopy->required(false)->setSave($data,$old)->getSave();
+                    }catch (\Exception $exception){
+                        throw new \think\Exception($fieldCopy->title().'：'.$exception->getMessage());
+                    }
                 }
 
 
