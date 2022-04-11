@@ -595,7 +595,11 @@ class FieldCollection extends Collection
         };
 
         $this->each(function(ModelField $v)use(&$fieldHideList,$data,&$checkHideField){
-            $checkHideField($v,isset($fieldHideList[$v->name()])?null:($data[$v->name()]??null));
+            try {
+                $checkHideField($v,isset($fieldHideList[$v->name()])?null:($data[$v->name()]??null));
+            }catch (\Exception $e){
+                throw new \think\Exception($v->title().'：'.$e->getMessage());
+            }
         });
 
         return $fieldHideList;

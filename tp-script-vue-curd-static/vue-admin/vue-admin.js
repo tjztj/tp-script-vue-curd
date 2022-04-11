@@ -1801,7 +1801,7 @@ define(requires, function (axios, Qs) {
                                             <div class="curd-table-row-step-title">
                                                 <a-tooltip v-if="stepInfo" placement="leftTop">
                                                     <template #title>{{ stepInfo.title }}</template>
-                                                    <span :style="{color:stepInfo.config.color||inherit}">{{ stepInfo.title }}</span>
+                                                    <span :style="{color:stepInfo.config.color||'inherit'}">{{ stepInfo.title }}</span>
                                                 </a-tooltip>
                                             </div>
                                             <div class="curd-table-row-step-other">
