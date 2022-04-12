@@ -173,6 +173,31 @@ class TreeSelect extends ModelField
         return $this;
     }
 
+
+    /**
+     * 显示时要处理的数据
+     * @param array $dataBaseData
+     * @throws \think\Exception
+     */
+    public function doShowData(array &$dataBaseData): void
+    {
+        if (isset($dataBaseData[$this->name()])) {
+            if(empty($dataBaseData[$this->name()])){
+                $dataBaseData[$this->name().'Text']='';
+                return;
+            }
+            static $items=[];
+            if(!isset($items[$this->guid()])){
+                $items[$this->guid()]=self::treeToList($this->items(),'value');
+            }
+            $texts=[];
+            foreach (explode(',',$dataBaseData[$this->name()]) as $val){
+                $texts[]=isset($items[$this->guid()][$val])?$items[$this->guid()][$val]['title']:'';
+            }
+            $dataBaseData[$this->name().'Text']=implode('，',array_filter($texts));
+        }
+    }
+
     /**
      * 模板导入备注
      * @param ExcelFieldTpl $excelFieldTpl
