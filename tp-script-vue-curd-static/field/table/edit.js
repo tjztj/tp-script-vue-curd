@@ -49,7 +49,7 @@ max-height: 92%;
                     list.value=props.info[props.field.name];
                 }
                 if(typeof list.value==='string'){
-                    list.value=JSON.parse(list);
+                    list.value=JSON.parse(list.value);
                 }
                 if(!list.value){
                     list.value=[];
