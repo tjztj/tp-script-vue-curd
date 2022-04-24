@@ -13,7 +13,7 @@ if(empty($param)){
     echo '未获取到文件名';
     exit;
 }
-
+$param=str_replace(['\\','..','//'],['/','','/'],$param);
 
 $dirs=array_map(function($v){
     return trim($v,'&');
