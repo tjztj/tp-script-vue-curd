@@ -74,10 +74,32 @@ class FieldDo
     protected $editShowDo;
 
 
+    /**
+     * 导出时执行（列表，数据处理之前）
+     * @var callable $exportListBeforeDo
+     */
+    protected $exportListBeforeDo;
+
+    /**
+     * 导出时执行（数据处理之前）
+     * @var callable $exportBeforeDo
+     */
+    protected $exportBeforeDo;
+
+    /**
+     * 导出时执行（数据处理之后）
+     * @var callable $exportAfterDo
+     */
+    protected $exportAfterDo;
 
 
     ##################################################################################################################
 
+    /**
+     * 设置列表数据展示时事件（单行）
+     * @param callable $func
+     * @return $this
+     */
     public function setIndexRowDo(callable $func): self
     {
         $this->indexRowDo=$func;
@@ -97,21 +119,21 @@ class FieldDo
     }
     /**
      * 列表获取到后执行 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param Collection $list
      * @param BaseModel|null $base
      */
-    public static function doIndex(FieldCollection $field,Collection $list,?BaseModel $base):void{
+    public static function doIndex(FieldCollection $fields,Collection $list,?BaseModel $base):void{
 
-        $list->each(static function(BaseModel $row)use($field,$base){
-            $field->each(static function(ModelField $field)use($base,$row){
+        $list->each(static function(BaseModel $row)use($fields,$base){
+            $fields->each(static function(ModelField $field)use($base,$row){
                 foreach ($field->getFieldDoList() as $fieldDo){
                     $fieldDo->doIndexRowDo($row,$base,$field);
                 }
             });
         });
         //另外再遍历，为了方便前面那个遍历后得到的东西在下面使用
-        $field->each(static function(ModelField $field)use($base,$list){
+        $fields->each(static function(ModelField $field)use($base,$list){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doIndexListDo($list,$base,$field);
             }
@@ -121,7 +143,11 @@ class FieldDo
 
     ##################################################################################################################
 
-
+    /**
+     * 设置列表数据展示时事件（列表）
+     * @param callable $func
+     * @return $this
+     */
     public function setIndexListDo(callable $func): self
     {
         $this->indexListDo=$func;
@@ -137,7 +163,11 @@ class FieldDo
 
     ##################################################################################################################
 
-
+    /**
+     * 设置列表页面显示时事件
+     * @param callable $func
+     * @return $this
+     */
     public function setIndexShowDo(callable $func): self
     {
         $this->indexShowDo=$func;
@@ -150,8 +180,8 @@ class FieldDo
         return $this;
     }
 
-    public static function doIndexShow(FieldCollection $field,?BaseModel &$baseModel,$controller):void{
-        $field->each(static function(ModelField $field)use(&$baseModel,$controller){
+    public static function doIndexShow(FieldCollection $fields,?BaseModel &$baseModel,$controller):void{
+        $fields->each(static function(ModelField $field)use(&$baseModel,$controller){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doIndexShowDo($field,$baseModel,$controller);
             }
@@ -161,8 +191,11 @@ class FieldDo
 
     ##################################################################################################################
 
-
-
+    /**
+     * 设置字段列表筛选时事件
+     * @param callable $func
+     * @return $this
+     */
     public function setIndexFilterBeforeDo(callable $func): self
     {
         $this->indexFilterBeforeDo=$func;
@@ -174,8 +207,8 @@ class FieldDo
         $func($field,$query,$filterData);
         return $this;
     }
-    public static function doIndexFilterBefore(FieldCollection $field,Query $query,array &$filterData):void{
-        $field->each(static function(ModelField $field)use($query,&$filterData){
+    public static function doIndexFilterBefore(FieldCollection $fields,Query $query,array &$filterData):void{
+        $fields->each(static function(ModelField $field)use($query,&$filterData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doIndexFilterBeforeDo($field,$query,$filterData);
             }
@@ -186,6 +219,11 @@ class FieldDo
 
     ##################################################################################################################
 
+    /**
+     * 设置详情页字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setShowInfoBeforeDo(callable $func): self
     {
         $this->showInfoBeforeDo=$func;
@@ -206,12 +244,12 @@ class FieldDo
 
     /**
      * 详情页字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param BaseModel $info
      * @param BaseModel|null $base
      */
-    public static function doShowBefore(FieldCollection $field,BaseModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info){
+    public static function doShowBefore(FieldCollection $fields,BaseModel $info,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,$info){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doShowInfoBeforeDo($info,$base,$field);
             }
@@ -221,6 +259,11 @@ class FieldDo
 
     ##################################################################################################################
 
+    /**
+     * 设置详情页字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setShowInfoDo(callable $func): self
     {
         $this->showInfoDo=$func;
@@ -241,12 +284,12 @@ class FieldDo
 
     /**
      * 详情页字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param BaseModel $info
      * @param BaseModel|null $base
      */
-    public static function doShow(FieldCollection $field,BaseModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info){
+    public static function doShow(FieldCollection $fields,BaseModel $info,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,$info){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doShowInfoDo($info,$base,$field);
             }
@@ -254,6 +297,12 @@ class FieldDo
     }
 
     ##################################################################################################################
+
+    /**
+     * 设置数据保存前字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setSaveBeforeDo(callable $func): self
     {
         $this->saveBeforeDo=$func;
@@ -277,13 +326,13 @@ class FieldDo
 
     /**
      * 数据保存前字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param array $postData   提交上来的数据
      * @param BaseModel|null $info
      * @param BaseModel|null $base
      */
-    public static function doSaveBefore(FieldCollection $field,array &$postData,BaseModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info,&$postData){
+    public static function doSaveBefore(FieldCollection $fields,array &$postData,BaseModel $info,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,$info,&$postData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doSaveBeforeDo($postData,$info,$base,$field);
             }
@@ -293,6 +342,12 @@ class FieldDo
 
 
     ##################################################################################################################
+
+    /**
+     * 设置数据保存前字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setSaveBeforeCheckedDo(callable $func): self
     {
         $this->saveBeforeCheckedDo=$func;
@@ -316,13 +371,13 @@ class FieldDo
 
     /**
      * 数据保存前字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param array $postData   提交上来的数据
      * @param BaseModel|null $info
      * @param BaseModel|null $base
      */
-    public static function doSaveBeforeChecked(FieldCollection $field,array &$saveData,BaseModel $info,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$info,&$saveData){
+    public static function doSaveBeforeChecked(FieldCollection $fields,array &$saveData,BaseModel $info,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,$info,&$saveData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doSaveBeforeCheckedDo($saveData,$info,$base,$field);
             }
@@ -331,7 +386,11 @@ class FieldDo
 
     ##################################################################################################################
 
-
+    /**
+     * 设置数据保存后字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setSaveAfterDo(callable $func): self
     {
         $this->saveAfterDo=$func;
@@ -356,14 +415,14 @@ class FieldDo
 
     /**
      * 数据保存后字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param array $saveData   保存的数据
      * @param BaseModel|null $before
      * @param BaseModel $after
      * @param BaseModel|null $base
      */
-    public static function doSaveAfter(FieldCollection $field,array $saveData,BaseModel $before,BaseModel $after,?BaseModel $base):void{
-        $field->each(static function(ModelField $field)use($base,$before,$after,$saveData){
+    public static function doSaveAfter(FieldCollection $fields,array $saveData,BaseModel $before,BaseModel $after,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,$before,$after,$saveData){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doSaveAfterDo($saveData,$before,$after,$base,$field);
             }
@@ -371,6 +430,12 @@ class FieldDo
     }
 
     ##################################################################################################################
+
+    /**
+     * 设置数据编辑显示字段事件
+     * @param callable $func
+     * @return $this
+     */
     public function setEditShowDo(callable $func): self
     {
         $this->editShowDo=$func;
@@ -394,18 +459,147 @@ class FieldDo
 
     /**
      * 数据编辑显示字段钩子 方便函数
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param BaseModel|null $info
      * @param BaseModel|null $base
      * @param bool $isStepNext
      */
-    public static function doEditShow(FieldCollection $field,BaseModel &$info,?BaseModel $base,bool $isStepNext):void{
-        $field->each(static function(ModelField $field)use($base,&$info,$isStepNext){
+    public static function doEditShow(FieldCollection $fields,BaseModel &$info,?BaseModel $base,bool $isStepNext):void{
+        $fields->each(static function(ModelField $field)use($base,&$info,$isStepNext){
             foreach ($field->getFieldDoList() as $fieldDo){
                 $fieldDo->doEditShowDo($info,$base,$field,$isStepNext);
             }
         });
     }
+
+
+    ##################################################################################################################
+
+    /**
+     * 设置数据导出事件（数据处理之前）
+     * @param callable $func
+     * @return $this
+     */
+    public function setExportBeforeDo(callable $func): self
+    {
+        $this->exportBeforeDo=$func;
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子（数据处理之前）
+     * @param array $info
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doExportBeforeDo(array &$info,ModelField $field):self{
+        $func=$this->exportBeforeDo?? static function(){};
+        $func($info,$field);
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子 方便函数（数据处理之前）
+     * @param FieldCollection $fields
+     * @param array $info
+     * @return void
+     */
+    public static function doExportBefore(FieldCollection $fields,array &$info):void{
+        $fields->each(static function(ModelField $field)use(&$info){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doExportBeforeDo($info,$field);
+            }
+        });
+    }
+
+    
+
+    ##################################################################################################################
+
+    /**
+     * 设置数据导出事件（数据处理之后）
+     * @param callable $func
+     * @return $this
+     */
+    public function setExportAfterDo(callable $func): self
+    {
+        $this->exportAfterDo=$func;
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子（数据处理之后）
+     * @param array $data
+     * @param array $info
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doExportAfterDo(array &$data,array $info,ModelField $field):self{
+        $func=$this->exportAfterDo?? static function(){};
+        $func($data,$info,$field);
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子 方便函数（数据处理之后）
+     * @param FieldCollection $fields
+     * @param array $data
+     * @param array $info
+     * @return void
+     */
+    public static function doExportAfter(FieldCollection $fields,array &$data,array $info):void{
+        $fields->each(static function(ModelField $field)use(&$data,$info){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doExportAfterDo($data,$info,$field);
+            }
+        });
+    }
+
+    ##################################################################################################################
+
+    /**
+     * 设置数据导出事件（列表，数据处理之前）
+     * @param callable $func
+     * @return $this
+     */
+    public function setExportListBeforeDo(callable $func): self
+    {
+        $this->exportListBeforeDo=$func;
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子（列表，数据处理之前）
+     * @param array $list
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doExportListBeforeDo(array &$list,ModelField $field):self{
+        $func=$this->exportListBeforeDo?? static function(){};
+        $func($list,$field);
+        return $this;
+    }
+
+
+    /**
+     * 数据导出钩子 方便函数（数据处理之前）
+     * @param FieldCollection $fields
+     * @param array $list
+     * @return void
+     */
+    public static function doExportListBefore(FieldCollection $fields,array &$list):void{
+        $fields->each(static function(ModelField $field)use(&$list){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doExportListBeforeDo($list,$field);
+            }
+        });
+    }
+
 
 
     ##################################################################################################################

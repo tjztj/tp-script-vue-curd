@@ -1645,9 +1645,7 @@ define(requires, function (axios, Qs) {
                         if (this.isCanDel(record)) {
                             delW = 31;
                         }
-
-
-                        const btnW = stepWidth + childW + childAddW + showW + editW + delW - 14;//要删掉一个间隔
+                        const btnW = stepWidth + childW + childAddW + showW + editW + delW +this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
                         if (btnW > btnWidth) {
                             btnWidth = btnW;
                         }
@@ -1739,6 +1737,145 @@ define(requires, function (axios, Qs) {
                             })
                         }
                     }
+                },
+                getBeforeBtns(row){
+                    return row.otherBtns.before;
+                },
+                getAfterBtns(row){
+                    return row.otherBtns.after;
+                },
+                getBeforeBtnsW(row){
+                    let w=0;
+                    const btns=this.getBeforeBtns(row);
+                    for(let i in btns){
+                        if(btns[i].btnTitle)w+=this.getTextWidthByBtn(btns[i].btnTitle)
+                    }
+                    return w;
+                },
+                getAfterBtnsW(row){
+                    let w=0;
+                    const btns=this.getAfterBtns(row);
+                    for(let i in btns){
+                        if(btns[i].btnTitle)w+=this.getTextWidthByBtn(btns[i].btnTitle)
+                    }
+                    return w;
+                },
+                refreshId(id){
+                    this.$emit('refreshId', id)
+                },
+                refreshTable(){
+                    this.$emit('refreshTable')
+                },
+                '$post':vueDefMethods.$post,
+                openBox:window.openBox,
+                openOtherBtn(btn,row){
+                    if(!btn.modalTitleFields){
+                        antd.Modal.confirm({
+                            content: btn.modalTitle,
+                            title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
+                            icon: (Vue.openBlock(), Vue.createBlock("svg", {
+                                t: "1615779502296",
+                                class: "icon anticon",
+                                viewBox: "0 0 1024 1024",
+                                version: "1.1",
+                                xmlns: "http://www.w3.org/2000/svg",
+                                width: "22",
+                                height: "22"
+                            }, [
+                                Vue.createVNode("path", {
+                                    d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
+                                    fill: '#faad14',
+                                })
+                            ])),
+                            onOk:()=>{
+                                return new Promise((resolve, reject) => {
+                                    this.$post(btn.saveUrl,{id:row.id}).then(res=>{
+                                        antd.message.success(res.msg);
+                                        this.refreshId( row.id)
+                                        resolve()
+                                    }).catch(err=>{
+                                        reject(err)
+                                    })
+                                });
+                            },
+                        })
+                        return;
+                    }
+                    this.openBox({
+                        title:btn.modalTitle,
+                        area: [btn.modalW, btn.modalH],
+                        offset: btn.modalH === '100vh' ? 'rt' : 'auto',
+                        content:'/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
+                    }).on('success',function (layero){
+                        const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];
+                        const win=iframe.contentWindow;
+
+
+                        function runScript(script){
+                            return new Promise((reslove, rejected) => {
+                                // 直接 document.head.appendChild(script) 是不会生效的，需要重新创建一个
+                                const newScript = win.document.createElement('script');
+                                // 获取 inline script
+                                newScript.innerHTML = script.innerHTML;
+                                // 存在 src 属性的话
+                                const src = script.getAttribute('src');
+                                if (src) newScript.setAttribute('src', src);
+
+                                // script 加载完成和错误处理
+                                newScript.onload = () => reslove();
+                                newScript.onerror = err => rejected();
+                                win.document.head.appendChild(newScript);
+                                win.document.head.removeChild(newScript);
+                                if (!src) {
+                                    // 如果是 inline script 执行是同步的
+                                    reslove();
+                                }
+                            })
+                        }
+
+                        function setHTMLWithScript(container, rawHTML){
+                            container.innerHTML = rawHTML;
+                            const scripts = container.querySelectorAll('script');
+
+                            return Array.prototype.slice.apply(scripts).reduce((chain, script) => {
+                                return chain.then(() => runScript(script));
+                            }, Promise.resolve());
+                        }
+
+                        win.VUE_CURD=window.VUE_CURD;
+                        win.moment=moment;
+                        win.beforeInit=function (){
+                            win.vueData.title=btn.modalTitle;
+                            win.vueData.fields=btn.modalTitleFields;
+                            win.vueData.groupFields=btn.modalTitleGroupFields;
+                            win.vueData.fieldComponents=btn.modalTitleFieldsComponents;
+                            win.vueData.isStepNext=false;
+                            win.vueData.stepInfo=null;
+                            win.vueData.vueCurdAction='edit';
+
+                            win.vueData.info=btn.info||{id:row.id};
+                            win.vueData.subUrl=btn.saveUrl;
+                            win.vueData.subBtnTitle=btn.saveBtnTitle;
+                        }
+
+                        let headHtml='';
+                        let headEls=document.querySelector('head').children;
+                        for(let i in headEls){
+                            if(typeof headEls[i].getAttribute==='function'&&!headEls[i].getAttribute('data-requiremodule')){
+                                headHtml+= headEls[i].outerHTML;
+                            }
+                        }
+
+                        setHTMLWithScript(win.document.querySelector('head'),"<style id='init-before-style'>body{display: none}</style>"
+                            +headHtml
+                            +"<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
+                            +"<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
+                            +"<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
+                            +"</script>");
+
+
+                    }).end();
+
                 },
             },
             template: `<div :id="id">
@@ -1835,6 +1972,11 @@ define(requires, function (axios, Qs) {
                                    
                                     </slot>
                                     
+                                    <template v-for="btn in getBeforeBtns(record)">
+                                        <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                        <a-divider type="vertical"></a-divider>
+                                    </template>
+                                    
                                     <slot name="do" :record="record">
                                         <a v-if="isCanShowInfo(record)" @click="openShow(record)">详情</a>
                                           
@@ -1869,6 +2011,11 @@ define(requires, function (axios, Qs) {
                                         <a-divider type="vertical"></a-divider>
                                         <a @click="openAddChildren(record)" style="color:#08979c">{{addChildrenBtnText(record)}}</a>
                                     </template>
+                                    
+                                      <template v-for="btn in getAfterBtns(record)">
+                                        <a-divider type="vertical"></a-divider>
+                                         <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                      </template>
                                     
                                     <slot name="do-after" :record="record">
                                      

@@ -40,22 +40,30 @@ max-height: 92%;
             }else{
                 isInit.value=true;
             }
-
-            
+            let addMaxId=Vue.ref(0);
             let list=Vue.ref(null);
-            Vue.watchEffect(()=>{
-                list.value = props.info[props.field.name+'List']||props.info[props.field.name+'Arr']||null;
-                if(list.value===null){
-                    list.value=props.info[props.field.name];
-                }
-                if(typeof list.value==='string'){
-                    list.value=JSON.parse(list.value);
-                }
-                if(!list.value){
-                    list.value=[];
-                }
-            })
-
+            Vue.watch(props.info, (newValue, oldValue) => {
+                    list.value = newValue[props.field.name+'List']||newValue[props.field.name+'Arr']||null;
+                    if(list.value===null){
+                        list.value=newValue[props.field.name];
+                    }
+                    if(typeof list.value==='string'){
+                        list.value=JSON.parse(list.value);
+                    }
+                    if(!list.value){
+                        list.value=[];
+                    }
+                    for(let i in list.value){
+                        if(!list.value[i].id){
+                            addMaxId.value++;
+                            list.value[i].id=addMaxId.value;
+                        }else if(addMaxId.value<list.value[i].id){
+                            addMaxId.value=list.value[i].id;
+                        }
+                    }
+                },
+                { immediate: true }
+            )
 
 
             return {
@@ -80,7 +88,7 @@ max-height: 92%;
                     groupFields:props.field.pageData.showGroupFields||{'':props.field.pageData.showFields},
                 },
                 showInfo:Vue.ref({}),
-                addMaxId: Vue.ref(0),
+                addMaxId: addMaxId,
                 fieldComponents,
                 isInit,
             }

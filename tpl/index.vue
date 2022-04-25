@@ -28,12 +28,12 @@
 }
 
 @media screen and (max-width: 820px) {
-  .curd-filter-box .filter-box-div{
-    grid-template-columns: auto;
-  }
-  .curd-filter-box .filter-item-box {
-    padding-left: 24px !important;
-  }
+    .curd-filter-box .filter-box-div{
+        grid-template-columns: auto;
+    }
+    .curd-filter-box .filter-item-box {
+        padding-left: 24px !important;
+    }
 }
 </style>
 {if $childTpl}
@@ -153,16 +153,16 @@
                         </div>
                     </template>
 
-                  <template v-if="auth.export">
-                      <div class="ant-space-item" v-if="auth.downExcelTpl">
-                          <a-divider type="vertical"></a-divider>
-                      </div>
-                    <div class="ant-space-item">
-                      <a-button class="azure-blue" @click="exportData" :disabled="!pagination.total">
-                        <export-outlined></export-outlined><span> 导出当前数据</span>
-                      </a-button>
-                    </div>
-                  </template>
+                    <template v-if="auth.export">
+                        <div class="ant-space-item" v-if="auth.downExcelTpl">
+                            <a-divider type="vertical"></a-divider>
+                        </div>
+                        <div class="ant-space-item">
+                            <a-button class="azure-blue" @click="exportData" :disabled="!pagination.total">
+                                <export-outlined></export-outlined><span> 导出当前数据</span>
+                            </a-button>
+                        </div>
+                    </template>
 
                     {block name="toolBtnRight"}{/block}
                 </div>
@@ -207,6 +207,8 @@
                     @open-next="openNext"
                     @open-show="openShow"
                     @open-child-list="openChildList"
+                    @refresh-id="refreshId"
+                    @refresh-table="refreshTable"
                     ref="indexcurdtable">
             <!--    配合actionWidth使用-->
             {block name="tableSlot"}{/block}

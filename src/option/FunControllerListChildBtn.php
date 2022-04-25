@@ -40,4 +40,10 @@ class FunControllerListChildBtn
      */
     public string $pageOffset='rt';
 
+    /**
+     * 是否可添加子表数据
+     * @var bool
+     */
+    public ?bool $canAdd=null;
+
 }

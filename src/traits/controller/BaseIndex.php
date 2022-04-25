@@ -20,6 +20,7 @@ use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
+use tpScriptVueCurd\option\index_row_btn\RowBtn;
 
 /**
  * 为了方便有时候子控制器也使用
@@ -88,6 +89,22 @@ trait BaseIndex
                 $this->error($e);
             }
 
+
+            /**
+             * 字段自定义按钮
+             */
+            $list->each(function (BaseModel $v)use($list,$parentInfo){
+                $otherBtns=[
+                    'before'=>[...$this->getListRowBeforeBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowBeforeBtns($this->fields,$parentInfo,$list)],
+                    'after'=>[...$this->getListRowAfterBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowAfterBtns($this->fields,$parentInfo,$list)],
+                ];
+                foreach ($otherBtns as $k=>$vo){
+                    foreach ($vo as $key=>$val){
+                        $otherBtns[$k][$key]=$val->toArray();
+                    }
+                }
+                $v->otherBtns=$otherBtns;
+            });
 
             //字段显示处理
             $option->data=$list->toArray();
@@ -394,6 +411,15 @@ trait BaseIndex
                         ['base_id'=>$info->id,'child_tpl'=>1,'show_filter'=>0,'c_window'=>['f'=>'auto','w'=>'50vw','h'=>'72vh']]
                     )->build();
                 }
+                //可能有性能问题，所以这个功能默认关闭
+                if($childControlle->parentIndexShowAddAuth){
+                    try{
+                        $rowAuthAdd=$childControlle->md->checkRowAuth($childControlle->getRowAuthAddFields(clone $childControlle->md,$info),$info,'add');
+                    }catch (\Exception $e){
+                        $rowAuthAdd=false;
+                    }
+                    $btn->canAdd=$rowAuthAdd&&$childControlle->getAuthAdd(clone $childControlle->md,$info);
+                }
                 $childBtns[class_basename($childControlle->md)]=$btn;
             }
             $info->childBtns=$childBtns;
@@ -657,5 +683,32 @@ trait BaseIndex
      */
     final public function isTreeIndex(){
         return isset($this->treePidField)&&$this->treePidField!=='';
+    }
+
+
+    /**
+     * 列表按钮组左侧
+     * @param BaseModel $info               当前行信息
+     * @param FieldCollection $fields
+     * @param BaseModel|null $parentInfo
+     * @param \think\model\Collection $list 列表信息
+     * @return RowBtn[]
+     */
+    public function getListRowBeforeBtns(BaseModel $info,FieldCollection $fields,?BaseModel $parentInfo,\think\model\Collection $list): array
+    {
+        return [];
+    }
+
+    /**
+     * 列表按钮组右侧
+     * @param BaseModel $info               当前行信息
+     * @param FieldCollection $fields
+     * @param BaseModel|null $parentInfo
+     * @param \think\model\Collection $list 列表信息
+     * @return RowBtn[]
+     */
+    public function getListRowAfterBtns(BaseModel $info,FieldCollection $fields,?BaseModel $parentInfo,\think\model\Collection $list): array
+    {
+        return [];
     }
 }

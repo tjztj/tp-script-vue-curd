@@ -12,6 +12,7 @@ use tpScriptVueCurd\traits\model\GenerateTable;
 use tpScriptVueCurd\traits\model\InfoAuth;
 use tpScriptVueCurd\traits\model\ModelBaseField;
 use tpScriptVueCurd\traits\model\ModelDelTraits;
+use tpScriptVueCurd\traits\model\ModelRowBtn;
 use tpScriptVueCurd\traits\model\ModelSave;
 use tpScriptVueCurd\traits\model\ModelStep;
 
@@ -22,7 +23,7 @@ use tpScriptVueCurd\traits\model\ModelStep;
  */
 abstract class VueCurlModel extends TimeModel
 {
-    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep,InfoAuth,GenerateTable;
+    use ModelSave,ModelDelTraits,ModelBaseField,ModelStep,InfoAuth,GenerateTable,ModelRowBtn;
 
     /**
      * @var Controller

@@ -15,6 +15,11 @@ trait Childs
      */
     private $parentController;
 
+    /**
+     * 是否在父列表中，判断当前用户有此表的添加权限
+     * @var bool $parentIndexShowAddAuth 可能有性能问题，所以这个功能默认关闭
+     */
+    public bool $parentIndexShowAddAuth=false;
 
     /**
      * 设置当前控制器的父控制器
