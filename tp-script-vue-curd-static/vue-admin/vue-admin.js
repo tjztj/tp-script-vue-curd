@@ -1853,7 +1853,7 @@ define(requires, function (axios, Qs) {
                             win.vueData.stepInfo=null;
                             win.vueData.vueCurdAction='edit';
 
-                            win.vueData.info=btn.info||{id:row.id};
+                            win.vueData.info=btn.info&&Object.keys(btn.info).length>0?btn.info:{id:row.id};
                             win.vueData.subUrl=btn.saveUrl;
                             win.vueData.subBtnTitle=btn.saveBtnTitle;
                         }
