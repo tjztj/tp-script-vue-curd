@@ -22,7 +22,6 @@ use tpScriptVueCurd\traits\Func;
  * 有关时间的模型
  * Class TimeModel
  * @author tj 1079798840@qq.com
- * @package app\common\model
  */
 class TimeModel extends Model
 {

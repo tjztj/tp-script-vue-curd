@@ -2,7 +2,8 @@
 
 namespace tpScriptVueCurd\traits\model;
 
-use app\common\model\BaseModel;
+
+use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\option\index_row_btn\RowBtn;
 
