@@ -1739,10 +1739,10 @@ define(requires, function (axios, Qs) {
                     }
                 },
                 getBeforeBtns(row){
-                    return row.otherBtns.before;
+                    return row.otherBtns?row.otherBtns.before:[];
                 },
                 getAfterBtns(row){
-                    return row.otherBtns.after;
+                    return row.otherBtns?row.otherBtns.after:[];
                 },
                 getBeforeBtnsW(row){
                     let w=0;
