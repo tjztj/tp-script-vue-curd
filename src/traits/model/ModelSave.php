@@ -108,6 +108,7 @@ trait ModelSave
         }
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
+        $info->controller=$this->controller;
 
         FieldDo::doSaveAfter($saveFields,$data,$this,$info,$parentInfo);
         $this->onAddAfter($info,$data,$parentInfo);
