@@ -342,6 +342,8 @@ trait Excel
      * @throws \think\db\exception\ModelNotFoundException
      */
     public function downExcelTpl():void{
+        $title=$this->getExcelTilte();
+        $excel=ExportExcel::make($title);
 
         ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         $emptyItem=[];
@@ -361,8 +363,16 @@ trait Excel
         for($i=0;$i<2000;$i++){
             $list[]=$emptyItem;
         }
-        $title=$this->getExcelTilte();
-        $excel=ExportExcel::make($title);
+
+
+        foreach ($row as $v){
+            $findCount=substr_count($v,"\n");
+            if($findCount>=5||strlen($v)>=120){
+                $excel->thRowHeight=104;
+                break;
+            }
+        }
+
         $excel->defFormatText=true;
         $excel->title->alignmentHorizontal=Alignment::HORIZONTAL_LEFT;
         $excel->title->wrapText=true;
