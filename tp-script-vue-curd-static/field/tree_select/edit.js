@@ -194,7 +194,7 @@ define([],function(){
  v-model:value="values"
  v-model:tree-expanded-keys="treeExpandedKeys"
  :tree-data="treeData"
- :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+ :dropdown-style="{ maxHeight: field.dropdownMaxHeight+'px', overflow: 'auto' }"
  :placeholder="field.placeholder||'请选择'+field.title"
   :disabled="field.readOnly"
   tree-node-filter-prop="label"

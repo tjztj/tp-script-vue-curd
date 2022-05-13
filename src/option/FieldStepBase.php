@@ -44,11 +44,17 @@ abstract class FieldStepBase
                         if(!isset($funcs[''])){
                             return false;
                         }
+                        if(is_callable($funcs[''])){
+                            return ($funcs[''])($info, $parentInfo, $field);
+                        }
                         return ($funcs['']->func)($info, $parentInfo, $field);
                     }
                     $currStep=endStepVal($info);
                     foreach ($funcs as $k=>$v){
                         if($k&&$k::name()===$currStep){
+                            if(is_callable($v)){
+                                return $v($info, $parentInfo, $field);
+                            }
                             return ($v->func)($info, $parentInfo, $field);
                         }
                     }
@@ -118,7 +124,7 @@ abstract class FieldStepBase
 
     /**
      * 数据下一步是否当前步骤，判断
-     * @return FieldStepBeforeCheck[]  [stepclass=>FieldStepBeforeCheck::make('',function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){})]
+     * @return callable[]|FieldStepBeforeCheck[]  [stepclass=>FieldStepBeforeCheck::make('',function(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){})]
      */
     abstract protected function beforeCheck(): array;
 

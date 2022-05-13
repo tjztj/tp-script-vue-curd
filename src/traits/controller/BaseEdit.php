@@ -186,7 +186,7 @@ trait BaseEdit
                 'data'=>$data,
                 'info'=>$savedInfo,
                 'baseInfo'=>$parentInfo,
-                'refreshList'=> $refreshList,
+                'refreshList'=> $this->treePidField?true:$refreshList,
             ]);
         }
 

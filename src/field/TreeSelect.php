@@ -19,7 +19,7 @@ class TreeSelect extends ModelField
 
     protected bool $canCheckParent=false;//是否可选中父级
     protected bool $multiple=false;//是否多选
-    protected int $dropdownMaxHeight=300;//弹出框最高高度
+    protected int $dropdownMaxHeight=400;//弹出框最高高度
     protected bool $treeCheckStrictly=false;//多选的时候才会有效，checkable 状态下节点选择完全受控（父子节点选中状态不再关联）
     protected string $showCheckedStrategy='SHOW_ALL';//SHOW_CHILD、SHOW_PARENT、SHOW_ALL。定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). SHOW_CHILD只显示子节点.
     protected array $items=[];

@@ -33,6 +33,8 @@ use tpScriptVueCurd\option\index_row_btn\RowBtn;
 trait BaseIndex
 {
 
+    //列表默认排序
+    public string $indexDefaultOrder='id DESC';
 
     /**
      * #title 数据列表
@@ -671,7 +673,7 @@ trait BaseIndex
             }
             $order=$sortField.' '.$sortOrder;
         }else{
-            $order='id DESC';
+            $order=$this->indexDefaultOrder;
         }
         return $order;
     }
