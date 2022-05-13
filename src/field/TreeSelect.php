@@ -84,7 +84,7 @@ class TreeSelect extends ModelField
         return $this->doAttr('justShowLast',$justShowLast);
     }
 
-    
+
     /**
      * 定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). 默认只显示子节点.
      * @param string|null $showCheckedStrategy
@@ -218,6 +218,9 @@ class TreeSelect extends ModelField
             $this->lists=self::treeToList($this->items(),'value','children');
         }
         foreach ($this->lists as $v){
+            if(!empty($v['children'])&&!$this->canCheckParent()){
+                continue;
+            }
             $keys=[];
             foreach ($v['parents'] as $val){
                 if(!isset($this->lists[$val])){
@@ -390,6 +393,9 @@ class TreeSelect extends ModelField
         }
         $values=[];
         foreach ($this->lists as $v){
+            if(!empty($v['children'])&&!$this->canCheckParent()){
+                continue;
+            }
             $keys=[];
             foreach ($v['parents'] as $val){
                 if(!isset($this->lists[$val])){
