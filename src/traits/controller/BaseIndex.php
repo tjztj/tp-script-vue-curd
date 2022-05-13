@@ -713,4 +713,17 @@ trait BaseIndex
     {
         return [];
     }
+
+
+    /**
+     * 获取列表查询条件（用来获取的方便方法）
+     * @param BaseModel|null $model
+     * @param BaseModel|null $parentInfo
+     * @return Query|BaseModel
+     * @throws \think\Exception
+     */
+    public function getModelDoListWhere(BaseModel $model=null,?BaseModel &$parentInfo=null){
+        is_null($model)&&$model=$this->md;
+        return $this->indexListModelWhere(clone $model,$parentInfo);
+    }
 }
