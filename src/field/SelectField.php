@@ -118,17 +118,13 @@ class SelectField extends ModelField
      * @return void
      */
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl):void{
-        if(count($this->items)>5){
-            $str='请根据网站上的规则填入相关选项';
-        }else{
-            $str='请填入以下选项'.($this->multiple?'（可填写多个，换行来分隔）':'').'：';
-            $str.="\n";
-            $texts=[];
-            foreach ($this->items as $v){
-                $texts[]=$v['text'];
-            }
-            $str.=implode("\n",$texts);
+        $str='请填入以下选项'.($this->multiple?'（可填写多个，换行来分隔）':'').'：';
+        $str.="\n";
+        $texts=[];
+        foreach ($this->items as $v){
+            $texts[]=$v['text'];
         }
+        $str.=implode("\n",$texts);
 
 
         $excelFieldTpl->explain=$str;
