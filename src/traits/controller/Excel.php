@@ -132,6 +132,7 @@ trait Excel
          * @var BaseModel $model
          */
         $model=new $modelClassName;
+        $model->controller=$this;
         $info=$model->addInfo($option->saveArr, $option->base,$this->myExcelFields()->excelFilter(),true);
 
         $optionAfter=new FunControllerImportAfter();
@@ -177,6 +178,7 @@ trait Excel
             $modelName=class_basename($modelClass);
             if(isset($datas[$modelName])){
                 $model=new $modelClass;
+                $model->controller=$childController;
                 $base=$this->getExcelBaseInfo($baseId);
 
 
