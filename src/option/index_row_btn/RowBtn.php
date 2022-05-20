@@ -4,15 +4,10 @@ namespace tpScriptVueCurd\option\index_row_btn;
 
 use tpScriptVueCurd\FieldCollection;
 
-class RowBtn
+class RowBtn extends Btn
 {
-    public string $btnTitle='';
-    public string $btnColor='';
 
-    public string $modalW='45vw';
-    public string $modalH='100vh';
-    public string $modalTitle='';
-    public ?FieldCollection $modalTitleFields=null;
+    public ?FieldCollection $modalFields=null;
 
     public string $saveUrl='';
     public string $saveBtnTitle='提交';
@@ -24,17 +19,12 @@ class RowBtn
     public ?array $info=[];
 
     public function toArray():array{
-        $modalTitleFields=$this->modalTitleFields?array_values($this->modalTitleFields->rendGroup()->fieldToArrayPageType('edit')->toArray()):null;
+        $modalFields=$this->modalFields?array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray()):null;
         return [
-            'btnTitle'=>$this->btnTitle,
-            'btnColor'=>$this->btnColor,
-            
-            'modalW'=>$this->modalW,
-            'modalH'=>$this->modalH,
-            'modalTitle'=>$this->modalTitle?:$this->btnTitle,
-            'modalTitleFields'=>$modalTitleFields,
-            'modalTitleGroupFields'=>$this->modalTitleFields&&$this->modalTitleFields->groupItems?FieldCollection::groupListByItems($modalTitleFields):null,
-            'modalTitleFieldsComponents'=>$this->modalTitleFields?$this->modalTitleFields->getComponents('edit'):[],
+            ...parent::toArray(),
+            'modalFields'=>$modalFields,
+            'modalGroupFields'=>$this->modalFields&&$this->modalFields->groupItems?FieldCollection::groupListByItems($modalFields):null,
+            'modalFieldsComponents'=>$this->modalFields?$this->modalFields->getComponents('edit'):[],
 
             'saveUrl'=>$this->saveUrl,
             'saveBtnTitle'=>$this->saveBtnTitle,

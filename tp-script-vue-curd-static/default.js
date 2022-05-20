@@ -315,11 +315,39 @@ define(['vueAdmin'], function (va) {
                         }
                         this.openBox(config).end();
                     }else{
+                        let title='修改 '+vueData.title+' 相关信息';
+                        let w=this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw';
+                        let h=this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh';
+                        let url=setUrlParams(vueData.defaultUrlTpl.replace('___URL_TPL___','edit'),{id:row.id})
+                        let offset=this.cWindow&&this.cWindow.f?this.cWindow.f:'rt';
+                        if(row.editBtn){
+                            if(row.editBtn.modalTitle){
+                                title=row.editBtn.modalTitle;
+                            }
+                            if(row.editBtn.modalW){
+                                w=row.editBtn.modalW;
+                            }
+                            if(row.editBtn.modalH){
+                                h=row.editBtn.modalH;
+                            }
+                            if(row.editBtn.modalUrl){
+                                url=row.editBtn.modalUrl;
+                            }
+                            if(row.editBtn.modalOffset){
+                                offset=row.editBtn.modalOffset;
+                            }
+                        }
+
+                        w=w.toLowerCase();
+                        h=h.toLowerCase();
+
+
+
                         this.openBox({
-                            title:'修改 '+vueData.title,
-                            offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
-                            area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
-                            content: setUrlParams(vueData.editUrl,{'id':row.id}),
+                            title:title,
+                            offset:offset,
+                            area: [w.toLowerCase(), h.toLowerCase()],
+                            content: url,
                         }).end();
                     }
                 },
@@ -331,11 +359,39 @@ define(['vueAdmin'], function (va) {
                     }
                 },
                 openShow(row){
+                    let title='查看 '+vueData.title+' 相关信息';
+                    let w=this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw';
+                    let h=this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh';
+                    let url=setUrlParams(vueData.defaultUrlTpl.replace('___URL_TPL___','show'),{id:row.id})
+                    let offset=this.cWindow&&this.cWindow.f?this.cWindow.f:'rt';
+                    if(row.showBtn){
+                        if(row.showBtn.modalTitle){
+                            title=row.showBtn.modalTitle;
+                        }
+                        if(row.showBtn.modalW){
+                            w=row.showBtn.modalW;
+                        }
+                        if(row.showBtn.modalH){
+                            h=row.showBtn.modalH;
+                        }
+                        if(row.showBtn.modalUrl){
+                            url=row.showBtn.modalUrl;
+                        }
+                        if(row.showBtn.modalOffset){
+                            offset=row.showBtn.modalOffset;
+                        }
+                    }
+
+                    w=w.toLowerCase();
+                    h=h.toLowerCase();
+
+
+
                     this.openBox({
-                        title:'查看 '+vueData.title+' 相关信息',
-                        offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
-                        area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
-                        content: setUrlParams(vueData.showUrl,{id:row.id}),
+                        title:title,
+                        offset:offset,
+                        area: [w.toLowerCase(), h.toLowerCase()],
+                        content: url,
                     }).end();
                 },
                 delSelectedRows(e,delChilds){

@@ -1695,10 +1695,19 @@ define(requires, function (axios, Qs) {
                     return '添加下级';
                 },
                 showBtnText(row) {
-                    return '详情'
+                    return row.showBtn&&row.showBtn.btnTitle?row.showBtn.btnTitle:'详情';
+                },
+                showBtnColor(row) {
+                    if(!row.showBtn){
+                        return null;
+                    }
+                    if(!row.showBtn.btnColor){
+                        return null;
+                    }
+                    return row.showBtn.btnColor;
                 },
                 editBtnText(row) {
-                    let editText = '修改';
+                    let editText = row.editBtn&&row.editBtn.btnTitle?row.editBtn.btnTitle:'修改';
                     if (this.fieldStepConfig && this.fieldStepConfig.enable && row.stepInfo && row.stepInfo.config.listBtnText) {
                         if (row.stepInfo.config.listBtnTextEdit !== '') {
                             return row.stepInfo.config.listBtnTextEdit;
@@ -1707,11 +1716,17 @@ define(requires, function (axios, Qs) {
                     }
                     return editText;
                 },
-                editBtnClor(row) {
+                editBtnColor(row) {
                     if (this.fieldStepConfig && this.fieldStepConfig.enable && row.stepInfo && row.stepInfo.config.listBtnText) {
                         return row.stepInfo.config.listBtnColorEdit;
                     }
-                    return null;
+                    if(!row.editBtn){
+                        return null;
+                    }
+                    if(!row.editBtn.btnColor){
+                        return null;
+                    }
+                    return row.editBtn.btnColor;
                 },
                 isCanShowInfo(row) {
                     return typeof row.__auth === 'undefined' || typeof row.__auth.show === 'undefined' || row.__auth.show === true;
@@ -1769,7 +1784,7 @@ define(requires, function (axios, Qs) {
                 '$post':vueDefMethods.$post,
                 openBox:window.openBox,
                 openOtherBtn(btn,row){
-                    if(!btn.modalTitleFields){
+                    if(!btn.modalFields){
                         antd.Modal.confirm({
                             content: btn.modalTitle,
                             title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
@@ -1846,9 +1861,9 @@ define(requires, function (axios, Qs) {
                         win.moment=moment;
                         win.beforeInit=function (){
                             win.vueData.title=btn.modalTitle;
-                            win.vueData.fields=btn.modalTitleFields;
-                            win.vueData.groupFields=btn.modalTitleGroupFields;
-                            win.vueData.fieldComponents=btn.modalTitleFieldsComponents;
+                            win.vueData.fields=btn.modalFields;
+                            win.vueData.groupFields=btn.modalGroupFields;
+                            win.vueData.fieldComponents=btn.modalFieldsComponents;
                             win.vueData.isStepNext=false;
                             win.vueData.stepInfo=null;
                             win.vueData.vueCurdAction='edit';
@@ -1978,11 +1993,11 @@ define(requires, function (axios, Qs) {
                                     </template>
                                     
                                     <slot name="do" :record="record">
-                                        <a v-if="isCanShowInfo(record)" @click="openShow(record)">详情</a>
+                                        <a v-if="isCanShowInfo(record)" @click="openShow(record)" :style="{color: showBtnColor(record)}">{{showBtnText(record)}}</a>
                                           
                                         <template v-if="isCanEdit(record)">
                                             <a-divider v-if="isCanShowInfo(record)" type="vertical"></a-divider>
-                                            <a @click="openEdit(record)" :style="{color: editBtnClor(record)}">{{editBtnText(record)}}</a>
+                                            <a @click="openEdit(record)" :style="{color: editBtnColor(record)}">{{editBtnText(record)}}</a>
                                         </template>
                                     </slot>
                                     

@@ -20,6 +20,7 @@ use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
+use tpScriptVueCurd\option\index_row_btn\OpenBtn;
 use tpScriptVueCurd\option\index_row_btn\RowBtn;
 
 /**
@@ -96,6 +97,20 @@ trait BaseIndex
              * 字段自定义按钮
              */
             $list->each(function (BaseModel $v)use($list,$parentInfo){
+                $showBtn=new OpenBtn();
+                $showBtn->btnTitle='详情';
+                $showBtn->modalTitle='查看 '.$this->title.' 相关信息';
+                $showBtn->modalUrl=url('show',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
+                $v->showBtn=$showBtn;
+
+
+                $editBtn=new OpenBtn();
+                $editBtn->btnTitle='修改';
+                $editBtn->modalTitle='修改 '.$this->title.' 相关信息';
+                $editBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
+                $v->editBtn=$editBtn;
+
+
                 $otherBtns=[
                     'before'=>[...$this->getListRowBeforeBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowBeforeBtns($this->fields,$parentInfo,$list)],
                     'after'=>[...$this->getListRowAfterBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowAfterBtns($this->fields,$parentInfo,$list)],
@@ -172,9 +187,8 @@ trait BaseIndex
             'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
+            'defaultUrlTpl'=>url('___URL_TPL___',['base_id'=>$baseId])->build(),//防止其他情况使用
             'listUrl'=>$this->request->url(),
-            'editUrl'=>url('edit',['base_id'=>$baseId])->build(),
-            'showUrl'=>url('show',['base_id'=>$baseId])->build(),
             'delUrl'=>url('del')->build(),
             'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseId])->build(),
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseId])->build(),
@@ -201,6 +215,7 @@ trait BaseIndex
                 'rowAuthAdd'=>$rowAuthAdd,
             ],
             'baseInfo'=>$parentInfo,
+            'baseId'=>$baseId,
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
