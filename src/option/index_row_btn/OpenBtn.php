@@ -7,9 +7,8 @@ class OpenBtn extends Btn
     public string $modalUrl='';
 
     public function toArray():array{
-        return [
-            ...parent::toArray(),
-            'modalUrl'=>$this->modalUrl,
-        ];
+        $btn=parent::toArray();
+        $btn['modalUrl']=$this->modalUrl;
+        return $btn;
     }
 }

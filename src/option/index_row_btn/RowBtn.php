@@ -19,17 +19,16 @@ class RowBtn extends Btn
     public ?array $info=[];
 
     public function toArray():array{
+        $btn=parent::toArray();
         $modalFields=$this->modalFields?array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray()):null;
-        return [
-            ...parent::toArray(),
-            'modalFields'=>$modalFields,
-            'modalGroupFields'=>$this->modalFields&&$this->modalFields->groupItems?FieldCollection::groupListByItems($modalFields):null,
-            'modalFieldsComponents'=>$this->modalFields?$this->modalFields->getComponents('edit'):[],
+        $btn['modalFields']=$modalFields;
+        $btn['modalGroupFields']=$this->modalFields&&$this->modalFields->groupItems?FieldCollection::groupListByItems($modalFields):null;
+        $btn['modalFieldsComponents']=$this->modalFields?$this->modalFields->getComponents('edit'):[];
+        $btn['saveUrl']=$this->saveUrl;
+        $btn['saveBtnTitle']=$this->saveBtnTitle;
+        $btn['info']=$this->info;
 
-            'saveUrl'=>$this->saveUrl,
-            'saveBtnTitle'=>$this->saveBtnTitle,
-            'info'=>$this->info,
-        ];
+        return $btn;
     }
 
 }
