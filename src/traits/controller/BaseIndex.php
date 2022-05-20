@@ -180,6 +180,11 @@ trait BaseIndex
         $showTableTool=$this->request->param('show_table_tool/d',1)===1;
 
         $baseId=$parentInfo?$parentInfo->id:0;
+
+        $addBtn=new OpenBtn();
+        $addBtn->btnTitle='新增';
+        $addBtn->modalUrl=url('edit',['base_id'=>$baseId])->build();
+
         $data=[
             'model'=>get_class($this->md),
             'modelName'=>class_basename($this->md),
@@ -193,6 +198,7 @@ trait BaseIndex
             'downExcelTplUrl'=>url('downExcelTpl',['base_id'=>$baseId])->build(),
             'importExcelTplUrl'=>url('importExcelTpl',['base_id'=>$baseId])->build(),
             'exportUrl'=>url('export',['base_id'=>$baseId])->build(),
+            'addBtn'=>$addBtn->toArray(),
             'title'=>$this->title,
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$filterFields->getFilterShowData(),

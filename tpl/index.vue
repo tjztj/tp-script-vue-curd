@@ -123,7 +123,7 @@
                         <div class="ant-space-item">
                             <a-button type="primary" @click="openAdd">
                                 <plus-outlined></plus-outlined>
-                                <span> 新增</span>
+                                <span> {$addBtn.btnTitle}</span>
                             </a-button>
                         </div>
                         <div class="ant-space-item">
