@@ -1793,7 +1793,7 @@ define(requires, function (axios, Qs) {
                 '$post':vueDefMethods.$post,
                 openBox:window.openBox,
                 openOtherBtn(btn,row){
-                    let w=(btn.modalH||'45vw').toLowerCase();
+                    let w=(btn.modalW||'45vw').toLowerCase();
                     let h=(btn.modalH||'100vh').toLowerCase();
 
                     let offset=btn.modalOffset;

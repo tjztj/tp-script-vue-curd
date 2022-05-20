@@ -229,6 +229,10 @@ define(['vueAdmin'], function (va) {
                     indentSize:vueData.indentSize,
                     expandAllRows:vueData.expandAllRows,
                     isTreeIndex:vueData.isTreeIndex,
+                    toolTitleLeftBtns:vueData.toolTitleLeftBtns||[],
+                    toolTitleRightBtns:vueData.toolTitleRightBtns||[],
+                    toolBtnLeftBtns:vueData.toolBtnLeftBtns||[],
+                    toolBtnRightBtns:vueData.toolBtnRightBtns||[],
                     //其他配置
                     ...getThisActionOhterData(),
                 }

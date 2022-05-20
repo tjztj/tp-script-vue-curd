@@ -233,6 +233,10 @@ trait BaseIndex
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
+            'toolTitleLeftBtns'=>$this->getToolTitleLeftBtns($this->fields,$parentInfo),
+            'toolTitleRightBtns'=>$this->getToolTitleRightBtns($this->fields,$parentInfo),
+            'toolBtnLeftBtns'=>$this->getToolBtnLeftBtns($this->fields,$parentInfo),
+            'toolBtnRightBtns'=>$this->getToolBtnRightBtns($this->fields,$parentInfo),
         ];
 
 
@@ -750,6 +754,39 @@ trait BaseIndex
      * @return RowBtn[]|OpenBtn[]
      */
     public function getToolTitleLeftBtns(FieldCollection $fields,?BaseModel $parentInfo):array{
+        return [];
+    }
+
+
+    /**
+     * 工具栏标题右侧按钮
+     * @param FieldCollection $fields       当前字段信息
+     * @param BaseModel|null $parentInfo    父表
+     * @return RowBtn[]|OpenBtn[]
+     */
+    public function getToolTitleRightBtns(FieldCollection $fields,?BaseModel $parentInfo):array{
+        return [];
+    }
+
+
+    /**
+     * 工具栏右侧按钮集左边
+     * @param FieldCollection $fields       当前字段信息
+     * @param BaseModel|null $parentInfo    父表
+     * @return RowBtn[]|OpenBtn[]
+     */
+    public function getToolBtnLeftBtns(FieldCollection $fields,?BaseModel $parentInfo):array{
+        return [];
+    }
+
+
+    /**
+     * 工具栏右侧按钮集右边
+     * @param FieldCollection $fields       当前字段信息
+     * @param BaseModel|null $parentInfo    父表
+     * @return RowBtn[]|OpenBtn[]
+     */
+    public function getToolBtnRightBtns(FieldCollection $fields,?BaseModel $parentInfo):array{
         return [];
     }
 
