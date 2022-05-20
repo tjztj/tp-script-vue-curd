@@ -87,6 +87,17 @@
         <div class="ant-pro-table-list-toolbar-container">
             <div class="ant-pro-table-list-toolbar-left">
                 {block name="toolTitleLeft"}{/block}
+                <div style="line-height: 64px;">
+                    <template v-for="(btn,index) in toolTitleLeftBtns">
+                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                            <span v-html="btn.btnSvg"></span>
+                            <span> {{btn.btnTitle}}</span>
+                        </a-button>
+                        <div class="ant-space-item" style="display: inline-block">
+                            <a-divider type="vertical"></a-divider>
+                        </div>
+                    </template>
+                </div>
 
 
                 {block name="toolTitleMid"}
@@ -114,11 +125,39 @@
                         </div>
                     </a-popconfirm>
                 </template>
+
+                <div style="line-height: 64px;">
+                    <template v-for="(btn,index) in toolTitleRightBtns">
+                        <div class="ant-space-item" style="display: inline-block">
+                            <a-divider type="vertical"></a-divider>
+                        </div>
+                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                            <span v-html="btn.btnSvg"></span>
+                            <span> {{btn.btnTitle}}</span>
+                        </a-button>
+                    </template>
+                </div>
+
                 {block name="toolTitleRight"}{/block}
+
+
             </div>
             <div class="ant-pro-table-list-toolbar-right">
                 <div class="ant-space ant-space-horizontal ant-space-align-center">
                     {block name="toolBtnLeft"}{/block}
+
+                    <template v-for="(btn,index) in toolBtnLeftBtns">
+                        <div class="ant-space-item">
+                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                                <span v-html="btn.btnSvg"></span>
+                                <span> {{btn.btnTitle}}</span>
+                            </a-button>
+                        </div>
+                        <div class="ant-space-item">
+                            <a-divider type="vertical"></a-divider>
+                        </div>
+                    </template>
+
 
                     <template v-if="canAdd">
                         {block name="toolAddBtn"}
@@ -162,6 +201,19 @@
                         <div class="ant-space-item">
                             <a-button class="azure-blue" @click="exportData" :disabled="!pagination.total">
                                 <export-outlined></export-outlined><span> 导出当前数据</span>
+                            </a-button>
+                        </div>
+                    </template>
+
+
+                    <template v-for="(btn,index) in toolBtnRightBtns">
+                        <div class="ant-space-item">
+                            <a-divider type="vertical"></a-divider>
+                        </div>
+                        <div class="ant-space-item">
+                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                                <span v-html="btn.btnSvg"></span>
+                                <span> {{btn.btnTitle}}</span>
                             </a-button>
                         </div>
                     </template>

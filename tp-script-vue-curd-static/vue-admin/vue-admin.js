@@ -709,6 +709,142 @@ define(requires, function (axios, Qs) {
         },
         log(obj) {
             return console.log(obj);
+        },
+        openOtherBtn(btn,row){
+            let w=(btn.modalW||'45vw').toLowerCase();
+            let h=(btn.modalH||'100vh').toLowerCase();
+
+            let offset=btn.modalOffset;
+            if(!offset){
+                offset=h==='100vh'?'rt':'auto';
+            }
+            if(btn.selfType==='OpenBtn'){
+                this.openBox({
+                    title:btn.modalTitle,
+                    offset:offset,
+                    area: [w, h],
+                    content: btn.modalUrl,
+                }).end();
+                return;
+            }
+
+
+
+            if(!btn.modalFields){
+                antd.Modal.confirm({
+                    content: btn.modalTitle,
+                    title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
+                    icon: (Vue.openBlock(), Vue.createBlock("svg", {
+                        t: "1615779502296",
+                        class: "icon anticon",
+                        viewBox: "0 0 1024 1024",
+                        version: "1.1",
+                        xmlns: "http://www.w3.org/2000/svg",
+                        width: "22",
+                        height: "22"
+                    }, [
+                        Vue.createVNode("path", {
+                            d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
+                            fill: '#faad14',
+                        })
+                    ])),
+                    onOk:()=>{
+                        return new Promise((resolve, reject) => {
+                            let option={};
+                            if(row){
+                                option.id=row.id;
+                            }
+                            this.$post(btn.saveUrl,option).then(res=>{
+                                antd.message.success(res.msg);
+                                if(btn.refreshList){
+                                    this.refreshTable();
+                                }else if(row){
+                                    this.refreshId( row.id)
+                                }
+                                resolve()
+                            }).catch(err=>{
+                                reject(err)
+                            })
+                        });
+                    },
+                })
+                return;
+            }
+            this.openBox({
+                title:btn.modalTitle,
+                area: [w, h],
+                offset: offset,
+                content:'/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
+            }).on('success',function (layero){
+                const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];
+                const win=iframe.contentWindow;
+
+
+                function runScript(script){
+                    return new Promise((reslove, rejected) => {
+                        // 直接 document.head.appendChild(script) 是不会生效的，需要重新创建一个
+                        const newScript = win.document.createElement('script');
+                        // 获取 inline script
+                        newScript.innerHTML = script.innerHTML;
+                        // 存在 src 属性的话
+                        const src = script.getAttribute('src');
+                        if (src) newScript.setAttribute('src', src);
+
+                        // script 加载完成和错误处理
+                        newScript.onload = () => reslove();
+                        newScript.onerror = err => rejected();
+                        win.document.head.appendChild(newScript);
+                        win.document.head.removeChild(newScript);
+                        if (!src) {
+                            // 如果是 inline script 执行是同步的
+                            reslove();
+                        }
+                    })
+                }
+
+                function setHTMLWithScript(container, rawHTML){
+                    container.innerHTML = rawHTML;
+                    const scripts = container.querySelectorAll('script');
+
+                    return Array.prototype.slice.apply(scripts).reduce((chain, script) => {
+                        return chain.then(() => runScript(script));
+                    }, Promise.resolve());
+                }
+
+                win.VUE_CURD=window.VUE_CURD;
+                win.moment=moment;
+                win.beforeInit=function (){
+                    win.vueData.title=btn.modalTitle;
+                    win.vueData.fields=btn.modalFields;
+                    win.vueData.groupFields=btn.modalGroupFields;
+                    win.vueData.fieldComponents=btn.modalFieldsComponents;
+                    win.vueData.isStepNext=false;
+                    win.vueData.stepInfo=null;
+                    win.vueData.vueCurdAction='edit';
+
+                    win.vueData.info=btn.info&&Object.keys(btn.info).length>0?btn.info:(row?{id:row.id}:{});
+                    win.vueData.subUrl=btn.saveUrl;
+                    win.vueData.subBtnTitle=btn.saveBtnTitle;
+                }
+
+                let headHtml='';
+                let headEls=document.querySelector('head').children;
+                for(let i in headEls){
+                    if(typeof headEls[i].getAttribute==='function'&&!headEls[i].getAttribute('data-requiremodule')){
+                        headHtml+= headEls[i].outerHTML;
+                    }
+                }
+
+                setHTMLWithScript(win.document.querySelector('head'),"<style id='init-before-style'>body{display: none}</style>"
+                    +headHtml
+                    +"<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
+                    +"<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
+                    +"<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
+                    +"</script>");
+
+
+            }).end();
+
         }
     };
 
@@ -1792,138 +1928,7 @@ define(requires, function (axios, Qs) {
                 },
                 '$post':vueDefMethods.$post,
                 openBox:window.openBox,
-                openOtherBtn(btn,row){
-                    let w=(btn.modalW||'45vw').toLowerCase();
-                    let h=(btn.modalH||'100vh').toLowerCase();
-
-                    let offset=btn.modalOffset;
-                    if(!offset){
-                        offset=h==='100vh'?'rt':'auto';
-                    }
-                    if(btn.selfType==='OpenBtn'){
-                        this.openBox({
-                            title:btn.modalTitle,
-                            offset:offset,
-                            area: [w, h],
-                            content: btn.modalUrl,
-                        }).end();
-                        return;
-                    }
-
-
-
-                    if(!btn.modalFields){
-                        antd.Modal.confirm({
-                            content: btn.modalTitle,
-                            title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
-                            icon: (Vue.openBlock(), Vue.createBlock("svg", {
-                                t: "1615779502296",
-                                class: "icon anticon",
-                                viewBox: "0 0 1024 1024",
-                                version: "1.1",
-                                xmlns: "http://www.w3.org/2000/svg",
-                                width: "22",
-                                height: "22"
-                            }, [
-                                Vue.createVNode("path", {
-                                    d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
-                                    fill: '#faad14',
-                                })
-                            ])),
-                            onOk:()=>{
-                                return new Promise((resolve, reject) => {
-                                    this.$post(btn.saveUrl,{id:row.id}).then(res=>{
-                                        antd.message.success(res.msg);
-                                        if(btn.refreshList){
-                                            this.refreshTable();
-                                        }else{
-                                            this.refreshId( row.id)
-                                        }
-                                        resolve()
-                                    }).catch(err=>{
-                                        reject(err)
-                                    })
-                                });
-                            },
-                        })
-                        return;
-                    }
-                    this.openBox({
-                        title:btn.modalTitle,
-                        area: [w, h],
-                        offset: offset,
-                        content:'/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
-                    }).on('success',function (layero){
-                        const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];
-                        const win=iframe.contentWindow;
-
-
-                        function runScript(script){
-                            return new Promise((reslove, rejected) => {
-                                // 直接 document.head.appendChild(script) 是不会生效的，需要重新创建一个
-                                const newScript = win.document.createElement('script');
-                                // 获取 inline script
-                                newScript.innerHTML = script.innerHTML;
-                                // 存在 src 属性的话
-                                const src = script.getAttribute('src');
-                                if (src) newScript.setAttribute('src', src);
-
-                                // script 加载完成和错误处理
-                                newScript.onload = () => reslove();
-                                newScript.onerror = err => rejected();
-                                win.document.head.appendChild(newScript);
-                                win.document.head.removeChild(newScript);
-                                if (!src) {
-                                    // 如果是 inline script 执行是同步的
-                                    reslove();
-                                }
-                            })
-                        }
-
-                        function setHTMLWithScript(container, rawHTML){
-                            container.innerHTML = rawHTML;
-                            const scripts = container.querySelectorAll('script');
-
-                            return Array.prototype.slice.apply(scripts).reduce((chain, script) => {
-                                return chain.then(() => runScript(script));
-                            }, Promise.resolve());
-                        }
-
-                        win.VUE_CURD=window.VUE_CURD;
-                        win.moment=moment;
-                        win.beforeInit=function (){
-                            win.vueData.title=btn.modalTitle;
-                            win.vueData.fields=btn.modalFields;
-                            win.vueData.groupFields=btn.modalGroupFields;
-                            win.vueData.fieldComponents=btn.modalFieldsComponents;
-                            win.vueData.isStepNext=false;
-                            win.vueData.stepInfo=null;
-                            win.vueData.vueCurdAction='edit';
-
-                            win.vueData.info=btn.info&&Object.keys(btn.info).length>0?btn.info:{id:row.id};
-                            win.vueData.subUrl=btn.saveUrl;
-                            win.vueData.subBtnTitle=btn.saveBtnTitle;
-                        }
-
-                        let headHtml='';
-                        let headEls=document.querySelector('head').children;
-                        for(let i in headEls){
-                            if(typeof headEls[i].getAttribute==='function'&&!headEls[i].getAttribute('data-requiremodule')){
-                                headHtml+= headEls[i].outerHTML;
-                            }
-                        }
-
-                        setHTMLWithScript(win.document.querySelector('head'),"<style id='init-before-style'>body{display: none}</style>"
-                            +headHtml
-                            +"<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
-                            +"<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
-                            +"<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
-                            +"</script>");
-
-
-                    }).end();
-
-                },
+                openOtherBtn:window.vueDefMethods.openOtherBtn,
             },
             template: `<div :id="id">
                         <a-table

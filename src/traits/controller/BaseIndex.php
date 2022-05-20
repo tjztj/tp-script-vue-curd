@@ -20,6 +20,7 @@ use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FunControllerIndexData;
 use tpScriptVueCurd\option\FunControllerIndexPage;
 use tpScriptVueCurd\option\FunControllerListChildBtn;
+use tpScriptVueCurd\option\index_row_btn\Btn;
 use tpScriptVueCurd\option\index_row_btn\OpenBtn;
 use tpScriptVueCurd\option\index_row_btn\RowBtn;
 
@@ -233,10 +234,10 @@ trait BaseIndex
             'fieldComponents'=>$this->fields->listShowItems()->getComponents('index'),
             'filterComponents'=>$filterFields->getFilterComponents(),
             'fieldStepConfig'=>$this->fields->getStepConfig(),
-            'toolTitleLeftBtns'=>$this->getToolTitleLeftBtns($this->fields,$parentInfo),
-            'toolTitleRightBtns'=>$this->getToolTitleRightBtns($this->fields,$parentInfo),
-            'toolBtnLeftBtns'=>$this->getToolBtnLeftBtns($this->fields,$parentInfo),
-            'toolBtnRightBtns'=>$this->getToolBtnRightBtns($this->fields,$parentInfo),
+            'toolTitleLeftBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolTitleLeftBtns($this->fields,$parentInfo)),
+            'toolTitleRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolTitleRightBtns($this->fields,$parentInfo)),
+            'toolBtnLeftBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnLeftBtns($this->fields,$parentInfo)),
+            'toolBtnRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnRightBtns($this->fields,$parentInfo)),
         ];
 
 
