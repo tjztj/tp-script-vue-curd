@@ -1793,6 +1793,25 @@ define(requires, function (axios, Qs) {
                 '$post':vueDefMethods.$post,
                 openBox:window.openBox,
                 openOtherBtn(btn,row){
+                    let w=(btn.modalH||'45vw').toLowerCase();
+                    let h=(btn.modalH||'100vh').toLowerCase();
+
+                    let offset=btn.modalOffset;
+                    if(!offset){
+                        offset=h==='100vh'?'rt':'auto';
+                    }
+                    if(btn.selfType==='OpenBtn'){
+                        this.openBox({
+                            title:btn.modalTitle,
+                            offset:offset,
+                            area: [w, h],
+                            content: btn.modalUrl,
+                        }).end();
+                        return;
+                    }
+
+
+
                     if(!btn.modalFields){
                         antd.Modal.confirm({
                             content: btn.modalTitle,
@@ -1815,7 +1834,11 @@ define(requires, function (axios, Qs) {
                                 return new Promise((resolve, reject) => {
                                     this.$post(btn.saveUrl,{id:row.id}).then(res=>{
                                         antd.message.success(res.msg);
-                                        this.refreshId( row.id)
+                                        if(btn.refreshList){
+                                            this.refreshTable();
+                                        }else{
+                                            this.refreshId( row.id)
+                                        }
                                         resolve()
                                     }).catch(err=>{
                                         reject(err)
@@ -1827,8 +1850,8 @@ define(requires, function (axios, Qs) {
                     }
                     this.openBox({
                         title:btn.modalTitle,
-                        area: [btn.modalW, btn.modalH],
-                        offset: btn.modalH === '100vh' ? 'rt' : 'auto',
+                        area: [w, h],
+                        offset: offset,
                         content:'/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
                     }).on('success',function (layero){
                         const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];

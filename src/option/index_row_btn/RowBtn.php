@@ -18,6 +18,9 @@ class RowBtn extends Btn
      */
     public ?array $info=[];
 
+
+    public bool $refreshList=false;//操作成功后刷新列表
+
     public function toArray():array{
         $btn=parent::toArray();
         $modalFields=$this->modalFields?array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray()):null;
@@ -27,7 +30,7 @@ class RowBtn extends Btn
         $btn['saveUrl']=$this->saveUrl;
         $btn['saveBtnTitle']=$this->saveBtnTitle;
         $btn['info']=$this->info;
-
+        $btn['refreshList']=$this->refreshList;
         return $btn;
     }
 

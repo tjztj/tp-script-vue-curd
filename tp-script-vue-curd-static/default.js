@@ -202,8 +202,8 @@ define(['vueAdmin'], function (va) {
                     },
                     showFilter:vueData.showFilter,
                     showTableTool:vueData.showTableTool,
-                    canDel:vueData.canDel&&vueData.auth.del,
-                    canEdit:vueData.canEdit&&vueData.auth.edit,
+                    canDel:vueData.auth.del,
+                    canEdit:vueData.auth.edit,
                     auth:vueData.auth,
                     childs:vueData.childs,
                     filterBase:{

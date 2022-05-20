@@ -121,11 +121,11 @@ trait Controller
 
     protected function addAfter(BaseModel $info): void
     {
-        // 数据添加钩子，方便之类处理（之类重写此方法）
+        // 数据添加成功后钩子，方便子类处理（子类重写此方法）
     }
     protected function editAfter(BaseModel $info): void
     {
-        // 数据修改钩子，方便之类处理（之类重写此方法）
+        // 数据修改成功后钩子，方便子类处理（子类重写此方法）
     }
 
     protected function createEditFetchDataBefore(FieldCollection $fields, BaseModel &$data,?BaseModel $baseModel):void

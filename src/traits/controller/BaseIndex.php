@@ -190,6 +190,7 @@ trait BaseIndex
         $baseId=$parentInfo?$parentInfo->id:0;
 
         $addBtn=new OpenBtn();
+        $addBtn->btnType='primary';
         $addBtn->btnTitle='新增';
         $addBtn->modalTitle='新增 '.$this->title;
         $addBtn->modalUrl=url('edit',['base_id'=>$baseId])->build();
@@ -217,8 +218,6 @@ trait BaseIndex
             'tableThemIsColor'=>tableThemIsColor(),
             'cWindow'=>$this->request->param('c_window/a'),
             'childTpl'=>$this->request->param('child_tpl/d',0),
-            'canEdit'=>$showTableTool,
-            'canDel'=>$showTableTool,
             'auth'=>[
                 'add'=>true,
                 'edit'=>true,
@@ -724,7 +723,7 @@ trait BaseIndex
      * @param FieldCollection $fields
      * @param BaseModel|null $parentInfo
      * @param \think\model\Collection $list 列表信息
-     * @return RowBtn[]
+     * @return RowBtn[]|OpenBtn[]
      */
     public function getListRowBeforeBtns(BaseModel $info,FieldCollection $fields,?BaseModel $parentInfo,\think\model\Collection $list): array
     {
@@ -737,10 +736,20 @@ trait BaseIndex
      * @param FieldCollection $fields
      * @param BaseModel|null $parentInfo
      * @param \think\model\Collection $list 列表信息
-     * @return RowBtn[]
+     * @return RowBtn[]|OpenBtn[]
      */
     public function getListRowAfterBtns(BaseModel $info,FieldCollection $fields,?BaseModel $parentInfo,\think\model\Collection $list): array
     {
+        return [];
+    }
+
+    /**
+     * 工具栏标题左侧按钮
+     * @param FieldCollection $fields       当前字段信息
+     * @param BaseModel|null $parentInfo    父表
+     * @return RowBtn[]|OpenBtn[]
+     */
+    public function getToolTitleLeftBtns(FieldCollection $fields,?BaseModel $parentInfo):array{
         return [];
     }
 

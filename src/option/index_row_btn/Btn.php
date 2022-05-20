@@ -5,7 +5,8 @@ namespace tpScriptVueCurd\option\index_row_btn;
 class Btn
 {
     public string $btnTitle='';
-    public string $btnColor='';
+    public string $btnType='a';//''（空）；'a'；'danger'；'warning'；'info'；'primary'；'dashed'；'text'；'link'
+    public string $btnColor='';//btnType==='a'有效
 
     public string $modalW='45vw';
     public string $modalH='100vh';
@@ -15,7 +16,10 @@ class Btn
 
     public function toArray():array{
         return [
+            'selfType'=>class_basename(static::class),
+
             'btnTitle'=>$this->btnTitle,
+            'btnType'=>$this->btnType,
             'btnColor'=>$this->btnColor,
 
             'modalW'=>$this->modalW,

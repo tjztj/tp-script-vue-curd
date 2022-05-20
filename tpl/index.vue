@@ -121,7 +121,7 @@
                     <template v-if="canAdd">
                         {block name="toolAddBtn"}
                         <div class="ant-space-item">
-                            <a-button type="primary" @click="openAdd">
+                            <a-button type="{$addBtn['btnType']==='a'?'link':$addBtn['btnType']}" @click="openAdd">
                                 <plus-outlined></plus-outlined>
                                 <span> {$addBtn.btnTitle}</span>
                             </a-button>
