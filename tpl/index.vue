@@ -89,7 +89,7 @@
                 {block name="toolTitleLeft"}{/block}
                 <div style="line-height: 64px;">
                     <template v-for="(btn,index) in toolTitleLeftBtns">
-                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="openOtherBtn(btn)">
                             <span v-html="btn.btnSvg"></span>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -131,7 +131,7 @@
                         <div class="ant-space-item" style="display: inline-block">
                             <a-divider type="vertical"></a-divider>
                         </div>
-                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                        <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="openOtherBtn(btn)">
                             <span v-html="btn.btnSvg"></span>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -148,7 +148,7 @@
 
                     <template v-for="(btn,index) in toolBtnLeftBtns">
                         <div class="ant-space-item">
-                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="openOtherBtn(btn)">
                                 <span v-html="btn.btnSvg"></span>
                                 <span> {{btn.btnTitle}}</span>
                             </a-button>
@@ -211,7 +211,7 @@
                             <a-divider type="vertical"></a-divider>
                         </div>
                         <div class="ant-space-item">
-                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="toolMyBtnClick(btn)">
+                            <a-button :type="btn.btnType==='a'?'link':btn.btnType" @click="openOtherBtn(btn)">
                                 <span v-html="btn.btnSvg"></span>
                                 <span> {{btn.btnTitle}}</span>
                             </a-button>
