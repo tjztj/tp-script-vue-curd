@@ -334,15 +334,10 @@ define(['vueAdmin'], function (va) {
                     if(vueData.addBtn&&vueData.addBtn.modalUrl){
                         url=vueData.addBtn.modalUrl;
                     }
-                    this.openBox({
-                        title:'新增 '+vueData.title,
-                        offset:this.cWindow&&this.cWindow.f?this.cWindow.f:'rt',
-                        area: [this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw', this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh'],
-                        content: setUrlParams(url,{'pid':row.id}),
-                    }).end();
+                    this.openBox(openParam(row.childAddBtn,'新增 '+vueData.title,url)).end();
                 },
                 openAdd(){
-                    this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,vueData.editUrl)).end();
+                    this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,vueData.defaultUrlTpl.replace('___URL_TPL___','edit'))).end();
                 },
                 openEdit(row){
                     if(row.stepInfo&&row.stepInfo.title){

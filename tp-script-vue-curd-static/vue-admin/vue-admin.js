@@ -1692,7 +1692,16 @@ define(requires, function (axios, Qs) {
                     return 17 + (text.split('').length * 14);
                 },
                 addChildrenBtnText(row){
-                    return '添加下级';
+                    return row.childAddBtn&&row.childAddBtn.btnTitle?row.childAddBtn.btnTitle:'添加下级';
+                },
+                addChildrenBtnColor(row) {
+                    if(!row.childAddBtn){
+                        return null;
+                    }
+                    if(!row.childAddBtn.btnColor){
+                        return null;
+                    }
+                    return row.childAddBtn.btnColor;
                 },
                 showBtnText(row) {
                     return row.showBtn&&row.showBtn.btnTitle?row.showBtn.btnTitle:'详情';
@@ -2024,7 +2033,7 @@ define(requires, function (axios, Qs) {
                                     
                                     <template v-if="isCanAddChildren(record)">
                                         <a-divider type="vertical"></a-divider>
-                                        <a @click="openAddChildren(record)" style="color:#08979c">{{addChildrenBtnText(record)}}</a>
+                                        <a @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
                                     </template>
                                     
                                       <template v-for="btn in getAfterBtns(record)">

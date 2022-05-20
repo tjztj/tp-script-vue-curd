@@ -111,6 +111,14 @@ trait BaseIndex
                 $v->editBtn=$editBtn;
 
 
+                $childAddBtn=new OpenBtn();
+                $childAddBtn->btnTitle='添加下级';
+                $childAddBtn->btnColor='#597ef7';
+                $childAddBtn->modalTitle='新增 '.$this->title;
+                $childAddBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'pid'=>$v->id])->build();
+                $v->childAddBtn=$childAddBtn;
+
+
                 $otherBtns=[
                     'before'=>[...$this->getListRowBeforeBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowBeforeBtns($this->fields,$parentInfo,$list)],
                     'after'=>[...$this->getListRowAfterBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowAfterBtns($this->fields,$parentInfo,$list)],
