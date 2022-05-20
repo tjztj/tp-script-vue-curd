@@ -183,6 +183,7 @@ trait BaseIndex
 
         $addBtn=new OpenBtn();
         $addBtn->btnTitle='新增';
+        $addBtn->modalTitle='新增 '.$this->title;
         $addBtn->modalUrl=url('edit',['base_id'=>$baseId])->build();
 
         $data=[
