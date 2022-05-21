@@ -1078,3 +1078,10 @@ a.red:hover,a.yellow:hover{
     box-shadow: none;
 }
 /****************************************************************/
+svg.icon{
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    fill: currentColor;
+    overflow: hidden;
+}
