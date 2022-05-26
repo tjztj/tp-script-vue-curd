@@ -1,0 +1,36 @@
+<?php
+
+namespace tpScriptVueCurd\field;
+
+use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
+use tpScriptVueCurd\tool\field_tpl\Edit;
+use tpScriptVueCurd\tool\field_tpl\FieldTpl;
+use tpScriptVueCurd\tool\field_tpl\Index;
+use tpScriptVueCurd\tool\field_tpl\Show;
+
+class ColorField extends ModelField
+{
+
+    public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
+    {
+        $excelFieldTpl->explain='请输入HEX颜色代码';
+    }
+
+    public static function componentUrl(): FieldTpl
+    {
+        $type=class_basename(static::class);
+        return new FieldTpl($type,
+            new Index($type,'/tp-script-vue-curd-static.php?field/color/index.js'),
+            new Show($type,'/tp-script-vue-curd-static.php?field/color/show.js'),
+            new Edit($type,'/tp-script-vue-curd-static.php?field/color/edit.js')
+        );
+    }
+
+    public function getGenerateColumnConfig(GenerateColumnOption $option): void
+    {
+        $option->setTypeVarchar(9);
+    }
+}
