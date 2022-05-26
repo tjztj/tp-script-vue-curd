@@ -4,6 +4,8 @@ namespace tpScriptVueCurd\field;
 
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\BetweenFilter;
+use tpScriptVueCurd\filter\EmptyFilter;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
@@ -13,6 +15,9 @@ use tpScriptVueCurd\tool\field_tpl\Show;
 
 class ColorField extends ModelField
 {
+    protected string $defaultFilterClass=EmptyFilter::class;
+    protected $nullVal='';//字段在数据库中为空时的值
+
 
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
     {
