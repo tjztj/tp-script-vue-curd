@@ -1,11 +1,14 @@
-define(['/tp-script-vue-curd-static.php?field/map_range/map_range.js'],function(mapRange){
+define(['/tp-script-vue-curd-static.php?field/map_range/map_range.js','/tp-script-vue-curd-static.php?field/map_range/BMapGL/map_range.js','/tp-script-vue-curd-static.php?field/map_range/AMap/map_range.js'],function(tMap,bMap,aMap){
     return {
         components:{
-            MapRange:mapRange,
+            tMap,bMap,aMap
         },
         props:['info','field'],
         template:`<div>
-                   <map-range v-model:value="info[field.name]" :disabled="true" :center="field.center.lng+','+field.center.lat" :district="field.district"></map-range>
+                        <t-map v-if="field.mapType==='TMap'" v-model:value="info[field.name]" :disabled="true" :center="field.center.lng+','+field.center.lat" :district="field.district"></t-map>
+                        <b-map v-if="field.mapType==='BMapGL'" v-model:value="info[field.name]" :disabled="true" :center="field.center.lng+','+field.center.lat" :district="field.district"></b-map>
+                        <a-map v-if="field.mapType==='AMap'" v-model:value="info[field.name]" :disabled="true" :center="field.center.lng+','+field.center.lat" :district="field.district"></a-map>
+                    
                 </div>`,
     }
 });

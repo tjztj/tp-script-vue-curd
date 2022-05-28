@@ -28,17 +28,8 @@
             width: 100%;
         }
 
-        /*.amap-logo{*/
-        /*    display: none!important; !*去掉高德地图logo*!*/
-        /*}*/
-        /*.amap-copyright {*/
-        /*   opacity:0!important; !*去掉高德的版本号*!*/
-        /*}*/
-        .tdt-control-copyright {
-            /*去掉天地图LOGO*/
-            display: none !important;
-        }
 
+        .anchorBL{z-index:-1!important;opacity:0!important;height:0!important;}
         .top {
             padding: 12px 0px;
             position: relative;
@@ -110,7 +101,7 @@
         <div class="search-rel" v-show="searchValue&&searchValue!==''&&relShow">
             <div v-if="list.length>0">
                 <ul class="search-rel-list">
-                    <li v-for="item in list" @click="selectRel(item)"><b>{{ item.name }}</b>{{ item.address }}</li>
+                    <li v-for="item in list" @click="selectRel(item)"><b>{{ item.title }}</b>{{ item.address }}</li>
                 </ul>
                 <a-pagination size="small" v-model:current="page" :page-size="pageSize" :total="count"
                               @change="pageChange"/>
@@ -168,21 +159,17 @@
         },
         mounted() {
             document.getElementById('app').style.display='flex'
-            window.mapInit = () => {
-                const checkHaveObjs = setInterval(() => {
-                    if (typeof T !== 'undefined' && typeof T.Map !== 'undefined') {
-                        clearInterval(checkHaveObjs);
-                        this.initMap();
-                    }
-                }, 20)
-            }
-            let jsapi = document.createElement('script'), jsapi2 = document.createElement('script');
-            jsapi2.src = 'https://webapi.amap.com/maps?v=1.4.15&key=2c89c6178dc817d34ad9783867366c14&callback=mapInit&plugin=AMap.DistrictSearch';
-            jsapi.src = 'https://api.tianditu.gov.cn/api?v=4.0&tk=dd78fa8009cfc85f584b62039a504a61';
-            document.head.appendChild(jsapi2);
+
+            const initFunc='initializeBmap';
+            window[initFunc]= ()=>{
+                this.initMap()
+            };
+
+            let jsapi = document.createElement('script');
+            jsapi.src = '//api.map.baidu.com/api?type=webgl&v=1.0&ak=ZjBuQWgLwuirL24Tvt6EIVZvG9zQXjdM&callback='+initFunc;
             document.head.appendChild(jsapi);
             document.addEventListener('click', e => {
-                if (e.target.closest('.search-rel') || e.target.matches('.search-rel') || e.target.closest('.input-box') || e.target.matches('.input-box')) {
+                if (e.target.closest('.search-rel') || e.target.matches('.search-rel') || e.target.closest('.input-box') || e.target.matches('.input-box')||(e.target.closest('li')&&e.target.closest('li').matches('.ant-pagination-item'))) {
                     return;
                 }
                 this.relShow = false;
@@ -190,111 +177,91 @@
         },
         methods: {
             initMap() {
-                const imageURL = "http://t0.tianditu.gov.cn/img_w/wmts?" +
-                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
-                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
-                //创建自定义图层对象
-                const lay = new T.TileLayer(imageURL, {minZoom: 1, maxZoom: 18});
-
-                const imageURL2 = "http://t0.tianditu.gov.cn/cia_w/wmts?" +
-                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
-                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
-                const lay2 = new T.TileLayer(imageURL2, {
-                    minZoom: 1,
-                    maxZoom: 18
-                });
-
-
-                const config = {layers: [lay, lay2]};
                 //初始化地图对象
-                window.map = new T.Map("map-container", config);
+                window.map = new BMapGL.Map('map-container');
                 //设置显示地图的中心点和级别
-                window.map.centerAndZoom(new T.LngLat(120.12, 30.19), 9);
-                //允许鼠标滚轮缩放地图
-                window.map.enableScrollWheelZoom();
+                window.map.centerAndZoom(new BMapGL.Point(120.12, 30.19), 9);  // 初始化地图,设置中心点坐标和地图级别
+                window.map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+                window.map.setMapType(BMAP_EARTH_MAP);      // 设置地图类型为地球模式
 
 
                 const setMark= (lngLat)=>{
                     if(!this.selectMk){
-                        this.selectMk = new T.Marker(lngLat); // 创建点
-                        const icon=new T.Icon({
-                            iconUrl:'https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png',
-                            iconAnchor:new T.Point(9,32)
-                        })
-                        this.selectMk.setIcon(icon)
-                        // icon.setIconUrl('https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png');
-                        window.map.addOverLay(this.selectMk);
-                    }else{
-                        this.selectMk.setLngLat(lngLat)
+                        this.selectMk = new BMapGL.Marker(lngLat); // 创建点
+                        window.map.addOverlay(this.selectMk);
                     }
+                    this.selectMk.setPosition(lngLat)
                     window.map.centerAndZoom(lngLat, 18);
-                    geocode.getLocation(lngLat,result=>{
-                        this.selectAddr=result.getAddress()
-                    });
+                    geocode.getLocation(lngLat, (rs)=>{
+                        this.selectAddr=rs.address
+                    })
                 }
-                window.geocode = new T.Geocoder();
+                window.geocode =  new BMapGL.Geocoder();
                 window.map.addEventListener("click",e=>{
-                    setMark(e.lnglat)
+                    setMark(e.latlng)
                 });
 
-
                 Vue.nextTick(() => {
+                    let that=this;
                     function initMark(){
+                        let centerPoint=null;
                         if(window.mapSelect){
                             const lnglat=window.mapSelect.split(',')
-                            setMark(new T.LngLat(lnglat[0],lnglat[1]))
+                            centerPoint=new BMapGL.Point(lnglat[0],lnglat[1]);
+                            setMark(centerPoint)
                         }else if(window.mapCenter){
-                            window.map.centerAndZoom(new T.LngLat(window.mapCenter[0], window.mapCenter[1]), 13);
+                            centerPoint=new BMapGL.Point(window.mapCenter[0], window.mapCenter[1]);
+                            window.map.centerAndZoom(centerPoint, 13);
                         }
+                        that.mapInput(centerPoint);
                     }
+
                     if(window.mapSelect){
                         initMark();
                     }else{
                         window.initSelect=initMark;
                     }
-
-
-                    this.mapInput();
                 })
             },
-            mapInput() {
-                //创建搜索对象
-                window.placeSearch = new T.LocalSearch(window.map, {
-                    pageCapacity: 10,	//每页显示的数量
-                    onSearchComplete: result => {
-                        this.count = result.getCount();
-                        this.page = window.placeSearch.getPageIndex()
-                        this.list = result.getPois() || [];
-                        this.relShow = true;
+            mapInput(center) {
+                geocode.getLocation(center, (rs)=>{
+                    //创建搜索对象
+                    window.placeSearch = new BMapGL.LocalSearch(rs.addressComponents.city?rs.addressComponents.city:rs.addressComponents.province, {
+                        pageCapacity: 10,	//每页显示的数量
+                        onSearchComplete: result => {
+                            this.count = result.getNumPois();
+                            this.page = result.getPageIndex()+1;
+                            let list=[]
+                            for(let i=0;i<10;i++){
+                                let val=result.getPoi(i);
+                                if(val)list.push(val)
+                            }
+                            this.list = list;
+                            this.relShow = true;
 
-                    },//接收数据的回调函数
-                });
+
+                        },//接收数据的回调函数
+                    });
+                })
             },
             doSearch() {
                 if (this.searchValue.replace(/\n/g, '') === '') {
                     return;
                 }
-                window.placeSearch.search(this.searchValue, 1);
+                window.placeSearch.search(this.searchValue);
             },
             pageChange(page) {
-                window.placeSearch.gotoPage(page)
+                window.placeSearch.gotoPage(page-1)
             },
             selectRel(rel){
-                const arr=rel.lonlat.split(' ');
-                const lngLat=new T.LngLat(arr[0], arr[1]);
+                const lngLat=rel.point;
                 if(!this.marker){
-                    this.marker = new T.Marker(lngLat); // 创建点
-                    // // const icon=this.marker.getIcon();
-                    // const icon=new T.Icon({
-                    //     iconUrl:'https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png',
-                    //     iconAnchor:new T.Point(9,32)
-                    // })
-                    // this.marker.setIcon(icon)
-                    // // icon.setIconUrl('https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png');
-                    window.map.addOverLay(this.marker);
-                }else{
-                    this.marker.setLngLat(lngLat)
+                    this.marker = new BMapGL.Marker(lngLat, {
+                        icon: new BMapGL.Icon('https://webapi.amap.com/theme/v1.3/markers/n/mark_bs.png', new BMapGL.Size(17, 30))
+                    }); // 创建点
+                    window.map.addOverlay(this.marker);
                 }
+                this.marker.setPosition(lngLat)
                 window.map.centerAndZoom(lngLat,18);
                 this.relShow=false;
             },
@@ -303,7 +270,7 @@
                 if(this.selectMk===null){
                     return;
                 }
-                const lngLat=this.selectMk.getLngLat();
+                const lngLat=this.selectMk.getPosition();
                 window.onMapSelected(lngLat.lng+','+lngLat.lat)
             }
         }

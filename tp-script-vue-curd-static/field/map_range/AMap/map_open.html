@@ -200,57 +200,13 @@
 <script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js" charset="utf-8"></script>
 <script>
+    let searchRess = {};
     window.map=null;
     window.polygon=null;
     window.polyEditor=null;
     window.markers=[];
     window.placeSearch=null;
 
-
-    //定义一些常量
-    let x_PI = 3.14159265358979324 * 3000.0 / 180.0;
-    let PI = 3.1415926535897932384626;
-    let a = 6378245.0;
-    let ee = 0.00669342162296594323;
-    function transformlat(lng, lat) {
-        lat = +lat;
-        lng = +lng;
-        let ret = -100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng));
-        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
-        ret += (20.0 * Math.sin(lat * PI) + 40.0 * Math.sin(lat / 3.0 * PI)) * 2.0 / 3.0;
-        ret += (160.0 * Math.sin(lat / 12.0 * PI) + 320 * Math.sin(lat * PI / 30.0)) * 2.0 / 3.0;
-        return ret
-    };
-    function transformlng(lng, lat) {
-        lat = +lat;
-        lng = +lng;
-        let ret = 300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng));
-        ret += (20.0 * Math.sin(6.0 * lng * PI) + 20.0 * Math.sin(2.0 * lng * PI)) * 2.0 / 3.0;
-        ret += (20.0 * Math.sin(lng * PI) + 40.0 * Math.sin(lng / 3.0 * PI)) * 2.0 / 3.0;
-        ret += (150.0 * Math.sin(lng / 12.0 * PI) + 300.0 * Math.sin(lng / 30.0 * PI)) * 2.0 / 3.0;
-        return ret
-    };
-    /**
-     * GCJ02 转换为 WGS84
-     * @param lng
-     * @param lat
-     * @returns {*[]}
-     */
-    function gcj02towgs84(lng, lat) {
-        lat = +lat;
-        lng = +lng;
-        let dlat = transformlat(lng - 105.0, lat - 35.0);
-        let dlng = transformlng(lng - 105.0, lat - 35.0);
-        let radlat = lat / 180.0 * PI;
-        let magic = Math.sin(radlat);
-        magic = 1 - ee * magic * magic;
-        let sqrtmagic = Math.sqrt(magic);
-        dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrtmagic) * PI);
-        dlng = (dlng * 180.0) / (a / sqrtmagic * Math.cos(radlat) * PI);
-        let mglat = lat + dlat;
-        let mglng = lng + dlng;
-        return [lng * 2 - mglng, lat * 2 - mglat]
-    };
     const option = {
         setup(props, ctx) {
         },
@@ -277,27 +233,27 @@
             },
         },
         mounted(){
-            window.mapInit=()=>{
-                const checkHaveObjs=setInterval(()=>{
-                    if(typeof T!=='undefined'&&typeof T.Map!=='undefined'){
-                        clearInterval(checkHaveObjs);
-                        if (document.getElementById('app')) document.getElementById('app').style.display = 'block'
-                        if (document.getElementById('app-loading')) document.getElementById('app-loading').style.display = 'none'
-                        this.initMap();
-                    }
-                },20)
+            const initFunc = 'initializeBmap';
+            window[initFunc] = () => {
+                AMap.plugin(['AMap.Geocoder', 'AMap.PlaceSearch','AMap.DistrictSearch','AMap.PolygonEditor'], () => {//异步同时加载多个插件
+                    if (document.getElementById('app')) document.getElementById('app').style.display = 'block'
+                    if (document.getElementById('app-loading')) document.getElementById('app-loading').style.display = 'none'
+                    this.initMap()
+                })
+            };
+            window._AMapSecurityConfig = {
+                securityJsCode: '604a1f9d93f234478330d19b97908c51',
             }
 
-            let jsapi = document.createElement('script'),jsapi2=document.createElement('script');
-            jsapi2.src = 'https://webapi.amap.com/maps?v=1.4.15&key=2c89c6178dc817d34ad9783867366c14&callback=mapInit&plugin=AMap.DistrictSearch';
-            jsapi.src='https://api.tianditu.gov.cn/api?v=4.0&tk=dd78fa8009cfc85f584b62039a504a61';
-            document.head.appendChild(jsapi2);
+            let jsapi = document.createElement('script');
+            jsapi.src = 'https://webapi.amap.com/maps?v=2.0&key=103028a8c0d4cbd05993f251c2a2ead7&&callback=' + initFunc + '&';
             document.head.appendChild(jsapi);
-            document.addEventListener('click',e=>{
-                if(e.target.closest('.search-rel')||e.target.matches('.search-rel')||e.target.closest('.input-box')||e.target.matches('.input-box')){
+            document.addEventListener('click', e => {
+                if (e.target.closest('.search-rel') || e.target.matches('.search-rel') || e.target.closest('.input-box') || e.target.matches('.input-box')||(e.target.closest('li')&&e.target.closest('li').matches('.ant-pagination-item'))) {
                     return;
                 }
-                this.relShow=false;
+
+                this.relShow = false;
             })
         },
         watch:{
@@ -308,62 +264,65 @@
 
         methods: {
             initMap(){
-                const imageURL = "http://t0.tianditu.gov.cn/img_w/wmts?" +
-                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
-                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
-                //创建自定义图层对象
-                const lay = new T.TileLayer(imageURL, {minZoom: 1, maxZoom: 18});
-
-                const imageURL2 = "http://t0.tianditu.gov.cn/cia_w/wmts?" +
-                    "SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles" +
-                    "&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=dd78fa8009cfc85f584b62039a504a61";
-                const lay2 = new T.TileLayer(imageURL2, {
-                    minZoom: 1,
-                    maxZoom: 18
-                });
-                const config = {layers: [lay, lay2]};
+                let defCenter = new AMap.LngLat(120.12, 30.19);
                 //初始化地图对象
-                window.map = new T.Map("map-container", config);
-                // window.map.addLayer(new T.TileLayer.WMS("http://t0.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={x}&TILECOL={y}&tk=dd78fa8009cfc85f584b62039a504a61"))
+                window.map = new AMap.Map('map-container', {
+                    layers: [
+                        // 卫星
+                        new AMap.TileLayer.Satellite(),
+                        // 路网
+                        new AMap.TileLayer.RoadNet()
+                    ],
+                    center: defCenter
+                });
                 //设置显示地图的中心点和级别
-                window.map.centerAndZoom(new T.LngLat(120.12, 30.19), 9);
-                //允许鼠标滚轮缩放地图
-                window.map.enableScrollWheelZoom();
+                window.map.setZoomAndCenter(9, defCenter);  // 初始化地
+                window.geocode = new AMap.Geocoder();
 
-
-                const windowInit=()=>{
-                    this.drawBounds();
-                    this.mapInput();
-                };
-                if(window.isWindowSuccessInit){
-                    Vue.nextTick(windowInit);
-                }else{
-                    window.windowSuccessInit=()=>{
+                window.map.on('complete',  ()=> {
+                    const windowInit=()=>{
+                        this.drawBounds();
+                        this.mapInput();
+                    };
+                    if(window.isWindowSuccessInit){
                         Vue.nextTick(windowInit);
+                    }else{
+                        window.windowSuccessInit=()=>{
+                            Vue.nextTick(windowInit);
+                        }
                     }
-                }
-
-
+                });
             },
             drawBounds(){
+                let polyEditorChange=()=>{
+                    const lngLats=window.polygon.getPath();
+                    console.log(lngLats);
+                    //todo
+                    if(lngLats&&lngLats.length>=3){
+                        this.pushOldPolygonPaths(lngLats)
+                    }
+                };
                 //点击事件
                 const addPolygonFun=params=>{
-                    if(Object.keys(window.polygon.getLngLats()).length>0&&Object.keys(window.polygon.getLngLats()[0]).length>0){
+                    if(window.polygon.getPath()&&Object.keys(window.polygon.getPath()).length>0&&Object.keys(window.polygon.getPath()[0]).length>0){
                         return;
                     }
                     if(window.markers.length>1){
-                        const polygonArr= [new T.LngLat(params.lnglat.lng, params.lnglat.lat)];
+                        const polygonArr= [new AMap.LngLat(params.lnglat.lng, params.lnglat.lat)];
                         window.markers.forEach((v)=>{
-                            polygonArr.push(v.getLngLat())
-                            window.map.removeOverLay(v);
+                            polygonArr.push(v.getPosition())
+                            v.remove();
                         })
                         window.markers=[];
                         this.setLngLats(polygonArr);
-                        // this.pushOldPolygonPaths(window.polygon.getLngLats())
+                        window.polyEditor.open();
+                        polyEditorChange();
                     }else{
                         // 创建点覆盖物
-                        const marker = new T.Marker(new T.LngLat(params.lnglat.lng, params.lnglat.lat)); // 创建点
-                        window.map.addOverLay(marker);
+                        const marker = new AMap.Marker({
+                            position:[params.lnglat.lng, params.lnglat.lat]
+                        }); // 创建点
+                        marker.setMap(window.map)
                         window.markers.push(marker)
                     }
                 };
@@ -375,31 +334,36 @@
                     const polygonLngLat=[];
                     if(polygonLngLatArr.length>0){
                         polygonLngLatArr.forEach(v=>{
-                            polygonLngLat.push(new T.LngLat(v[0],v[1]))
+                            polygonLngLat.push(new AMap.LngLat(v[0],v[1]))
                         })
                     }
-                    window.polygon =new T.Polygon(polygonLngLat,{
-                        color: "#096dd9",
-                        weight: 1.5,
-                        opacity: 0.9,
+                    window.polygon =new AMap.Polygon({
+                        path:polygonLngLat,
+                        strokeColor : "#096dd9",
+                        strokeWeight : 1.5,
+                        strokeOpacity : 0.9,
                         fillColor: "#69c0ff",
                         fillOpacity: 0.3
                     });
-                    window.map.addOverLay(window.polygon);
+                    window.map.addOverlay(window.polygon);
+                    window.polyEditor = new AMap.PolygonEditor(window.map);
+                    window.polyEditor.addAdsorbPolygons([window.polygon]);
+                    window.polyEditor.setTarget(window.polygon);
+                    window.polyEditor.on('addnode',polyEditorChange)
+                    window.polyEditor.on('removenode',polyEditorChange)
+                    window.polyEditor.on('adjust',polyEditorChange)
+                    window.polyEditor.on('move',polyEditorChange)
+                    window.polyEditor.on('add',polyEditorChange)
+
                     if(polygonLngLat.length>0){
                         //显示最佳比例尺
-                        window.map.setViewport(polygonLngLat);
-                        window.polygon.enableEdit();
+                        // window.map.setFitView(polygonLngLat);
+                        window.map.setFitView([window.polygon]);
+                        window.polyEditor.open();
                     }else if(window.mapCenter&&setCenter){
-                        window.map.centerAndZoom(new T.LngLat(window.mapCenter[0], window.mapCenter[1]), 13);
+                        window.map.setZoomAndCenter(13,new AMap.LngLat(window.mapCenter[0], window.mapCenter[1]));
                     }
 
-                    setInterval(()=>{
-                        const lngLats=window.polygon.getLngLats();
-                        if(lngLats[0]&&lngLats[0].length>3){
-                            this.pushOldPolygonPaths(lngLats[0])
-                        }
-                    },20)
                 }
 
                 if(window.mapDistrict){
@@ -412,61 +376,112 @@
                     //行政区查询
                     district.setLevel('city');
                     district.search(window.mapDistrict,(status, result)=> {
+                        console.log(result);
                         if(!result.districtList||!result.districtList[0]||!result.districtList[0].boundaries||result.districtList[0].boundaries.length===0){
                             antd.notification.error({message: '无相关范围', duration: 0});
                             //点击事件
-                            window.map.addEventListener("click", addPolygonFun);
+                            window.map.on("click", addPolygonFun);
                             initSet();
                             return;
                         }
-                        const pointsArr=[];
+                        const pointsArr=[],polygonBgList=[];
                         for(let i in result.districtList[0].boundaries){
                             const regionLngLats=[];
                             result.districtList[0].boundaries[i].forEach(lnglatObj=>{
-                                const arr=gcj02towgs84(lnglatObj.R,lnglatObj.Q);
-                                const lnglat= new T.LngLat(arr[0], arr[1]);
+                                const lnglat= new AMap.LngLat(lnglatObj.lng, lnglatObj.lat);
                                 regionLngLats.push(lnglat);
                                 pointsArr.push(lnglat);
                             });
 
                             //创建面对象
-                            const polygonBg = new T.Polygon(regionLngLats,{color: "#d3adf7", weight: 3, opacity: 0.9, fillColor: "#d3adf7", fillOpacity: 0});
+                            const polygonBg = new AMap.Polygon({strokeColor : "#d3adf7", strokeWeight : 3, strokeOpacity : 0.9, fillColor: "#d3adf7", fillOpacity: 0,path:regionLngLats});
                             //向地图上添加行政区划面
-                            window.map.addOverLay(polygonBg);
+                            window.map.addOverlay(polygonBg);
                             //点击事件
-                            polygonBg.addEventListener("click", addPolygonFun);
+                            polygonBg.on("click", addPolygonFun);
+                            polygonBgList.push(polygonBg)
                         }
                         //显示最佳比例尺
-                        window.map.setViewport(pointsArr);
+                        // window.map.setViewport(pointsArr);
+                        window.map.setFitView(polygonBgList);
                         initSet(false);
                     });
                 }else{
                     //点击事件
-                    window.map.addEventListener("click", addPolygonFun);
+                    window.map.on("click", addPolygonFun);
                     initSet();
                 }
             },
             mapInput(){
-                //创建搜索对象
-                window.placeSearch = new T.LocalSearch(window.map, {
-                    pageCapacity: 10,	//每页显示的数量
-                    onSearchComplete: result=>{
-                        this.count=result.getCount();
-                        this.page= window.placeSearch.getPageIndex()
-                        this.list=result.getPois()||[];
-                        this.relShow=true;
-
-                    },//接收数据的回调函数
-                });
+                let initplaceSearch= (city)=>{
+                    //创建搜索对象
+                    window.placeSearch = new AMap.PlaceSearch({
+                        city: city,
+                        pageSize: 10, //每页结果数,默认10
+                    });
+                }
+                let center='';
+                if(window.mapDistrict){
+                    rel=window.mapDistrict.match(/省(.+市)/u)
+                    if(rel&&rel[1]){
+                        center=rel[1];
+                    }else{
+                        rel=window.mapDistrict.match(/(.+市)/u)
+                        if(rel&&rel[1]){
+                            center=rel[1];
+                        }
+                    }
+                }
+                if(center){
+                    initplaceSearch(center);
+                }else if(window.mapCenter){
+                    geocode.getAddress(new AMap.LngLat(window.mapCenter[0], window.mapCenter[1]), (status, rs) => {
+                        initplaceSearch(rs.regeocode.addressComponent.city ? rs.regeocode.addressComponent.city : rs.regeocode.addressComponent.province);
+                    })
+                }else{
+                    initplaceSearch('杭州市');
+                }
             },
             doSearch(){
                 if(this.searchValue.replace(/\n/g,'')===''){
                     return;
                 }
-                window.placeSearch.search(this.searchValue,1);
+                window.placeSearch.setPageIndex(1)
+                this.setSearchData();
             },
-            pageChange(page){
-                window.placeSearch.gotoPage(page)
+            pageChange(page) {
+                window.placeSearch.setPageIndex(page)
+                this.setSearchData();
+            },
+            setSearchDataVal(result) {
+                if (!result.poiList) {
+                    if (this.page == 1) {
+                        this.count = 0;
+                        this.list = [];
+                    } else {
+                        this.page--;
+                        this.pageChange(this.page);
+                    }
+                } else {
+                    if (result.poiList.pois.length < 10 || (typeof searchRess[this.searchValue][this.page + 1] !== 'undefined' && (!searchRess[this.searchValue][this.page + 1].poiList || !searchRess[this.searchValue][this.page + 1].poiList.length))) {
+                        this.count = 10 * (this.page - 1) + result.poiList.pois.length;
+                    } else {
+                        this.count = result.poiList.count;
+                    }
+                    this.list = result.poiList.pois;
+                }
+                this.relShow = true;
+            },
+            setSearchData() {
+                searchRess[this.searchValue] = searchRess[this.searchValue] || {};
+                if (searchRess[this.searchValue][this.page]) {
+                    this.setSearchDataVal(searchRess[this.searchValue][this.page])
+                } else {
+                    window.placeSearch.search(this.searchValue, (status, result) => {
+                        searchRess[this.searchValue][this.page] = result;
+                        this.setSearchDataVal(result)
+                    });
+                }
             },
             pushOldPolygonPaths(paths){
                 let pathArr=[];
@@ -496,9 +511,13 @@
                 this.nowPolygonPathsIndex--;
                 let paths=[];
                 this.oldPolygonPaths[this.nowPolygonPathsIndex].forEach(v=>{
-                    paths.push(new T.LngLat(v[0], v[1]))
+                    paths.push(new AMap.LngLat(v[0], v[1]))
                 })
                 this.setLngLats(paths)
+                window.polyEditor.close();
+                setTimeout(()=>{
+                    window.polyEditor.open();
+                },40)
             },
             forwardDraw(){
                 if(!this.canForward){
@@ -507,50 +526,50 @@
                 this.nowPolygonPathsIndex++;
                 let paths=[];
                 this.oldPolygonPaths[this.nowPolygonPathsIndex].forEach(v=>{
-                    paths.push(new T.LngLat(v[0], v[1]))
+                    paths.push(new AMap.LngLat(v[0], v[1]))
                 })
                 this.setLngLats(paths)
+                window.polyEditor.close();
+                setTimeout(()=>{
+                    window.polyEditor.open();
+                },40)
             },
             setLngLats(paths){
-                window.polygon.disableEdit();
-                window.polygon.setLngLats(paths);
-                setTimeout(()=>{
-                    window.polygon.enableEdit();
-                },50)
+                window.polygon.setPath(paths);
+                if(paths.length===0){
+                    window.polyEditor.close();
+                }
             },
             selectRel(rel){
-                const arr=rel.lonlat.split(' ');
-                const lngLat=new T.LngLat(arr[0], arr[1]);
-                if(!this.marker){
-                    this.marker = new T.Marker(lngLat); // 创建点
-                    // const icon=this.marker.getIcon();
-                    const icon=new T.Icon({
-                        iconUrl:'https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png',
-                        iconAnchor:new T.Point(9,32)
-                    })
-                    this.marker.setIcon(icon)
-                    // icon.setIconUrl('https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png');
-                    window.map.addOverLay(this.marker);
-                }else{
-                    this.marker.setLngLat(lngLat)
+                window.map.setZoom(12);
+                const lngLat = rel.location;
+                if (!this.marker) {
+                    this.marker = new AMap.Marker({
+                        position: lngLat,
+                        icon: new AMap.Icon({
+                            image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_rs.png'
+                        })
+                    }); // 创建点
+                    this.marker.setMap(window.map);
                 }
-                window.map.centerAndZoom(lngLat,18);
-                this.relShow=false;
+                this.marker.setPosition(lngLat)
 
+                window.map.setZoomAndCenter(18, lngLat);
+                this.relShow = false;
             },
             submit(){
                 if(!window.polygon){
                     this.$message.warning('请先绘制一个区域')
                     return;
                 }
-                const lngLats=window.polygon.getLngLats();
-                if(!lngLats[0]||lngLats[0].length<3){
+                const lngLats=window.polygon.getPath();
+                if(!lngLats||lngLats.length<3){
                     this.$message.warning('请先绘制一个区域')
                     return;
                 }
                 let pathArr=[];
-                for(let i in lngLats[0]){
-                    pathArr.push([lngLats[0][i].lng, lngLats[0][i].lat]);
+                for(let i in lngLats){
+                    pathArr.push([lngLats[i].lng, lngLats[i].lat]);
                 }
                 if(pathArr.length===0){
                     this.$message.warning('请先绘制一个区域')

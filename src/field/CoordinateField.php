@@ -19,12 +19,29 @@ class CoordinateField extends ModelField
     protected bool $canExcelImport=false;//是否可以excel导入
     protected LngLat $center;//默认中心坐标
 
+    protected string $mapType='TMap';//'TMap','AMap','BMapGL'
+
 
     public function __construct()
     {
         parent::__construct();
         //设置默认值
         $this->center=new LngLat(120.19,30.19);
+    }
+
+
+    /**地图类型  'TMap','AMap','BMapGL'
+     * @param string $mapType
+     * @return $this|LngLat
+     */
+    public function mapType(string $mapType = null)
+    {
+        if($mapType!==null){
+            if(!in_array($mapType,['TMap','AMap','BMapGL'])){
+                throw new \Exception('地图类型只能是（TMap,AMap,BMapGL），当前传入的值为'.$mapType);
+            }
+        }
+        return $this->doAttr('mapType', $mapType);
     }
 
 
@@ -36,6 +53,7 @@ class CoordinateField extends ModelField
     {
         return $this->doAttr('center', $center);
     }
+
 
 
     /**

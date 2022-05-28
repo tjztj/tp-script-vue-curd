@@ -21,12 +21,27 @@ class MapRangeField extends ModelField
     //行政区域、范围，如：浙江省杭州市萧山区河上镇
     protected string $district='';
 
+    protected string $mapType='TMap';//'TMap','AMap','BMapGL'
 
     public function __construct()
     {
         parent::__construct();
         //设置默认值
         $this->center=new LngLat(120.19,30.19);
+    }
+
+    /**地图类型  'TMap','AMap','BMapGL'
+     * @param string $mapType
+     * @return $this|LngLat
+     */
+    public function mapType(string $mapType = null)
+    {
+        if($mapType!==null){
+            if(!in_array($mapType,['TMap','AMap','BMapGL'])){
+                throw new \Exception('地图类型只能是（TMap,AMap,BMapGL），当前传入的值为'.$mapType);
+            }
+        }
+        return $this->doAttr('mapType', $mapType);
     }
 
     /**地图中心坐标(https://map.tianditu.gov.cn/)
@@ -40,6 +55,7 @@ class MapRangeField extends ModelField
 
 
     /**行政区域、范围，如：杭州市、萧山区、衢江区
+     * 行政区级别包括：国家、省/直辖市、市、区/县4个级别
      * @param string|null $district
      * @return $this|string
      */
