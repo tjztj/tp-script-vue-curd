@@ -829,7 +829,7 @@ a.red:hover,a.yellow:hover{
 }
 
 .curd-filter-box .filter-item-box:nth-of-type(odd) {
-    padding-left: 24px;
+    padding-left: 32px;
 }
 
 .curd-filter-box .filter-item-box:nth-of-type(even) {

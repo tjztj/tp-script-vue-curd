@@ -5,10 +5,10 @@
 }
 
 .head {
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: 18px;
+    padding-bottom: 18px;
     background-color: #fff;
-    margin-bottom: 12px;
+    margin-bottom: 18px;
     border: 1px solid #91d5ff;
     border-radius: 2px;
 }
