@@ -12,7 +12,7 @@ define([], function () {
             window.mapObjs[mapId] = {};
             window.mapObjs[mapId].mark=null;
 
-            const centerArr=(props.center||'120.12,30.19').split(',');
+            const centerArr=(props.center&&props.center!==','?props.center:'120.12,30.19').split(',');
 
             function setMark(lnglat){
                 const arr=lnglat.split(',');

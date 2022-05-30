@@ -1,6 +1,6 @@
 define([], function () {
     return {
-        props: ['value', 'disabled', 'placeholder','district'],
+        props: ['value', 'disabled', 'placeholder','district','center'],
         setup(props, ctx) {
             props.value = props.value || '';
             props.placeholder = props.placeholder || '还未选择区域';
@@ -11,7 +11,7 @@ define([], function () {
             window.mapObjs = window.mapObjs || {};
             window.mapObjs[mapId] = {};
 
-            const centerArr=(props.center||'120.12,30.19').split(',');
+            const centerArr=(props.center&&props.center!==','?props.center:'120.212402,30.168529').split(',');
 
             function initMap() {
                 Vue.nextTick(() => {
