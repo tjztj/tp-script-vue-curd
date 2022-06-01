@@ -68,7 +68,7 @@ define(['vueAdmin'], function (va) {
                         parentWindow.antd.message.success(res.msg);
 
                         if(window.thatBtn&&window.thatBtn.refreshPage){
-                            parentWindow.vueDefMethods.showLoadMsg()
+                            parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('body'))
                             parentWindow.setTimeout(()=>{
                                 parentWindow.location.reload();
                             },200)
