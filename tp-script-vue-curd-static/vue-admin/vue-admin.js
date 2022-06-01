@@ -755,14 +755,24 @@ define(requires, function (axios, Qs) {
                                 option.id=row.id;
                             }
                             this.$post(btn.saveUrl,option).then(res=>{
-                                antd.message.success(res.msg);
+
                                 if(btn.refreshPage){
-                                    window.vueDefMethods.showLoadMsg('',document.querySelector('body'))
-                                    setTimeout(()=>{
-                                        window.location.reload();
-                                    },200)
+                                    if(top.layer&&top.layer.msg){
+                                        top.layer.msg(res.msg, {icon: 1, shade: this.shade, scrollbar: false, time: 1500, shadeClose: true})
+                                        window.vueDefMethods.showLoadMsg('', window.document.querySelector('body'))
+                                        window.setTimeout(()=>{
+                                            window.location.reload();
+                                        },80)
+                                    }else{
+                                        window.antd.message.success(res.msg);
+                                        window.vueDefMethods.showLoadMsg('', window.document.querySelector('#app>.box>.body'))
+                                        window.setTimeout(()=>{
+                                            window.location.reload();
+                                        },200)
+                                    }
                                     return;
                                 }
+                                antd.message.success(res.msg);
                                 if(btn.refreshList){
                                     this.refreshTable();
                                 }else if(row){

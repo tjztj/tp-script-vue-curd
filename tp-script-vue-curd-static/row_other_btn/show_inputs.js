@@ -65,14 +65,23 @@ define(['vueAdmin'], function (va) {
                         this.loading=true;
                     }
                     this.$post(vueData.subUrl,this.form).then(async res=>{
-                        parentWindow.antd.message.success(res.msg);
 
                         if(window.thatBtn&&window.thatBtn.refreshPage){
-                            parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('body'))
-                            parentWindow.setTimeout(()=>{
-                                parentWindow.location.reload();
-                            },200)
+                            if(top.layer&&top.layer.msg){
+                                top.layer.msg(res.msg, {icon: 1, shade: this.shade, scrollbar: false, time: 1500, shadeClose: true})
+                                parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('body'))
+                                parentWindow.setTimeout(()=>{
+                                    parentWindow.location.reload();
+                                },80)
+                            }else{
+                                parentWindow.antd.message.success(res.msg);
+                                parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('#app>.box>.body'))
+                                parentWindow.setTimeout(()=>{
+                                    parentWindow.location.reload();
+                                },200)
+                            }
                         }else{
+
                             if(this.form&&this.form.id&&!res.data.refreshList&&(!window.thatBtn||!window.thatBtn.refreshList)){
                                 window.listVue.refreshId(this.form.id);
                             }else{
