@@ -770,6 +770,7 @@ define(requires, function (axios, Qs) {
                                             window.location.reload();
                                         },200)
                                     }
+                                    resolve()
                                     return;
                                 }
                                 antd.message.success(res.msg);
