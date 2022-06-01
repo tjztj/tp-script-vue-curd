@@ -20,6 +20,7 @@ class RowBtn extends Btn
 
 
     public bool $refreshList=false;//操作成功后刷新列表
+    public bool $refreshPage=false;//操作成功后刷新页面
 
     public function toArray():array{
         $btn=parent::toArray();
@@ -31,6 +32,7 @@ class RowBtn extends Btn
         $btn['saveBtnTitle']=$this->saveBtnTitle;
         $btn['info']=$this->info;
         $btn['refreshList']=$this->refreshList;
+        $btn['refreshPage']=$this->refreshPage;
         return $btn;
     }
 

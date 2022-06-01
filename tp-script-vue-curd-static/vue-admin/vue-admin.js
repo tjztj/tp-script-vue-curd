@@ -756,6 +756,10 @@ define(requires, function (axios, Qs) {
                             }
                             this.$post(btn.saveUrl,option).then(res=>{
                                 antd.message.success(res.msg);
+                                if(btn.refreshPage){
+                                    window.location.reload();
+                                    return;
+                                }
                                 if(btn.refreshList){
                                     this.refreshTable();
                                 }else if(row){
