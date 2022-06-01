@@ -102,6 +102,8 @@ trait BaseEdit
             if(isset($this->request->editId)){
                 $data['id']=$this->request->editId;
             }
+            $this->setPostDataBefore($data);
+
             $model->startTrans();
             $savedInfo=null;
             $parentInfo=null;

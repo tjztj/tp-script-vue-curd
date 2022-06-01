@@ -119,6 +119,10 @@ trait Controller
         //列表数据处理钩子
     }
 
+    protected function setPostDataBefore(array &$post):void{
+        //用户提交的数据处理
+    }
+
     protected function addAfter(BaseModel $info): void
     {
         // 数据添加成功后钩子，方便子类处理（子类重写此方法）
