@@ -757,7 +757,10 @@ define(requires, function (axios, Qs) {
                             this.$post(btn.saveUrl,option).then(res=>{
                                 antd.message.success(res.msg);
                                 if(btn.refreshPage){
-                                    window.location.reload();
+                                    window.vueDefMethods.showLoadMsg()
+                                    setTimeout(()=>{
+                                        window.location.reload();
+                                    },200)
                                     return;
                                 }
                                 if(btn.refreshList){
@@ -817,6 +820,7 @@ define(requires, function (axios, Qs) {
 
                 win.VUE_CURD=window.VUE_CURD;
                 win.moment=moment;
+                win.thatBtn=btn;
                 win.beforeInit=function (){
                     win.vueData.title=btn.modalTitle;
                     win.vueData.fields=btn.modalFields;

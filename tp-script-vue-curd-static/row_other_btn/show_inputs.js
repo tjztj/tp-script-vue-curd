@@ -66,11 +66,20 @@ define(['vueAdmin'], function (va) {
                     }
                     this.$post(vueData.subUrl,this.form).then(async res=>{
                         parentWindow.antd.message.success(res.msg);
-                        if(this.form&&this.form.id&&!res.data.refreshList){
-                            window.listVue.refreshId(this.form.id);
+
+                        if(window.thatBtn&&window.thatBtn.refreshPage){
+                            parentWindow.vueDefMethods.showLoadMsg()
+                            parentWindow.setTimeout(()=>{
+                                parentWindow.location.reload();
+                            },200)
                         }else{
-                            window.listVue.refreshTable();
+                            if(this.form&&this.form.id&&!res.data.refreshList&&(!window.thatBtn||!window.thatBtn.refreshList)){
+                                window.listVue.refreshId(this.form.id);
+                            }else{
+                                window.listVue.refreshTable();
+                            }
                         }
+
                         if(!option.notClose){
                             this.close();
                         }else{
