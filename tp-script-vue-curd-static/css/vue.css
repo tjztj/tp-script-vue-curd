@@ -1085,3 +1085,9 @@ svg.icon{
     fill: currentColor;
     overflow: hidden;
 }
+.ant-btn.my-other-btn>span.anticon{
+    line-height: 1.5715;
+}
+.ant-btn.my-other-btn>span.anticon svg.icon{
+    vertical-align:baseline;
+}
