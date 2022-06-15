@@ -15,7 +15,7 @@ define([],function(){
               }
           },
         },
-        template:`<div>
+        template:`<div style="display: inline">
                     <a-tooltip placement="topLeft" v-if="record.text">
                         <a-tooltip placement="topLeft"><template #title><span :style="{color:color()}">{{record.text}}</span></template><span :style="{color:color()}">{{record.text}}</span></a-tooltip>
                     </a-tooltip>

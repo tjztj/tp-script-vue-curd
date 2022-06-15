@@ -34,7 +34,7 @@ define([],function(){
                 return val;
             }
         },
-        template:`<div>
+        template:`<div style="display: inline">
                     <a-tooltip placement="topLeft" v-if="record.text">
                         <a-tooltip placement="topLeft"><template #title>
                         <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
