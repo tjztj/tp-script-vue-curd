@@ -37,9 +37,9 @@ abstract class VueCurlModel extends TimeModel
         $this->doGenerateTable();
     }
 
-    public function newInstance(array $data = [], $where = null): Model
+    public function newInstance(array $data = [], $where = null, array $options = []): Model
     {
-        $md=parent::newInstance($data, $where);
+        $md=parent::newInstance($data, $where,$options);
         if($this->controller){
             $md->controller=$this->controller;
         }
