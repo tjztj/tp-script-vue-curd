@@ -54,9 +54,9 @@ if (!function_exists('tpScriptVueCurdUploadDefaultUrl')) {
 
 if (!function_exists('tpScriptVueCurdGetFileInfosByUrls')) {
     /**
-     * 文件上传默认url
+     * 文件上传字段显示时，处理显示内容
      * @param array $urls
-     * @return array 返回的数据需为 [ [id=>1,url=>'',original_name=>''],[id=>2,url=>'',original_name=>''] ]
+     * @return array 返回的数据需为 [ url=>[id=>1,url=>'',original_name=>''],[id=>2,url=>'',original_name=>''] ]
      */
     function tpScriptVueCurdGetFileInfosByUrls(array $urls):array{
         return [];
@@ -200,9 +200,9 @@ if (!function_exists('tableThemIsColor')) {
 if (!function_exists('tsvcThemCssPath')) {
     /**
      * 自定义主题文件路径（更改默认样式）
-     * @return bool
+     * @return string
      */
-    function tsvcThemCssPath():bool{
+    function tsvcThemCssPath():string{
         return '';
     }
 }
