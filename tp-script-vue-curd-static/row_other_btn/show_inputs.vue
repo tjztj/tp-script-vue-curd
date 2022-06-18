@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css?v={$vueCurdDebug?time():$vueCurdVersion}" media="all">
+
 </head>
 <body style="background-color: #fff">
 <div id="app-loading">

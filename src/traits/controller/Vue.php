@@ -62,6 +62,7 @@ trait Vue
         $this->assign('guid',$this->guid);
         $this->assign('loginUrl',tpScriptVueCurdGetLoginUrl());
         $this->assign('vueCurdDebug',static::debug());
+        $this->assign('themCssPath',tsvcThemCssPath());
     }
 
 

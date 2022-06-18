@@ -8,6 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?2.2.7" media="all">
     <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css?v={$vueCurdDebug?time():$vueCurdVersion}" media="all">
+    {if !empty($themCssPath)}
+    <link rel="stylesheet" href="{$themCssPath}" media="all">
+    {/if}
     <script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js?3.2.11" charset="utf-8"></script>
     <script src="/tp-script-vue-curd-static.php?moment/moment.min.js" charset="utf-8"></script>
     <script>

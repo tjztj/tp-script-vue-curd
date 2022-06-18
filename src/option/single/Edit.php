@@ -75,6 +75,7 @@ class Edit
             'vueCurdAction'=>$request->action(),
             'vueCurdController'=>$request->controller(),
             'vueCurdModule'=>$this->app->http->getName(),
+            'themCssPath'=>tsvcThemCssPath(),
             'guid'=>$this->guid,
             'loginUrl'=>tpScriptVueCurdGetLoginUrl(),
             'vueCurdDebug'=>\think\facade\App::isDebug(),

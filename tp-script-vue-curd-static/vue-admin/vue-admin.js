@@ -797,6 +797,16 @@ define(requires, function (axios, Qs) {
                 const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];
                 const win=iframe.contentWindow;
 
+                let v=vueData.vueCurdDebug?((new Date()).valueOf()):vueData.vueCurdVersion;
+                ['/tp-script-vue-curd-static.php?css/vue.css?v='+v, vueData.themCssPath].forEach(val=>{
+                    if(!val)return;
+                    let styleEl = win.document.createElement('link');
+                    styleEl.setAttribute('rel', 'stylesheet');
+                    styleEl.setAttribute('media','all');
+                    styleEl.setAttribute('href', val);
+                    win.document.head.appendChild(styleEl);
+                })
+
 
                 function runScript(script){
                     return new Promise((reslove, rejected) => {

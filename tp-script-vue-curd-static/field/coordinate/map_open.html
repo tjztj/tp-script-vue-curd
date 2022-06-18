@@ -3,100 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>选择地点</title>
-    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css" media="all">
-    <link rel="stylesheet" href="/tp-script-vue-curd-static.php?css/vue.css" media="all">
-    <style>
-        body {
-            height: 100vh;
-        }
-
-        #app {
-            height: 100%;
-            width: 100%;
-            padding: 0!important;
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        .body {
-            flex: 1;
-        }
-
-        #map-container {
-            height: 100%;
-            width: 100%;
-        }
-
-        /*.amap-logo{*/
-        /*    display: none!important; !*去掉高德地图logo*!*/
-        /*}*/
-        /*.amap-copyright {*/
-        /*   opacity:0!important; !*去掉高德的版本号*!*/
-        /*}*/
-        .tdt-control-copyright {
-            /*去掉天地图LOGO*/
-            display: none !important;
-        }
-
-        .top {
-            padding: 12px 0px;
-            position: relative;
-        }
-
-
-        .search-rel {
-            position: absolute;
-            z-index: 999999;
-            background-color: #fff;
-            left: 0;
-            right: 0;
-            border-left: 1px solid #d9d9d9;
-            border-right: 1px solid #d9d9d9;
-            border-bottom-left-radius: 2px;
-            border-bottom-right-radius: 2px;
-            box-shadow: 0 3px 12px 0 rgba(0, 0, 0, .2);
-        }
-
-        .search-rel ul.search-rel-list {
-            padding: 0;
-            margin: 0 0 12px 0;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .search-rel .search-rel-list li {
-            list-style: none;
-            padding: 6px 12px;
-            cursor: pointer;
-            color: #8c8c8c;
-        }
-
-        .search-rel .search-rel-list li + li {
-            border-top: 1px dashed #efefef;
-        }
-
-        .search-rel .search-rel-list li:hover {
-            background-color: #fafafa;
-        }
-
-        .search-rel .search-rel-list li b {
-            padding-right: 12px;
-            color: #000;
-        }
-
-        .search-rel .ant-pagination {
-            margin-bottom: 8px;
-        }
-        .foot{
-            padding: 12px;
-            display: flex;
-        }
-        .foot .select-info{
-            flex: 1;
-        }
-    </style>
 </head>
 <body>
+<style>
+    body {
+        height: 100vh;
+    }
+
+    #app {
+        height: 100%;
+        width: 100%;
+        padding: 0!important;
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .body {
+        flex: 1;
+    }
+
+    #map-container {
+        height: 100%;
+        width: 100%;
+    }
+
+    /*.amap-logo{*/
+    /*    display: none!important; !*去掉高德地图logo*!*/
+    /*}*/
+    /*.amap-copyright {*/
+    /*   opacity:0!important; !*去掉高德的版本号*!*/
+    /*}*/
+    .tdt-control-copyright {
+        /*去掉天地图LOGO*/
+        display: none !important;
+    }
+
+    .top {
+        padding: 12px 0px;
+        position: relative;
+    }
+
+
+    .search-rel {
+        position: absolute;
+        z-index: 999999;
+        background-color: #fff;
+        left: 0;
+        right: 0;
+        border-left: 1px solid #d9d9d9;
+        border-right: 1px solid #d9d9d9;
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+        box-shadow: 0 3px 12px 0 rgba(0, 0, 0, .2);
+    }
+
+    .search-rel ul.search-rel-list {
+        padding: 0;
+        margin: 0 0 12px 0;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .search-rel .search-rel-list li {
+        list-style: none;
+        padding: 6px 12px;
+        cursor: pointer;
+        color: #8c8c8c;
+    }
+
+    .search-rel .search-rel-list li + li {
+        border-top: 1px dashed #efefef;
+    }
+
+    .search-rel .search-rel-list li:hover {
+        background-color: #fafafa;
+    }
+
+    .search-rel .search-rel-list li b {
+        padding-right: 12px;
+        color: #000;
+    }
+
+    .search-rel .ant-pagination {
+        margin-bottom: 8px;
+    }
+    .foot{
+        padding: 12px;
+        display: flex;
+    }
+    .foot .select-info{
+        flex: 1;
+    }
+</style>
 <div id="app" style="display: none">
     <div class="top">
         <div class="input-box" @click="relShow=relShow||(searchValue&&searchValue!=='')">

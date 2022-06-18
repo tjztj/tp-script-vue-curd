@@ -104,6 +104,22 @@ define([], function () {
                         mapWindow=layero.find('iframe')[0].contentWindow;
                     }
 
+                    let v=vueData.vueCurdDebug?((new Date()).valueOf()):vueData.vueCurdVersion;
+                    ['/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?v='+v,
+                        '/tp-script-vue-curd-static.php?css/vue.css?v='+v,
+                        vueData.themCssPath
+                    ].forEach(val=>{
+                        if(!val)return;
+                        let styleEl = mapWindow.document.createElement('link');
+                        styleEl.setAttribute('rel', 'stylesheet');
+                        styleEl.setAttribute('media','all');
+                        styleEl.setAttribute('href', val);
+                        mapWindow.document.head.appendChild(styleEl);
+                    })
+
+
+
+
                     mapWindow.mapSelect = this.value;
                     mapWindow.mapCenter=this.centerArr;
                     if(mapWindow.initSelect){
