@@ -102,6 +102,9 @@ trait BaseIndex
                 $showBtn->btnTitle='详情';
                 $showBtn->modalTitle='查看 '.$this->title.' 相关信息';
                 $showBtn->modalUrl=url('show',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
+                if($this->getParentController()){
+                    $showBtn->modalOffset='lt';
+                }
                 $v->showBtn=$showBtn;
 
 
@@ -109,6 +112,9 @@ trait BaseIndex
                 $editBtn->btnTitle='修改';
                 $editBtn->modalTitle='修改 '.$this->title.' 相关信息';
                 $editBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
+                if($this->getParentController()){
+                    $editBtn->modalOffset='lt';
+                }
                 $v->editBtn=$editBtn;
 
 
@@ -118,6 +124,9 @@ trait BaseIndex
                     $childAddBtn->btnColor='#597ef7';
                     $childAddBtn->modalTitle='新增 '.$this->title;
                     $childAddBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'pid'=>$v->id])->build();
+                    if($this->getParentController()){
+                        $childAddBtn->modalOffset='lt';
+                    }
                     $v->childAddBtn=$childAddBtn;
                 }
 
@@ -198,7 +207,7 @@ trait BaseIndex
         $addBtn->btnTitle='新增';
         $addBtn->modalTitle='新增 '.$this->title;
         $addBtn->modalUrl=url('edit',['base_id'=>$baseId])->build();
-        if($baseId){
+        if($this->getParentController()){
             $addBtn->modalOffset='lt';
         }
 
