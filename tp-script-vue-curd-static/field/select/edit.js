@@ -67,7 +67,7 @@ define([],function(){
                                   :placeholder="field.placeholder||'请选择'+field.title"
                                    :disabled="field.readOnly"
                                    :filter-option="filterOption"
-                                   allow-clear
+                                   :allow-clear="!field.required"
                                   show-search>
                                   
                                   <template v-if="haveGroup">

@@ -63,6 +63,7 @@ define([], function () {
                             :disabled="field.readOnly"
                             :disabled-date="disabledDate"
                             :show-time="field.showTime?{ defaultValue: moment('00:00:00', 'HH:mm:ss') }:false"
+                            :allow-clear="!field.required"
                             style="width: 100%;"
                         />
                     </div>

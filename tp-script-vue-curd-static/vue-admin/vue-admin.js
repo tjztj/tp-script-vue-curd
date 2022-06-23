@@ -64,7 +64,7 @@ define(requires, function (axios, Qs) {
         if (parseInt(res.code) === 1) {
             return res
         }
-        if (res.confirm&&res.confirm.show) {
+        if (res.confirm && res.confirm.show) {
             return await new Promise((resolve, reject) => {
                 antd.Modal.confirm({
                     content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
@@ -279,8 +279,8 @@ define(requires, function (axios, Qs) {
             return MyPromise(function (trigger) {
 
                 let key;
-                const openInfo={
-                    visible:false,
+                const openInfo = {
+                    visible: false,
                 };
                 if (option.offset && option.offset === 'auto') {
                     key = 'bodyModals';
@@ -292,7 +292,7 @@ define(requires, function (axios, Qs) {
                             case 'lt':
                             case 'lb':
                                 openInfo.offset = 'left';
-                                openInfo.width = openInfo.width||'45vw';
+                                openInfo.width = openInfo.width || '45vw';
                                 break;
                             case 'r':
                             case 'rt':
@@ -314,12 +314,12 @@ define(requires, function (axios, Qs) {
                         option.area = ['45vw', '100vh'];
                     }
                 }
-                this.openType=key;
-                if(appObj[key]){
-                    this.openIndex=appObj[key].length;
-                }else{
-                    this.openIndex=0;
-                    appObj[key]=[];
+                this.openType = key;
+                if (appObj[key]) {
+                    this.openIndex = appObj[key].length;
+                } else {
+                    this.openIndex = 0;
+                    appObj[key] = [];
                 }
 
 
@@ -334,7 +334,7 @@ define(requires, function (axios, Qs) {
                     trigger('close');
                 }
 
-                openInfo.onload =  (e)=> {
+                openInfo.onload = (e) => {
                     let iframe = e.target;
                     let body = iframe.contentWindow.document.querySelector('body');
                     iframe.contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
@@ -343,7 +343,7 @@ define(requires, function (axios, Qs) {
                         iframe,
                         body,
                         option: openInfo,
-                        close:()=> {
+                        close: () => {
                             appObj[this.openType][this.openIndex].visible = false;
                             // openInfo.visible = false;
                         }
@@ -710,18 +710,18 @@ define(requires, function (axios, Qs) {
         log(obj) {
             return console.log(obj);
         },
-        openOtherBtn(btn,row){
-            let w=(btn.modalW||'45vw').toLowerCase();
-            let h=(btn.modalH||'100vh').toLowerCase();
+        openOtherBtn(btn, row) {
+            let w = (btn.modalW || '45vw').toLowerCase();
+            let h = (btn.modalH || '100vh').toLowerCase();
 
-            let offset=btn.modalOffset;
-            if(!offset){
-                offset=h==='100vh'?'rt':'auto';
+            let offset = btn.modalOffset;
+            if (!offset) {
+                offset = h === '100vh' ? 'rt' : 'auto';
             }
-            if(btn.selfType==='OpenBtn'){
+            if (btn.selfType === 'OpenBtn') {
                 this.openBox({
-                    title:btn.modalTitle,
-                    offset:offset,
+                    title: btn.modalTitle,
+                    offset: offset,
                     area: [w, h],
                     content: btn.modalUrl,
                 }).end();
@@ -729,8 +729,7 @@ define(requires, function (axios, Qs) {
             }
 
 
-
-            if(!btn.modalFields){
+            if (!btn.modalFields) {
                 antd.Modal.confirm({
                     content: btn.modalTitle,
                     title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
@@ -748,39 +747,45 @@ define(requires, function (axios, Qs) {
                             fill: '#faad14',
                         })
                     ])),
-                    onOk:()=>{
+                    onOk: () => {
                         return new Promise((resolve, reject) => {
-                            let option={};
-                            if(row){
-                                option.id=row.id;
+                            let option = {};
+                            if (row) {
+                                option.id = row.id;
                             }
-                            this.$post(btn.saveUrl,option).then(res=>{
+                            this.$post(btn.saveUrl, option).then(res => {
 
-                                if(btn.refreshPage){
-                                    if(top.layer&&top.layer.msg){
-                                        top.layer.msg(res.msg, {icon: 1, shade: this.shade, scrollbar: false, time: 1500, shadeClose: true})
+                                if (btn.refreshPage) {
+                                    if (top.layer && top.layer.msg) {
+                                        top.layer.msg(res.msg, {
+                                            icon: 1,
+                                            shade: this.shade,
+                                            scrollbar: false,
+                                            time: 1500,
+                                            shadeClose: true
+                                        })
                                         window.vueDefMethods.showLoadMsg('', window.document.querySelector('body'))
-                                        window.setTimeout(()=>{
+                                        window.setTimeout(() => {
                                             window.location.reload();
-                                        },80)
-                                    }else{
+                                        }, 80)
+                                    } else {
                                         window.antd.message.success(res.msg);
                                         window.vueDefMethods.showLoadMsg('', window.document.querySelector('#app>.box>.body'))
-                                        window.setTimeout(()=>{
+                                        window.setTimeout(() => {
                                             window.location.reload();
-                                        },200)
+                                        }, 200)
                                     }
                                     resolve()
                                     return;
                                 }
                                 antd.message.success(res.msg);
-                                if(btn.refreshList){
+                                if (btn.refreshList) {
                                     this.refreshTable();
-                                }else if(row){
-                                    this.refreshId( row.id)
+                                } else if (row) {
+                                    this.refreshId(row.id)
                                 }
                                 resolve()
-                            }).catch(err=>{
+                            }).catch(err => {
                                 reject(err)
                             })
                         });
@@ -789,17 +794,16 @@ define(requires, function (axios, Qs) {
                 return;
             }
             this.openBox({
-                title:btn.modalTitle,
+                title: btn.modalTitle,
                 area: [w, h],
                 offset: offset,
-                content:'/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
-            }).on('success',function (layero){
-                const iframe=layero.iframe?layero.iframe:layero.find('iframe')[0];
-                const win=iframe.contentWindow;
+                content: '/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
+            }).on('success', function (layero) {
+                const iframe = layero.iframe ? layero.iframe : layero.find('iframe')[0];
+                const win = iframe.contentWindow;
 
 
-
-                function runScript(script){
+                function runScript(script) {
                     return new Promise((reslove, rejected) => {
                         // 直接 document.head.appendChild(script) 是不会生效的，需要重新创建一个
                         const newScript = win.document.createElement('script');
@@ -821,7 +825,7 @@ define(requires, function (axios, Qs) {
                     })
                 }
 
-                function setHTMLWithScript(container, rawHTML){
+                function setHTMLWithScript(container, rawHTML) {
                     container.innerHTML = rawHTML;
                     const scripts = container.querySelectorAll('script');
 
@@ -830,37 +834,37 @@ define(requires, function (axios, Qs) {
                     }, Promise.resolve());
                 }
 
-                win.VUE_CURD=window.VUE_CURD;
-                win.moment=moment;
-                win.thatBtn=btn;
-                win.beforeInit=function (){
-                    win.vueData.title=btn.modalTitle;
-                    win.vueData.fields=btn.modalFields;
-                    win.vueData.groupFields=btn.modalGroupFields;
-                    win.vueData.fieldComponents=btn.modalFieldsComponents;
-                    win.vueData.isStepNext=false;
-                    win.vueData.stepInfo=null;
-                    win.vueData.vueCurdAction='edit';
+                win.VUE_CURD = window.VUE_CURD;
+                win.moment = moment;
+                win.thatBtn = btn;
+                win.beforeInit = function () {
+                    win.vueData.title = btn.modalTitle;
+                    win.vueData.fields = btn.modalFields;
+                    win.vueData.groupFields = btn.modalGroupFields;
+                    win.vueData.fieldComponents = btn.modalFieldsComponents;
+                    win.vueData.isStepNext = false;
+                    win.vueData.stepInfo = null;
+                    win.vueData.vueCurdAction = 'edit';
 
-                    win.vueData.info=btn.info&&Object.keys(btn.info).length>0?btn.info:(row?{id:row.id}:{});
-                    win.vueData.subUrl=btn.saveUrl;
-                    win.vueData.subBtnTitle=btn.saveBtnTitle;
+                    win.vueData.info = btn.info && Object.keys(btn.info).length > 0 ? btn.info : (row ? {id: row.id} : {});
+                    win.vueData.subUrl = btn.saveUrl;
+                    win.vueData.subBtnTitle = btn.saveBtnTitle;
                 }
 
-                let headHtml='';
-                let headEls=document.querySelector('head').children;
-                for(let i in headEls){
-                    if(typeof headEls[i].getAttribute==='function'&&!headEls[i].getAttribute('data-requiremodule')){
-                        headHtml+= headEls[i].outerHTML;
+                let headHtml = '';
+                let headEls = document.querySelector('head').children;
+                for (let i in headEls) {
+                    if (typeof headEls[i].getAttribute === 'function' && !headEls[i].getAttribute('data-requiremodule')) {
+                        headHtml += headEls[i].outerHTML;
                     }
                 }
 
-                setHTMLWithScript(win.document.querySelector('head'),"<style id='init-before-style'>body{display: none}</style>"
-                    +headHtml
-                    +"<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
-                    +"<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
-                    +"<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
-                    +"</script>");
+                setHTMLWithScript(win.document.querySelector('head'), "<style id='init-before-style'>body{display: none}</style>"
+                    + headHtml
+                    + "<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
+                    + "<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
+                    + "<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
+                    + "</script>");
 
 
             }).end();
@@ -874,8 +878,8 @@ define(requires, function (axios, Qs) {
             return {};
         };
         let dt = option.data();
-        dt.bodyDrawers=[];
-        dt.bodyModals=[];
+        dt.bodyDrawers = [];
+        dt.bodyModals = [];
         dt.imgShowConfig = {
             list: [],
         },
@@ -1045,8 +1049,8 @@ define(requires, function (axios, Qs) {
                                 if (val === '') val = [];
                                 const valArr = typeof val === 'object' ? val : val.toString().split(',');
                                 for (let i in valArr) {
-                                    for(let n in fieldWhere.valueData){
-                                        if(fieldWhere.valueData[n]===valArr[i]){
+                                    for (let n in fieldWhere.valueData) {
+                                        if (fieldWhere.valueData[n] === valArr[i]) {
                                             return true;
                                         }
                                     }
@@ -1065,7 +1069,7 @@ define(requires, function (axios, Qs) {
                         }
                         const checkFieldWhereSelf = (fieldWhere) => {
                             if (fieldWhere.field.name === fieldWhere.RETURN_FALSE_FIELD_NAME) {
-                                return fieldWhere.ands&&fieldWhere.ands.length>0;
+                                return fieldWhere.ands && fieldWhere.ands.length > 0;
                             }
                             let val = null;
                             let formValue = formVal[fieldWhere.field.name];
@@ -1086,13 +1090,16 @@ define(requires, function (axios, Qs) {
                                 return !fieldWhere.isNot;
                             }
 
-                            if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
-                                if(!/^\d+$/.test(val.toString())){
-                                    val = moment(val).unix()
-                                }else if(val < 10000){
-                                    val = moment(val+'-01-01').unix()
+                            if (val) {
+                                if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
+                                    if (!/^\d+$/.test(val.toString())) {
+                                        val = moment(val).unix()
+                                    } else if (val < 10000) {
+                                        val = moment(val + '-01-01').unix()
+                                    }
                                 }
                             }
+
 
                             if (typeof val === 'object') {
                                 if (fieldWhere.field.type === 'RegionField') {
@@ -1148,7 +1155,7 @@ define(requires, function (axios, Qs) {
                                     v.showItem = true;
                                 } else {
                                     if (formVal[field.name] !== undefined && formVal[field.name] !== '') {
-                                        if (field.type === 'CheckboxField' || ((field.type === 'SelectField'||field.type === 'TreeSelect') && field.multiple)) {
+                                        if (field.type === 'CheckboxField' || ((field.type === 'SelectField' || field.type === 'TreeSelect') && field.multiple)) {
                                             let newVals = [];
                                             formVal[field.name].toString().split(',').forEach(val => {
                                                 if (val !== v.value.toString()) {
@@ -1174,7 +1181,7 @@ define(requires, function (axios, Qs) {
                                 field.editTipArr = [];
                                 return;
                             }
-                            field.editTipArr = field.editTips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                            field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1183,7 +1190,7 @@ define(requires, function (axios, Qs) {
                                 field.tipArr = [];
                                 return;
                             }
-                            field.tipArr = field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                            field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1228,10 +1235,10 @@ define(requires, function (axios, Qs) {
                                     inputVal = checkVal || '';
                                     //如果是时间格式
                                     if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
-                                        if(!/^\d+$/.test(checkVal.toString())){
+                                        if (!/^\d+$/.test(checkVal.toString())) {
                                             inputVal = moment(checkVal).unix()
-                                        }else if(checkVal < 10000){
-                                            inputVal = moment(checkVal+'-01-01').unix()
+                                        } else if (checkVal < 10000) {
+                                            inputVal = moment(checkVal + '-01-01').unix()
                                         }
                                     } else if (field.type === 'RegionField' && typeof checkVal !== 'number' && typeof checkVal !== 'string') {
                                         const regionKeys = Object.keys(checkVal);
@@ -1342,19 +1349,19 @@ define(requires, function (axios, Qs) {
                         }
                         ///////////////////////////////////////////////////////////////////////////////////////////////
                         ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const setFieldAttrByWhere=(field)=>{
-                            const def='--setAttrValByWheres--def--';
-                            for(const attr in field.attrWhereValueList){
-                                let val=typeof field[attr]==='undefined'?def:field[attr];
-                                for(let k=field.attrWhereValueList[attr].length-1;k>=0;k--){
-                                    const {value,where}=field.attrWhereValueList[attr][k];
-                                    if(where===null||checkFieldWhere(where)){
-                                        val=value;
+                        const setFieldAttrByWhere = (field) => {
+                            const def = '--setAttrValByWheres--def--';
+                            for (const attr in field.attrWhereValueList) {
+                                let val = typeof field[attr] === 'undefined' ? def : field[attr];
+                                for (let k = field.attrWhereValueList[attr].length - 1; k >= 0; k--) {
+                                    const {value, where} = field.attrWhereValueList[attr][k];
+                                    if (where === null || checkFieldWhere(where)) {
+                                        val = value;
                                         break;
                                     }
                                 }
-                                if((typeof field[attr]==='undefined'&&val!==def)||field[attr]!==val){
-                                    field[attr]=val;
+                                if ((typeof field[attr] === 'undefined' && val !== def) || field[attr] !== val) {
+                                    field[attr] = val;
                                 }
                             }
                         }
@@ -1469,12 +1476,12 @@ define(requires, function (axios, Qs) {
                     fieldComponents
                 }
             },
-            computed:{
-                tipArr(){
+            computed: {
+                tipArr() {
                     if (this.field.tips.length === 0) {
                         return [];
                     }
-                    return this.field.tips.filter(val => val.show===null?true:checkFieldWhere(val.show));
+                    return this.field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
                 },
             },
             methods: {
@@ -1513,7 +1520,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns','canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth','showCreateTime','setScrollY','childrenColumnName','indentSize','expandAllRows','isTreeIndex'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1572,12 +1579,12 @@ define(requires, function (axios, Qs) {
                         slots: {customRender: 'step-info', title: 'custom-title-step-info'},
                         fixed: props.fieldStepConfig.listFixed ? props.fieldStepConfig.listFixed : false,
                     };
-                    if(props.fieldStepConfig.width&&props.fieldStepConfig.width>0){
-                        stepCol.width=props.fieldStepConfig.width;
+                    if (props.fieldStepConfig.width && props.fieldStepConfig.width > 0) {
+                        stepCol.width = props.fieldStepConfig.width;
                     }
                     if (props.fieldStepConfig.listFixed) {
-                        stepCol.width = stepCol.width||180;
-                        if(props.showCreateTime===undefined||props.showCreateTime){
+                        stepCol.width = stepCol.width || 180;
+                        if (props.showCreateTime === undefined || props.showCreateTime) {
                             columns.push(createTimeCol)
                             columnsCount++;
                         }
@@ -1590,7 +1597,7 @@ define(requires, function (axios, Qs) {
                         columnsCount++;
                     }
                 } else {
-                    if(props.showCreateTime===undefined||props.showCreateTime){
+                    if (props.showCreateTime === undefined || props.showCreateTime) {
                         columns.push(createTimeCol)
                         columnsCount++;
                     }
@@ -1598,7 +1605,7 @@ define(requires, function (axios, Qs) {
 
 
                 //可prop动态设置宽度
-                const newActionW = Vue.ref(props.actionDefWidth || (32+28));
+                const newActionW = Vue.ref(props.actionDefWidth || (32 + 28));
                 columns.push({
                     // title:'操作',
                     slots: {customRender: 'action', title: 'custom-title-action'},
@@ -1639,15 +1646,15 @@ define(requires, function (axios, Qs) {
                     let h = undefined;
                     await Vue.nextTick(async function () {
                         await new Promise(async function (resolve) {
-                            setTimeout(function (){
+                            setTimeout(function () {
                                 let parent = document.getElementById(id).parentNode;
                                 let elH = (parent.querySelector('.ant-table-body .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-tbody')).clientHeight;
-                                let theadH = (parent.querySelector('.ant-table-header .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-thead')|| parent.querySelector('.ant-table-header .ant-table-thead')).clientHeight;
-                                let pageH=parent.querySelector('ul.ant-table-pagination')?parent.querySelector('ul.ant-table-pagination').clientHeight:0;
-                                if(pageH){
-                                    pageH+=32;
-                                }else{
-                                    pageH=0;
+                                let theadH = (parent.querySelector('.ant-table-header .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-thead') || parent.querySelector('.ant-table-header .ant-table-thead')).clientHeight;
+                                let pageH = parent.querySelector('ul.ant-table-pagination') ? parent.querySelector('ul.ant-table-pagination').clientHeight : 0;
+                                if (pageH) {
+                                    pageH += 32;
+                                } else {
+                                    pageH = 0;
                                 }
                                 if (document.body.clientHeight >= elH && (parent.clientHeight - theadH - pageH) >= elH) {
                                     resolve()
@@ -1655,58 +1662,58 @@ define(requires, function (axios, Qs) {
                                 }
                                 h = parent.clientHeight - theadH - pageH;
                                 resolve()
-                            },40)
+                            }, 40)
                         })
                     })
                     return h;
                 };
 
-                const columnsVals=Vue.ref(columns);
+                const columnsVals = Vue.ref(columns);
                 let onresize = () => {
                     scrollX.value = getX();
-                    if(scrollX.value===undefined){
-                        const tablePath='#' + id+'>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
-                        if(!document.querySelector('#' + id)
-                        ||!document.querySelector('#' + id),document.querySelector(tablePath)){
-                            if(!document.querySelector('#' + id+'>.curd-table table')||!document.querySelector('#' + id+'>.curd-table .ant-table-body')){
-                                setTimeout(()=>{
+                    if (scrollX.value === undefined) {
+                        const tablePath = '#' + id + '>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
+                        if (!document.querySelector('#' + id)
+                        || !document.querySelector('#' + id), document.querySelector(tablePath)) {
+                            if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table .ant-table-body')) {
+                                setTimeout(() => {
                                     onresize();
-                                },40)
+                                }, 40)
                             }
-                        }else{
-                            scrollX.value=document.querySelector('#' + id).clientWidth;
+                        } else {
+                            scrollX.value = document.querySelector('#' + id).clientWidth;
                         }
                     }
 
 
-                    columnsVals.value.forEach(col=>{
-                        if(typeof col.fixed!=='undefined'){
-                            if(scrollX.value===undefined){
-                                if(typeof col.fixedOld==='undefined'){
-                                    col.fixedOld=col.fixed;
+                    columnsVals.value.forEach(col => {
+                        if (typeof col.fixed !== 'undefined') {
+                            if (scrollX.value === undefined) {
+                                if (typeof col.fixedOld === 'undefined') {
+                                    col.fixedOld = col.fixed;
                                 }
-                                col.fixed=false;
-                            }else if(typeof col.fixedOld!=='undefined'){
-                                col.fixed=col.fixedOld;
+                                col.fixed = false;
+                            } else if (typeof col.fixedOld !== 'undefined') {
+                                col.fixed = col.fixedOld;
                             }
                         }
                     })
 
-                    if(props.setScrollY){
+                    if (props.setScrollY) {
                         getY().then(res => {
                             scrollY.value = res;
                         })
                     }
                 };
-                Vue.nextTick(function (){
+                Vue.nextTick(function () {
                     onresize();
-                    const oldResize=window.onresize||function (){};
-                    window.onresize = (e)=>{
+                    const oldResize = window.onresize || function () {
+                    };
+                    window.onresize = (e) => {
                         oldResize(e);
                         onresize();
                     };
                 })
-
 
 
                 let childsObjs = {};
@@ -1728,7 +1735,7 @@ define(requires, function (axios, Qs) {
                     fieldObjs,
                     childsObjs,
                     onresize,
-                    expandedRowKeys:Vue.ref([]),
+                    expandedRowKeys: Vue.ref([]),
                 }
             },
             watch: {
@@ -1736,18 +1743,18 @@ define(requires, function (axios, Qs) {
                     this.getActionWidthByProps()
                 },
                 data(data) {
-                    Vue.nextTick( ()=>{
+                    Vue.nextTick(() => {
                         this.onresize();
-                        setTimeout(()=>{
+                        setTimeout(() => {
                             this.onresize();
-                        },40)
+                        }, 40)
                     });
                     this.getActionWidthByProps();
-                    const expandedRowKeys=[];
-                    if(this.expandAllRows){
-                        const setPids= list=>{
-                            list.forEach(v=>{
-                                if(v[this.childrenColumnName]&&v[this.childrenColumnName].length>0){
+                    const expandedRowKeys = [];
+                    if (this.expandAllRows) {
+                        const setPids = list => {
+                            list.forEach(v => {
+                                if (v[this.childrenColumnName] && v[this.childrenColumnName].length > 0) {
                                     expandedRowKeys.push(v.id);
                                     setPids(v[this.childrenColumnName])
                                 }
@@ -1755,7 +1762,7 @@ define(requires, function (axios, Qs) {
                         }
                         setPids(data);
                     }
-                    this.expandedRowKeys=expandedRowKeys;
+                    this.expandedRowKeys = expandedRowKeys;
                 }
             },
             methods: {
@@ -1781,8 +1788,8 @@ define(requires, function (axios, Qs) {
                             }
                         }
 
-                        let childAddW=0;
-                        if(this.isCanAddChildren(record)){
+                        let childAddW = 0;
+                        if (this.isCanAddChildren(record)) {
                             childAddW = this.getTextWidthByBtn(this.addChildrenBtnText(record))
                         }
 
@@ -1801,7 +1808,7 @@ define(requires, function (axios, Qs) {
                         if (this.isCanDel(record)) {
                             delW = 31;
                         }
-                        const btnW = stepWidth + childW + childAddW + showW + editW + delW +this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
+                        const btnW = stepWidth + childW + childAddW + showW + editW + delW + this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
                         if (btnW > btnWidth) {
                             btnWidth = btnW;
                         }
@@ -1847,32 +1854,32 @@ define(requires, function (axios, Qs) {
                     text = text || '';
                     return 17 + (text.split('').length * 14);
                 },
-                addChildrenBtnText(row){
-                    return row.childAddBtn&&row.childAddBtn.btnTitle?row.childAddBtn.btnTitle:'添加下级';
+                addChildrenBtnText(row) {
+                    return row.childAddBtn && row.childAddBtn.btnTitle ? row.childAddBtn.btnTitle : '添加下级';
                 },
                 addChildrenBtnColor(row) {
-                    if(!row.childAddBtn){
+                    if (!row.childAddBtn) {
                         return null;
                     }
-                    if(!row.childAddBtn.btnColor){
+                    if (!row.childAddBtn.btnColor) {
                         return null;
                     }
                     return row.childAddBtn.btnColor;
                 },
                 showBtnText(row) {
-                    return row.showBtn&&row.showBtn.btnTitle?row.showBtn.btnTitle:'详情';
+                    return row.showBtn && row.showBtn.btnTitle ? row.showBtn.btnTitle : '详情';
                 },
                 showBtnColor(row) {
-                    if(!row.showBtn){
+                    if (!row.showBtn) {
                         return null;
                     }
-                    if(!row.showBtn.btnColor){
+                    if (!row.showBtn.btnColor) {
                         return null;
                     }
                     return row.showBtn.btnColor;
                 },
                 editBtnText(row) {
-                    let editText = row.editBtn&&row.editBtn.btnTitle?row.editBtn.btnTitle:'修改';
+                    let editText = row.editBtn && row.editBtn.btnTitle ? row.editBtn.btnTitle : '修改';
                     if (this.fieldStepConfig && this.fieldStepConfig.enable && row.stepInfo && row.stepInfo.config.listBtnText) {
                         if (row.stepInfo.config.listBtnTextEdit !== '') {
                             return row.stepInfo.config.listBtnTextEdit;
@@ -1885,10 +1892,10 @@ define(requires, function (axios, Qs) {
                     if (this.fieldStepConfig && this.fieldStepConfig.enable && row.stepInfo && row.stepInfo.config.listBtnText) {
                         return row.stepInfo.config.listBtnColorEdit;
                     }
-                    if(!row.editBtn){
+                    if (!row.editBtn) {
                         return null;
                     }
-                    if(!row.editBtn.btnColor){
+                    if (!row.editBtn.btnColor) {
                         return null;
                     }
                     return row.editBtn.btnColor;
@@ -1902,10 +1909,10 @@ define(requires, function (axios, Qs) {
                 isCanDel(row) {
                     return this.canDel && (!row.__auth || typeof row.__auth.del === 'undefined' || row.__auth.del === true)
                 },
-                isCanAddChildren(row){
-                    return this.isTreeIndex&&this.canAdd;
+                isCanAddChildren(row) {
+                    return this.isTreeIndex && this.canAdd;
                 },
-                onExpand (expanded, record) {
+                onExpand(expanded, record) {
                     if (expanded) {
                         // 设置展开窗Key，代表展开操作
                         this.expandedRowKeys.push(record.id)
@@ -1918,37 +1925,37 @@ define(requires, function (axios, Qs) {
                         }
                     }
                 },
-                getBeforeBtns(row){
-                    return row.otherBtns?row.otherBtns.before:[];
+                getBeforeBtns(row) {
+                    return row.otherBtns ? row.otherBtns.before : [];
                 },
-                getAfterBtns(row){
-                    return row.otherBtns?row.otherBtns.after:[];
+                getAfterBtns(row) {
+                    return row.otherBtns ? row.otherBtns.after : [];
                 },
-                getBeforeBtnsW(row){
-                    let w=0;
-                    const btns=this.getBeforeBtns(row);
-                    for(let i in btns){
-                        if(btns[i].btnTitle)w+=this.getTextWidthByBtn(btns[i].btnTitle)
+                getBeforeBtnsW(row) {
+                    let w = 0;
+                    const btns = this.getBeforeBtns(row);
+                    for (let i in btns) {
+                        if (btns[i].btnTitle) w += this.getTextWidthByBtn(btns[i].btnTitle)
                     }
                     return w;
                 },
-                getAfterBtnsW(row){
-                    let w=0;
-                    const btns=this.getAfterBtns(row);
-                    for(let i in btns){
-                        if(btns[i].btnTitle)w+=this.getTextWidthByBtn(btns[i].btnTitle)
+                getAfterBtnsW(row) {
+                    let w = 0;
+                    const btns = this.getAfterBtns(row);
+                    for (let i in btns) {
+                        if (btns[i].btnTitle) w += this.getTextWidthByBtn(btns[i].btnTitle)
                     }
                     return w;
                 },
-                refreshId(id){
+                refreshId(id) {
                     this.$emit('refreshId', id)
                 },
-                refreshTable(){
+                refreshTable() {
                     this.$emit('refreshTable')
                 },
-                '$post':vueDefMethods.$post,
-                openBox:window.openBox,
-                openOtherBtn:window.vueDefMethods.openOtherBtn,
+                '$post': vueDefMethods.$post,
+                openBox: window.openBox,
+                openOtherBtn: window.vueDefMethods.openOtherBtn,
             },
             template: `<div :id="id">
                         <a-table
@@ -2169,15 +2176,15 @@ define(requires, function (axios, Qs) {
                 },
                 search(val, item) {
                     item.activeValue = val;
-                    const data=this.getFilterData();
-                    if(this.$refs){
-                        for(let key in this.$refs){
-                            if(key.indexOf('filters.')===0&&typeof this.$refs[key].onParentSearch==='function'){
+                    const data = this.getFilterData();
+                    if (this.$refs) {
+                        for (let key in this.$refs) {
+                            if (key.indexOf('filters.') === 0 && typeof this.$refs[key].onParentSearch === 'function') {
                                 this.$refs[key].onParentSearch();
                             }
                         }
                     }
-                    this.$emit('search',data);
+                    this.$emit('search', data);
                 },
                 getFilterData() {
                     let curdFilters = [], curdChildFilters = {}, haveHide = false;
