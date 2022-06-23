@@ -107,7 +107,7 @@ trait ModelSave
             $data[static::getUpdateLoginUserField()]=staticTpScriptVueCurdGetLoginData()['id'];
         }
         if(isset($data[$this->createTime])&&empty($data[$this->createTime])){
-            $data[$this->createTime]=0;
+            $data[$this->createTime]=time();
         }
         //onAddBefore请用doSaveDataAfter
         $info=static::create($data);
