@@ -191,10 +191,14 @@ trait ModelSave
             }
         }
 
-        unset( $data['create_time']
-            , $data['update_time']
-            , $data['delete_time']
-        );
+        foreach (['create_time','update_time','delete_time'] as $v){
+            try{
+                $fields->getFieldByNmae('create_time');
+                if(!empty($beforeInfo->readonly))unset($beforeInfo->readonly[array_search($v,$beforeInfo->readonly)]);
+            }catch (\Exception $e){
+                unset($data[$v]);
+            }
+        }
         if(static::getCreateLoginUserField()){
             unset($data[static::getCreateLoginUserField()]);
         }
