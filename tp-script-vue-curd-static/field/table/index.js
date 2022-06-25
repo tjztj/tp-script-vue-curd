@@ -32,7 +32,7 @@ max-height: 92%;
         },
         template:`<div>
 <a v-if="list.length>0" @click="visible=true">查看</a> 
-<span v-else style="color: #f0f0f0">无</span>
+<span v-else style="color: #d9d9d9">无</span>
  <a-modal
     class="table-field-index-show-modal"
     :title="field.title"

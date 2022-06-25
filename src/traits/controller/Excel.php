@@ -370,7 +370,7 @@ trait Excel
         foreach ($row as $v){
             $findCount=substr_count($v,"\n");
             if($findCount>=5||strlen($v)>=120){
-                $excel->thRowHeight=104;
+                $excel->thRowMaxHeight=104;
                 break;
             }
         }

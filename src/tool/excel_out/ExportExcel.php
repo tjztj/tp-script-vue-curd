@@ -52,7 +52,7 @@ class ExportExcel
 
     public ?string $thBgColor=null;//表头要设置的颜色 ARGB类型（ARGB 头两位是透明度，00是全然透明，ff是全然不透明，后6位是RGB值）
 
-    public int $thRowHeight=0;//固定表头的杭高
+    public int $thRowMaxHeight=0;//固定表头的行高
 
     /**
      * @var ExportCell[]
@@ -283,10 +283,10 @@ class ExportExcel
             isset($v->alignmentVertical)&&$style->getAlignment()->setVertical($v->alignmentVertical);
             isset($v->alignmentHorizontal)&&$style->getAlignment()->setHorizontal($v->alignmentHorizontal);
 
-            if($this->thRowHeight&&$v instanceof ExportThCell){
-                $maxH[$v->row]=$this->thRowHeight;
+            if($this->thRowMaxHeight&&$v instanceof ExportThCell&&$maxH[$v->row]>$this->thRowMaxHeight){
+                $maxH[$v->row]=$this->thRowMaxHeight;
             }else if(isset($v->height)&&(!isset($maxH[$v->row])||$v->height>$maxH[$v->row])){
-                $maxH[$v->row]=$v->height;
+                $maxH[$v->row]= min($v->height, $this->thRowMaxHeight);
             }
             if(isset($v->width)&&(!isset($maxW[$v->col])||$v->width>$maxW[$v->col])){
                 $maxW[$v->col]=$v->width;

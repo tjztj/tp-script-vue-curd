@@ -52,7 +52,7 @@ define([],function(){
       </template>
       <a>查看</a>
     </a-popover>
-  <span v-else style="color: #f0f0f0">无</span>
+  <span v-else style="color: #d9d9d9">无</span>
 </div>`,
     }
 });
