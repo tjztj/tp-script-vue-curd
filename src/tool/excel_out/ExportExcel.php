@@ -6,21 +6,21 @@ namespace tpScriptVueCurd\tool\excel_out;
 /**
  *示例
 $heads=[
-    ['name'=>'type','value'=>'类别',],
-    ['name'=>'project_name','value'=>'项目名称',],
-    ['name'=>'inspection_num_sum','value'=>'检查次数',],
-    ['name'=>'count_val','value'=>'发现问题数',],
-    ['name'=>'pp_count','value'=>'处置总人数',],
-    ['value'=>'第一种形态处置人数','childs'=>[
-        ['value'=>'不含诫勉谈话','format'=>fn($v)=>'bbb'],
-        ['value'=>'子列表2','childs'=>[
-            ['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
-            ['name'=>'admonish_val_count','value'=>'子列表2--B',],
-            ]],
-        ]
-    ],
-    ['name'=>'discipline_count','value'=>'党纪政务处分人数',],
-    ['name'=>'proposal_yes_count','value'=>'发放监察建议书',],
+['name'=>'type','value'=>'类别',],
+['name'=>'project_name','value'=>'项目名称',],
+['name'=>'inspection_num_sum','value'=>'检查次数',],
+['name'=>'count_val','value'=>'发现问题数',],
+['name'=>'pp_count','value'=>'处置总人数',],
+['value'=>'第一种形态处置人数','childs'=>[
+['value'=>'不含诫勉谈话','format'=>fn($v)=>'bbb'],
+['value'=>'子列表2','childs'=>[
+['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
+['name'=>'admonish_val_count','value'=>'子列表2--B',],
+]],
+]
+],
+['name'=>'discipline_count','value'=>'党纪政务处分人数',],
+['name'=>'proposal_yes_count','value'=>'发放监察建议书',],
 ];
 ExportExcel::make('“五项监督”子库一览表')->setThead($heads)->setData($list)->out();
  */
@@ -283,10 +283,10 @@ class ExportExcel
             isset($v->alignmentVertical)&&$style->getAlignment()->setVertical($v->alignmentVertical);
             isset($v->alignmentHorizontal)&&$style->getAlignment()->setHorizontal($v->alignmentHorizontal);
 
-            if($this->thRowMaxHeight&&$v instanceof ExportThCell&&$maxH[$v->row]>$this->thRowMaxHeight){
-                $maxH[$v->row]=$this->thRowMaxHeight;
+            if($this->thRowMaxHeight&&$v instanceof ExportThCell){
+                $maxH[$v->row]=min($this->thRowMaxHeight,empty($v->height)?count(explode("\n",$v->value))*((!empty($v->fontSize)?$v->fontSize:$style->getFont()->getSize())+5.5):$v->height);
             }else if(isset($v->height)&&(!isset($maxH[$v->row])||$v->height>$maxH[$v->row])){
-                $maxH[$v->row]= min($v->height, $this->thRowMaxHeight);
+                $maxH[$v->row]=$v->height;
             }
             if(isset($v->width)&&(!isset($maxW[$v->col])||$v->width>$maxW[$v->col])){
                 $maxW[$v->col]=$v->width;
