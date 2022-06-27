@@ -33,7 +33,7 @@ class DateField extends ModelField
     public function __construct()
     {
         parent::__construct();
-        $this->max=time();
+        $this->max=strtotime(date('Y-m-d 23:59:59'));
     }
 
 
@@ -131,6 +131,8 @@ class DateField extends ModelField
             }else if(is_numeric($dataBaseData[$name])){
                 //有些时间戳小于10位
                 $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate($this->showTime()?'Y-m-d H:i:s':'Y-m-d',$dataBaseData[$name]);
+            }else{
+                $dataBaseData[$name]=\tpScriptVueCurd\tool\Time::unixtimeToDate($this->showTime()?'Y-m-d H:i:s':'Y-m-d',\tpScriptVueCurd\tool\Time::dateToUnixtime($dataBaseData[$name]));
             }
         }
     }
