@@ -284,7 +284,10 @@ class ExportExcel
             isset($v->alignmentHorizontal)&&$style->getAlignment()->setHorizontal($v->alignmentHorizontal);
 
             if($this->thRowMaxHeight&&$v instanceof ExportThCell){
-                $maxH[$v->row]=min($this->thRowMaxHeight,empty($v->height)?$this->thRowMaxHeight:$v->height,count(explode("\n",$v->value))*((!empty($v->fontSize)?$v->fontSize:$style->getFont()->getSize())+5.5));
+                $maxHVal=min($this->thRowMaxHeight,empty($v->height)?$this->thRowMaxHeight:$v->height,count(explode("\n",$v->value))*((!empty($v->fontSize)?$v->fontSize:$style->getFont()->getSize())+5.5));
+                if(empty($maxH[$v->row])||$maxH[$v->row]<$maxHVal){
+                    $maxH[$v->row]=$maxHVal;
+                }
             }else if(isset($v->height)&&(!isset($maxH[$v->row])||$v->height>$maxH[$v->row])){
                 $maxH[$v->row]=$v->height;
             }
