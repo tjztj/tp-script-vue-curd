@@ -129,6 +129,16 @@
 <script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js" charset="utf-8"></script>
 <script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js" charset="utf-8"></script>
 <script>
+    function getQueryVariable(variable)
+    {
+        let query = window.location.search.substring(1);
+        let vars = query.split("&");
+        for (let i=0;i<vars.length;i++) {
+            let pair = vars[i].split("=");
+            if(pair[0].toString() === variable.toString()){return pair[1];}
+        }
+        return false;
+    }
     let searchRess = {};
     //生成随机 GUID 数
     window.guid = function () {
@@ -189,7 +199,8 @@
         },
         methods: {
             initMap() {
-                let defCenter = new AMap.LngLat(120.12, 30.19);
+                let ct=getQueryVariable('center');
+                let defCenter = ct&&ct!==','?new AMap.LngLat(ct.split(',')[0], ct.split(',')[1]):new AMap.LngLat(120.12, 30.19);
                 //初始化地图对象
                 window.map = new AMap.Map('map-container', {
                     layers: [

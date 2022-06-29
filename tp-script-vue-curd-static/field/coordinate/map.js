@@ -95,7 +95,7 @@ define([], function () {
                 this.openBox({
                     title: '请选择相关地点',
                     offset: 'lt',
-                    content: '/tp-script-vue-curd-static.php?field/coordinate/map_open.html',
+                    content: '/tp-script-vue-curd-static.php?field/coordinate/map_open.html&center='+this.centerArr.join(','),
                 }).on('success', (layero, index) => {
                     let mapWindow;
                     if(layero.iframe&&layero.iframe.contentWindow){
@@ -136,8 +136,8 @@ define([], function () {
         },
         template: `<div style="position: relative" :style="sizeStyle">
                         <a-spin :spinning="!isInited">
-                            <div v-show="!disabled"><a-button size="small" style="position: absolute;right: 6px;top: 6px;z-index: 1112" @click="openSelect">{{value===''?'选择':'更改'}}</a-button></div>
-                            <div v-show="value===''" :style="{lineHeight:sizeStyle.height}" style="position: absolute;z-index: 1111;background-color: rgba(0,0,0,.45);left: 0;right: 0;top: 0;bottom: 0;text-align: center;color:#fff">{{placeholder}}</div>
+                            <div v-show="!disabled"><a-button size="small" style="position: absolute;right: 6px;top: 6px;z-index: 1031" @click="openSelect">{{value===''?'选择':'更改'}}</a-button></div>
+                            <div v-show="value===''" :style="{lineHeight:sizeStyle.height}" style="position: absolute;z-index: 1030;background-color: rgba(0,0,0,.45);left: 0;right: 0;top: 0;bottom: 0;text-align: center;color:#fff">{{placeholder}}</div>
                             <div :id="mapId" :style="sizeStyle" style="border-radius: 2px;overflow: hidden"></div>
                         </a-spin>
                       </div>`
