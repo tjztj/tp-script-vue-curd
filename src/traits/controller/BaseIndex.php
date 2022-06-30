@@ -705,8 +705,8 @@ trait BaseIndex
      */
     protected function getListOrder(){
         $sortField=$this->request->param('sortField');
-        if($sortField){
-            $sortOrder=$this->request->param('sortOrder','');
+        $sortOrder=$this->request->param('sortOrder','');
+        if($sortField&&$sortOrder){
             switch (strtolower($sortOrder)){
                 case 'desc':
                 case 'asc':

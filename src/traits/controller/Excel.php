@@ -7,6 +7,8 @@ namespace tpScriptVueCurd\traits\controller;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\NamedRange;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use tpScriptVueCurd\tool\excel_out\ExportCell;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -350,7 +352,6 @@ trait Excel
         ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         $emptyItem=[];
         foreach ($expCellName as $k=>$v){
-            $expCellName[$k]['fontSize']=13;
             $cell=['name'=>$v['name'],'value'=>$row[$v['name']]?:'','wrapText'=>true,'fontBold'=>false];
             if(isset($v['format'])){
                 $cell['format']=$v['format'];
@@ -467,7 +468,7 @@ trait Excel
         $expCellName=[];
         $row=[];
         foreach ($expFields as $v){
-            $th=['name'=>$v->name,'value'=>$v->title];
+            $th=['name'=>$v->name,'value'=>$v->title,'fontSize'=>13,'fontColor'=>'FF000000','alignmentVertical'=>Alignment::VERTICAL_CENTER,'fontBold'=>true,'fontName'=>'Microsoft YaHei UI Light'];
             if($v->width){
                 $th['width']=$v->width;
             }
@@ -476,6 +477,20 @@ trait Excel
             }
             if($v->isText){
                 $th['formatText']=$v->isText;
+            }
+            if($v->field->required()){
+                $objRichText = new RichText();
+                $objRichText->createTextRun('*')->getFont()
+                    ->setColor(new Color('FFCF1322'))
+                    ->setBold($th['fontBold'])
+                    ->setSize($th['fontSize'])
+                    ->setName('Calibri');
+                $objRichText->createTextRun($th['value'])->getFont()
+                    ->setColor(new Color($th['fontColor']))
+                    ->setBold($th['fontBold'])
+                    ->setSize($th['fontSize'])
+                    ->setName($th['fontName']);
+                $th['value']=$objRichText;
             }
             if($v->items||$v->type==='RegionField'){
                 $th['format']= static function ($row, ExportCell $cell)use($v){

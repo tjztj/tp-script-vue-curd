@@ -3,8 +3,8 @@
 
 namespace tpScriptVueCurd\tool\excel_out;
 
-/**
- *示例
+
+ /**示例
 $heads=[
     ['name'=>'type','value'=>'类别',],
     ['name'=>'project_name','value'=>'项目名称',],
@@ -16,18 +16,19 @@ $heads=[
         ['value'=>'子列表2','childs'=>[
             ['value'=>'子列表2--A','format'=>fn($v)=>$v['id']],
             ['name'=>'admonish_val_count','value'=>'子列表2--B',],
-            ]],
-        ]
+        ]],
+    ]
     ],
     ['name'=>'discipline_count','value'=>'党纪政务处分人数',],
     ['name'=>'proposal_yes_count','value'=>'发放监察建议书',],
 ];
 ExportExcel::make('“五项监督”子库一览表')->setThead($heads)->setData($list)->out();
- */
+*/
 
 
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -79,7 +80,7 @@ class ExportExcel
         $this->title->col='A';
         $this->title->fontSize=20;
         $this->title->fontName='Simhei';
-        $this->title->fontColor='00000000';
+        $this->title->fontColor='FF000000';
         $this->title->alignmentHorizontal=Alignment::HORIZONTAL_CENTER;
         $this->title->alignmentVertical=Alignment::VERTICAL_CENTER;
     }
@@ -163,7 +164,7 @@ class ExportExcel
             $cell->row=$rowNum;
 
             //设置默认属性
-            isset($cell->fontColor)|| $cell->fontColor='00000000';
+            isset($cell->fontColor)|| $cell->fontColor='FF000000';
             isset($cell->fontBold)|| $cell->fontBold=true;
 
             $this->colThs[$colNum]=$cell;
@@ -284,13 +285,33 @@ class ExportExcel
             isset($v->alignmentHorizontal)&&$style->getAlignment()->setHorizontal($v->alignmentHorizontal);
 
             if($this->thRowMaxHeight&&$v instanceof ExportThCell){
-                $maxHVal=min($this->thRowMaxHeight,empty($v->height)?$this->thRowMaxHeight:$v->height,count(explode("\n",$v->value))*((!empty($v->fontSize)?$v->fontSize:$style->getFont()->getSize())+5.5));
+                $valueText=$v->value instanceof RichText?$v->value->getPlainText():$v->value;
+                if(empty($v->height)){
+                    $fz=!empty($v->fontSize)?$v->fontSize:$style->getFont()->getSize();
+                    $w=$maxW[$v->col]??$v->width??0;
+                    if($w){
+                        $line=0;
+                        foreach (explode("\n",$valueText) as $val){
+                            $line+= ceil(mb_strlen($val)/($w/($fz/6.5)));
+                        }
+                    }else{
+                        $line=count(explode("\n",$valueText));
+                    }
+                    $h=$line*($fz+5.5);
+                    $maxHVal=min($this->thRowMaxHeight,$h);
+                }else{
+                    $maxHVal=min($this->thRowMaxHeight,$v->height);
+                }
                 if(empty($maxH[$v->row])||$maxH[$v->row]<$maxHVal){
                     $maxH[$v->row]=$maxHVal;
                 }
             }else if(isset($v->height)&&(!isset($maxH[$v->row])||$v->height>$maxH[$v->row])){
                 $maxH[$v->row]=$v->height;
+            }else if($v instanceof ExportThCell&&!isset($v->wrapText)){
+                $v->wrapText=true;
             }
+
+
             if(isset($v->width)&&(!isset($maxW[$v->col])||$v->width>$maxW[$v->col])){
                 $maxW[$v->col]=$v->width;
             }
