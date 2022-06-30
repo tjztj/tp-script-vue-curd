@@ -425,7 +425,7 @@ define(['vueAdmin'], function (va) {
                     const where=this.getWhere();
                     where.id=id;
                     where.page=1;
-                    where.pageGuid=VUE_CURD.GUID;
+                    // where.pageGuid=VUE_CURD.GUID;
                     where.refreshId=1;
                     this.$get(this.indexUrl,where).then(data => {
                         if(!data.data.data[0]){

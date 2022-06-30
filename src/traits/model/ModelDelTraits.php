@@ -113,7 +113,7 @@ trait ModelDelTraits
             $result->delete();
         }
         foreach ($modelIds as $md=>$mdIds){
-            Db::name(class_basename($md))->whereIn('id',$mdIds)->update(['delete_system_admin_id'=>$user['id']]);
+            Db::name((new $md)->getName())->whereIn('id',$mdIds)->update(['delete_system_admin_id'=>$user['id']]);
         }
         $this->onDelAfter($list);
         return $list;
