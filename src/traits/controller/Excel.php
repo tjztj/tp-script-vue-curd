@@ -37,6 +37,9 @@ trait Excel
 {
     public FieldCollection $fields;
 
+    /**
+     * @var bool 如果是，模板中将填写子表的数据；如果否模板中指挥导入本表的数据
+     */
     private bool $baseAndChildImport=true;//是父表+子表 列表导入
     /**
      * @var BaseModel[]
@@ -77,6 +80,9 @@ trait Excel
              * @var Controller $v
              * @var BaseModel $model
              */
+            if(!$v->parentImportSelf){
+                continue;
+            }
             $model=$v->md;
 
             $modelName=class_basename($model);
@@ -176,6 +182,9 @@ trait Excel
          */
         $childControllerClassList=[];
         foreach ($this->getChildControllers() as $childController){
+            if(!$childController->parentImportSelf){
+                continue;
+            }
             $modelClass=get_class($childController->md);
             $modelName=class_basename($modelClass);
             if(isset($datas[$modelName])){
