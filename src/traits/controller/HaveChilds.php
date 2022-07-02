@@ -20,6 +20,13 @@ trait HaveChilds
 
 
     /**
+     * 是否显示子表的筛选
+     * @var bool
+     */
+    public bool $showChildFilters=true;
+
+
+    /**
      * 设置当前控制器的子控制器集合
      * @param array|Controller[] $childControllers
      * @return $this
@@ -80,13 +87,13 @@ trait HaveChilds
             $childModelClass=get_class($childController->md);
             $childModel=$childController->md;
             $name=class_basename($childModelClass);
-            $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>!$v instanceof RegionField);
+            $filterFields=$childModel->fields()->filter(fn(ModelField $v)=>$this->showChildFilters&&$childController->parentShowSelfFilter&&!$v instanceof RegionField);
 
 
             $fetch['childs'][]=[
                 'class'=>$childModelClass,
                 'name'=>$name,
-                'filterData'=>json_decode($this->request->param($name.'filterData','',null)),
+                'filterData'=>$this->showChildFilters&&$childController->parentShowSelfFilter?json_decode($this->request->param($name.'filterData','',null)):'',
                 'title'=>$childController->title,
                 'filterConfig'=>$filterFields->getFilterShowData(),
             ];

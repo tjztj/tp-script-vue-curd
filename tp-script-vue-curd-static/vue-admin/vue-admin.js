@@ -2133,16 +2133,19 @@ define(requires, function (axios, Qs) {
                     [props.class]: props.title,
                     [props.name]: props.title,
                 };
-                for (let i in props.childs) {
-                    filterSource.value[props.childs[i].name] = props.childs[i].filterConfig.map(function (v) {
+
+
+                let childFList=props.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0)
+                for (let i in childFList) {
+                    filterSource.value[childFList[i].name] = childFList[i].filterConfig.map(function (v) {
                         if (v.group) {
                             v.title = v.group + ' >' + v.title
                         }
                         return v;
                     })
 
-                    modelTitles[props.childs[i].class] = props.childs[i].title;
-                    modelTitles[props.childs[i].name] = props.childs[i].title;
+                    modelTitles[childFList[i].class] = childFList[i].title;
+                    modelTitles[childFList[i].name] = childFList[i].title;
                 }
 
                 return {
@@ -2160,7 +2163,13 @@ define(requires, function (axios, Qs) {
                         filterConfig: this.filterSource.filterConfig,
                         filterData: this.filterData
                     }
-                }
+                },
+                childFilterEmptys(){
+                    if(!this.childs){
+                        return [];
+                    }
+                    return this.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0);
+                },
             },
             methods: {
                 filterGroupIsShow(child) {
@@ -2249,11 +2258,11 @@ define(requires, function (axios, Qs) {
                     return items.filter(vo => {
                         return !this.filterValues[vo.name];
                     })
-                }
+                },
             },
             template: `<div class="curd-filter-box">
                     <a-spin :spinning="loading">
-                            <div class="filter-box-title" v-if="childs&&childs.length>0&&filterGroupIsShow(base)">{{title}}：</div>
+                            <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
                             <div class="filter-box-div" v-if="filterGroupIsShow(base)">
                                 <transition-group name="bounce">
                                     <template v-for="(item,index) in filterSource.filterConfig">
@@ -2269,8 +2278,8 @@ define(requires, function (axios, Qs) {
                                     </template>
                                 </transition-group>
                             </div>
-                            <template v-if="childs">
-                                <template v-for="child in childs">
+                            <template v-if="childFilterEmptys.length>0">
+                                <template v-for="child in childFilterEmptys">
                                     <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
                                     <div class="filter-box-div" v-show="filterGroupIsShow(child)">
                                         <transition-group name="bounce">
