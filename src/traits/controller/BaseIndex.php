@@ -36,8 +36,6 @@ use tpScriptVueCurd\option\LeftCate;
 trait BaseIndex
 {
 
-    private ?LeftCate $leftCate=null;
-
     //列表默认排序
     public string $indexDefaultOrder='id DESC';
 
@@ -60,14 +58,12 @@ trait BaseIndex
         $childTpl=$this->request->param('child_tpl/d',0);
 
 
-        $this->leftCate=new LeftCate();
-
 
 
         if($this->request->isAjax()){
             if($this->request->param('get_left_cate/d',0)===1){
-                $this->setLeftCate($this->leftCate);
-                $this->success($this->leftCate->toArray());
+                $leftCate=$this->getLeftCate();
+                $leftCate===null||$this->success($leftCate->toArray());
             }
 
             $model=$this->indexListModelWhere(clone $this->md,$parentInfo);
@@ -234,9 +230,9 @@ trait BaseIndex
         }
 
 
-        $this->setLeftCate($this->leftCate);
-        if($childTpl&&$this->leftCate->show&&$this->leftCate->paramName==='base_id'){
-            $this->leftCate->show=false;
+        $leftCate=$this->getLeftCate();
+        if($childTpl&&$leftCate&&$leftCate->show&&$leftCate->paramName==='base_id'){
+            $leftCate->show=false;
         }
 
         $data=[
@@ -281,7 +277,7 @@ trait BaseIndex
             'toolTitleRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolTitleRightBtns($this->fields,$parentInfo)),
             'toolBtnLeftBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnLeftBtns($this->fields,$parentInfo)),
             'toolBtnRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnRightBtns($this->fields,$parentInfo)),
-            'leftCate'=>$this->leftCate->toArray(),
+            'leftCate'=>$leftCate->toArray(),
         ];
 
 
@@ -364,10 +360,11 @@ trait BaseIndex
 
         return $model
             ->where(function (Query $query){
-                if(!$this->leftCate||!$this->leftCate->show||$this->leftCate->paramName==='base_id'){
+                $leftCate=$this->getLeftCate();
+                if(!$leftCate||!$leftCate->show||$leftCate->paramName==='base_id'){
                     return;
                 }
-                $query->where($this->leftCate->where);
+                $query->where($leftCate->where);
             })
             ->where(function (Query $query)use($parentInfo,$searchIdKey){
                 if($searchIdKey){
@@ -857,10 +854,9 @@ trait BaseIndex
 
     /**
      * 设置左侧分组显示
-     * @param LeftCate $leftCate
-     * @return void
+     * @return LeftCate|null
      */
-    public function setLeftCate(LeftCate $leftCate): void
+    public function getLeftCate(): ?LeftCate
     {}
 
 }

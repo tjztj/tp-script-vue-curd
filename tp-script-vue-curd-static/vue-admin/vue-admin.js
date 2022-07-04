@@ -2188,14 +2188,22 @@ define(requires, function (axios, Qs) {
             },
             methods: {
                 restFilter(){
-                    this.filterSource={
-                        filterConfig:[],
+                    const filterSource=JSON.parse(JSON.stringify(this.oldFilterConfig.filterSource));
+                    for(let i in this.filterSource){
+                        filterSource[i].forEach(v=>{
+                            v.rest=true;
+                        })
                     }
+                    this.filterSource=filterSource;
+                    this.filterData=JSON.parse(JSON.stringify(this.oldFilterConfig.filterData));
+                    this.childFilterData=JSON.parse(JSON.stringify(this.oldFilterConfig.childFilterData));
+                    this.showMoreFilter=!!this.oldFilterConfig.showMoreFilter;
                     setTimeout(()=>{
-                        this.filterSource=JSON.parse(JSON.stringify(this.oldFilterConfig.filterSource));
-                        this.filterData=JSON.parse(JSON.stringify(this.oldFilterConfig.filterData));
-                        this.childFilterData=JSON.parse(JSON.stringify(this.oldFilterConfig.childFilterData));
-                        this.showMoreFilter=!!this.oldFilterConfig.showMoreFilter;
+                        for(let i in this.filterSource){
+                            this.filterSource[i].forEach(v=>{
+                                v.rest=false;
+                            })
+                        }
                     })
                 },
                 filterGroupIsShow(child) {
@@ -2294,7 +2302,8 @@ define(requires, function (axios, Qs) {
                                     <template v-for="(item,index) in filterSource.filterConfig">
                                         <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name">
                                             <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
-                                             <component :is="item.type" 
+                                             <component v-if="item.rest!==true"
+                                                        :is="item.type" 
                                                         :config="item"
                                                         :ref="'filters.filterConfig.'+item.name"
                                                         @search="search($event,item)"
@@ -2312,7 +2321,8 @@ define(requires, function (axios, Qs) {
                                             <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
                                                 <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
                                                     <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
-                                                     <component :is="item.type" 
+                                                     <component v-if="item.rest!==true"
+                                                                :is="item.type" 
                                                                 :config="item"
                                                                 :ref="'filters.'+child.name+'.'+item.name"
                                                                 @search="search($event,item)"

@@ -88,7 +88,7 @@
                     </a-button>
                 </a-tooltip>
             </div>
-            <div><a-input-search v-model:value="leftCateObj.searchValue" placeholder="输入关键字" allow-clear :disabled="leftCateObj.loading"></a-input-search></div>
+            <div style="flex: 1"><a-input-search v-model:value="leftCateObj.searchValue" placeholder="输入关键字" allow-clear :disabled="leftCateObj.loading"></a-input-search></div>
             <div>
                 <a-tooltip>
                     <template #title>展开全部</template>
