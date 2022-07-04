@@ -634,7 +634,7 @@ define(['vueAdmin'], function (va) {
                     if(url.indexOf('&'+this.leftCate.paramName+'=')>-1){
                         url=url.replace(new RegExp('/\&'+this.leftCate.paramName+'\=\d*/'),'&'+this.leftCate.paramName+'='+leftCateVal)
                     }else if(url.indexOf('?'+this.leftCate.paramName+'=')>-1){
-                        url=url.replace(new RegExp('/\?'+this.leftCate.paramName+'\=\d*/'),'&'+this.leftCate.paramName+'='+leftCateVal)
+                        url=url.replace(new RegExp('/\?'+this.leftCate.paramName+'\=\d*/'),'?'+this.leftCate.paramName+'='+leftCateVal)
                     }else{
                         url=setUrlParams(url,{[this.leftCate.paramName]:leftCateVal})
                     }
