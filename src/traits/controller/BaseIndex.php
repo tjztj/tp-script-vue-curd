@@ -235,6 +235,9 @@ trait BaseIndex
 
 
         $this->setLeftCate($this->leftCate);
+        if($childTpl&&$this->leftCate->show&&$this->leftCate->paramName==='base_id'){
+            $this->leftCate->show=false;
+        }
 
         $data=[
             'model'=>get_class($this->md),
