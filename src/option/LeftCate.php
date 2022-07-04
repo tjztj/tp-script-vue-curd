@@ -50,6 +50,23 @@ class LeftCate
     public $where=[];
 
 
+    private array $tree=[];
+    private array $list=[];
+
+
+    /**
+     * $listCall 需返回
+     * [
+     *  ['value'=>1,'pvalue'=>0,'title'=>'父数据'],
+     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据'],
+     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据']
+     * ]
+     */
+    public function __construct(callable $listCall)
+    {
+        $this->setListCallable($listCall);
+    }
+
     /**
      * $listCall 需返回
      * [
@@ -64,11 +81,34 @@ class LeftCate
     }
 
 
+
+    public function getTree():array{
+        if(empty($this->tree)){
+            $this->tree=isset($this->listCall)?TreeSelect::listToTree(($this->listCall)(),'value','pvalue'):[];
+        }
+        return $this->tree;
+    }
+
+
+    /**
+     * 获取列表数据
+     * @return void
+     */
+    public function getList():array{
+        if(empty($this->list)){
+            $this->list=TreeSelect::treeToList($this->getTree(),'value');
+        }
+        return $this->list;
+    }
+
+
+
+
     public function toArray():array{
         return [
             'show'=>$this->show,
             'title'=>$this->title,
-            'list'=>isset($this->listCall)?TreeSelect::listToTree(($this->listCall)(),'value','pvalue'):[],
+            'list'=>$this->tree,
             'width'=>$this->width,
             'paramName'=>$this->paramName,
             'defaultExpandAll'=>$this->defaultExpandAll,
