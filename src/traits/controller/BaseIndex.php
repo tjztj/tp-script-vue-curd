@@ -856,7 +856,6 @@ trait BaseIndex
      * 设置左侧分组显示
      * @return LeftCate|null
      */
-    public function getLeftCate(): ?LeftCate
-    {}
+    public function getLeftCate(): ?LeftCate{return null;}
 
 }
