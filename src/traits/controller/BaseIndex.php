@@ -277,7 +277,7 @@ trait BaseIndex
             'toolTitleRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolTitleRightBtns($this->fields,$parentInfo)),
             'toolBtnLeftBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnLeftBtns($this->fields,$parentInfo)),
             'toolBtnRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnRightBtns($this->fields,$parentInfo)),
-            'leftCate'=>$leftCate->toArray(),
+            'leftCate'=>$leftCate?$leftCate->toArray():null,
         ];
 
 
