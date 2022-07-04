@@ -65,10 +65,9 @@ define(['vueAdmin'], function (va) {
                         this.loading=true;
                     }
                     this.$post(vueData.subUrl,this.form).then(async res=>{
-
                         if(window.thatBtn&&window.thatBtn.refreshPage){
                             if(top.layer&&top.layer.msg){
-                                top.layer.msg(res.msg, {icon: 1, shade: this.shade, scrollbar: false, time: 1500, shadeClose: true})
+                                top.layer.msg(res.msg, {icon: 1, shade:  [0.02, '#000'], scrollbar: false, time: 1500, shadeClose: true})
                                 parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('body'))
                                 parentWindow.setTimeout(()=>{
                                     parentWindow.location.reload();
@@ -81,7 +80,7 @@ define(['vueAdmin'], function (va) {
                                 },200)
                             }
                         }else{
-
+                            parentWindow.antd.message.success(res.msg);
                             if(this.form&&this.form.id&&!res.data.refreshList&&(!window.thatBtn||!window.thatBtn.refreshList)){
                                 window.listVue.refreshId(this.form.id);
                             }else{

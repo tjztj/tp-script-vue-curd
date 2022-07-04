@@ -759,7 +759,7 @@ define(requires, function (axios, Qs) {
                                     if (top.layer && top.layer.msg) {
                                         top.layer.msg(res.msg, {
                                             icon: 1,
-                                            shade: this.shade,
+                                            shade: [0.02, '#000'],
                                             scrollbar: false,
                                             time: 1500,
                                             shadeClose: true
