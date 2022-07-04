@@ -759,7 +759,7 @@ define(requires, function (axios, Qs) {
                                     if (top.layer && top.layer.msg) {
                                         top.layer.msg(res.msg, {
                                             icon: 1,
-                                            shade: [0.02, '#000'],
+                                            shade: this.shade,
                                             scrollbar: false,
                                             time: 1500,
                                             shadeClose: true
@@ -2159,6 +2159,7 @@ define(requires, function (axios, Qs) {
                     filterData: Vue.ref({}),
                     childFilterData: Vue.ref({}),
                     showMoreFilter: Vue.ref(false),
+                    oldFilterConfig:Vue.ref({}),
                 }
             },
             computed: {
@@ -2176,7 +2177,27 @@ define(requires, function (axios, Qs) {
                     return this.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0);
                 },
             },
+            created(){
+
+                this.oldFilterConfig={
+                    filterSource:JSON.parse(JSON.stringify(this.filterSource)),
+                    filterData:JSON.parse(JSON.stringify(this.filterData)),
+                    childFilterData:JSON.parse(JSON.stringify(this.childFilterData)),
+                    showMoreFilter:!!this.showMoreFilter,
+                }
+            },
             methods: {
+                restFilter(){
+                    this.filterSource={
+                        filterConfig:[],
+                    }
+                    setTimeout(()=>{
+                        this.filterSource=JSON.parse(JSON.stringify(this.oldFilterConfig.filterSource));
+                        this.filterData=JSON.parse(JSON.stringify(this.oldFilterConfig.filterData));
+                        this.childFilterData=JSON.parse(JSON.stringify(this.oldFilterConfig.childFilterData));
+                        this.showMoreFilter=!!this.oldFilterConfig.showMoreFilter;
+                    })
+                },
                 filterGroupIsShow(child) {
                     for (let i in this.filterSource[child.name]) {
                         if (this.filterGroupItemIsShow(this.filterSource[child.name][i], child)) {
