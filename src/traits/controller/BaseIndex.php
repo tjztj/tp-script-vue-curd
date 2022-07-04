@@ -23,6 +23,7 @@ use tpScriptVueCurd\option\FunControllerListChildBtn;
 use tpScriptVueCurd\option\index_row_btn\Btn;
 use tpScriptVueCurd\option\index_row_btn\OpenBtn;
 use tpScriptVueCurd\option\index_row_btn\RowBtn;
+use tpScriptVueCurd\option\LeftCate;
 
 /**
  * 为了方便有时候子控制器也使用
@@ -34,6 +35,8 @@ use tpScriptVueCurd\option\index_row_btn\RowBtn;
  */
 trait BaseIndex
 {
+
+    private ?LeftCate $leftCate=null;
 
     //列表默认排序
     public string $indexDefaultOrder='id DESC';
@@ -54,10 +57,19 @@ trait BaseIndex
         }catch (\Exception $e){
             $this->error($e);
         }
+        $childTpl=$this->request->param('child_tpl/d',0);
+
+
+        $this->leftCate=new LeftCate();
 
 
 
         if($this->request->isAjax()){
+            if($this->request->param('get_left_cate/d',0)===1){
+                $this->setLeftCate($this->leftCate);
+                $this->success($this->leftCate->toArray());
+            }
+
             $model=$this->indexListModelWhere(clone $this->md,$parentInfo);
             $model=$model->order($this->getListOrder());
             $option=$this->indexListSelect($model);
@@ -97,12 +109,22 @@ trait BaseIndex
             /**
              * 字段自定义按钮
              */
-            $list->each(function (BaseModel $v)use($list,$parentInfo){
+            $list->each(function (BaseModel $v)use($list,$parentInfo,$childTpl){
+                if(is_array($parentInfo)){
+                    $parentData=$parentInfo[$v[$v::parentField()]]??null;
+//                    $isChildPage=false;
+                }else{
+                    $parentData=$parentInfo;
+//                    $isChildPage=!empty($parentInfo->id);
+                }
+
+
+
                 $showBtn=new OpenBtn();
                 $showBtn->btnTitle='详情';
                 $showBtn->modalTitle='查看 '.$this->title.' 相关信息';
-                $showBtn->modalUrl=url('show',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
-                if($this->getParentController()){
+                $showBtn->modalUrl=url('show',['base_id'=>$parentData&&!empty($parentData->id)?$parentData->id:0,'id'=>$v->id])->build();
+                if($childTpl){
                     $showBtn->modalOffset='lt';
                 }
                 $v->showBtn=$showBtn;
@@ -111,8 +133,8 @@ trait BaseIndex
                 $editBtn=new OpenBtn();
                 $editBtn->btnTitle='修改';
                 $editBtn->modalTitle='修改 '.$this->title.' 相关信息';
-                $editBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'id'=>$v->id])->build();
-                if($this->getParentController()){
+                $editBtn->modalUrl=url('edit',['base_id'=>$parentData&&!empty($parentData->id)?$parentData->id:0,'id'=>$v->id])->build();
+                if($childTpl){
                     $editBtn->modalOffset='lt';
                 }
                 $v->editBtn=$editBtn;
@@ -123,8 +145,8 @@ trait BaseIndex
                     $childAddBtn->btnTitle='添加下级';
                     $childAddBtn->btnColor='#597ef7';
                     $childAddBtn->modalTitle='新增 '.$this->title;
-                    $childAddBtn->modalUrl=url('edit',['base_id'=>$parentInfo&&!empty($parentInfo->id)?$parentInfo->id:0,'pid'=>$v->id])->build();
-                    if($this->getParentController()){
+                    $childAddBtn->modalUrl=url('edit',['base_id'=>$parentData&&!empty($parentData->id)?$parentData->id:0,'pid'=>$v->id])->build();
+                    if($childTpl){
                         $childAddBtn->modalOffset='lt';
                     }
                     $v->childAddBtn=$childAddBtn;
@@ -133,8 +155,8 @@ trait BaseIndex
 
 
                 $otherBtns=[
-                    'before'=>[...$this->getListRowBeforeBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowBeforeBtns($this->fields,$parentInfo,$list)],
-                    'after'=>[...$this->getListRowAfterBtns($v,$this->fields,$parentInfo,$list),...$v->getListRowAfterBtns($this->fields,$parentInfo,$list)],
+                    'before'=>[...$this->getListRowBeforeBtns($v,$this->fields,$parentData,$list),...$v->getListRowBeforeBtns($this->fields,$parentData,$list)],
+                    'after'=>[...$this->getListRowAfterBtns($v,$this->fields,$parentData,$list),...$v->getListRowAfterBtns($this->fields,$parentData,$list)],
                 ];
                 foreach ($otherBtns as $k=>$vo){
                     foreach ($vo as $key=>$val){
@@ -207,9 +229,12 @@ trait BaseIndex
         $addBtn->btnTitle='新增';
         $addBtn->modalTitle='新增 '.$this->title;
         $addBtn->modalUrl=url('edit',['base_id'=>$baseId])->build();
-        if($this->getParentController()){
+        if($childTpl){
             $addBtn->modalOffset='lt';
         }
+
+
+        $this->setLeftCate($this->leftCate);
 
         $data=[
             'model'=>get_class($this->md),
@@ -233,7 +258,7 @@ trait BaseIndex
             'showTableTool'=>$showTableTool,
             'tableThemIsColor'=>tableThemIsColor(),
             'cWindow'=>$this->request->param('c_window/a'),
-            'childTpl'=>$this->request->param('child_tpl/d',0),
+            'childTpl'=>$childTpl,
             'auth'=>[
                 'add'=>true,
                 'edit'=>true,
@@ -253,6 +278,7 @@ trait BaseIndex
             'toolTitleRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolTitleRightBtns($this->fields,$parentInfo)),
             'toolBtnLeftBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnLeftBtns($this->fields,$parentInfo)),
             'toolBtnRightBtns'=>array_map(static fn (Btn $v)=>$v->toArray(),$this->getToolBtnRightBtns($this->fields,$parentInfo)),
+            'leftCate'=>$this->leftCate->toArray(),
         ];
 
 
@@ -334,6 +360,12 @@ trait BaseIndex
         $this->setIndexFilterAddStep($filterFields,$filterData);
 
         return $model
+            ->where(function (Query $query){
+                if(!$this->leftCate||!$this->leftCate->show||$this->leftCate->paramName==='base_id'){
+                    return;
+                }
+                $query->where($this->leftCate->where);
+            })
             ->where(function (Query $query)use($parentInfo,$searchIdKey){
                 if($searchIdKey){
                     $id=$this->request->param($searchIdKey.'/d');
@@ -818,4 +850,13 @@ trait BaseIndex
         is_null($model)&&$model=$this->md;
         return $this->indexListModelWhere(clone $model,$parentInfo);
     }
+
+
+    /**
+     * 设置左侧分组显示
+     * @param LeftCate $leftCate
+     * @return void
+     */
+    public function setLeftCate(LeftCate $leftCate){}
+
 }

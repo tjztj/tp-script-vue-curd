@@ -175,6 +175,16 @@ define(['vueAdmin'], function (va) {
             })
         }
 
+        function getTreeParentKeys(tree){
+            const returnArr=[];
+            tree.forEach(v=>{
+                if(v.children){
+                    returnArr.push(v.value);
+                    returnArr.push(...getTreeParentKeys(v.children));
+                }
+            })
+            return returnArr;
+        }
 
 
         const infos={};
@@ -233,6 +243,14 @@ define(['vueAdmin'], function (va) {
                     toolTitleRightBtns:vueData.toolTitleRightBtns||[],
                     toolBtnLeftBtns:vueData.toolBtnLeftBtns||[],
                     toolBtnRightBtns:vueData.toolBtnRightBtns||[],
+                    leftCate:vueData.leftCate||{show:false},
+                    leftCateObj:{
+                        sourceData:vueData.leftCate&&vueData.leftCate.list?JSON.parse(JSON.stringify(vueData.leftCate.list)):[],
+                        searchValue:'',
+                        expandedKeys:vueData.leftCate&&vueData.leftCate.defaultExpandAll?getTreeParentKeys(vueData.leftCate&&vueData.leftCate.list?vueData.leftCate.list:[]):[],
+                        selectedKeys:[],
+                        loading:false,
+                    },
                     //其他配置
                     ...getThisActionOhterData(),
                 }
@@ -264,6 +282,34 @@ define(['vueAdmin'], function (va) {
                 }
             },
             watch:{
+                'leftCateObj.searchValue'(value){
+                    value=value.trim();
+                    let newData=JSON.parse(JSON.stringify(this.leftCateObj.sourceData));
+                    if(value===''){
+                        this.leftCateObj.expandedKeys = getTreeParentKeys(newData);
+                        this.leftCate.list=newData;
+                    }
+
+                    let expandedKeys=[];
+                    let getFinds=function (datas){
+                        return datas.filter(function (item){
+                            if(item.children){
+                                item.children=getFinds(item.children);
+                                if(item.children.length>0){
+                                    expandedKeys.push(item.value);
+                                    return item;
+                                }
+                            }
+                            if(item.title.indexOf(value) > -1){
+                                return item;
+                            }
+                        });
+                    }
+
+                    let newTree=getFinds(newData);
+                    this.leftCateObj.expandedKeys = expandedKeys;
+                    this.leftCate.list=newTree;
+                },
                 ...getThisActionOhterWatchs(),
             },
             methods:{
@@ -285,7 +331,23 @@ define(['vueAdmin'], function (va) {
                     const where=this.getWhere();
                     where.pageGuid=VUE_CURD.GUID;
                     where.refreshId=0;
-                    this.$get(this.indexUrl,where).then(data => {
+                    let url=this.indexUrl;
+                    if(this.leftCate&&this.leftCate.show){
+                        let leftCateVal=this.leftCateObj.selectedKeys[0]||0;
+                        if(this.leftCate.paramName==='base_id'){
+                            if(url.indexOf('&base_id=')>-1){
+                                url=url.replace(/\&base_id\=\d*/,'&base_id='+leftCateVal)
+                            }else if(url.indexOf('?base_id=')>-1){
+                                url=url.replace(/\?base_id\=\d*/,'?base_id='+leftCateVal)
+                            }else{
+                                url=setUrlParams(url,{base_id:leftCateVal})
+                            }
+                        }else{
+                            where[this.leftCate.paramName]=leftCateVal;
+                        }
+                    }
+
+                    this.$get(url,where).then(data => {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
@@ -294,7 +356,7 @@ define(['vueAdmin'], function (va) {
                         })
                         this.data = data.data.data;
                         this.loading = false;
-                        this.refreshTableTirgger(this.indexUrl,where,data);
+                        this.refreshTableTirgger(url,where,data);
                     }).catch(()=>{
                         this.loading = false;
                     });
@@ -511,6 +573,30 @@ define(['vueAdmin'], function (va) {
                 },
                 getInfos(){
                     return infos;
+                },
+                leftCateExpand(){
+                    //展开左侧分组
+                    this.leftCateObj.expandedKeys=getTreeParentKeys(this.leftCate.list||[])
+                },
+                leftCateShrink(){
+                    //收起左侧分组
+                    this.leftCateObj.expandedKeys=[];
+                },
+                leftCateSelect(selectedKeys,e){
+                    this.leftCateObj.selectedKeys=selectedKeys;
+                    this.refreshTable();
+                },
+                leftCateRefresh(){
+                    this.leftCateObj.loading=true;
+                    this.$get(this.indexUrl,{'get_left_cate':1}).then(data => {
+                        this.leftCate=data.data;
+                        this.leftCateObj.sourceData= JSON.parse(JSON.stringify(data.data.list));
+                        this.leftCateObj.searchValue='';
+                        this.leftCateObj.loading = false;
+                    }).catch(()=>{
+                        this.leftCateObj.loading = false;
+                    });
+
                 },
                 ////其他配置
                 ...getThisActionOhterMethods()

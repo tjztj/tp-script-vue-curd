@@ -1091,3 +1091,31 @@ svg.icon{
 .ant-btn.my-other-btn>span.anticon svg.icon{
     vertical-align:baseline;
 }
+/**********************************************************************/
+.left-cate-div-parent{
+    padding-right: 24px;
+    background-color: #f0f2f5;
+}
+.left-cate-div{
+    background-color: #fff;
+    height: 100%;
+    border-radius: 2;
+    max-height: calc(100vh - 48px);
+    min-width: 150px;
+}
+.left-cate-div .ant-pro-table-list-toolbar-title{
+    padding:8px 16px;
+    border-bottom: 1px solid #f0f2f5;
+}
+.left-cate-list{
+    padding: 8px 16px 8px 16px;
+}
+.left-cate-tool{
+    display: flex;
+    align-items: center;
+    padding: 12px 4px;
+    border-bottom: 1px solid #f0f2f5;
+}
+.left-cate-tool>div{
+    margin: 0 6px;
+}

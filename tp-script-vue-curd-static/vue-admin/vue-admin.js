@@ -942,7 +942,12 @@ define(requires, function (axios, Qs) {
         app.component('exportOutlined', {
             template: `<span role="img" aria-label="close" class="anticon anticon-close"><svg class="" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13493"><path d="M710.208 0.512H210.56v887.04H960V237.184H710.208V0.512z m187.328 531.84v59.328L647.744 768.96V651.008H397.952v-177.28h249.792V355.136l249.792 177.28z" p-id="13494"></path><path d="M772.672 0.512v177.28H960zM152.96 125.056H64V1024h721.92v-87.168H152.96z" p-id="13495"></path></svg></span>`
         })
-
+        app.component('ShrinkOutlined', {
+            template: `<span role="img" aria-label="shrink" class="anticon anticon-shrink"><svg focusable="false" class="" data-icon="shrink" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896"><path d="M881.7 187.4l-45.1-45.1a8.03 8.03 0 00-11.3 0L667.8 299.9l-54.7-54.7a7.94 7.94 0 00-13.5 4.7L576.1 439c-.6 5.2 3.7 9.5 8.9 8.9l189.2-23.5c6.6-.8 9.3-8.8 4.7-13.5l-54.7-54.7 157.6-157.6c3-3 3-8.1-.1-11.2zM439 576.1l-189.2 23.5c-6.6.8-9.3 8.9-4.7 13.5l54.7 54.7-157.5 157.5a8.03 8.03 0 000 11.3l45.1 45.1c3.1 3.1 8.2 3.1 11.3 0l157.6-157.6 54.7 54.7a7.94 7.94 0 0013.5-4.7L447.9 585a7.9 7.9 0 00-8.9-8.9z"></path></svg></span>`
+        })
+        app.component('ArrowsAltOutlined', {
+            template: `<span role="img" aria-label="arrows-alt" class="anticon anticon-arrows-alt"><svg focusable="false" class="" data-icon="arrows-alt" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896"><path d="M855 160.1l-189.2 23.5c-6.6.8-9.3 8.8-4.7 13.5l54.7 54.7-153.5 153.5a8.03 8.03 0 000 11.3l45.1 45.1c3.1 3.1 8.2 3.1 11.3 0l153.6-153.6 54.7 54.7a7.94 7.94 0 0013.5-4.7L863.9 169a7.9 7.9 0 00-8.9-8.9zM416.6 562.3a8.03 8.03 0 00-11.3 0L251.8 715.9l-54.7-54.7a7.94 7.94 0 00-13.5 4.7L160.1 855c-.6 5.2 3.7 9.5 8.9 8.9l189.2-23.5c6.6-.8 9.3-8.8 4.7-13.5l-54.7-54.7 153.6-153.6c3.1-3.1 3.1-8.2 0-11.3l-45.2-45z"></path></svg></span>`
+        })
 
         /*** 年选择器 ***/
         app.component('AYearPicker', {

@@ -71,7 +71,65 @@
 </style>
 {/if}
 {block name="style"}{/block}
-<div class="box">
+{if isset($leftCate)&&!empty($leftCate['show'])}
+<div class="box-base" style="display: flex">
+{/if}
+<div v-if="leftCate.show" class="left-cate-div-parent">
+    <div class="left-cate-div" :style="{width:leftCate.width}">
+        <div class="ant-pro-table-list-toolbar-title">{{leftCate.title}}</div>
+        <div class="left-cate-tool">
+            <div>
+                <a-tooltip>
+                    <template #title>刷新</template>
+                    <a-button shape="circle" type="dashed" @click="leftCateRefresh" :disabled="leftCateObj.loading">
+                        <template #icon>
+                            <reload-outlined></reload-outlined>
+                        </template>
+                    </a-button>
+                </a-tooltip>
+            </div>
+            <div><a-input-search v-model:value="leftCateObj.searchValue" placeholder="输入关键信息查找" allow-clear :disabled="leftCateObj.loading"></a-input-search></div>
+            <div>
+                <a-tooltip>
+                    <template #title>展开全部</template>
+                    <a-button shape="circle" type="dashed" @click="leftCateExpand" :disabled="leftCateObj.loading">
+                        <template #icon>
+                            <arrows-alt-outlined></arrows-alt-outlined>
+                        </template>
+                    </a-button>
+                </a-tooltip>
+            </div>
+
+            <div>
+                <a-tooltip>
+                    <template #title>收起全部</template>
+                    <a-button shape="circle" type="dashed" @click="leftCateShrink" :disabled="leftCateObj.loading">
+                        <template #icon>
+                            <shrink-outlined></shrink-outlined>
+                        </template>
+                    </a-button>
+                </a-tooltip>
+            </div>
+
+        </div>
+        <div class="left-cate-list">
+            <a-spin :spinning="leftCateObj.loading">
+                <a-tree :tree-data="leftCate.list" :replace-fields="{key:'value'}" v-model:expanded-keys="leftCateObj.expandedKeys" v-model:checked-keys="leftCateObj.selectedKeys" @select="leftCateSelect">
+                    <template #title="{ title }">
+                    <span v-if="title.indexOf(leftCateObj.searchValue.trim()) > -1">
+                      {{ title.substr(0, title.indexOf(leftCateObj.searchValue.trim())) }}
+                      <span style="color: #f50">{{ leftCateObj.searchValue.trim() }}</span>
+                      {{ title.substr(title.indexOf(leftCateObj.searchValue.trim()) + leftCateObj.searchValue.trim().length) }}
+                    </span>
+                        <span v-else>{{ title }}</span>
+                    </template>
+                </a-tree>
+            </a-spin>
+        </div>
+    </div>
+</div>
+
+<div class="box" :style="leftCate.show?'flex:1':''">
 <div class="head" v-if="showFilter">
     <curd-filter ref="filter"
                  @search="doFilter"
@@ -274,5 +332,7 @@
 
 <!--</div>-->
 </div>
-
+{if isset($leftCate)&&!empty($leftCate['show'])}
+</div>
+{/if}
 {block name="script"}{/block}
