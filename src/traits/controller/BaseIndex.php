@@ -857,6 +857,7 @@ trait BaseIndex
      * @param LeftCate $leftCate
      * @return void
      */
-    public function setLeftCate(LeftCate $leftCate){}
+    public function setLeftCate(LeftCate $leftCate): void
+    {}
 
 }
