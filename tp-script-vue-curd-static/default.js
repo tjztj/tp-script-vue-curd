@@ -424,7 +424,13 @@ define(['vueAdmin'], function (va) {
                 },
                 openShow(row){
                     let url=vueData.defaultUrlTpl.replace('___URL_TPL___','show');
+                    if(vueData.showBtn&&vueData.showBtn.modalUrl){
+                        url=vueData.showBtn.modalUrl;
+                    }
                     url=this.getUrlByLeftCate(url);
+                    if(vueData.showBtn&&vueData.showBtn.modalUrl){
+                        vueData.showBtn.modalUrl=url;
+                    }
                     this.openBox(openParam(
                         row.showBtn,
                         '查看 '+vueData.title+' 相关信息',
