@@ -20,17 +20,7 @@ class LeftCate
     public string $title='';
 
 
-
-    /**
-     * 列表，格式
-     * [
-     *  ['value'=>1,'pvalue'=>0,'title'=>'父数据'],
-     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据'],
-     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据']
-     * ]
-     * @var array
-     */
-    public array $list=[];
+    private $listCall;
 
 
     /**
@@ -60,12 +50,25 @@ class LeftCate
     public $where=[];
 
 
+    /**
+     * $listCall 需返回
+     * [
+     *  ['value'=>1,'pvalue'=>0,'title'=>'父数据'],
+     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据'],
+     *  ['value'=>2,'pvalue'=>1,'title'=>'子数据']
+     * ]
+     */
+    public function setListCallable(callable $listCall):void
+    {
+        $this->listCall=$listCall;
+    }
+
 
     public function toArray():array{
         return [
             'show'=>$this->show,
             'title'=>$this->title,
-            'list'=>TreeSelect::listToTree($this->list,'value','pvalue'),
+            'list'=>isset($this->listCall)?TreeSelect::listToTree(($this->listCall)(),'value','pvalue'):[],
             'width'=>$this->width,
             'paramName'=>$this->paramName,
             'defaultExpandAll'=>$this->defaultExpandAll,
