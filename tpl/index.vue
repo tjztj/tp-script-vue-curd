@@ -160,9 +160,9 @@
 
                 {block name="toolTitleMid"}
                 {if $childTpl}
-                <div class="childTitle">详细列表</div>
+                <div class="childTitle">{{titleByLeftCateSelect('详细列表')}}</div>
                 {else/}
-                <div class="ant-pro-table-list-toolbar-title">{$title}</div>
+                <div class="ant-pro-table-list-toolbar-title">{{titleByLeftCateSelect('{$title}')}}</div>
                 {/if}
                 {/block}
 

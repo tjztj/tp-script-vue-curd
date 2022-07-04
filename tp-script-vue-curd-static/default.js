@@ -598,6 +598,29 @@ define(['vueAdmin'], function (va) {
                     });
 
                 },
+                titleByLeftCateSelect(title){
+                    if(!this.leftCate.show||!this.leftCateObj.selectedKeys||this.leftCateObj.selectedKeys.length===0){
+                        return title;
+                    }
+                    let cate=this.getTitleByLeftCateVal(this.leftCateObj.selectedKeys[0],this.leftCateObj.sourceData);
+                    if(cate===''){
+                        return title;
+                    }
+                    return cate+'：'+title;
+                },
+                getTitleByLeftCateVal(val,tree){
+                    for(let i in tree){
+                        if(tree[i].value===val){
+                            return tree[i].title;
+                        }else if(tree[i].children){
+                            let title=this.getTitleByLeftCateVal(val,tree[i].children);
+                            if(title!==''){
+                                return title
+                            }
+                        }
+                    }
+                    return '';
+                },
                 ////其他配置
                 ...getThisActionOhterMethods()
             }
