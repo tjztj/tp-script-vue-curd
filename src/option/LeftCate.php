@@ -108,7 +108,7 @@ class LeftCate
         return [
             'show'=>$this->show,
             'title'=>$this->title,
-            'list'=>$this->tree,
+            'list'=>$this->getTree(),
             'width'=>$this->width,
             'paramName'=>$this->paramName,
             'defaultExpandAll'=>$this->defaultExpandAll,
