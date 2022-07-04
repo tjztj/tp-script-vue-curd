@@ -332,20 +332,7 @@ define(['vueAdmin'], function (va) {
                     where.pageGuid=VUE_CURD.GUID;
                     where.refreshId=0;
                     let url=this.indexUrl;
-                    if(this.leftCate&&this.leftCate.show){
-                        let leftCateVal=this.leftCateObj.selectedKeys[0]||0;
-                        if(this.leftCate.paramName==='base_id'){
-                            if(url.indexOf('&base_id=')>-1){
-                                url=url.replace(/\&base_id\=\d*/,'&base_id='+leftCateVal)
-                            }else if(url.indexOf('?base_id=')>-1){
-                                url=url.replace(/\?base_id\=\d*/,'?base_id='+leftCateVal)
-                            }else{
-                                url=setUrlParams(url,{base_id:leftCateVal})
-                            }
-                        }else{
-                            where[this.leftCate.paramName]=leftCateVal;
-                        }
-                    }
+                    url=this.getUrlByLeftCate(url);
 
                     this.$get(url,where).then(data => {
                         this.pagination.current=data.data.current_page;
@@ -407,36 +394,11 @@ define(['vueAdmin'], function (va) {
                     if(vueData.addBtn&&vueData.addBtn.modalUrl){
                         url=vueData.addBtn.modalUrl;
                     }
-
-                    if(!this.leftCate||!this.leftCate.show){
-                        this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,url)).end();
-                        return;
-                    }
-
-                    let leftCateVal=this.leftCateObj.selectedKeys[0]||0;
-
-                    if(this.leftCate.paramName!=='base_id'){
-                        url=setUrlParams(url,{[this.leftCate.paramName]:leftCateVal});
-                        if(vueData.addBtn&&vueData.addBtn.modalUrl){
-                            vueData.addBtn.modalUrl=url;
-                        }
-                        this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,url)).end();
-                        return;
-                    }
-
-                    if(url.indexOf('&base_id=')>-1){
-                        url=url.replace(/\&base_id\=\d*/,'&base_id='+leftCateVal)
-                    }else if(url.indexOf('?base_id=')>-1){
-                        url=url.replace(/\?base_id\=\d*/,'?base_id='+leftCateVal)
-                    }else{
-                        url=setUrlParams(url,{base_id:leftCateVal})
-                    }
-                    let cate=this.getTitleByLeftCateVal(this.leftCateObj.selectedKeys[0],this.leftCateObj.sourceData);
+                    url=this.getUrlByLeftCate(url);
                     if(vueData.addBtn&&vueData.addBtn.modalUrl){
                         vueData.addBtn.modalUrl=url;
                     }
                     this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,url)).end();
-
                 },
                 openEdit(row){
                     if(row.stepInfo&&row.stepInfo.title){
@@ -461,10 +423,12 @@ define(['vueAdmin'], function (va) {
                     }
                 },
                 openShow(row){
+                    let url=vueData.defaultUrlTpl.replace('___URL_TPL___','show');
+                    url=this.getUrlByLeftCate(url);
                     this.openBox(openParam(
                         row.showBtn,
                         '查看 '+vueData.title+' 相关信息',
-                        setUrlParams(vueData.defaultUrlTpl.replace('___URL_TPL___','show'),{id:row.id})
+                        setUrlParams(url,{id:row.id})
                     )).end();
                 },
                 delSelectedRows(e,delChilds){
@@ -654,6 +618,21 @@ define(['vueAdmin'], function (va) {
                         }
                     }
                     return '';
+                },
+                getUrlByLeftCate(url){
+                    if(!this.leftCate||!this.leftCate.show){
+                        return url;
+                    }
+                    const leftCateVal=this.leftCateObj.selectedKeys[0]||0;
+
+                    if(url.indexOf('&'+this.leftCate.paramName+'=')>-1){
+                        url=url.replace(new RegExp('/\&'+this.leftCate.paramName+'\=\d*/'),'&'+this.leftCate.paramName+'='+leftCateVal)
+                    }else if(url.indexOf('?'+this.leftCate.paramName+'=')>-1){
+                        url=url.replace(new RegExp('/\?'+this.leftCate.paramName+'\=\d*/'),'&'+this.leftCate.paramName+'='+leftCateVal)
+                    }else{
+                        url=setUrlParams(url,{[this.leftCate.paramName]:leftCateVal})
+                    }
+                    return url;
                 },
                 ////其他配置
                 ...getThisActionOhterMethods()
