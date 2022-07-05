@@ -31,7 +31,11 @@ class ImagesField extends ModelField
     protected $imgFieldShowUrlDo=null;
 
     protected bool $canExport=false;//不能导出此字段数据
-    protected bool $listShowImg=false;//是否在列表中已图片格式显示
+    protected array $listShowImg=[
+        'maxWidth'=>'72px',//最大宽度
+        'height'=>'64px',//最大高度、
+        'show'=>false,
+    ];//是否在列表中已图片格式显示
 
     /**最小值
      * @param string|null $url
@@ -60,11 +64,20 @@ class ImagesField extends ModelField
 
     /**
      * 是否在列表中已图片格式显示
-     * @param bool|null $listShowImg
-     * @return $this|bool
+     * @param bool|null|array $listShowImg
+     * @return $this|array
      */
-    public function listShowImg(bool $listShowImg=null){
-        return $this->doAttr('listShowImg',$listShowImg);
+    public function listShowImg($listShowImg=null){
+        if (is_null($listShowImg)) {
+            return $this->listShowImg;
+        }
+        if(is_bool($listShowImg)){
+            $this->listShowImg['show']=$listShowImg;
+        }else{
+            $this->listShowImg=$listShowImg;
+        }
+        $this->fieldPushAttrByWhere('listShowImg',$this->listShowImg);
+        return $this;
     }
     /**
      * 图片丢失了，在编辑、查看、列表中是否显示出来
