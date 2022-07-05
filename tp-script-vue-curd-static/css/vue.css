@@ -1125,8 +1125,14 @@ svg.icon{
 }
 /***************************************************/
 .list-img-field-box{
-    height: 60px;
+    height: 64px;
+    max-width: 72px;
 }
 .list-img-field-box .ant-image-img{
     height: 100%;
+    max-width: 100%;
+    cursor: pointer;
+}
+.list-img-field-box .ant-image-img:hover{
+    box-shadow: 3px 5px 6px 1px rgb(0 0 0 / 28%);
 }
