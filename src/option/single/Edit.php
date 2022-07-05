@@ -58,11 +58,11 @@ class Edit
         $fieldArr=array_values($this->fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
 
         if(is_null($this->info)){
-            $this->info=new \tpScriptVueCurd\base\model\TimeModel();
-        }else if(is_array($this->info)){
-            $this->info=new \tpScriptVueCurd\base\model\TimeModel($this->info);
+            $this->info=[];
+        }else if(!is_array($this->info)){
+            $this->info=$this->info->toArray();
         }
-        $info=$this->info->toArray();
+        $info=$this->info;
         //只处理地区
         $this->fields->filter(fn(ModelField $v)=> ($v instanceof RegionField && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
         //原信息
