@@ -43,7 +43,7 @@ define([],function(){
                         <template #title>查看图片</template>
                         
                          <a-image-preview-group v-if="field.listShowImg.show">
-                            <a-image class="list-img-field-box" :src="item" v-for="item in imgs" style="{max-width: field.listShowImg.show.maxWidth;height: field.listShowImg.show.height}"></a-image>
+                            <a-image class="list-img-field-box" :src="item" v-for="item in imgs" :style="{'max-width': field.listShowImg.show.maxWidth;height: field.listShowImg.show.height;}"></a-image>
                          </a-image-preview-group>
                          
                         <a v-else @click="showImages(record.text)"><file-image-outlined></file-image-outlined> 查看</a>
