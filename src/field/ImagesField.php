@@ -31,6 +31,7 @@ class ImagesField extends ModelField
     protected $imgFieldShowUrlDo=null;
 
     protected bool $canExport=false;//不能导出此字段数据
+    protected bool $listShowImg=false;//是否在列表中已图片格式显示
 
     /**最小值
      * @param string|null $url
@@ -55,6 +56,16 @@ class ImagesField extends ModelField
         return $this->doAttr('multiple',$multiple);
     }
 
+
+
+    /**
+     * 是否在列表中已图片格式显示
+     * @param bool|null $listShowImg
+     * @return $this|bool
+     */
+    public function listShowImg(bool $listShowImg=null){
+        return $this->doAttr('listShowImg',$listShowImg);
+    }
     /**
      * 图片丢失了，在编辑、查看、列表中是否显示出来
      * @param bool|null $removeMissings
