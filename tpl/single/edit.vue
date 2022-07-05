@@ -4,7 +4,7 @@
     margin-top: 5px;
 }
 </style>
-{if $title}<h2 style="padding: 24px;margin: 0;font-size: 18px;font-weight: bold">{$title}</h2>{/if}
+{if $title}<h2 style="padding: 24px;margin: 0;font-size: 18px;font-weight: bold">{$title}</h2>{else/}<div style="height: 30px">&nbsp;</div>{/if}
 <div class="vuecurd-def-box" style="padding: 6px 0 36px 0">
 
 <a-spin :spinning="loading">
