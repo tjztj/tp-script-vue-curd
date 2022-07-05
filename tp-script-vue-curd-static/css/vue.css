@@ -1128,10 +1128,14 @@ svg.icon{
     height: 64px;
     max-width: 72px;
 }
+.list-img-field-box .ant-image{
+    margin-right: 2px;
+}
 .list-img-field-box .ant-image-img{
     height: 100%;
     max-width: 100%;
     cursor: pointer;
+    border-radius: 2px;
 }
 .list-img-field-box .ant-image-img:hover{
     box-shadow: 3px 5px 6px 1px rgb(0 0 0 / 28%);
