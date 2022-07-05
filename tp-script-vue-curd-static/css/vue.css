@@ -1123,3 +1123,10 @@ svg.icon{
 .left-cate-tool>div{
     margin: 0 6px;
 }
+/***************************************************/
+.list-img-field-box{
+    height: 60px;
+}
+.list-img-field-box .ant-image-img{
+    height: 100%;
+}
