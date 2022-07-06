@@ -8,7 +8,7 @@
 <div class="vuecurd-def-box" style="padding: 6px 0 36px 0">
 
 <a-spin :spinning="loading">
-    <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm" style="max-width: 960px">
+    <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm" :style="{'padding-left':formLeft,'max-width':formMaxWidth}" layout="{$formLayout}">
         <template v-for="(groupFieldItems,groupTitle) in groupFields">
             <template v-if="showGroup">
                 <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">

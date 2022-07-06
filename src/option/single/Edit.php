@@ -25,6 +25,11 @@ class Edit
     public string $bgColor='#f0f2f5';//页面背景色
 
 
+    public string $formLayout='horizontal';//表单布局	'horizontal'|'vertical'|'inline'
+    public string $formMaxWidth='960px';
+    public string $formLeft='0px';
+
+
     private string $guid;
     private APP $app;
     public string $jsPath='/tp-script-vue-curd-static.php?single/edit.js';
@@ -90,6 +95,9 @@ class Edit
             'refreshBtnTitle'=>$this->refreshBtnTitle,
             'saveUrl'=>$this->saveUrl,
             'bgColor'=>$this->bgColor,
+            'formLeft'=>$this->formLeft,
+            'formLayout'=>$this->formLayout,
+            'formMaxWidth'=>$this->formMaxWidth,
         ];
         $this->app->view->assign($data);
         $this->app->view->assign('vue_data_json', json_encode($data));
