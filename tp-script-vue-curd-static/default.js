@@ -274,7 +274,7 @@ define(['vueAdmin'], function (va) {
                         if(!this.$refs.indexcurdtable.isCanDel(record)){
                             return;
                         }
-                        if(!record.__auth||typeof record.__auth.show==='undefined'||record.__auth.show===true){
+                        if(!record.__auth||typeof record.__auth.del==='undefined'||record.__auth.del===true){
                             ids.push(id)
                         }
                     })
