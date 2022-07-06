@@ -61,11 +61,11 @@ class ImagesField extends ModelField
     }
 
 
-
     /**
      * 是否在列表中已图片格式显示
      * @param bool|null|array $listShowImg
      * @return $this|array
+     * @throws \think\Exception
      */
     public function listShowImg($listShowImg=null){
         if (is_null($listShowImg)) {
@@ -73,8 +73,13 @@ class ImagesField extends ModelField
         }
         if(is_bool($listShowImg)){
             $this->listShowImg['show']=$listShowImg;
+        }else if(is_array($listShowImg)){
+            //性能问题，不用array_merge
+            foreach ($listShowImg as $k=>$v){
+                isset($this->listShowImg[$k])&&$this->listShowImg[$k]=$v;
+            }
         }else{
-            $this->listShowImg=array_merge($this->listShowImg,$listShowImg);
+            throw new \think\Exception($this->name().'字段的listShowImg参数不正确');
         }
         $this->fieldPushAttrByWhere('listShowImg',$this->listShowImg);
         return $this;
