@@ -74,7 +74,7 @@ class ImagesField extends ModelField
         if(is_bool($listShowImg)){
             $this->listShowImg['show']=$listShowImg;
         }else{
-            $this->listShowImg=$listShowImg;
+            $this->listShowImg=array_merge($this->listShowImg,$listShowImg);
         }
         $this->fieldPushAttrByWhere('listShowImg',$this->listShowImg);
         return $this;
