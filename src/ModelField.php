@@ -63,6 +63,7 @@ abstract class ModelField
     protected bool $showUseComponent = false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule = null;//数据验证
     protected $nullVal = '';//字段在数据库中为空时的值
+    protected bool $canSaveZero=false;//是否可保存为0，验证为空的时候跳过0
     /**
      * @var FieldDo[] $fieldDoList
      */
@@ -717,6 +718,15 @@ abstract class ModelField
     }
 
     /**
+     * 是否可以保存为0，验证为空的时候跳过0
+     * @param bool|null $canSaveZero
+     * @return $this|bool
+     */
+    public function canSaveZero(bool $canSaveZero=null){
+        return $this->doAttr('canSaveZero', $canSaveZero);
+    }
+
+    /**
      * 设置字段在数据库中为空时的值
      * @param $nullVal
      * @return $this
@@ -855,7 +865,13 @@ abstract class ModelField
      */
     final protected function defaultCheckRequired($val, string $msg = '不可为空'): void
     {
-        if ($this->required() && (empty($val) || $this->nullVal() === $val)) {
+        if(!$this->required()){
+            return;
+        }
+        if(($val===0||$val==='0')&&$this->canSaveZero()){
+            return;
+        }
+        if((empty($val))||$this->nullVal() === $val){
             throw new \think\Exception($msg);
         }
     }
