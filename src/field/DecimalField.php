@@ -71,7 +71,7 @@ class DecimalField extends ModelField
                 throw new \think\Exception('不能为空');
             }
 
-            if($data[$name]){
+            if($data[$name]||($this->nullVal()===''&&$data[$name]!=='')){
                 $precision=$this->precision();
                 $rule=['between'=>$this->min().','.$this->max()];
 

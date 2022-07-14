@@ -65,14 +65,15 @@ class IntField extends ModelField
 //                $this->defaultCheckRequired($this->save);
                 throw new \think\Exception('不能为空');
             }
-            if($data[$name]){
+            if($data[$name]||($this->nullVal()===''&&$data[$name]!=='')){
+                $data[$name]=(int)$data[$name];
                 $rule=['between'=>$this->min().','.$this->max()];
                 $rule[]='integer';
                 $validate=Validate::rule($name,$rule);
                 if(!$validate->check($data)){
                     throw new \think\Exception($validate->getError());
                 }
-                $this->save=(int)$data[$name];
+                $this->save=$data[$name];
             }else{
                 $this->save=$this->nullVal();
             }

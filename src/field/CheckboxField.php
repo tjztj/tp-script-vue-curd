@@ -53,9 +53,7 @@ class CheckboxField extends ModelField
     {
         $name=$this->name();
         if(isset($data[$name])){
-            if(empty($data[$name])) {
-                $this->save=$this->nullVal();
-            }else {
+            if($data[$name]||($this->nullVal()===''&&$data[$name]!=='')){
                 is_array($data[$name])||$data[$name]=explode(',',$data[$name]);
                 $data[$name]=array_map('trim',$data[$name]);
                 $data[$name]=array_filter($data[$name]);
@@ -64,6 +62,8 @@ class CheckboxField extends ModelField
                     throw new \think\Exception(implode(',',$otherVal).' 不在可选中');
                 }
                 $this->save=implode(',',$data[$name]);
+            }else{
+                $this->save=$this->nullVal();
             }
         }
         //没有传参也要判断
