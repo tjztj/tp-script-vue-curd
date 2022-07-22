@@ -1405,7 +1405,8 @@ define(requires, function (axios, Qs) {
                     //外部调用
                     let isNotErr = true;
                     for (const field of this.groupFieldItems) {
-                        if (isNotErr && field.type === 'ListField') {
+                        //ListField
+                        if (isNotErr && field.fields&&field.fields.length>0) {
                             for (let i in this.form[field.name]) {
                                 if (this.$refs['listFieldForm' + i]) {
                                     isNotErr = await new Promise(resolve => {

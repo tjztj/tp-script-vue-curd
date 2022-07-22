@@ -8,6 +8,7 @@ use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\CheckboxField;
+use tpScriptVueCurd\field\ListField;
 use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\field\SelectField;
@@ -627,7 +628,7 @@ class FieldCollection extends Collection
             }
             $tpl=$field->componentTpls();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
-            if($field->getType()==='ListField'||$field->getType()==='TableField'){
+            if($field instanceof ListField||is_subclass_of($field,ListField::class)){
                 foreach ($field->fields()->getComponents($type) as $k=>$v){
                     $return[$field->name().'['.$k.']']=$v;
                 }

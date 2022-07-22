@@ -11,6 +11,6 @@ define([],function(){
                 }
             }
         },
-        template:`<div><a-input v-model:value="val" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly"/></div>`,
+        template:`<div :class="{readOnlyJustShowText:field.readOnlyJustShowText}"><a-input v-model:value="val" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly"/></div>`,
     }
 });

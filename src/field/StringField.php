@@ -23,6 +23,18 @@ class StringField extends ModelField
 {
     protected string $defaultFilterClass=LikeFilter::class;
 
+    protected bool $readOnlyJustShowText=false;
+
+    /**
+     * readOnly时，是否不显示输入框
+     * @param bool|null $readOnlyJustShowText
+     * @return $this|bool
+     */
+    public function readOnlyJustShowText(bool $readOnlyJustShowText = null)
+    {
+        return $this->doAttr('readOnlyJustShowText', $readOnlyJustShowText);
+    }
+
 
     /**
      * 设置保存的值
