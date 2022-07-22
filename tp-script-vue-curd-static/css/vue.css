@@ -1135,3 +1135,8 @@ svg.icon{
 .list-img-field-box:hover{
     box-shadow: 0px 3px 4px 2px rgb(0 0 0 / 28%);
 }
+/***********************/
+.read-only-just-show-text{
+    display: inline-block;
+    padding-top: 4px;
+}
