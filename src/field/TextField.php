@@ -23,7 +23,8 @@ class TextField extends ModelField
 {
     protected string $defaultFilterClass=LikeFilter::class;
 
-
+    protected int $rowMin = 2;
+    protected int $rowMax = 5;
     /**
      * 设置保存的值
      * @param array $data  数据值集合
@@ -40,6 +41,16 @@ class TextField extends ModelField
             $this->defaultCheckRequired($this->nullVal());
         }
         return $this;
+    }
+
+    public function rowMin($min = null)
+    {
+        return $this->doAttr('rowMin', $min);
+    }
+
+    public function rowMax($max = null)
+    {
+        return $this->doAttr('rowMax', $max);
     }
 
     /**

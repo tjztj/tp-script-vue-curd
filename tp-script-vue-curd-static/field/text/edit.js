@@ -23,7 +23,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-textarea v-model:value="val" :auto-size="{ minRows: 2, maxRows: 5 }"
+                        <a-textarea v-model:value="val" :auto-size="{ minRows: field.rowMin, maxRows: field.rowMax }"
                                     :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly"/>
                     </div>
                     <div class="r">
