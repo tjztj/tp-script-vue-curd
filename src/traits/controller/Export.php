@@ -8,6 +8,7 @@ use think\facade\Cache;
 use think\facade\Db;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\tool\excel_out\ExportExcel;
 
 /**
@@ -34,10 +35,13 @@ trait Export
         $list=array_map(function ($v){
             $data=[];
             foreach ($this->fields as $f){
+                FieldDo::doExportBefore($f,$data[$f]);
                 $data[$f->name()]=$f->getExportText($v);
+                FieldDo::doExportAfter($f,$data[$f],$v);
             }
             return $data;
         },$list);
+        FieldDo::doExportListBefore($this->fields,$list);
 
 
         $title=$this->getExportTitle();
