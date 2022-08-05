@@ -32,16 +32,18 @@ trait Export
         $ths=$this->getExportThead($fields);
 
         $list=Db::query($sql)?:[];
+        FieldDo::doExportListBefore($this->fields,$list);
+
         $list=array_map(function ($v){
             $data=[];
+            FieldDo::doExportBefore($this->fields,$data);
             foreach ($this->fields as $f){
-                FieldDo::doExportBefore($f,$data[$f]);
                 $data[$f->name()]=$f->getExportText($v);
-                FieldDo::doExportAfter($f,$data[$f],$v);
             }
+            FieldDo::doExportAfter($this->fields,$data,$v);
             return $data;
         },$list);
-        FieldDo::doExportListBefore($this->fields,$list);
+
 
 
         $title=$this->getExportTitle();
