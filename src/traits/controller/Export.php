@@ -36,7 +36,7 @@ trait Export
 
         $list=array_map(function ($v){
             $data=[];
-            FieldDo::doExportBefore($this->fields,$data);
+            FieldDo::doExportBefore($this->fields,$v);
             foreach ($this->fields as $f){
                 $data[$f->name()]=$f->getExportText($v);
             }
