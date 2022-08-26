@@ -17,6 +17,7 @@ use tpScriptVueCurd\option\FieldStepCollection;
 use tpScriptVueCurd\option\FieldTip;
 use tpScriptVueCurd\option\FieldWhere;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
+use tpScriptVueCurd\option\grid\GridCol;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -92,6 +93,9 @@ abstract class ModelField
     protected bool $canExport=true;//是否可以导出本字段数据
 
     protected FieldTpl $componentTpls;
+    protected ?GridCol $grid=null;
+    protected $gridByEdit=null;
+    protected $gridByShow=null;
 
     public function __construct()
     {
@@ -736,6 +740,50 @@ abstract class ModelField
         $this->nullVal = $nullVal;
         return $this;
     }
+
+
+    /**
+     * 详情与编辑页面布局
+     * @param callable $editOrShowGrid
+     * @param callable|null $showGrid  当为空时，使用编辑的页面布局
+     * @return $this
+     */
+    public function gridBy(callable $editOrShowGrid,?callable $showGrid=null){
+        /*$editOrShowGrid=function (BaseModel $info,ModelField $field){
+            return
+        }*/
+
+        $this->gridByEdit=$editOrShowGrid;
+        if(is_null($showGrid)){
+            $this->gridByShow=$editOrShowGrid;
+        }else{
+            $this->gridByShow=$showGrid;
+        }
+        return $this;
+    }
+    /**
+     * 布局
+     * @param GridCol|null $grid
+     * @return $this|GridCol
+     */
+    public function grid(GridCol $grid=null){
+        return $this->doAttr('grid', $grid);
+    }
+    /**
+     * 取消
+     * @return void
+     */
+    public function gridNull(){
+        $this->grid=null;
+    }
+    public function getEditGridBy():?callable{
+        return $this->gridByEdit;
+    }
+    public function getShowGridBy():?callable{
+        return $this->gridByShow;
+    }
+
+
 
     /**
      * 设置保存的值，子类可重写

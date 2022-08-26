@@ -258,6 +258,7 @@ trait BaseIndex
             'tableThemIsColor'=>tableThemIsColor(),
             'cWindow'=>$this->request->param('c_window/a'),
             'childTpl'=>$childTpl,
+            'showMultipleSelection'=>null,//true or false  是否显示多选框（null，根据del权限判断）
             'auth'=>[
                 'add'=>true,
                 'edit'=>true,

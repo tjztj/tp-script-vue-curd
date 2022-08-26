@@ -25,6 +25,7 @@ require.config({
         'antDesignVue': ["tp-script-vue-curd-static.php?ant-design-vue/antd.min.js"],
         "moment": ["tp-script-vue-curd-static.php?moment/moment.min.js"],
         "g6": ["tp-script-vue-curd-static.php?antv/g6.min.js"],
+        ...window.VUE_CURD.REQUIRES,
     },
     //css 依赖
     shim:{

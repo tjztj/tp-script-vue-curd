@@ -332,11 +332,30 @@ trait BaseEdit
         }
 
 
+
+
+
         $fieldArr=array_values($fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
+        $groupFields=$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
+
+
+
+        $fields->each(function (ModelField $field)use($data,$baseModel){
+            $func=$field->getEditGridBy();
+            $func&&$field->grid($func($data,$baseModel,$field));
+        });
+        $groupGrids=[];
+        foreach ($groupFields?:[''=>$fields->all()] as $k=>$v){
+            $func=$fields->getEditGridBy();
+            $groupGrids[$k]=$func?$func($data,$baseModel,$v,$k):null;
+        }
+
+
         return [
             'title'=>$this->title,
             'fields'=>$fieldArr,
-            'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
+            'groupFields'=>$groupFields,
+            'groupGrids'=>$groupGrids,
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('edit'),
             'isStepNext'=>$isStepNext,

@@ -4,6 +4,7 @@ namespace tpScriptVueCurd\option;
 
 use think\db\Query;
 use tpScriptVueCurd\field\TreeSelect;
+use tpScriptVueCurd\option\index_row_btn\OpenBtn;
 
 class LeftCate
 {
@@ -49,6 +50,22 @@ class LeftCate
      */
     public $where=[];
 
+
+    /**
+     * 添加按钮配置
+     * @var OpenBtn|null
+     */
+    public ?OpenBtn $addBtn=null;
+    /**
+     * 编辑按钮配置
+     * @var OpenBtn|null
+     */
+    public ?OpenBtn $editBtn=null;
+    /**
+     * 删除的url
+     * @var string
+     */
+    public string $rmUrl='';
 
     private array $tree=[];
     private array $list=[];
@@ -112,6 +129,9 @@ class LeftCate
             'width'=>$this->width,
             'paramName'=>$this->paramName,
             'defaultExpandAll'=>$this->defaultExpandAll,
+            'addBtn'=>$this->addBtn?$this->addBtn->toArray():null,
+            'editBtn'=>$this->editBtn?$this->editBtn->toArray():null,
+            'rmUrl'=>$this->rmUrl
         ];
     }
 }

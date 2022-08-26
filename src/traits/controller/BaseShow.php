@@ -66,8 +66,11 @@ trait BaseShow
         $this->showBefore($data,$parentInfo,$fields);
 
 
+
+
+
         $info=$data->toArray();
-        return $this->doShow($this->title,$info,$fields);
+        return $this->doShow($this->title,$info,$fields,$data,$parentInfo);
     }
 
     /**
@@ -77,7 +80,7 @@ trait BaseShow
      * @param FieldCollection $fields
      * @return mixed
      */
-    protected function doShow(string $title,array $info,FieldCollection $fields){
+    protected function doShow(string $title,array $info,FieldCollection $fields,BaseModel $data,?BaseModel $baseModel){
         $this->assign('thisAction','show');//使用它的js
 
         $fields=$fields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
@@ -86,10 +89,26 @@ trait BaseShow
         $fields->doShowData($info);
         $fieldArr=array_values($fields->fieldToArrayPageType('show')->toArray());
 
+
+
+        $groupFields=$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
+
+
+        $fields->each(function (ModelField $field)use($data,$baseModel){
+            $func=$field->getShowGridBy();
+            $func&&$field->grid($func($data,$baseModel,$field));
+        });
+        $groupGrids=[];
+        foreach ($groupFields?:[''=>$fields->all()] as $k=>$v){
+            $func=$fields->getShowGridBy();
+            $groupGrids[$k]=$func?$func($data,$baseModel,$v,$k):null;
+        }
+
         return $this->showTpl('show',$this->showFetch([
             'title'=>$title,
             'fields'=>$fieldArr,
-            'groupFields'=>$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
+            'groupFields'=>$groupFields,
+            'groupGrids'=>$groupGrids,
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('show'),
         ]));

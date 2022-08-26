@@ -186,6 +186,18 @@ define(['vueAdmin'], function (va) {
             return returnArr;
         }
 
+        let leftCate=vueData.leftCate||{show:false,list:[]};
+        let leftCateShowTools={};
+        let setLCST=function (tree){
+            for(let i in tree){
+                leftCateShowTools[tree[i].value]=false;
+                if(tree[i].children){
+                    setLCST(tree[i].children);
+                }
+            }
+        };
+        setLCST(leftCate.list)
+
 
         const infos={};
         return {
@@ -223,9 +235,14 @@ define(['vueAdmin'], function (va) {
                         title:vueData.title,
                         filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
                     },
+                    showMultipleSelection:typeof vueData.showMultipleSelection==='undefined'?null:vueData.showMultipleSelection,
                     rowSelection:{
                         selectedRowKeys:rowSelecteds,
-                        onChange(selectedRowKeys) {
+                        onChange(selectedRowKeys,selectedRows) {
+                            if(window.rowSelection){
+                                //可其他页面操作的钩子
+                                window.rowSelection(selectedRowKeys,rowSelecteds,selectedRows)
+                            }
                             rowSelecteds.value=selectedRowKeys;
                         },
                     },
@@ -243,13 +260,14 @@ define(['vueAdmin'], function (va) {
                     toolTitleRightBtns:vueData.toolTitleRightBtns||[],
                     toolBtnLeftBtns:vueData.toolBtnLeftBtns||[],
                     toolBtnRightBtns:vueData.toolBtnRightBtns||[],
-                    leftCate:vueData.leftCate||{show:false},
+                    leftCate:leftCate,
                     leftCateObj:{
                         sourceData:vueData.leftCate&&vueData.leftCate.list?JSON.parse(JSON.stringify(vueData.leftCate.list)):[],
                         searchValue:'',
                         expandedKeys:vueData.leftCate&&vueData.leftCate.defaultExpandAll?getTreeParentKeys(vueData.leftCate&&vueData.leftCate.list?vueData.leftCate.list:[]):[],
                         selectedKeys:[],
                         loading:false,
+                        showTools:leftCateShowTools,
                     },
                     //其他配置
                     ...getThisActionOhterData(),
@@ -594,6 +612,8 @@ define(['vueAdmin'], function (va) {
                     this.leftCateObj.loading=true;
                     this.$get(this.indexUrl,{'get_left_cate':1}).then(data => {
                         this.leftCate=data.data;
+                        setLCST(this.leftCate.list);
+                        this.leftCateObj.showTools=leftCateShowTools;
                         this.leftCateObj.sourceData= JSON.parse(JSON.stringify(data.data.list));
                         this.leftCateObj.searchValue='';
                         this.leftCateObj.loading = false;
@@ -640,6 +660,56 @@ define(['vueAdmin'], function (va) {
                     }
                     return url;
                 },
+                leftCateOpenAdd(){
+                    if(!this.leftCate.addBtn.modalUrl||this.leftCate.addBtn.modalUrl.trim()===''){
+                        return;
+                    }
+                    this.openBox(openParam(this.leftCate.addBtn,'新增 '+this.leftCate.title,this.leftCate.addBtn.modalUrl))
+                        .on('success', (layero, index)=>{
+                            let win;
+                            if(layero.iframe&&layero.iframe.contentWindow){
+                                win=layero.iframe.contentWindow;
+                            }else{
+                                win=layero.find('iframe')[0].contentWindow;
+                            }
+                            win.listVue={refreshTable:this.leftCateRefresh,}
+                        })
+                        .end();
+                },
+                leftCateOpenEdit(row){
+                    if(!this.leftCate.editBtn.modalUrl||this.leftCate.editBtn.modalUrl.trim()===''){
+                        return;
+                    }
+                    this.leftCateObj.showTools[row.value]=false;
+                    this.leftCate.editBtn.modalUrl=setUrlParams(this.leftCate.editBtn.modalUrl,{id:row.value});
+                    this.openBox(openParam(this.leftCate.editBtn,'修改 '+this.leftCate.title,this.leftCate.editBtn.modalUrl))
+                        .on('success', (layero, index)=>{
+                            let win;
+                            if(layero.iframe&&layero.iframe.contentWindow){
+                                win=layero.iframe.contentWindow;
+                            }else{
+                                win=layero.find('iframe')[0].contentWindow;
+                            }
+                            win.listVue={refreshTable:this.leftCateRefresh,refreshId:this.leftCateRefresh}
+                        })
+                        .end();
+                },
+                leftCateDeleteRow(row,delChilds){
+                    if(!this.leftCate.rmUrl||this.leftCate.rmUrl.trim()===''){
+                        return;
+                    }
+                    this.leftCateObj.showTools[row.value]=false;
+                    this.leftCateObj.loading=true;
+                    this.$post(this.leftCate.rmUrl,{ids:[row.value],id:row.value,delChilds:delChilds?1:0}).then(res=>{
+                        antd.message.success(res.msg);
+                        this.leftCateRefresh();
+                    }).catch(err=>{
+                        this.leftCateObj.loading = false;
+                        if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
+                            antd.message.error('当前项已有关联数据，不可删除');
+                        }
+                    })
+                },
                 ////其他配置
                 ...getThisActionOhterMethods()
             }
@@ -667,6 +737,7 @@ define(['vueAdmin'], function (va) {
                     loading:false,
                     haveGroup:!!vueData.groupFields,
                     groupFields:vueData.groupFields||{'':vueData.fields},
+                    groupGrids:vueData.groupGrids||{},
                     labelCol: { span: 4 },
                     wrapperCol: { span: 18 },
                     form:form,
@@ -777,6 +848,7 @@ define(['vueAdmin'], function (va) {
                     info:vueData.info,
                     haveGroup:vueData.groupFields?true:false,
                     groupFields:vueData.groupFields||{'':vueData.fields},
+                    groupGrids:vueData.groupGrids||{},
                     fieldComponents,
                     //其他配置
                     ...getThisActionOhterData(),

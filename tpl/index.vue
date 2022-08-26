@@ -76,7 +76,16 @@
 {/if}
 <div v-if="leftCate.show" class="left-cate-div-parent">
     <div class="left-cate-div" :style="{width:leftCate.width}">
-        <div class="ant-pro-table-list-toolbar-title">{{leftCate.title}}</div>
+        <div class="ant-pro-table-list-toolbar-title">
+            <div class="ant-pro-table-list-toolbar-title-text">{{leftCate.title}}</div>
+            <a-tooltip v-if="leftCate.addBtn" placement="right" :title="leftCate.addBtn.btnTitle">
+                <a-button @click="leftCateOpenAdd" type="dashed">
+                    <template #icon>
+                        <plus-outlined></plus-outlined>
+                    </template>
+                </a-button>
+            </a-tooltip>
+        </div>
         <div class="left-cate-tool">
             <div>
                 <a-tooltip>
@@ -115,13 +124,31 @@
         <div class="left-cate-list">
             <a-spin :spinning="leftCateObj.loading">
                 <a-tree :tree-data="leftCate.list" :replace-fields="{key:'value'}" v-model:expanded-keys="leftCateObj.expandedKeys" v-model:checked-keys="leftCateObj.selectedKeys" @select="leftCateSelect">
-                    <template #title="{ title }">
-                    <span v-if="title.indexOf(leftCateObj.searchValue.trim()) > -1">
-                      {{ title.substr(0, title.indexOf(leftCateObj.searchValue.trim())) }}
-                      <span style="color: #f50">{{ leftCateObj.searchValue.trim() }}</span>
-                      {{ title.substr(title.indexOf(leftCateObj.searchValue.trim()) + leftCateObj.searchValue.trim().length) }}
-                    </span>
-                        <span v-else>{{ title }}</span>
+                    <template #title="item">
+                        <template v-if="leftCate.editBtn||leftCate.rmUrl">
+                            <a-popover placement="bottomLeft" trigger="contextmenu" v-model:visible="leftCateObj.showTools[item.value]">
+                                <template #content>
+                                    <div v-if="leftCate.editBtn"><a @click="leftCateOpenEdit(item)"><edit-outlined></edit-outlined>&nbsp;{{leftCate.editBtn.btnTitle||'修改'}}</a></div>
+                                    <a-divider v-if="leftCate.editBtn&&leftCate.rmUrl" style="margin: 6px 0"></a-divider>
+                                    <div v-if="leftCate.rmUrl"><a class="red" @click="leftCateDeleteRow(item)"><del-outlined></del-outlined>&nbsp;删除</a></div>
+                                </template>
+                                <span v-if="leftCateObj.searchValue.trim()!==''&&item.title.indexOf(leftCateObj.searchValue.trim()) > -1">
+                                    {{ item.title.substr(0, item.title.indexOf(leftCateObj.searchValue.trim())) }}
+                                    <span style="color: #f50">{{ leftCateObj.searchValue.trim() }}</span>
+                                    {{ item.title.substr(item.title.indexOf(leftCateObj.searchValue.trim()) + leftCateObj.searchValue.trim().length) }}
+                                </span>
+                                <span v-else>{{ item.title }}</span>
+                            </a-popover>
+                        </template>
+                        <template v-else>
+                            <span v-if="item.title.indexOf(leftCateObj.searchValue.trim()) > -1">
+                                {{ item.title.substr(0, item.title.indexOf(leftCateObj.searchValue.trim())) }}
+                                <span style="color: #f50">{{ leftCateObj.searchValue.trim() }}</span>
+                                {{ item.title.substr(item.title.indexOf(leftCateObj.searchValue.trim()) + leftCateObj.searchValue.trim().length) }}
+                            </span>
+                            <span v-else>{{ item.title }}</span>
+                        </template>
+
                     </template>
                 </a-tree>
             </a-spin>
@@ -162,7 +189,9 @@
                 {if $childTpl}
                 <div class="childTitle">{{titleByLeftCateSelect('详细列表')}}</div>
                 {else/}
-                <div class="ant-pro-table-list-toolbar-title">{{titleByLeftCateSelect('{$title}')}}</div>
+                <div class="ant-pro-table-list-toolbar-title" style="width: 100%">
+                    <div style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: calc(100% - 1em);">{{titleByLeftCateSelect('{$title}')}}</div>
+                </div>
                 {/if}
                 {/block}
 
@@ -302,7 +331,7 @@
                     :can-edit="canEdit"
                     :can-del="canDel"
                     :action-width="actionWidth"
-                    :row-selection="canDel?rowSelection:null"
+                    :row-selection="showMultipleSelection===true||(canDel&&showMultipleSelection===null)?rowSelection:null"
                     :field-step-config="fieldStepConfig"
                     :action-def-width="actionDefWidth"
                     :show-create-time="showCreateTime"

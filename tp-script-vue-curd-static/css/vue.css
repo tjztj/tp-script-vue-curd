@@ -121,7 +121,12 @@ body{
 .ant-pro-table-list-toolbar-title {
     color: rgba(0,0,0,.85);
     font-size: 16px;
-    font-family: PingFangSC-Medium
+    font-family: PingFangSC-Medium;
+    display: flex;
+    align-items: center;
+}
+.ant-pro-table-list-toolbar-title-text{
+    flex: 1;
 }
 
 .ant-pro-table-list-toolbar-search:not(:last-child) {
@@ -145,12 +150,13 @@ body{
 
 .ant-pro-table-list-toolbar-left {
     display: flex;
-    justify-content: flex-start
+    justify-content: flex-start;
+    flex: 1;
 }
 
 .ant-pro-table-list-toolbar-right {
     display: flex;
-    justify-content: flex-end
+    justify-content: flex-end;
 }
 
 .ant-pro-table-list-toolbar-extra-line {
@@ -664,10 +670,16 @@ body{
     }
 }
 /****************************************************************/
-.red,.red:hover{
+.red{
+    color: #f5222d;
+}
+.red:hover{
     color: #a61d24;
 }
-.yellow,.yellow:hover{
+.yellow{
+    color: #fa8c16;
+}
+.yellow:hover{
     color: #d89614;
 }
 a.red:hover,a.yellow:hover{

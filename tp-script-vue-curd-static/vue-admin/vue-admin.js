@@ -1021,7 +1021,7 @@ define(requires, function (axios, Qs) {
 
         app.component('FieldGroupItem', {
             name: 'fieldGroupItem',
-            props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info'],
+            props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info','grid'],
             setup(props, ctx) {
                 return {
                     formVal: Vue.ref(props.form),
@@ -1036,7 +1036,23 @@ define(requires, function (axios, Qs) {
                     set(val) {
                         this.$emit('update:field-hide-list', val)
                     }
-                }
+                },
+                gridStyle(){
+                    const style={};
+                    if(!this.grid){
+                        return style;
+                    }
+
+                    for(let i in this.grid){
+                        if(this.grid[i]){
+                            style[i]=this.grid[i];
+                        }
+                    }
+                    if(Object.keys(style).length>0){
+                        style.display='grid';
+                    }
+                    return style;
+                },
             },
             watch: {
                 formVal: {
@@ -1436,10 +1452,22 @@ define(requires, function (axios, Qs) {
                     }
                     return field.title;
                 },
+                fieldStyle(field){
+                    const style={};
+                    if(!field.grid){
+                        return style;
+                    }
+                    for(let i in field.grid){
+                        if(field.grid[i]){
+                            style[i]=field.grid[i];
+                        }
+                    }
+                    return style;
+                },
             },
             template: `
-                        <div>
-                            <div v-for="field in groupFieldItems" :data-name="field.name">
+                        <div :style="gridStyle">
+                            <div v-for="field in groupFieldItems" :data-name="field.name" :style="fieldStyle(field)">
                                 <transition name="slide-fade">
                                 <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.editTipArr&&field.editTipArr.length>0}">

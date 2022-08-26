@@ -16,6 +16,7 @@ use tpScriptVueCurd\field\TreeSelect;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
+use tpScriptVueCurd\option\grid\Grid;
 use tpScriptVueCurd\traits\field\FieldCollectionStep;
 use tpScriptVueCurd\traits\Func;
 
@@ -30,6 +31,9 @@ class FieldCollection extends Collection
     use Func,FieldCollectionStep;
     private bool $saveHideFieldSetNull=true;//当字段未隐藏时，设置字段的值为空
     public array $groupItems=[];//字段分组（如果少于2个组，将为空；字段不设置group，将赋值为 基本信息）
+    protected $gridByEdit=null;
+    protected $gridByShow=null;
+
     public function __construct($items = [])
     {
         $this->setGroupItems($items);
@@ -693,4 +697,30 @@ class FieldCollection extends Collection
             return false;
         });
     }
+
+    /**
+     * 详情与编辑页面布局
+     * @param callable $editOrShowGrid
+     * @param callable|null $showGrid  当为空时，使用编辑的页面布局
+     * @return $this
+     */
+    public function gridBy(callable $editOrShowGrid,?callable $showGrid=null){
+        /*$editOrShowGrid=function (BaseModel $info,?BaseModel $base,array $fields,string $group){
+            return
+        }*/
+        $this->gridByEdit=$editOrShowGrid;
+        if(is_null($showGrid)){
+            $this->gridByShow=$editOrShowGrid;
+        }else{
+            $this->gridByShow=$showGrid;
+        }
+        return $this;
+    }
+    public function getEditGridBy():?callable{
+        return $this->gridByEdit;
+    }
+    public function getShowGridBy():?callable{
+        return $this->gridByShow;
+    }
+
 }

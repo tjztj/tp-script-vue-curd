@@ -25,7 +25,8 @@
             MODULE:'{$vueCurdModule}',
             VERSION: "{$vueCurdVersion|default='1.0.0'}",
             SITE_VERSION:'{$version|default=\'\'}',
-            DEBUG:'{$vueCurdDebug?1:0}'==='1'
+            DEBUG:'{$vueCurdDebug?1:0}'==='1',
+            REQUIRES:{$jsRequires|default=false|json_encode|raw}||{},
         };
     </script>
     <script>window.vueData={$vue_data_json|raw};</script>
