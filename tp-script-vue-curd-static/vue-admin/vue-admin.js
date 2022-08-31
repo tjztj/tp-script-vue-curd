@@ -1591,7 +1591,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex','showAction'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1677,13 +1677,15 @@ define(requires, function (axios, Qs) {
 
                 //可prop动态设置宽度
                 const newActionW = Vue.ref(props.actionDefWidth || (32 + 28));
-                columns.push({
-                    // title:'操作',
-                    slots: {customRender: 'action', title: 'custom-title-action'},
-                    width: newActionW,
-                    fixed: 'right',
-                })
-                columnsCount++;
+                if(props.showAction!==false){
+                    columns.push({
+                        // title:'操作',
+                        slots: {customRender: 'action', title: 'custom-title-action'},
+                        width: newActionW,
+                        fixed: 'right',
+                    })
+                    columnsCount++;
+                }
                 let id = 'pub-default-table-' + window.guid();
 
                 //太小出现滚动条

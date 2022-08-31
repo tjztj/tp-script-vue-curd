@@ -252,6 +252,7 @@ max-height: 92%;
                                 :can-del="canDel&&!isDisabled"
                                 :action-def-width="actionDefWidth"
                                 :show-create-time="false"
+                                :show-action="field.showAction"
                                 @refresh-table="refreshTable"
                                 @change="handleTableChange"
                                 @open-show="openShow"

@@ -20,6 +20,12 @@ class TableField extends ListField
      */
     protected int $pageSize=0;
 
+    /**
+     * 是否线上操作栏
+     * @var bool
+     */
+    protected bool $showAction=true;
+
 
 
     /**
@@ -29,6 +35,16 @@ class TableField extends ListField
      */
     public function pageSize(int $pageSize=null){
         return $this->doAttr('pageSize',$pageSize);
+    }
+
+
+    /**
+     * 是否显示操作栏
+     * @param bool|null $showAction
+     * @return TableField|bool
+     */
+    public function showAction(bool $showAction=null){
+        return $this->doAttr('showAction',$showAction);
     }
 
 
