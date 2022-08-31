@@ -705,7 +705,7 @@ class FieldCollection extends Collection
      * @return $this
      */
     public function gridBy(callable $editOrShowGrid,?callable $showGrid=null){
-        /*$editOrShowGrid=function (BaseModel $info,?BaseModel $base,array $fields,string $group){
+        /*$editOrShowGrid=function ($info,?BaseModel $base,array $fields,string $group){
             return
         }*/
         $this->gridByEdit=$editOrShowGrid;

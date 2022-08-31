@@ -1058,6 +1058,7 @@ define(requires, function (axios, Qs) {
             watch: {
                 formVal: {
                     handler(formVal) {
+                        let forceUpdate=false;
                         const checkVal = function (fieldWhere, val) {
                             if (fieldWhere.type === 'in') {
                                 for (let i in fieldWhere.valueData) {
@@ -1170,11 +1171,17 @@ define(requires, function (axios, Qs) {
                             //TODO::未完成对TreeSelect的支持
                             field.items.forEach(v => {
                                 if (!v.showItemBy) {
-                                    delete v.showItem;
+                                    if(typeof v.showItem!=='undefined'){
+                                        delete v.showItem;
+                                        forceUpdate=true;
+                                    }
                                     return;
                                 }
                                 if (checkFieldWhere(v.showItemBy)) {
-                                    v.showItem = true;
+                                    if(v.showItem!==true){
+                                        v.showItem = true;
+                                        forceUpdate=true;
+                                    }
                                 } else {
                                     if (formVal[field.name] !== undefined && formVal[field.name] !== '') {
                                         if (field.type === 'CheckboxField' || ((field.type === 'SelectField' || field.type === 'TreeSelect') && field.multiple)) {
@@ -1187,32 +1194,52 @@ define(requires, function (axios, Qs) {
                                             const newVal = newVals.join(',');
                                             if (newVal !== formVal[field.name]) {
                                                 formVal[field.name] = this.formVal[field.name] = newVal;
+                                                forceUpdate=true;
                                             }
                                         } else if (formVal[field.name].toString() === v.value.toString()) {
                                             formVal[field.name] = this.formVal[field.name] = '';
+                                            forceUpdate=true;
                                         }
                                     }
 
-                                    v.showItem = false;
+                                    if(v.showItem!==false){
+                                        v.showItem = false;
+                                        forceUpdate=true;
+                                    }
+
                                 }
                             });
                         };
                         ///////////////////////////////////////////////////////////////////////////////////////////////
                         const checkFieldEditTipShow = function (field) {
                             if (field.editTips.length === 0) {
+                                if(field.editTipArr&&field.editTipArr.length>0){
+                                    forceUpdate=true;
+                                }
                                 field.editTipArr = [];
                                 return;
                             }
+                            let old=JSON.stringify(field.editTipArr);
                             field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
+                            if(forceUpdate===false&&old!==JSON.stringify(field.editTipArr)){
+                                forceUpdate=true;
+                            }
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
                         const checkFieldTipShow = function (field) {
                             if (field.tips.length === 0) {
+                                if(field.tipArr&&field.tipArr.length>0){
+                                    forceUpdate=true;
+                                }
                                 field.tipArr = [];
                                 return;
                             }
+                            let old=JSON.stringify(field.tipArr);
                             field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
+                            if(forceUpdate===false&&old!==JSON.stringify(field.tipArr)){
+                                forceUpdate=true;
+                            }
                         }
 
                         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1232,16 +1259,22 @@ define(requires, function (axios, Qs) {
                             if (hide) {
                                 this.currentFieldHideList[key] = this.currentFieldHideList[key] || [];
                                 this.currentFieldHideList[key].push(fieldName);
+                                forceUpdate=true;
                                 return;
                             }
                             if (typeof this.currentFieldHideList[key] === 'undefined') {
                                 return;
                             }
                             if (this.currentFieldHideList[key].length > 0) {
+                                let old=JSON.stringify(this.currentFieldHideList[key]);
                                 this.currentFieldHideList[key] = this.currentFieldHideList[key].filter(v => v !== fieldName);
+                                if(forceUpdate===false&&old!==JSON.stringify(this.currentFieldHideList[key])){
+                                    forceUpdate=true;
+                                }
                             }
                             if (this.currentFieldHideList[key].length === 0) {
                                 delete this.currentFieldHideList[key]
+                                forceUpdate=true;
                             }
                         }
                         const checkHideField = (field, checkVal) => {
@@ -1384,6 +1417,7 @@ define(requires, function (axios, Qs) {
                                 }
                                 if ((typeof field[attr] === 'undefined' && val !== def) || field[attr] !== val) {
                                     field[attr] = val;
+                                    forceUpdate=true;
                                 }
                             }
                         }
@@ -1396,8 +1430,10 @@ define(requires, function (axios, Qs) {
                             checkHideField(field, this.currentFieldHideList[field.name] ? '' : formVal[field.name]);
                             setFieldAttrByWhere(field);
                         });
-
                         this.$emit('update:form', formVal);
+                        if(forceUpdate){
+                            this.$forceUpdate();
+                        }
                     },
                     immediate: true,
                     deep: true,
