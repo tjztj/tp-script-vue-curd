@@ -13,7 +13,7 @@
         </div>
         <div class="show-group-field-rows" :class="{'is-grid-box':!!groupGrids[groupTitle]}" :style="gridStyle(groupTitle)">
             <template v-for="field in groupFieldItems">
-                <a-row class="row" v-if="!field.showUseComponent" :style="groupGrids[groupTitle]?fieldStyle(field):{}">
+                <a-row class="row" v-if="!field.showUseComponent" :style="groupGrids[groupTitle]?fieldStyle(field,groupTitle):{}">
                     <a-col class="l" v-bind="groupGrids[groupTitle]?field.editLabelCol:{}">
                         {block name="fieldTitle"}
                         {{field.title}}：
@@ -28,7 +28,7 @@
                     :is="'VueCurdShow'+field.type"
                     :field="field"
                     :info="info"
-                    :style="fieldStyle(field)"
+                    :style="fieldStyle(field,groupTitle)"
                 ></component>
             </template>
         </div>

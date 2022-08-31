@@ -1455,7 +1455,7 @@ define(requires, function (axios, Qs) {
                 },
                 fieldStyle(field){
                     const style={};
-                    if(!field.grid){
+                    if(!field.grid||!this.grid){
                         return style;
                     }
                     for(let i in field.grid){

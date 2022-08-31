@@ -898,9 +898,9 @@ define(['vueAdmin'], function (va) {
                     }
                     return style;
                 },
-                fieldStyle(field){
+                fieldStyle(field,groupTitle){
                     const style={};
-                    if(!field.grid){
+                    if(!field.grid||!this.groupGrids[groupTitle]){
                         return style;
                     }
                     for(let i in field.grid){
