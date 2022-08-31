@@ -859,7 +859,7 @@ define(requires, function (axios, Qs) {
                         headHtml += headEls[i].outerHTML;
                     }
                 }
-
+                win.document.getElementById('app-loading').style.display='';
                 setHTMLWithScript(win.document.querySelector('head'), "<style id='init-before-style'>body{display: none}</style>"
                     + headHtml
                     + "<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
