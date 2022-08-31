@@ -1,7 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        #app-loading {
+            position: fixed;
+            z-index: 100000000;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            width: 3.3em;
+            height: 3.3em;
+        }
 
+        #app-loading svg {
+            width: 100%;
+            transform-origin: center;
+            animation: rotate 2s linear infinite;
+        }
+
+        #app-loading circle {
+            fill: none;
+            stroke: #2196f3;
+            stroke-width: 2;
+            stroke-dasharray: 1, 200;
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+            animation: dash 1.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dasharray: 1, 200;
+                stroke-dashoffset: 0;
+            }
+            50% {
+                stroke-dasharray: 90, 200;
+                stroke-dashoffset: -35px;
+            }
+            100% {
+                stroke-dashoffset: -125px;
+            }
+        }
+    </style>
 </head>
 <body style="background-color: #fff">
 <div id="app-loading" style="display: none">
