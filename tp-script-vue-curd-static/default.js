@@ -882,6 +882,34 @@ define(['vueAdmin'], function (va) {
                     }
                     window.top.showImages(imgs, start);
                 },
+                gridStyle(title){
+                    const style={};
+                    if(!this.groupGrids[title]){
+                        return style;
+                    }
+
+                    for(let i in this.groupGrids[title]){
+                        if(this.groupGrids[title][i]){
+                            style[i]=this.groupGrids[title][i];
+                        }
+                    }
+                    if(Object.keys(style).length>0){
+                        style.display='grid';
+                    }
+                    return style;
+                },
+                fieldStyle(field){
+                    const style={};
+                    if(!field.grid){
+                        return style;
+                    }
+                    for(let i in field.grid){
+                        if(field.grid[i]){
+                            style[i]=field.grid[i];
+                        }
+                    }
+                    return style;
+                },
                 ////其他配置
                 ...getThisActionOhterMethods()
             }

@@ -417,7 +417,7 @@ abstract class ModelField
 
 
     /**
-     * 字段在添加修改时是否显示
+     * 数据提交验证，可填入tp的内置规则名称（https://www.kancloud.cn/manual/thinkphp6_0/1037629），或者写一个函数
      * @param $validateRule
      * @return $this|mixed
      */

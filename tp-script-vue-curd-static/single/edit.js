@@ -26,6 +26,7 @@ define(['vueAdmin'], function (va) {
                     fieldHideList:{},
                     formLeft:vueData.formLeft,
                     formMaxWidth:vueData.formMaxWidth,
+                    groupGrids:vueData.groupGrids||{},
                 }
             },
             computed:{

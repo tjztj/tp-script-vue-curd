@@ -841,6 +841,7 @@ define(requires, function (axios, Qs) {
                     win.vueData.title = btn.modalTitle;
                     win.vueData.fields = btn.modalFields;
                     win.vueData.groupFields = btn.modalGroupFields;
+                    win.vueData.groupGrids = btn.modalGroupGrids;
                     win.vueData.fieldComponents = btn.modalFieldsComponents;
                     win.vueData.isStepNext = false;
                     win.vueData.stepInfo = null;

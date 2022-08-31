@@ -74,6 +74,20 @@ class Edit
         $info['sourceData']=$this->info;
 
 
+        $groupFields=$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
+
+        $this->fields->each(function (ModelField $field)use($info){
+            $func=$field->getEditGridBy();
+            $func&&$field->grid($func($info,null,$field));
+        });
+        $groupGrids=[];
+        foreach ($groupFields?:[''=>$this->fields->all()] as $k=>$v){
+            $func=$this->fields->getEditGridBy();
+            $groupGrids[$k]=$func?$func($info,null,$v,$k):null;
+        }
+
+
+
         $request=request();
         $data=[
             'vueCurdVersion'=>\tpScriptVueCurd\traits\controller\Vue::vueCurdVersion(),
@@ -84,11 +98,12 @@ class Edit
             'guid'=>$this->guid,
             'loginUrl'=>tpScriptVueCurdGetLoginUrl(),
             'vueCurdDebug'=>\think\facade\App::isDebug(),
-
+            'groupFields'=>$groupFields,
+            'groupGrids'=>$groupGrids,
             'jsPath'=>$this->jsPath,
             'title'=>$this->title,
             'fields'=>$fieldArr,
-            'groupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null,
+            'groupFields'=>$groupFields,
             'info'=>$info,
             'fieldComponents'=>$this->fields->getComponents('edit'),
             'subBtnTitle'=>$this->subBtnTitle?:'确定提交',

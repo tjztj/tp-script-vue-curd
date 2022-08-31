@@ -453,7 +453,7 @@ body{
     border-left: 1px solid #91d5ff;
     text-shadow: 1px 1px 1px rgba(0,0 ,0 , .08);
 }
-.vuecurd-show-def-box .field-group-fieldset>.row{
+.vuecurd-show-def-box .field-group-fieldset>.show-group-field-rows>.row{
     display: flex;
     font-size: 14px;
     font-variant: tabular-nums;
@@ -461,12 +461,15 @@ body{
     vertical-align: top;
     padding: 12px 18px;
 }
-.vuecurd-show-def-box .field-group-fieldset>.row:nth-child(odd){
+.vuecurd-show-def-box .field-group-fieldset>.show-group-field-rows:not(.is-grid-box)>.row:nth-child(odd){
     background-color: #fbfbff;
     border-top:1px solid #e9f3ff;
     border-bottom:1px solid #e9f3ff;
 }
-.vuecurd-show-def-box .field-group-fieldset>.row>.l{
+.vuecurd-show-def-box .field-group-fieldset>.show-group-field-rows.is-grid-box>.row+.row{
+    border-top:1px solid #e9f3ff;
+}
+.vuecurd-show-def-box .field-group-fieldset>.show-group-field-rows>.row>.l{
     padding-right: .5em;
     width: 16.66666667%;
     /*text-align: right;*/
@@ -476,7 +479,7 @@ body{
     letter-spacing: .08em;
     text-shadow: 1px 1px 1px rgba(0,0,0,0.08);
 }
-.vuecurd-show-def-box .field-group-fieldset>.row>.r{
+.vuecurd-show-def-box .field-group-fieldset>.show-group-field-rows>.row>.r{
     flex: 1;
     color: rgba(0,0,0,.65);
 }
@@ -760,13 +763,13 @@ a.red:hover,a.yellow:hover{
 .curd-show-field-box .list-field-item>.list-field-item-row:nth-child(odd){
     background-image: linear-gradient(to right, #fff, #fcfcff);
 }
-.field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item{
+.field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item{
     background-image: linear-gradient(to left, #fefffa, #fffcf9);
     border: 1px solid #ffe7ba;
     border-radius: 4px;
     box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.04)
 }
-.field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item:hover{
+.field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item:hover{
     box-shadow:none;
     border: 1px solid #ffd591;
 }
@@ -776,7 +779,7 @@ a.red:hover,a.yellow:hover{
 .curd-show-field-box .list-field-item>div+div{
     border-top: 1px solid #d2d7ef;
 }
-.field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item>div+div{
+.field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item>div+div{
     border-top: 1px solid #ffe7ba;
 }
 .curd-show-field-box .list-field-item+.list-field-item{
@@ -785,7 +788,7 @@ a.red:hover,a.yellow:hover{
 .curd-show-field-box .list-field-item-row{
     display: flex;
 }
-.field-group-fieldset>.row:nth-child(odd) .curd-show-field-box .list-field-item-row:hover{
+.field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item-row:hover{
     background-color: #fff;
     border-radius: 4px;
 }

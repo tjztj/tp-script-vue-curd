@@ -11,24 +11,27 @@
                 {/block}
             </legend>
         </div>
-        <template v-for="field in groupFieldItems">
-            <div class="row" v-if="!field.showUseComponent">
-                <div class="l">
-                    {block name="fieldTitle"}
+        <div class="show-group-field-rows" :class="{'is-grid-box':!!groupGrids[groupTitle]}" :style="gridStyle(groupTitle)">
+            <template v-for="field in groupFieldItems">
+                <a-row class="row" v-if="!field.showUseComponent" :style="groupGrids[groupTitle]?fieldStyle(field):{}">
+                    <a-col class="l" v-bind="groupGrids[groupTitle]?field.editLabelCol:{}">
+                        {block name="fieldTitle"}
                         {{field.title}}：
-                    {/block}
-                </div>
-                <div class="r">
-                    <curd-show-field :field="field" :info="info"></curd-show-field>
-                </div>
-            </div>
-            <component
-                v-else-if="fieldComponents['VueCurdShow'+field.type]"
-                :is="'VueCurdShow'+field.type"
-                :field="field"
-                :info="info"
-            ></component>
-        </template>
+                        {/block}
+                    </a-col>
+                    <a-col class="r" v-bind="groupGrids[groupTitle]?field.editWrapperCol:{}">
+                        <curd-show-field :field="field" :info="info"></curd-show-field>
+                    </a-col>
+                </a-row>
+                <component
+                    v-else-if="fieldComponents['VueCurdShow'+field.type]"
+                    :is="'VueCurdShow'+field.type"
+                    :field="field"
+                    :info="info"
+                    :style="fieldStyle(field)"
+                ></component>
+            </template>
+        </div>
     </fieldset>
 </template>
 </div>

@@ -17,6 +17,7 @@ define(['vueAdmin'], function (va) {
                 loading:false,
                 haveGroup:!!vueData.groupFields,
                 groupFields:vueData.groupFields||{'':vueData.fields},
+                groupGrids:vueData.groupGrids||{},
                 labelCol: { span: 4 },
                 wrapperCol: { span: 18 },
                 form:form,
