@@ -53,7 +53,7 @@ define(['vueAdmin'], function (va) {
                 onSubmit(){
                     this.$refs.pubForm.validate().then(async() => {
                         for(let i in this.groupFields){
-                            if(this.$refs['fieldGroup'+i]){
+                            if(this.$refs['fieldGroup'+i]&&this.$refs['fieldGroup'+i].validateListForm){
                                 if(await this.$refs['fieldGroup'+i].validateListForm()===false){
                                     return;
                                 }
