@@ -1,42 +1,73 @@
 define([], function () {
+    let lastVal=null;
     return {
         props: ['field', 'value', 'validateStatus', 'listFieldLabelCol', 'listFieldWrapperCol', 'groupFieldItems','fieldHideList'],
         setup(props,ctx){
-            const listFieldObjs = {},currentFieldHideList={};
-            if (props.value&&props.value!=='null') {
-                let lists = JSON.parse(props.value);
-                for (let n in lists) {
-                    currentFieldHideList[n]={};
-                    listFieldObjs[n]=lists[n];
-                }
-            } else {
-                const guid=window.guid();
-                currentFieldHideList[guid]={};
-                listFieldObjs[guid]={};
-            }
+
             return {
-                listFieldObjs:Vue.ref(listFieldObjs),
-                currentFieldHideList:Vue.ref(currentFieldHideList),
+
             }
+        },
+        data(){
+          return {
+              listFieldObjs:{},
+              currentFieldHideList:{},
+          }
         },
         watch: {
             listFieldObjs:{
                 handler(listFieldObjs) {
-                    this.$emit('update:value', JSON.stringify(listFieldObjs));
+                    lastVal= JSON.stringify(listFieldObjs);
+                    this.$emit('update:value', lastVal);
                 },
                 deep: true,
                 immediate: true,
-            }
+            },
+            value(value){
+                if(lastVal===value){
+                    return;
+                }
+                this.listFieldObjs={};
+                this.currentFieldHideList={};
+                this.$nextTick(()=>{
+                    setTimeout(()=>{
+                        this.setVal(value);
+                        this.$forceUpdate();
+                    })
+                })
+
+            },
+        },
+        beforeMount(){
+            this.setVal(this.value)
         },
         methods: {
+            setVal(value){
+                const listFieldObjs = {},currentFieldHideList={};
+                if (value&&value!=='null'&&value!=='{}') {
+                    let lists = JSON.parse(value);
+                    for (let n in lists) {
+                        currentFieldHideList[n]={};
+                        listFieldObjs[n]=lists[n];
+                    }
+                } else {
+                    const guid=window.guid();
+                    currentFieldHideList[guid]={};
+                    listFieldObjs[guid]={};
+                }
+                this.listFieldObjs=listFieldObjs;
+                this.currentFieldHideList=currentFieldHideList;
+            },
             addListField() {
                 const guid=window.guid();
                 this.currentFieldHideList[guid]={};
                 this.listFieldObjs[guid]={};
+                this.$forceUpdate();
             },
             removeListField(key) {
                 delete this.listFieldObjs[key];
                 delete this.currentFieldHideList[key];
+                this.$forceUpdate();
             },
         },
 
