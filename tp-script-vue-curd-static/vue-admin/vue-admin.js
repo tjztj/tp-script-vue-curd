@@ -1431,7 +1431,14 @@ define(requires, function (axios, Qs) {
                         });
                         this.$emit('update:form', formVal);
                         if(forceUpdate){
-                            this.$forceUpdate();
+                            this.updateFormView=this.updateFormView||1;
+                            this.updateFormView++;
+                            let updateFormView=this.updateFormView;
+                            this.$nextTick(()=>{
+                                if(updateFormView===this.updateFormView){
+                                    this.$forceUpdate();
+                                }
+                            })
                         }
                     },
                     immediate: true,
