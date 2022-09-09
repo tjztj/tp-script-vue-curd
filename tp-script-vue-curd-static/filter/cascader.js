@@ -2,24 +2,11 @@ define([],function(){
     return {
         props:['config'],
         setup(props,ctx){
-            const val=Vue.ref(props.config.activeValue||'')
             return {
                 val:Vue.ref(props.config.activeValue||'')
             }
         },
         computed:{
-            val:{
-                get(){
-                    return props.config.activeValue||'';
-                },
-                set(val){
-                    if(val&&val.length===0){
-                        this.$emit('search','');
-                    }else{
-                        this.$emit('search',val[val.length-1]);
-                    }
-                }
-            },
             items(){
                 if(!this.config.items){
                     return [];
@@ -28,6 +15,15 @@ define([],function(){
                     return this.config.items[0].children;
                 }
                 return this.config.items;
+            },
+        },
+        watch:{
+            val(val){
+                if(val&&val.length===0){
+                    this.$emit('search','');
+                }else{
+                    this.$emit('search',val[val.length-1]);
+                }
             },
         },
         template:`<div>

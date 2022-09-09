@@ -110,7 +110,6 @@ class Edit
             'jsPath'=>$this->jsPath,
             'title'=>$this->title,
             'fields'=>$fieldArr,
-            'groupFields'=>$groupFields,
             'info'=>$info,
             'fieldComponents'=>$this->fields->getComponents('edit'),
             'subBtnTitle'=>$this->subBtnTitle?:'确定提交',
