@@ -21,6 +21,21 @@ if (vueData.filterComponents) {
 }
 
 define(requires, function (axios, Qs) {
+    //防抖
+    function debounce(fn, delay) {
+        let timer = 0
+        return function() {
+            // 如果这个函数已经被触发了
+            if(timer){
+                clearTimeout(timer)
+            }
+            timer = setTimeout(() => {
+                fn.apply(this, arguments); // 透传 this和参数
+                timer = 0
+            },delay)
+        }
+    }
+
     /**
      * 自定义Promise
      * @param doFunction
@@ -1023,26 +1038,15 @@ define(requires, function (axios, Qs) {
             name: 'fieldGroupItem',
             props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info','grid'],
             setup(props, ctx) {
-                //防抖节流函数
-                let throttle = function(func, delay) {
-                    let prev = Date.now();
-                    return function() {
-                        let context = this;   //this指向window
-                        let args = arguments;
-                        let now = Date.now();
-                        if (now - prev >= delay) {
-                            func.apply(context, args);
-                            prev = Date.now();
-                        }
-                    }
-                }
+
+
+
 
                 return {
                     formVal: Vue.ref(props.form),
                     validateStatus: Vue.ref({}),
                     formValIsImmediateed:Vue.ref(false),
-                    throttle,
-                    formValOld: Vue.ref({}),
+                    formValOld:Vue.ref({}),
                 }
             },
             computed: {
@@ -1073,7 +1077,7 @@ define(requires, function (axios, Qs) {
             },
             watch: {
                 formVal: {
-                    handler(formVal) {
+                    handler(formVal,formValOld) {
                         let forceUpdate=false;
                         const checkVal = function (fieldWhere, val) {
                             if (fieldWhere.type === 'in') {
@@ -1458,15 +1462,26 @@ define(requires, function (axios, Qs) {
                             })
                         }
 
-                        this.throttle(()=>{
-                            this.$nextTick(()=>{
-                                this.formChangeSet();
-                            });
-                        },80)
+
+                        if(this.formValIsImmediateed===false){
+                            this.formValIsImmediateed=true;
+                            this.formValOld=JSON.parse(JSON.stringify(formVal));
+                        }else{
+                            if(this.odFormChangeSet){
+                                this.odFormChangeSet(formVal,this.formValOld);
+                            }
+                        }
                     },
                     immediate: true,
                     deep: true,
                 }
+            },
+            mounted(){
+                this.odFormChangeSet=debounce((formVal,formValOld)=>{
+                    this.$nextTick(()=>{
+                        this.formChangeSet(formVal,formValOld);
+                    });
+                },80);
             },
             methods: {
                 ...vueDefMethods,
@@ -1530,45 +1545,54 @@ define(requires, function (axios, Qs) {
                     }
                     return style;
                 },
-                formChangeSet(){
-                    let doChange=true;
-                    if(this.formValIsImmediateed===false){
-                        this.formValIsImmediateed=true;
-                        doChange=false;
-                    }
-                    let formValOld={};
+                formChangeSet(formVal,formValOld){
                     this.groupFieldItems.forEach(field => {
                         if(!field.editOnChange||typeof field.editOnChange!=='string'){
                             return;
                         }
-                        formValOld[field.name]=JSON.parse(JSON.stringify(this.formVal[field.name]));
-                        if(formValOld[field.name]===null||formValOld[field.name]===undefined){
-                            formValOld[field.name]='';
-                        }
-                        formValOld[field.name]=formValOld[field.name].toString()
-
-                        if(doChange){
-                            if(typeof this.formValOld[field.name]==='undefined'||this.formValOld[field.name]===null){
-                                if(formValOld[field.name]!==''&&!(typeof formValOld[field.name]==='undefined')){
-                                    this.ajaxGetFormChangeSet(field);
-                                }
-                            }else if(formValOld[field.name]!==this.formValOld[field.name].toString()){
-                                this.ajaxGetFormChangeSet(field);
-                            }
+                        let oldVal=typeof formValOld[field.name]==='undefined'||formValOld[field.name]===null?'':formValOld[field.name].toString();
+                        let newVal=typeof formVal[field.name]==='undefined'||formVal[field.name]===null?'':formVal[field.name].toString();
+                        if(oldVal!==newVal){
+                            this.ajaxGetFormChangeSet(field);
                         }
                     })
-                    this.formValOld=formValOld;
+                    this.formValOld=JSON.parse(JSON.stringify(formVal));
                 },
                 '$post': vueDefMethods.$post,
                 ajaxGetFormChangeSet(field){
-                    let fields={};
-                    this.groupFieldItems.forEach(field => {
-                        fields[field.name]=field;
+                    let fieldKeys={};
+                    this.groupFieldItems.forEach((field,key) => {
+                        fieldKeys[field.name]=key;
                     });
                     this.$post(field.editOnChange,{formChangeSetField:field.name,form:this.formVal}).then(res=>{
-                        console.log(res);
-                        if(res.form){
+                        let updateFormView=false;
+                        if(res.data.fields){
+                            for(let fieldName in res.data.fields){
+                                for (let key in res.data.fields[fieldName]){
+                                    if(fieldKeys[fieldName]){
+                                        updateFormView=true;
+                                        let val=typeof res.data.fields[fieldName][key]==='number'?res.data.fields[fieldName][key].toString():res.data.fields[fieldName][key];
+                                        this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]=this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]||[];
+                                        this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key].push({
+                                            value:val,
+                                            where:null
+                                        })
+                                        this.groupFieldItems[fieldKeys[fieldName]][key]=val;
+                                    }
+                                }
+                            }
+                        }
+                        if(res.data.form){
+                            for(let key in res.data.form){
+                                updateFormView=true;
+                                this.formVal[key]=typeof res.data.form[key]==='number'?res.data.form[key].toString():res.data.form[key];
+                            }
+                        }
 
+                        if(updateFormView===true){
+                            this.$nextTick(()=>{
+                                this.$forceUpdate();
+                            })
                         }
                     })
                 }

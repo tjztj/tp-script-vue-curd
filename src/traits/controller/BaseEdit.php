@@ -103,7 +103,8 @@ trait BaseEdit
                 if(!is_callable($editOnChange)){
                     throw new \think\Exception('字段'.$field->name().'的属性editOnChange设置错误');
                 }
-                $editOnChangeReturn=$editOnChange($this->request->param('form/a',[]))||[];
+                $editOnChangeReturn=$editOnChange($this->request->param('form/a',[]));
+                $editOnChangeReturn||$editOnChangeReturn=[];
             }catch (\Exception $exception){
                 $this->error($exception->getMessage());
             }
@@ -352,7 +353,12 @@ trait BaseEdit
 
 
 
-
+        $fields->each(function (ModelField $field){
+            $editOnChange=$field->editOnChange();
+            if($editOnChange&&!is_string($editOnChange)){
+                $field->editOnChange(request()->url());
+            }
+        });
 
         $fieldArr=array_values($fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
         $groupFields=$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
@@ -360,10 +366,6 @@ trait BaseEdit
 
 
         $fields->each(function (ModelField $field)use($data,$baseModel){
-            $editOnChange=$field->editOnChange();
-            if($editOnChange&&!is_string($editOnChange)){
-                $field->editOnChange(request()->url());
-            }
             $func=$field->getEditGridBy();
             $func&&$field->grid($func($data,$baseModel,$field));
         });

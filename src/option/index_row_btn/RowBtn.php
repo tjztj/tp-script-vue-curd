@@ -25,9 +25,6 @@ class RowBtn extends Btn
 
     public function toArray():array{
         $btn=parent::toArray();
-        $modalFields=$this->modalFields?array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray()):null;
-        $modalGroupFields=$this->modalFields&&$this->modalFields->groupItems?FieldCollection::groupListByItems($modalFields):null;
-
         $groupGrids=[];
         if($this->modalFields){
             $this->modalFields->each(function (ModelField $field){
@@ -35,7 +32,11 @@ class RowBtn extends Btn
                 if($editOnChange&&!is_string($editOnChange)){
                     throw new \think\Exception('此字段的editOnChange只能设置为url');
                 }
+            });
+            $modalFields=array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray());
+            $modalGroupFields=$this->modalFields->groupItems?FieldCollection::groupListByItems($modalFields):null;
 
+            $this->modalFields->each(function (ModelField $field){
                 $func=$field->getEditGridBy();
                 $func&&$field->grid($func($this->info?:[],null,$field));
             });
@@ -43,7 +44,11 @@ class RowBtn extends Btn
                 $func=$this->modalFields->getEditGridBy();
                 $groupGrids[$k]=$func?$func($this->info?:[],null,$v,$k):null;
             }
+        }else{
+            $modalFields=null;
+            $modalGroupFields=null;
         }
+
 
 
 

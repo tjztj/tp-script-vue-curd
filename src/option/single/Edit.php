@@ -73,14 +73,17 @@ class Edit
         //原信息
         $info['sourceData']=$this->info;
 
-
-        $groupFields=$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
-
         $this->fields->each(function (ModelField $field)use($info){
             $editOnChange=$field->editOnChange();
             if($editOnChange&&!is_string($editOnChange)){
                 throw new \think\Exception('此字段的editOnChange只能设置为url');
             }
+        });
+
+
+        $groupFields=$this->fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;
+
+        $this->fields->each(function (ModelField $field)use($info){
             $func=$field->getEditGridBy();
             $func&&$field->grid($func($info,null,$field));
         });
