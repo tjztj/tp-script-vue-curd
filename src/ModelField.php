@@ -97,6 +97,13 @@ abstract class ModelField
     protected $gridByEdit=null;
     protected $gridByShow=null;
 
+
+    /**
+     * 监听值变化
+     * @var null|callable|string
+     */
+    protected $editOnChange=null;
+
     public function __construct()
     {
         $this->guid = create_guid();
@@ -1138,6 +1145,17 @@ abstract class ModelField
      */
     public function getExportText(array $data):string{
         return $data[$this->name()]??'';
+    }
+
+    /**
+     * 当页面中此字段的值改变时，会执行此方法，此方法与表单提交的地址有关
+     * 如果参数是回调函数，仅支持form下直属字段，否则(ListField、TableField情况下)请传入url
+     * @param callable|string|null $editOnChange
+     * @return $this|string|callable
+     */
+    public function editOnChange($editOnChange=null){
+        //方法与url需返回要修改的form与fields
+        return $this->doAttr('editOnChange', $editOnChange);
     }
 
 

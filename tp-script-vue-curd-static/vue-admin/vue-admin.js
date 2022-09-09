@@ -1023,9 +1023,26 @@ define(requires, function (axios, Qs) {
             name: 'fieldGroupItem',
             props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info','grid'],
             setup(props, ctx) {
+                //防抖节流函数
+                let throttle = function(func, delay) {
+                    let prev = Date.now();
+                    return function() {
+                        let context = this;   //this指向window
+                        let args = arguments;
+                        let now = Date.now();
+                        if (now - prev >= delay) {
+                            func.apply(context, args);
+                            prev = Date.now();
+                        }
+                    }
+                }
+
                 return {
                     formVal: Vue.ref(props.form),
                     validateStatus: Vue.ref({}),
+                    formValIsImmediateed:Vue.ref(false),
+                    throttle,
+                    formValOld: Vue.ref({}),
                 }
             },
             computed: {
@@ -1440,6 +1457,12 @@ define(requires, function (axios, Qs) {
                                 }
                             })
                         }
+
+                        this.throttle(()=>{
+                            this.$nextTick(()=>{
+                                this.formChangeSet();
+                            });
+                        },80)
                     },
                     immediate: true,
                     deep: true,
@@ -1507,6 +1530,48 @@ define(requires, function (axios, Qs) {
                     }
                     return style;
                 },
+                formChangeSet(){
+                    let doChange=true;
+                    if(this.formValIsImmediateed===false){
+                        this.formValIsImmediateed=true;
+                        doChange=false;
+                    }
+                    let formValOld={};
+                    this.groupFieldItems.forEach(field => {
+                        if(!field.editOnChange||typeof field.editOnChange!=='string'){
+                            return;
+                        }
+                        formValOld[field.name]=JSON.parse(JSON.stringify(this.formVal[field.name]));
+                        if(formValOld[field.name]===null||formValOld[field.name]===undefined){
+                            formValOld[field.name]='';
+                        }
+                        formValOld[field.name]=formValOld[field.name].toString()
+
+                        if(doChange){
+                            if(typeof this.formValOld[field.name]==='undefined'||this.formValOld[field.name]===null){
+                                if(formValOld[field.name]!==''&&!(typeof formValOld[field.name]==='undefined')){
+                                    this.ajaxGetFormChangeSet(field);
+                                }
+                            }else if(formValOld[field.name]!==this.formValOld[field.name].toString()){
+                                this.ajaxGetFormChangeSet(field);
+                            }
+                        }
+                    })
+                    this.formValOld=formValOld;
+                },
+                '$post': vueDefMethods.$post,
+                ajaxGetFormChangeSet(field){
+                    let fields={};
+                    this.groupFieldItems.forEach(field => {
+                        fields[field.name]=field;
+                    });
+                    this.$post(field.editOnChange,{formChangeSetField:field.name,form:this.formVal}).then(res=>{
+                        console.log(res);
+                        if(res.form){
+
+                        }
+                    })
+                }
             },
             template: `
                         <div :style="gridStyle">

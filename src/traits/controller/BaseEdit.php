@@ -93,6 +93,25 @@ trait BaseEdit
         if(is_null($model)){
             $model=$this->md;
         }
+
+
+
+        if($this->request->param('formChangeSetField')){
+            try{
+                $field=$fields->findByName($this->request->param('formChangeSetField'));
+                $editOnChange=$field->editOnChange();
+                if(!is_callable($editOnChange)){
+                    throw new \think\Exception('字段'.$field->name().'的属性editOnChange设置错误');
+                }
+                $editOnChangeReturn=$editOnChange($this->request->param('form/a',[]))||[];
+            }catch (\Exception $exception){
+                $this->error($exception->getMessage());
+            }
+            $this->success(['form'=>$editOnChangeReturn['form']??null,'fields'=>$editOnChangeReturn['fields']??null]);
+        }
+
+
+
         if(is_null($baseModel)&&$this->getParentController()){
             $baseModel=clone $this->getParentController()->md;
         }
@@ -341,6 +360,10 @@ trait BaseEdit
 
 
         $fields->each(function (ModelField $field)use($data,$baseModel){
+            $editOnChange=$field->editOnChange();
+            if($editOnChange&&!is_string($editOnChange)){
+                $field->editOnChange(request()->url());
+            }
             $func=$field->getEditGridBy();
             $func&&$field->grid($func($data,$baseModel,$field));
         });

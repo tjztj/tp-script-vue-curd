@@ -31,6 +31,11 @@ class RowBtn extends Btn
         $groupGrids=[];
         if($this->modalFields){
             $this->modalFields->each(function (ModelField $field){
+                $editOnChange=$field->editOnChange();
+                if($editOnChange&&!is_string($editOnChange)){
+                    throw new \think\Exception('此字段的editOnChange只能设置为url');
+                }
+
                 $func=$field->getEditGridBy();
                 $func&&$field->grid($func($this->info?:[],null,$field));
             });
