@@ -36,16 +36,37 @@ define([],function(){
                     return val;
                 }
                 return this.items[val.toString()].title;
-            }
+            },
+            oneStyle(){
+                if(this.lists.length>1){
+                    return {};
+                }
+                let color=this.color(Object.values(this.lists)[0]);
+                if(!color){
+                    return {};
+                }
+                return {color:color};
+            },
         },
         template:`<div style="display: inline">
-                    <a-tooltip placement="topLeft" v-if="record.text">
-                        <a-tooltip placement="topLeft"><template #title>
-                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                <template v-if="record.record['_showText_'+field.name]">
+                     <a-tooltip placement="topLeft">
+                        <template #title>{{record.record['_showText_'+field.name]}}</template>
+                        <span :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
+                     </a-tooltip>
+                </template>
+                <template v-else-if="record.text">
+                    <a-tooltip placement="topLeft">
+                        <template #title>
+                            <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
                         </template>
-                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
-                        </a-tooltip>
+                        <span>
+                            <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                        </span>
                     </a-tooltip>
+               </template>
+
+                   
                 </div>`,
     }
 });

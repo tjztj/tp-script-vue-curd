@@ -33,6 +33,9 @@ define([],function(){
         props:['info','field'],
         computed:{
             showText(){
+                if(this.info['_showText_'+this.field.name]){
+                    return this.info['_showText_'+this.field.name].toString();
+                }
                 const val=this.info[this.field.name];
                 if(val===undefined||val===''){
                     return [];

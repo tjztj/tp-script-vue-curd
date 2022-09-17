@@ -32,10 +32,24 @@ define([],function(){
                     }
                 }
                 return val;
-            }
+            },
+            oneStyle(){
+                if(this.lists.length>1){
+                    return {};
+                }
+                let color=this.color(Object.values(this.lists)[0]);
+                if(!color){
+                    return {};
+                }
+                return {color:color};
+            },
         },
         template:`<div>
-                    <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                    <span v-if="info['_showText_'+field.name]" :style="oneStyle()">{{info['_showText_'+field.name]}}</span>
+                    <template v-else>
+                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                    </template>
+                    
                 </div>`,
     }
 });

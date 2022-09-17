@@ -16,7 +16,8 @@ define([],function(){
           },
         },
         template:`<div>
-                    <span :style="{color:color()}">{{info[field.name]}}</span>
+                    <span v-if="info['_showText_'+field.name]" :style="{color:color()}">{{info['_showText_'+field.name]}}</span>
+                    <span v-else :style="{color:color()}">{{info[field.name]}}</span>
                 </div>`,
     }
 });

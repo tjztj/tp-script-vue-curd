@@ -32,10 +32,24 @@ define([],function(){
                     }
                 }
                 return val;
-            }
+            },
+            oneStyle(){
+                if(this.lists.length>1){
+                    return {};
+                }
+                let color=this.color(Object.values(this.lists)[0]);
+                if(!color){
+                    return {};
+                }
+                return {color:color};
+            },
         },
         template:`<div style="display: inline">
-                    <a-tooltip placement="topLeft" v-if="record.text">
+                    <a-tooltip placement="topLeft" v-if="record.record['_showText_'+field.name]">
+                        <template #title>{{record.record['_showText_'+field.name]}}</template>
+                        <span :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
+                    </a-tooltip>
+                    <a-tooltip placement="topLeft" v-else-if="record.text">
                         <a-tooltip placement="topLeft"><template #title>
                         <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
                         </template>

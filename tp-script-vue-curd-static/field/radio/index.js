@@ -16,7 +16,11 @@ define([],function(){
           },
         },
         template:`<div style="display: inline">
-                    <a-tooltip placement="topLeft" v-if="record.text">
+                    <a-tooltip placement="topLeft"  v-if="record.record['_showText_'+field.name]">
+                        <template #title>{{record.record['_showText_'+field.name]}}</template>
+                        <span :style="{color:color()}">{{record.record['_showText_'+field.name]}}</span>
+                    </a-tooltip>
+                    <a-tooltip placement="topLeft" v-else-if="record.text">
                         <a-tooltip placement="topLeft"><template #title><span :style="{color:color()}">{{record.text}}</span></template><span :style="{color:color()}">{{record.text}}</span></a-tooltip>
                     </a-tooltip>
                 </div>`,
