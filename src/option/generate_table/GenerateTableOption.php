@@ -220,11 +220,11 @@ class GenerateTableOption extends Collection
 
             $sql="CREATE TABLE `$tableName`  ( `id` int NOT NULL AUTO_INCREMENT, \n ".implode(" ,\n ",$cols).", \n 
   `create_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
-  `create_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
+  `".$model::getCreateLoginUserField()."` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
   `update_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '更新时间',
   `delete_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '删除时间',
-  `delete_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
-  `update_system_admin_id` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
+  `".$model::getDeleteLoginUserField()."` int(11) NOT NULL DEFAULT 0 COMMENT '删除人',
+  `".$model::getUpdateLoginUserField()."` int(11) NOT NULL DEFAULT 0 COMMENT '修改人',
   PRIMARY KEY (`id`)
 ) ENGINE=$this->engine , COMMENT = '".addslashes($comment)."';";
 

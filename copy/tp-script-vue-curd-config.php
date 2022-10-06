@@ -95,7 +95,7 @@ if (!function_exists('getModelDefaultCreateLoginUserField')) {
      * @return string
      */
     function getModelDefaultCreateLoginUserField():string{
-        return 'create_admin_id';
+        return 'create_system_admin_id';
     }
 }
 
@@ -105,7 +105,7 @@ if (!function_exists('getModelDefaultUpdateLoginUserField')) {
      * @return string
      */
     function getModelDefaultUpdateLoginUserField():string{
-        return 'update_admin_id';
+        return 'update_system_admin_id';
     }
 }
 
@@ -116,7 +116,7 @@ if (!function_exists('getModelDefaultDeleteLoginUserField')) {
      * @return string
      */
     function getModelDefaultDeleteLoginUserField():string{
-        return 'delete_admin_id';
+        return 'delete_system_admin_id';
     }
 }
 
