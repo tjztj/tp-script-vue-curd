@@ -264,7 +264,8 @@ define(requires, function (axios, Qs) {
                             body.on('closeIframe', function () {
                                 layero.close();
                             })
-                            layero.find('iframe').css('padding', '0px 0 28px 0')
+                            // layero.find('iframe').css('padding', '0px 0 28px 0')
+                            layero.find('iframe').css('padding', '0px')
                             box.$.each(body, function (i, v) {
                                 box.$(v).before('<style>html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}</style>');
                             });
