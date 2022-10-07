@@ -18,6 +18,11 @@ class FieldWhere
     public const TYPE_IN='in';
     public const TYPE_BETWEEN='between';
     public const TYPE_FIND_IN_SET='find_in_set';
+    public const TYPE_GT='>';
+    public const TYPE_EGT='>=';
+    public const TYPE_LT='<';
+    public const TYPE_ELT='<=';
+    public const TYPE_EQ='=';
 
     //别名
     public const IN=self::TYPE_IN;
@@ -27,6 +32,12 @@ class FieldWhere
     public const NOT_IN=self::NOT;
     public const NOT_BETWEEN='__NOT_BETWEEN__';
     public const NOT_FIND_IN_SET='__NOT_FIND_IN_SET__';
+
+    public const GT=self::TYPE_GT;
+    public const EGT=self::TYPE_EGT;
+    public const LT=self::TYPE_LT;
+    public const ELT=self::TYPE_ELT;
+    public const EQ=self::TYPE_EQ;
 
 
 
@@ -53,14 +64,18 @@ class FieldWhere
     /**
      * FieldWhere constructor.
      * @param ModelField $field
-     * @param array|string|int|float $valueData
+     * @param array|string|int|float $valueData in,between,find_in_set,>,<,=,<>,>=,<=,!=
      * @param string $type
      * @param bool $isNot  是否非，反转
      * @throws \think\Exception
      */
     public function __construct(ModelField $field, $valueData, string $type=self::TYPE_IN, bool $isNot=false)
     {
+        $type=strtolower($type);
         switch ($type){
+            case '<>':
+            case '!=':
+            case '!==':
             case self::NOT:
                 $type=self::TYPE_IN;
                 $isNot=!$isNot;
@@ -73,6 +88,29 @@ class FieldWhere
                 $type=self::TYPE_FIND_IN_SET;
                 $isNot=!$isNot;
                 break;
+            case self::EGT:
+                $type=self::TYPE_BETWEEN;
+                $valueData=[$valueData,null];
+                break;
+            case self::GT:
+                $type=self::TYPE_BETWEEN;
+                $isNot=!$isNot;
+                $valueData=[null,$valueData];
+                break;
+            case self::ELT:
+                $type=self::TYPE_BETWEEN;
+                $valueData=[null,$valueData];
+                break;
+            case self::LT:
+                $type=self::TYPE_BETWEEN;
+                $isNot=!$isNot;
+                $valueData=[$valueData,null];
+                break;
+            case self::EQ:
+                $type=self::TYPE_IN;
+                $valueData=[$valueData];
+                break;
+
         }
 
 

@@ -566,7 +566,7 @@ abstract class ModelField
 
 
     /**
-     * 字段在编辑时显示的备注信息，不能与pushEditTip法混用
+     * 字段在编辑时显示的备注信息，不能与pushEditTip方法混用
      * @param string|null $message
      * @return $this|FieldEditTip|null
      */
