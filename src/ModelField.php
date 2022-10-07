@@ -566,7 +566,20 @@ abstract class ModelField
 
 
     /**
-     * 字段在编辑页面时，可根据填写的内容显示不同的提示信息|设置
+     * 字段在编辑时显示的备注信息，不能与pushEditTip法混用
+     * @param string|null $message
+     * @return $this|FieldEditTip|null
+     */
+    public function editTip(string $message=null){
+        if(is_null($message)){
+            return $this->editTips[0]??null;
+        }
+        $this->editTips=[new FieldEditTip($message, null)];
+        return $this;
+    }
+
+    /**
+     * 字段在编辑页面时，可根据填写的内容显示不同的提示信息|设置，不能与editTip方法混用
      * @param string $message
      * @param FieldWhere|null $show
      * @return FieldEditTip
