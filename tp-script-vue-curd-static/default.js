@@ -344,7 +344,7 @@ define(['vueAdmin'], function (va) {
                     this.myFilters.sortOrder=sorter.order;
                     this.fetch();
                 },
-                fetch() {
+                fetch(resolve) {
                     this.loading = true;
                     const where=this.getWhere();
                     where.pageGuid=VUE_CURD.GUID;
@@ -362,6 +362,9 @@ define(['vueAdmin'], function (va) {
                         this.data = data.data.data;
                         this.loading = false;
                         this.refreshTableTirgger(url,where,data);
+                        if(resolve&&typeof resolve==='function'){
+                            resolve(url,where,data)
+                        }
                     }).catch(()=>{
                         this.loading = false;
                     });
@@ -457,10 +460,15 @@ define(['vueAdmin'], function (va) {
                 },
                 delSelectedRows(e,delChilds){
                     this.loading = true;
-                    this.$post(vueData.delUrl,{ids:this.delSelectedIds,delChilds:delChilds?1:0}).then(res=>{
+                    let url=vueData.delUrl;
+                    let where={ids:this.delSelectedIds,delChilds:delChilds?1:0};
+                    this.$post(url,where).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
                         this.rowSelection.selectedRowKeys=[];
+                        if(typeof window.onDel==='function'){
+                            window.onDel(url,where,res);
+                        }
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
@@ -480,9 +488,14 @@ define(['vueAdmin'], function (va) {
                 },
                 deleteRow(row,delChilds){
                     this.loading = true;
-                    this.$post(vueData.delUrl,{ids:[row.id],delChilds:delChilds?1:0}).then(res=>{
+                    let url=vueData.delUrl;
+                    let where={ids:[row.id],delChilds:delChilds?1:0};
+                    this.$post(url,where).then(res=>{
                         antd.message.success(res.msg);
                         this.refreshTable();
+                        if(typeof window.onDel==='function'){
+                            window.onDel(url,where,res);
+                        }
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
@@ -501,7 +514,11 @@ define(['vueAdmin'], function (va) {
                     })
                 },
                 refreshTable(){
-                    this.fetch();
+                    this.fetch(function (url,where,data){
+                        if(typeof window.onRefreshTable==='function'){
+                            window.onRefreshTable(url,where,data);
+                        }
+                    });
                 },
                 refreshId(id){
                     this.loading = true;
@@ -510,7 +527,12 @@ define(['vueAdmin'], function (va) {
                     where.page=1;
                     // where.pageGuid=VUE_CURD.GUID;
                     where.refreshId=1;
-                    this.$get(this.indexUrl,where).then(data => {
+                    let url=this.indexUrl;
+                    this.$get(url,where).then(data => {
+                        if(typeof window.onRefreshId==='function'){
+                            window.onRefreshId(url,where,data);
+                        }
+
                         if(!data.data.data[0]){
                             this.loading = false;
                             return;
@@ -793,6 +815,10 @@ define(['vueAdmin'], function (va) {
                             }else{
                                 window.listVue.refreshTable();
                             }
+                            if(typeof window.onSubmit==='function'){
+                                window.onSubmit(window.location.href,this.form,res);
+                            }
+
                             if(!option.notClose){
                                 this.close();
                             }else{
