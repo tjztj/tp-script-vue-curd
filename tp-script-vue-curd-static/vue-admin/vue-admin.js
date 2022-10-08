@@ -70,7 +70,7 @@ define(requires, function (axios, Qs) {
      * 初始化请求
      */
     window.service = axios.create({
-        baseURL: '/' + window.VUE_CURD.MODULE + '/',
+        // baseURL: '/' + window.VUE_CURD.MODULE + '/',
         withCredentials: true,
         timeout: 150000
     });
@@ -589,14 +589,14 @@ define(requires, function (axios, Qs) {
         ...loadMsg,
         ...uploadMethods,
         '$get'(url, params) {
-            if (url.indexOf('/' + window.VUE_CURD.MODULE + '/') === 0) {
-                url = url.replace('\/' + window.VUE_CURD.MODULE + '\/', '')
+            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+                url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
             return service({url, method: 'get', params, headers: {'X-REQUESTED-WITH': 'xmlhttprequest'}})
         },
         '$post'(url, data) {
-            if (url.indexOf('/' + window.VUE_CURD.MODULE + '/') === 0) {
-                url = url.replace('\/' + window.VUE_CURD.MODULE + '\/', '')
+            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+                url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
             return service({
                 url,

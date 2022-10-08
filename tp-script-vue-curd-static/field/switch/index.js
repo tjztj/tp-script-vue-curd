@@ -39,8 +39,8 @@ define(['qs'], function (Qs) {
                 return val === this.field.items[1].value.toString() || val === this.field.items[1].title.toString();
             },
             '$post'(url, data) {
-                if (url.indexOf('/' + window.VUE_CURD.MODULE + '/') === 0) {
-                    url = url.replace('\/' + window.VUE_CURD.MODULE + '\/', '')
+                if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+                    url = '/' + window.VUE_CURD.MODULE + '/'+url;
                 }
                 return service({
                     url,
