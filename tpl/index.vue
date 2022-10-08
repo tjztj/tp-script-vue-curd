@@ -189,7 +189,7 @@
                 {if $childTpl}
                 <div class="childTitle">{{titleByLeftCateSelect('详细列表')}}</div>
                 {else/}
-                <div class="ant-pro-table-list-toolbar-title" :style="{width: leftCate.show?'calc('+titleByLeftCateSelect('{$title}').length+'em + 16px)':'auto'}">
+                <div class="ant-pro-table-list-toolbar-title" :style="{width: leftCate.show?'calc('+titleByLeftCateSelect('{$title}').length+'em * 1.08)':'auto'}">
                     <div style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 100%;">{{titleByLeftCateSelect('{$title}')}}</div>
                 </div>
                 {/if}
