@@ -152,6 +152,7 @@ body{
     display: flex;
     justify-content: flex-start;
     flex: 1;
+    padding-right: 6px;
 }
 
 .ant-pro-table-list-toolbar-right {
