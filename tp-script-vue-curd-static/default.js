@@ -473,8 +473,12 @@ define(['vueAdmin'], function (va) {
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
                             antd.message.destroy();
+                            let childsText='';
+                            if(vueData.childs){
+                                childsText='（'+vueData.childs.map(v=>v.title).join('、')+'）';
+                            }
                             const modal = antd.Modal.confirm({
-                                content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据？',
+                                content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据'+childsText+'？',
                                 icon:warnIcon(),
                                 onOk:()=> {
                                     this.delSelectedRows(e,true)
