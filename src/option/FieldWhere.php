@@ -71,7 +71,7 @@ class FieldWhere
      */
     public function __construct(ModelField $field, $valueData, string $type=self::TYPE_IN, bool $isNot=false)
     {
-        $type=strtolower($type);
+//        $type=strtolower($type);
         switch ($type){
             case '<>':
             case '!=':
