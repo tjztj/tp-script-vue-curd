@@ -39,7 +39,7 @@ define(['qs'], function (Qs) {
                 return val === this.field.items[1].value.toString() || val === this.field.items[1].title.toString();
             },
             '$post'(url, data) {
-                if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+                if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false&&/^https?:/.test(url)===false) {
                     url = '/' + window.VUE_CURD.MODULE + '/'+url;
                 }
                 return service({

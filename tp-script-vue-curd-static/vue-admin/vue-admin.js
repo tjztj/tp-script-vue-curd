@@ -589,13 +589,13 @@ define(requires, function (axios, Qs) {
         ...loadMsg,
         ...uploadMethods,
         '$get'(url, params) {
-            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false&&/^https?:/.test(url)===false) {
                 url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
             return service({url, method: 'get', params, headers: {'X-REQUESTED-WITH': 'xmlhttprequest'}})
         },
         '$post'(url, data) {
-            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false) {
+            if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false&&/^https?:/.test(url)===false) {
                 url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
             return service({
