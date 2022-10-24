@@ -1734,7 +1734,7 @@ define(requires, function (axios, Qs) {
                     ellipsis: true,
                     dataIndex: "create_time",
                     slots: {customRender: 'create-time', title: 'custom-title-create_time'},
-                    width: 154,
+                    width: 152,
                     sorter: true,
                 };
 

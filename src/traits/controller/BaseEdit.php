@@ -154,7 +154,7 @@ trait BaseEdit
                     }
 
 
-                    $fields->each(function (ModelField $v)use($data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
+                    $fields->each(function (ModelField $v)use(&$data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
                     $savedInfo=$model->addInfo($data,$parentInfo,$fields,false,$returnSaveData);
                     $this->addAfter($savedInfo);
                 }else{
@@ -185,7 +185,7 @@ trait BaseEdit
                     if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
                         return $this->error('您不能进行此操作-02');
                     }
-                    $fields->each(function (ModelField $v)use($data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
+                    $fields->each(function (ModelField $v)use(&$data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
                     $savedInfo=$model->saveInfo($data,$fields,$parentInfo,$old,$returnSaveData);
                     $this->editAfter($savedInfo);
                 }
