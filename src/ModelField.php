@@ -79,6 +79,7 @@ abstract class ModelField
     public bool $objWellToArr = true;
     protected array $attrWhereValueList=[];
     protected bool $generateColumn=true;
+    protected array $listColStyle=[];//列表中单元格内的样式
 
     /**
      * @var string 调用toArray的时候，toArray自行根据此值判断处理，防止多余的数据到前台，影响性能
@@ -433,6 +434,16 @@ abstract class ModelField
         return $this->doAttr('validateRule', $validateRule);
     }
 
+
+    /**
+     * 列表中单元格内的样式
+     * @param array|null $listColStyle
+     * @return $this|array
+     */
+    public function listColStyle(array $listColStyle = null)
+    {
+        return $this->doAttr('listColStyle', $listColStyle);
+    }
 
     /**
      * 隐藏本字段条件

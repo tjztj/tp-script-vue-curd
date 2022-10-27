@@ -2125,6 +2125,9 @@ define(requires, function (axios, Qs) {
                 '$post': vueDefMethods.$post,
                 openBox: window.openBox,
                 openOtherBtn: window.vueDefMethods.openOtherBtn,
+                colStyle(field,row){
+                    return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style||{})
+                },
             },
             template: `<div :id="id">
                         <a-table
@@ -2161,6 +2164,7 @@ define(requires, function (axios, Qs) {
                                         :is="'VueCurdIndex'+item.type" 
                                         :field="item" 
                                         :record="record"
+                                        :style="colStyle(item,record.record)"
                                         @refresh-table="$emit('refreshTable')"
                                     ></component>
                                 </slot>
