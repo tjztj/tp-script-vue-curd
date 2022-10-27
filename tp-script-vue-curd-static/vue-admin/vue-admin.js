@@ -2178,7 +2178,7 @@ define(requires, function (axios, Qs) {
                                     :record="record">
                                     <a-tooltip placement="topLeft">
                                         <template #title>{{record.text}}</template>
-                                        {{record.text}}
+                                        <span :style="colStyle(fieldObjs[record.column.dataIndex],record.record)">{{record.text}}</span>
                                     </a-tooltip>
                                 </slot>
                              </template>
