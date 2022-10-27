@@ -2126,7 +2126,7 @@ define(requires, function (axios, Qs) {
                 openBox: window.openBox,
                 openOtherBtn: window.vueDefMethods.openOtherBtn,
                 colStyle(field,row){
-                    return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style||{})
+                    return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style&&row.__style[field.name]&&typeof row.__style[field.name]==='object'?row.__style[field.name]:{})
                 },
             },
             template: `<div :id="id">
