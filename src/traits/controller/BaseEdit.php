@@ -514,12 +514,31 @@ trait BaseEdit
             // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
             $app=app('http')->getName();
             $app&&$app.='/';
-            return (bool)array_intersect([
-                $app.$this->request->controller().'/'.$this->request->action(),
-                $app.str_replace('._','.',parse_name($this->request->controller())).'/'.$this->request->action(),
-                $app.str_replace('._','.',parse_name($this->request->controller())).'/'.parse_name($this->request->action()),
-                $app.$this->request->controller().'/'.parse_name($this->request->action()),
-            ],$stepInfo->config['canEditActions']);
+            $controllerList=[$this->request->controller()];
+
+
+            $controllerArr=explode('.',$this->request->controller());
+            if(count($controllerArr)>1){
+                foreach ([parse_name($controllerArr[0]),parse_name($controllerArr[0],1),parse_name($controllerArr[0],1,false)] as $v){
+                    $controllerList[]=$v.'.'.parse_name($controllerArr[1]);
+                    $controllerList[]=$v.'.'.parse_name($controllerArr[1],1);
+                    $controllerList[]=$v.'.'.parse_name($controllerArr[1],1,false);
+                }
+            }else{
+                $controllerList[]=parse_name($this->request->controller());
+                $controllerList[]=parse_name($this->request->controller(),1);
+                $controllerList[]=parse_name($this->request->controller(),1,false);
+
+            }
+            $actions=[];
+            foreach ($controllerList as $v){
+                $actions[]=$app.$v.'/'.$this->request->action();
+                $actions[]=$app.$v.'/'.parse_name($this->request->action());
+                $actions[]=$app.$v.'/'.parse_name($this->request->action(),1);
+                $actions[]=$app.$v.'/'.parse_name($this->request->action(),1,false);
+            }
+
+            return (bool)array_intersect($actions,$stepInfo->config['canEditActions']);
         }
 
         if(!empty($stepInfo->config['listBtnUrl'])){
