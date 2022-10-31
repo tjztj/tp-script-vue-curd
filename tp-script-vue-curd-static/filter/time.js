@@ -13,6 +13,7 @@ define([],function(){
                 document.querySelector('head').insertAdjacentHTML('beforeend', style);
             }
             const inputValue=Vue.ref('');
+            const value=Vue.ref('');
             const onParentSearch = () => {
                 let val='';
                 if(props.config.activeValue){
@@ -22,11 +23,12 @@ define([],function(){
                     }
                 }
                 inputValue.value=val;
+                value.value=val;
             }
             onParentSearch();
 
             return {
-                inputValue,onParentSearch,val:Vue.ref(inputValue.value)
+                inputValue,onParentSearch,val:value
             }
         },
         methods: {
@@ -46,7 +48,7 @@ define([],function(){
         },
         template:`<div>
                 <div class="input-value-div filter-input-field-box">
-                    <a-time-picker v-model:value="val" size="small" @openChange="search"/>
+                    <a-time-picker v-model:value="val" size="small" valueFormat="HH:mm:ss" @openChange="openChange"/>
                 </div>
 </div>`,
     }
