@@ -26,17 +26,27 @@ define([],function(){
             onParentSearch();
 
             return {
-                inputValue,onParentSearch
+                inputValue,onParentSearch,val:Vue.ref(inputValue.value)
             }
         },
         methods: {
             search(){
                 this.$emit('search',this.inputValue);
             },
+            openChange(open){
+                if(open){
+                    return;
+                }
+                if(this.val===this.inputValue){
+                    return;
+                }
+                this.inputValue=this.val.toString();
+                this.search();
+            },
         },
         template:`<div>
                 <div class="input-value-div filter-input-field-box">
-                    <a-time-picker v-model:value="inputValue" size="small" @change="search"/>
+                    <a-time-picker v-model:value="val" size="small" @openChange="search"/>
                 </div>
 </div>`,
     }
