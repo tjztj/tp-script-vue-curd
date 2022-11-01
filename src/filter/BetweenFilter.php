@@ -55,7 +55,7 @@ class BetweenFilter extends ModelFilter
         }else if(empty($value['start'])){
             $query->where($this->field->name(),'<=',$value['end']);
         }else{
-            if(bccomp($value['start'],$value['end'])===1){
+            if(bccomp($value['start'],$value['end'])===-1){
                 $query->whereBetween($this->field->name(),[$value['start'],$value['end']]);
             }else{
                 $query->whereBetween($this->field->name(),[$value['end'],$value['start']]);

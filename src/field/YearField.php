@@ -3,6 +3,7 @@
 namespace tpScriptVueCurd\field;
 
 use tpScriptVueCurd\ExcelFieldTpl;
+use tpScriptVueCurd\filter\YearFilter;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
@@ -12,7 +13,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
 
 class YearField extends ModelField
 {
-
+    protected string $defaultFilterClass=YearFilter::class;
     public function excelTplExplain(ExcelFieldTpl $excelFieldTpl): void
     {
         $excelFieldTpl->width=8;
