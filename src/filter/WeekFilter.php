@@ -71,7 +71,7 @@ class WeekFilter extends ModelFilter
         return $time - (($w?:7) - 1) * 24 * 3600;
     }
 
-    static public function componentUrl():string{
+    public static function componentUrl():string{
         return '/tp-script-vue-curd-static.php?filter/week.js';
     }
 }

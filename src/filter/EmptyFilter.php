@@ -22,7 +22,7 @@ class EmptyFilter extends ModelFilter
     }
     public function generateWhere(Query $query,$value):void{}
 
-    static public function componentUrl():string{
+    public static function componentUrl():string{
         return '';
     }
 }

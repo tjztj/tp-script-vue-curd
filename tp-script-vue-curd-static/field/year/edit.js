@@ -4,7 +4,7 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    return this.value
+                    return this.value.toString()
                 },
                 set(val){
                     this.$emit('update:value', val);

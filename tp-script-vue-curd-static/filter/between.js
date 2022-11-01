@@ -59,7 +59,7 @@ define([],function(){
                                   />
                                   <a-input
                                     v-model:value="separator"
-                                    style=" width: 30px; border-left: 0; pointer-events: none; backgroundColor: #fff"
+                                    style=" width: 30px; border-left: 0; pointer-events: none; background-color: #fff"
                                     placeholder="~"
                                     disabled
                                   />
