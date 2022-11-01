@@ -15,9 +15,10 @@ use think\db\Query;
 class TimeFilter extends ModelFilter
 {
     protected array $items=[
+        ['start'=>'00:00','end'=>'05:59','title'=>'凌晨'],
         ['start'=>'06:00','end'=>'11:59','title'=>'上午'],
         ['start'=>'12:00','end'=>'18:59','title'=>'下午'],
-        ['start'=>'19:00','end'=>'05:59','title'=>'晚上'],
+        ['start'=>'19:00','end'=>'23:59','title'=>'晚上'],
     ];
     //如：
     //[
