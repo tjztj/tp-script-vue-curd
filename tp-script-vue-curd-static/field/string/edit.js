@@ -11,6 +11,14 @@ define([],function(){
                 }
             }
         },
-        template:`<div><span class="read-only-just-show-text" v-if="field.readOnly&&field.readOnlyJustShowText">{{val}}</span><a-input v-else v-model:value="val" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly" :allow-clear="field.disengageSensitivity" @keyup.delete="val=''"/></div>`,
+        methods:{
+            keyupDelete(){
+                if(!this.field.disengageSensitivity){
+                    return;
+                }
+                this.val='';
+            }
+        },
+        template:`<div><span class="read-only-just-show-text" v-if="field.readOnly&&field.readOnlyJustShowText">{{val}}</span><a-input v-else v-model:value="val" :placeholder="field.placeholder||'请填写'+field.title" :suffix="field.ext" :disabled="field.readOnly" :allow-clear="field.disengageSensitivity" @keyup.delete="keyupDelete"/></div>`,
     }
 });
