@@ -12,6 +12,7 @@ use tpScriptVueCurd\field\ListField;
 use tpScriptVueCurd\field\PasswordField;
 use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\field\SelectField;
+use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\field\TreeSelect;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
@@ -260,7 +261,7 @@ class FieldCollection extends Collection
     public function doShowData(array &$data): void
     {
         $this->each(function(ModelField $v)use(&$data){
-            if($v instanceof PasswordField||!isset($data[$v->name()])){
+            if($v instanceof PasswordField||($v instanceof StringField&&$v->disengageSensitivity())||!isset($data[$v->name()])){
                 return ;
             }
             $data['_Original_'.$v->name()]=$data[$v->name()];//原数据

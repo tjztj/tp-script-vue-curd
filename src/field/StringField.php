@@ -25,6 +25,15 @@ class StringField extends ModelField
 
     protected bool $readOnlyJustShowText=false;
 
+
+    protected bool $disengageSensitivity=false;
+
+    /**
+     * min before after
+     * @var string|null
+     */
+    protected ?string $disengageSensitivityFormat=null;
+
     /**
      * readOnly时，是否不显示输入框
      * @param bool|null $readOnlyJustShowText
@@ -37,6 +46,20 @@ class StringField extends ModelField
 
 
     /**
+     * 脱敏
+     * @param bool|null $disengageSensitivity
+     * @param string|null $format min before after aaa***bbb
+     * @return $this|bool
+     */
+    public function disengageSensitivity(bool $disengageSensitivity = null,string $format=null)
+    {
+        if($format!==null){
+            $this->disengageSensitivityFormat=$format;
+        }
+        return $this->doAttr('disengageSensitivity', $disengageSensitivity);
+    }
+
+    /**
      * 设置保存的值
      * @param array $data  数据值集合
      * @return $this
@@ -45,6 +68,10 @@ class StringField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
+            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::setMinChartE($old[$this->name()])){
+                $this->save=$old[$this->name()];
+            }
+
             if($this->required()&&($this->save===''||$this->save===$this->nullVal())){
                 $this->defaultCheckRequired($this->save);
             }
@@ -52,6 +79,18 @@ class StringField extends ModelField
             $this->defaultCheckRequired('');
         }
         return $this;
+    }
+
+    /**
+     * 显示时要处理的数据
+     * @param array $dataBaseData
+     */
+    public function doShowData(array &$dataBaseData): void
+    {
+        $name=$this->name();
+        if(isset($dataBaseData[$name])&&$this->disengageSensitivity()){
+            $dataBaseData[$name]=self::setMinChartE($dataBaseData[$name],$this->disengageSensitivityFormat);
+        }
     }
 
     /**
@@ -80,5 +119,158 @@ class StringField extends ModelField
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeVarchar();
+    }
+
+    /**
+     * 脱敏处理
+     * @param $val
+     * @param $disengageSensitivityFormat
+     * @return string
+     */
+    public static function setMinChartE($val,$disengageSensitivityFormat): string
+    {
+
+        $val=(string)$val;
+        $len=mb_strlen($val);
+        if($len===0){
+            return '';
+        }
+
+
+        $getDefReturn= static function ($beforeLen, $afterLen, $format)use($len,$val){
+            if($len<2){
+                return '*';
+            }
+            if($len<3){
+                $beforeLen=is_null($beforeLen)?1:$beforeLen;
+                $afterLen=is_null($afterLen)?1:$afterLen;
+                if($format==='after'){
+                    return $beforeLen?mb_substr($val,0,$beforeLen).'*':str_pad('',$len,'*');
+                }
+
+                return $afterLen?'*'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+            }
+
+            if($len<4){
+                $beforeLen=is_null($beforeLen)?1:$beforeLen;
+                $afterLen=is_null($afterLen)?1:$afterLen;
+                if($format==='before'){
+                    return $afterLen?'**'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+                }
+
+                if($format==='after'){
+                    return $beforeLen?mb_substr($val,0,$beforeLen).'**':str_pad('',$len,'*');
+                }
+                return mb_substr($val,0,$beforeLen).'**'.($afterLen?mb_substr($val,-$afterLen):str_pad('',$len-$beforeLen,'*'));
+            }
+
+            if($len<5){
+                $beforeLen=is_null($beforeLen)?1:$beforeLen;
+                $afterLen=is_null($afterLen)?1:$afterLen;
+            }else if($len<7){
+                $beforeLen=is_null($beforeLen)?1:$beforeLen;
+                $afterLen=is_null($afterLen)?1:$afterLen;
+            }else if($len<8){
+                $beforeLen=is_null($beforeLen)?1:$beforeLen;
+                $afterLen=is_null($afterLen)?2:$afterLen;
+            }else{
+                $beforeLen=is_null($beforeLen)?2:$beforeLen;
+                $afterLen=is_null($afterLen)?2:$afterLen;
+            }
+            if($format==='before'){
+                return $afterLen?'***'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+            }
+
+            if($format==='after'){
+                return $beforeLen?mb_substr($val,0,$beforeLen).'***':str_pad('',$len,'*');
+            }
+            return mb_substr($val,0,$beforeLen).'***'.($afterLen?mb_substr($val,-$afterLen):str_pad('',$len-$beforeLen,'*'));
+        };
+
+
+        if(is_null($disengageSensitivityFormat)&&filter_var($val,FILTER_VALIDATE_EMAIL)){
+            switch (mb_strlen($val)){
+                case 1:
+                    $beforeLen=0;
+                    break;
+                case 2:
+                case 3:
+                    $beforeLen=1;
+                    break;
+                case 4:
+                case 5:
+                    $beforeLen=2;
+                    break;
+                default:
+                    $beforeLen=3;
+            }
+            return $getDefReturn($beforeLen,mb_strlen($val)-mb_strrpos($val, '@'),'min');
+        }
+        $format=$disengageSensitivityFormat;
+        if(is_null($format)){
+            return $getDefReturn(null,null,'min');
+        }
+        if(in_array($format,['before','after','min'])){
+            return $getDefReturn(null,null,$format);
+        }
+
+        $formatArr=mb_str_split($format);
+        $beforeArr=mb_str_split($val);
+
+
+        $newBefore=[];
+        $beforeI=0;
+        $maxBeforeI=ceil(count($beforeArr)/count($formatArr)*mb_substr_count($format,'a'));
+        $maxAfterI=ceil(count($beforeArr)/count($formatArr)*mb_substr_count($format,'b'));
+        if($maxBeforeI+$maxAfterI>=count($beforeArr)){
+            if($maxBeforeI+$maxAfterI-count($beforeArr)===2){
+                $maxBeforeI--;
+                $maxAfterI--;
+            }else if($maxAfterI>$maxBeforeI){
+                $maxAfterI--;
+            }else{
+                $maxBeforeI--;
+            }
+        }
+
+        foreach ($formatArr as $v){
+            if($v==='a'&&$beforeI<$maxBeforeI){
+                $newBefore[]=$beforeArr[$beforeI]??'';
+                $beforeI++;
+            }else{
+                $newBefore[]=$v==='a'?'':$v;
+            }
+        }
+
+
+        $afterArr=array_reverse($beforeArr);
+        $endI=0;
+        $new=[];
+        foreach (array_reverse($newBefore) as $v){
+            if($v==='b'&&$endI<$maxAfterI){
+                $new[]=$afterArr[$endI]??'';
+                $endI++;
+            }else{
+                $new[]=$v==='b'?'':$v;
+            }
+        }
+        $newVal=implode('',array_reverse($new));
+        if($beforeI+$endI<count($formatArr)&&$newVal!==$val){
+            return $newVal;
+        }
+
+
+
+        return str_replace(['a','b'],'',$format);
+
+
+//        if($beforeI&&$endI){
+//            return $getDefReturn(null,null,'min');
+//        }
+//        if($beforeI){
+//            return $getDefReturn(null,null,'after');
+//        }
+//
+//        return $getDefReturn(null,null,'before');
     }
 }
