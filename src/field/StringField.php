@@ -123,11 +123,11 @@ class StringField extends ModelField
 
     /**
      * 脱敏处理
-     * @param $val
-     * @param $disengageSensitivityFormat
+     * @param string $val
+     * @param string|null $disengageSensitivityFormat
      * @return string
      */
-    public static function tuoMing($val,$disengageSensitivityFormat): string
+    public static function tuoMing(string $val,string $disengageSensitivityFormat=null): string
     {
 
         $val=(string)$val;
@@ -142,26 +142,29 @@ class StringField extends ModelField
                 return '*';
             }
             if($len<3){
+                if($format!=='after'){
+                    $afterLen=is_null($afterLen)?1:$afterLen;
+                    return $afterLen?'*'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+                }
                 $beforeLen=is_null($beforeLen)?1:$beforeLen;
-                $afterLen=is_null($afterLen)?1:$afterLen;
-                if($format==='after'){
+                if(!$afterLen){
                     return $beforeLen?mb_substr($val,0,$beforeLen).'*':str_pad('',$len,'*');
                 }
-
-                return $afterLen?'*'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+                return str_pad('',$len,'*');
             }
 
             if($len<4){
                 $beforeLen=is_null($beforeLen)?1:$beforeLen;
                 $afterLen=is_null($afterLen)?1:$afterLen;
+                $asterisk=str_pad('',$len-$beforeLen-$afterLen,'*');
                 if($format==='before'){
-                    return $afterLen?'**'.mb_substr($val,-$afterLen):str_pad('',$len,'*');
+                    return $afterLen?$asterisk.mb_substr($val,-$afterLen):str_pad('',$len,'*');
                 }
 
                 if($format==='after'){
-                    return $beforeLen?mb_substr($val,0,$beforeLen).'**':str_pad('',$len,'*');
+                    return $beforeLen?mb_substr($val,0,$beforeLen).$asterisk:str_pad('',$len,'*');
                 }
-                return mb_substr($val,0,$beforeLen).'**'.($afterLen?mb_substr($val,-$afterLen):str_pad('',$len-$beforeLen,'*'));
+                return mb_substr($val,0,$beforeLen).$asterisk.($afterLen?mb_substr($val,-$afterLen):str_pad('',$len-$beforeLen,'*'));
             }
 
             if($len<5){
@@ -214,24 +217,32 @@ class StringField extends ModelField
             return $getDefReturn(null,null,$format);
         }
 
+        $val=str_replace(['a','b'],['α','β'],$val);
         $formatArr=mb_str_split($format);
         $beforeArr=mb_str_split($val);
 
 
         $newBefore=[];
         $beforeI=0;
-        $maxBeforeI=ceil(count($beforeArr)/count($formatArr)*mb_substr_count($format,'a'));
-        $maxAfterI=ceil(count($beforeArr)/count($formatArr)*mb_substr_count($format,'b'));
-        if($maxBeforeI+$maxAfterI>=count($beforeArr)){
-            if($maxBeforeI+$maxAfterI-count($beforeArr)===2){
-                $maxBeforeI--;
-                $maxAfterI--;
-            }else if($maxAfterI>$maxBeforeI){
-                $maxAfterI--;
-            }else{
-                $maxBeforeI--;
+
+        if($len<=mb_substr_count($format,'a')+mb_substr_count($format,'b')){
+            $maxBeforeI=ceil($len/count($formatArr)*mb_substr_count($format,'a'));
+            $maxAfterI=ceil($len/count($formatArr)*mb_substr_count($format,'b'));
+            if($maxBeforeI+$maxAfterI>=$len){
+                if($maxBeforeI+$maxAfterI-$len===2){
+                    $maxBeforeI--;
+                    $maxAfterI--;
+                }else if($maxAfterI>$maxBeforeI){
+                    $maxAfterI--;
+                }else{
+                    $maxBeforeI--;
+                }
             }
+        }else{
+            $maxBeforeI=$maxAfterI=$len+1;
         }
+
+
 
         foreach ($formatArr as $v){
             if($v==='a'&&$beforeI<$maxBeforeI){
@@ -256,21 +267,11 @@ class StringField extends ModelField
         }
         $newVal=implode('',array_reverse($new));
         if($beforeI+$endI<count($formatArr)&&$newVal!==$val){
-            return $newVal;
+            return str_replace(['α','β'],['a','b'],$newVal);
         }
 
 
 
         return str_replace(['a','b'],'',$format);
-
-
-//        if($beforeI&&$endI){
-//            return $getDefReturn(null,null,'min');
-//        }
-//        if($beforeI){
-//            return $getDefReturn(null,null,'after');
-//        }
-//
-//        return $getDefReturn(null,null,'before');
     }
 }
