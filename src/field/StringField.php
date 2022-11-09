@@ -68,7 +68,7 @@ class StringField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
-            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMing($old[$this->name()])){
+            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMin($old[$this->name()])){
                 $this->save=$old[$this->name()];
             }
 
@@ -89,7 +89,7 @@ class StringField extends ModelField
     {
         $name=$this->name();
         if(isset($dataBaseData[$name])&&$this->disengageSensitivity()){
-            $dataBaseData[$name]=self::tuoMing($dataBaseData[$name],$this->disengageSensitivityFormat);
+            $dataBaseData[$name]=self::tuoMin($dataBaseData[$name],$this->disengageSensitivityFormat);
         }
     }
 
@@ -127,7 +127,7 @@ class StringField extends ModelField
      * @param string|null $disengageSensitivityFormat
      * @return string
      */
-    public static function tuoMing(string $val,string $disengageSensitivityFormat=null): string
+    public static function tuoMin(string $val,string $disengageSensitivityFormat=null): string
     {
 
         $val=(string)$val;
