@@ -129,8 +129,6 @@ class StringField extends ModelField
      */
     public static function tuoMin(string $val,string $disengageSensitivityFormat=null): string
     {
-
-        $val=(string)$val;
         $len=mb_strlen($val);
         if($len===0){
             return '';
