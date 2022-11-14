@@ -116,23 +116,42 @@ define(requires, function (axios, Qs) {
 
 
     /****窗口方法***/
-    window.parseTime = function (t, e) {
-        if (0 === arguments.length) return null;
-        const n = e || "{y}-{m}-{d} {h}:{i}:{s}";
-        let g;
-        g = "object" == typeof t ? t : ("number" != typeof (t = "string" == typeof t && /^-?[0-9]+$/.test(t) ? parseInt(t) : t) || 10 !== t.toString().length && 9 !== t.toString().length || (t *= 1e3), new Date(t));
-        const r = {
-            y: g.getFullYear(),
-            m: g.getMonth() + 1,
-            d: g.getDate(),
-            h: g.getHours(),
-            i: g.getMinutes(),
-            s: g.getSeconds(),
-            a: g.getDay()
+    /****窗口方法***/
+    window.parseTime = function (time, cFormat) {
+        if (arguments.length === 0) {
+            return null
+        }
+        const format = cFormat || '{y}-{m}-{d} {h}:{i}:{s}';
+        let date;
+        if (typeof time === 'object') {
+            date = time
+        } else {
+            if ((typeof time === 'string') && (/^-?[0-9]+$/.test(time))) {
+                time = parseInt(time)
+            }
+            // if ((typeof time === 'number') && (time.toString().length === 10 || time.toString().length === 9)) {
+            //     time = time * 1000
+            // }
+            date = new Date(time)
+        }
+        const formatObj = {
+            y: date.getFullYear(),
+            m: date.getMonth() + 1,
+            d: date.getDate(),
+            h: date.getHours(),
+            i: date.getMinutes(),
+            s: date.getSeconds(),
+            a: date.getDay()
         };
-        return n.replace(/{(y|m|d|h|i|s|a)+}/g, (t, e) => {
-            let n = r[e];
-            return "a" === e ? ["日", "一", "二", "三", "四", "五", "六"][n] : (0 < t.length && n < 10 && (n = "0" + n), n || 0)
+        return format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+            let value = formatObj[key];
+            if (key === 'a') {
+                return ['日', '一', '二', '三', '四', '五', '六'][value]
+            }
+            if (result.length > 0 && value < 10) {
+                value = '0' + value
+            }
+            return value || 0
         })
     };
     window.getMonthWeek = function (dateStr) {

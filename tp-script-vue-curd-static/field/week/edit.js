@@ -5,7 +5,7 @@ define([],function(){
             val:{
                 get(){
                     if(/^\d+$/g.test(this.value.toString())){
-                        return parseTime(this.value,'{y}-{m}-{d}');
+                        return parseTime(Math.abs(this.value).toString().length<=10?this.value*1000:this.value,'{y}-{m}-{d}');
                     }
                     return this.value
                 },

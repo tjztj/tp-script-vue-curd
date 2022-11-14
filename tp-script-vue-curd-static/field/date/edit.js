@@ -11,7 +11,7 @@ define([], function () {
                     let val = '';
                     if (/^\-?\d+$/g.test(this.value.toString())) {
                         //时间戳
-                        val = parseTime(this.value, this.field.showTime ? '{y}-{m}-{d} {h}:{i}:{s}' : '{y}-{m}-{d}');
+                        val = parseTime(Math.abs(this.value).toString().length<=10?this.value*1000:this.value, this.field.showTime ? '{y}-{m}-{d} {h}:{i}:{s}' : '{y}-{m}-{d}');
                         this.$emit('update:value', val);
                     } else {
                         val = this.value;
