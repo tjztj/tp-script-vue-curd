@@ -13,7 +13,7 @@ define([],function(){
         },
         methods:{
             keyupDelete(){
-                if(!this.field.disengageSensitivity){
+                if(this.val.indexOf('*')===-1||!this.field.disengageSensitivity){
                     return;
                 }
                 this.val='';
