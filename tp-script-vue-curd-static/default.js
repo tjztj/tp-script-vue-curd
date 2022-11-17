@@ -200,6 +200,14 @@ define(['vueAdmin'], function (va) {
 
 
         const infos={};
+        const setInfos=function (list){
+            list.forEach(v=>{
+                infos[v.id]=v;
+                if(v.children&&v.children.length>0){
+                    setInfos(v.children);
+                }
+            })
+        };
         return {
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
@@ -356,9 +364,7 @@ define(['vueAdmin'], function (va) {
                         this.pagination.current=data.data.current_page;
                         this.pagination.total = data.data.total;
                         this.dataOther=Object.keys(data.data.other).length>0?data.data.other:{};
-                        data.data.data.forEach(item=>{
-                            infos[item.id]=item;
-                        })
+                        setInfos(data.data.data);
                         this.data = data.data.data;
                         this.loading = false;
                         this.refreshTableTirgger(url,where,data);

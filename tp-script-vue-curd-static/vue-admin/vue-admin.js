@@ -1910,6 +1910,8 @@ define(requires, function (axios, Qs) {
                     })
                 }
 
+                const guid=window.guid();
+                Vue.provide('table-guid',guid)
                 return {
                     actionW: newActionW,
                     columns: columnsVals,
@@ -1923,6 +1925,7 @@ define(requires, function (axios, Qs) {
                     childsObjs,
                     onresize,
                     expandedRowKeys: Vue.ref([]),
+                    guid,
                 }
             },
             watch: {
@@ -2183,6 +2186,7 @@ define(requires, function (axios, Qs) {
                                         :field="item" 
                                         :record="record"
                                         :style="colStyle(item,record.record)"
+                                        :list="data"
                                         @refresh-table="$emit('refreshTable')"
                                     ></component>
                                 </slot>

@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\filter;
 
 
 use tpScriptVueCurd\field\CheckboxField;
+use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelFilter;
 use tpScriptVueCurd\traits\field\CheckField;
 use think\db\Query;
@@ -18,8 +19,39 @@ class SelectFilter extends ModelFilter
 {
     protected array $items=[];
     protected bool $multiple=false;
+    protected string $url='';//远程地址
+    protected string $lableField='';
+    protected string $valueField='';
+
 
     public function config():array{
+        if(!$this->url&&method_exists($this->field,'url')&&!method_exists($this->field,'items')){
+            $this->url=$this->field->url();
+            if(method_exists($this->field,'fields')){
+                $fields=$this->field->fields();
+                if($this->valueField===''){
+                    $this->valueField='id';
+                }
+                if($this->lableField===''){
+                    if($fields instanceof FieldCollection){
+                        $f=$fields[0];
+                        $this->lableField=$f->name();
+                    }else{
+                        $this->lableField=key($fields);
+                    }
+                }
+            }
+        }
+        if($this->url){
+            return [
+                'items'=>[],
+                'url'=>$this->url,
+                'multiple'=>$this->multiple(),
+                'lableField'=>$this->lableField,
+                'valueField'=>$this->valueField,
+            ];
+        }
+
         if(empty($this->items)){
             if(method_exists($this->field,'items')){
                 foreach ($this->field->items() as $v){
@@ -38,6 +70,7 @@ class SelectFilter extends ModelFilter
         }
         return [
             'items'=>$this->items,
+            'url'=>'',
             'multiple'=>$this->multiple(),
         ];
     }
@@ -65,6 +98,41 @@ class SelectFilter extends ModelFilter
         $this->items=$items;
         return $this;
     }
+
+
+    public function setUrl(string $url,string $lableField,string $valueField): SelectFilter
+    {
+        $this->url=$url;
+        $this->lableField=$lableField;
+        $this->valueField=$valueField;
+        return $this;
+    }
+
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    public function getLableField(): string
+    {
+        return $this->lableField;
+    }
+
+    public function getValueField(): string
+    {
+        return $this->valueField;
+    }
+
+    public function setLableField(string $lableField): string
+    {
+        return $this->lableField=$lableField;
+    }
+
+    public function setValueField(string $valueField): string
+    {
+        return $this->valueField=$valueField;
+    }
+
 
     public function generateWhere(Query $query,$value):void{
         if($value||$value===0||$value==='0'||($value===''&&in_array('',array_column($this->field->items(),'value'),true))){
