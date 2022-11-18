@@ -40,6 +40,7 @@ display: none!important;
                 show:false,
                 id:'table-select-'+window.guid(),
                 options:[],
+                maxW:'95vw',
             }
         },
         created(){
@@ -60,6 +61,7 @@ display: none!important;
                     title: this.field.fields[i],
                     dataIndex: i,
                     key: i,
+                    ellipsis:true,
                 })
             }
             this.columns=columns;
@@ -71,7 +73,7 @@ display: none!important;
             },
             value:{
                 handler(value, oldValue) {
-                    value=value.trim();
+                    value=value.toString().trim();
                     let selects=this.getValueStr();
                     if(selects===value){
                         return;
@@ -165,6 +167,8 @@ display: none!important;
                 return window.vueDefMethods.$post.call(this,...params,)
             },
             getList(){
+                this.maxW= document.querySelector('#'+this.id).clientWidth+'px';
+
                 this.loading=true;
                 const params={...this.myFilters};
                 this.$post(this.field.url,params).then(res=>{
@@ -301,7 +305,7 @@ display: none!important;
   >
   </a-select>
  <template #overlay>
-  <div class="select-table-dropdown">
+  <div class="select-table-dropdown" :style="{'max-width': maxW}">
     <a-table :row-key="record => record.id" :loading="loading" :columns="columns" :data-source="data" :pagination="pagination" @change="handleTableChange" size="small" :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange,type:field.multiple?'checkbox':'radio' }">
         <template #custom-title-action>操作</template>
         <template #action="{ record }">   
