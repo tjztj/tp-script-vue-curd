@@ -27,6 +27,8 @@ class FilesField extends ModelField
     protected string $accept='';//上传文件类型
     protected bool $multiple=true;//是否可多选
 
+    protected bool $checkFilesIsLocal=true;//验证上传的文件是否为本地文件
+
     /**
      * @var callable
      */
@@ -121,6 +123,10 @@ class FilesField extends ModelField
                 $accepts=explode(',',$this->accept);
                 $arr=explode('|',$this->save);
                 foreach ($arr as $k=>$v){
+                    if($this->checkFilesIsLocal()&&!self::checkFilesLocal($v)){
+                        throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件路径非法');
+                    }
+
                     $have=false;
                     foreach ($accepts as $val){
                         if(self::checkUrlIsMimeOrExt($v,$val)){
@@ -498,5 +504,46 @@ class FilesField extends ModelField
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeText();
+    }
+
+
+    /**
+     * 验证是否为本地文件，不验证文件是否存在
+     * @param $files
+     * @param string $separator
+     * @return bool
+     */
+    public static function checkFilesLocal($files,string $separator='|'):bool{
+        if(!is_array($files)){
+            $files=explode($separator,$files);
+        }
+        if(empty($files)){
+            return true;
+        }
+
+        foreach ($files as $v){
+            $v=str_replace('\\','',$v);
+            if(mb_strpos($v,'..')!==false){
+                return false;
+            }
+            if(mb_strpos($v, '/') !== 0&&mb_strpos($v, request()->domain()) !== 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 是否要验证上传的文件为本地文件
+     * @param bool|null $checkFilesIsLocal
+     * @return $this|bool
+     */
+    public function checkFilesIsLocal(bool $checkFilesIsLocal=null){
+        if(is_null($checkFilesIsLocal)){
+            return $this->checkFilesIsLocal;
+        }
+        $this->checkFilesIsLocal=$checkFilesIsLocal;
+        return $this;
     }
 }

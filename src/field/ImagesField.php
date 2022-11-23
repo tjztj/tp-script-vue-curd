@@ -30,6 +30,8 @@ class ImagesField extends ModelField
      */
     protected $imgFieldShowUrlDo=null;
 
+    protected bool $checkFilesIsLocal=true;//验证上传的文件是否为本地文件
+
     protected bool $canExport=false;//不能导出此字段数据
     protected array $listShowImg=[
         'maxWidth'=>'72px',//最大宽度
@@ -114,6 +116,9 @@ class ImagesField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];
+            if(FilesField::checkFilesLocal($this->save)===false){
+                throw new \think\Exception('图片路径非法');
+            }
         }
         $this->defaultCheckRequired($this->save,'请上传图片');
         return $this;
@@ -190,5 +195,18 @@ class ImagesField extends ModelField
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeText();
+    }
+
+    /**
+     * 是否要验证上传的文件为本地文件
+     * @param bool|null $checkFilesIsLocal
+     * @return $this|bool
+     */
+    public function checkFilesIsLocal(bool $checkFilesIsLocal=null){
+        if(is_null($checkFilesIsLocal)){
+            return $this->checkFilesIsLocal;
+        }
+        $this->checkFilesIsLocal=$checkFilesIsLocal;
+        return $this;
     }
 }
