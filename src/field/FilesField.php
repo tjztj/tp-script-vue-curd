@@ -517,6 +517,7 @@ class FilesField extends ModelField
         if(!is_array($files)){
             $files=explode($separator,$files);
         }
+        $files=array_filter($files);
         if(empty($files)){
             return true;
         }
