@@ -35,7 +35,7 @@ class GenerateTableOption extends Collection
      * @var bool
      */
     protected bool $modifyColumn=false;
-    
+
 
     /**
      * @return string
@@ -75,7 +75,8 @@ class GenerateTableOption extends Collection
     public function generateItems():array{
         $arr=[];
         $this->model->fields()->each(function (ModelField $v)use(&$arr){
-            if(!$v->generateColumn()){
+            $generateColumn=$v->generateColumn();
+            if(!$generateColumn){
                 return;
             }
             try{
@@ -85,6 +86,9 @@ class GenerateTableOption extends Collection
             }
 
             $v->getGenerateColumnConfig($field);
+            if(is_callable($generateColumn)&&$generateColumn($field)===false){
+                return;
+            }
             if(empty($field->getComment())){
                 $field->setComment(($v->group()?$v->group().'|':'').$v->title());
             }
@@ -106,15 +110,15 @@ class GenerateTableOption extends Collection
         if($this->isEmpty()){
             throw new \think\Exception(get_class($model) .'未在模型中定义字段');
         }
-       if($this->engine!=='InnoDB'&&$this->engine!=='MyISAM'){
-           throw new \think\Exception('engine不能设置为'.$this->engine.'，只能是InnoDB与MyISAM');
-       }
-       //重新设置字段
+        if($this->engine!=='InnoDB'&&$this->engine!=='MyISAM'){
+            throw new \think\Exception('engine不能设置为'.$this->engine.'，只能是InnoDB与MyISAM');
+        }
+        //重新设置字段
         $this->items = $this->convertToArray($this->generateItems());
 
-       if(empty($model->controller)){
-           return '';
-       }
+        if(empty($model->controller)){
+            return '';
+        }
 
         $controll=$model->controller;
         if($controll->getParentController()){

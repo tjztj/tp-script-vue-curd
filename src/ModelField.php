@@ -78,7 +78,11 @@ abstract class ModelField
     public const REQUIRED = true;//开启必填验证
     public bool $objWellToArr = true;
     protected array $attrWhereValueList=[];
-    protected bool $generateColumn=true;
+    /**
+     *
+     * @var $generateColumn null|bool|callable
+     */
+    protected $generateColumn=null;
     protected array $listColStyle=[];//列表中单元格内的样式
 
     /**
@@ -1136,13 +1140,17 @@ abstract class ModelField
 
 
     /**
-     * 是否要生成字段
-     * @param bool|null $generateColumn
-     * @return $this|bool
+     * 是否要生成字段 function(GenerateColumnOption $option){$option->setTypeVarchar(80);}
+     * @param bool|null|callable $generateColumn
+     * @return $this|bool|callable
      */
-    public function generateColumn(bool $generateColumn = null)
+    public function generateColumn($generateColumn = null)
     {
-        return $this->doAttr('generateColumn', $generateColumn);
+        if($generateColumn===null){
+            return $this->generateColumn ?? true;
+        }
+        $this->generateColumn=$generateColumn;
+        return $this;
     }
     /**
      * 数据库字段生成配置
