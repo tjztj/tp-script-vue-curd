@@ -70,6 +70,7 @@ class SelectField extends ModelField
                 throw new \think\Exception('只能选择一项');
             }
             $this->save=implode(',',$data[$name]);
+            $this->defaultCheckRequired($this->save);
         }else{
             $this->defaultCheckRequired($this->nullVal());
         }
