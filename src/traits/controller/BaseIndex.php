@@ -173,6 +173,7 @@ trait BaseIndex
             //控制器数据处理钩子
             try{
                 $this->indexData($option);
+                FieldDo::doIndexAfter($this->fields,$option->data);
                 if($this->isTreeIndex()){
                     $option->data=$this->listToTree($option->data);
                 }

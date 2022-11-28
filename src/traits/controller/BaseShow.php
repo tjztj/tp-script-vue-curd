@@ -103,6 +103,7 @@ trait BaseShow
             $func=$fields->getShowGridBy();
             $groupGrids[$k]=$func?$func($data,$baseModel,$v,$k):null;
         }
+        FieldDo::doShowAfter($fields,$info,$baseModel);
 
         return $this->showTpl('show',$this->showFetch([
             'title'=>$title,

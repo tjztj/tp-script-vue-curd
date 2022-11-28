@@ -24,6 +24,17 @@ class FieldDo
     protected $indexListDo;
 
     /**
+     * index页面执行完成后会执行（所有数据都处理完成后）
+     * @var callable $indexRowAfterDo
+     */
+    protected $indexRowAfterDo;
+    /**
+     * index页面执行完成后会执行（所有数据都处理完成后）
+     * @var callable $indexListAfterDo
+     */
+    protected $indexListAfterDo;
+
+    /**
      * index页面显示前
      * @var callable $indexShowDo
      */
@@ -47,6 +58,12 @@ class FieldDo
      * @var callable $showInfoDo
      */
     protected $showInfoDo;
+
+    /**
+     * 在showInfoDo 之后执行
+     * @var callable $showInfoAfterDo
+     */
+    protected $showInfoAfterDo;
 
     /**
      * 数据保存前
@@ -143,6 +160,7 @@ class FieldDo
 
     ##################################################################################################################
 
+
     /**
      * 设置列表数据展示时事件（列表）
      * @param callable $func
@@ -157,6 +175,80 @@ class FieldDo
     {
         $func=$this->indexListDo?? static function(){};
         $func($list,$base,$field);
+        return $this;
+    }
+
+
+    ##################################################################################################################
+
+
+
+
+
+    ##################################################################################################################
+
+    /**
+     * 设置列表数据展示时事件（单行）
+     * @param callable $func
+     * @return $this
+     */
+    public function setIndexRowAfterDo(callable $func): self
+    {
+        $this->indexRowAfterDo=$func;
+        return $this;
+    }
+
+    /**
+     * @param array $row
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doIndexRowAfterDo(array &$row,ModelField $field): self
+    {
+        $func=$this->indexRowAfterDo?? static function(){};
+        $func($row,$field);
+        return $this;
+    }
+
+    /**
+     * 列表获取到后执行 方便函数
+     * @param FieldCollection $fields
+     * @param array $list
+     */
+    public static function doIndexAfter(FieldCollection $fields,array &$list):void{
+        foreach ($list as $k=>$v){
+            $fields->each(static function(ModelField $field)use(&$list,$k){
+                foreach ($field->getFieldDoList() as $fieldDo){
+                    $fieldDo->doIndexRowAfterDo($list[$k],$field);
+                }
+            });
+        }
+        //另外再遍历，为了方便前面那个遍历后得到的东西在下面使用
+        $fields->each(static function(ModelField $field)use(&$list){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doIndexListAfterDo($list,$field);
+            }
+        });
+    }
+
+
+    ##################################################################################################################
+
+
+    /**
+     * 设置列表数据展示时事件（列表，所有数据都处理完成后）
+     * @param callable $func
+     * @return $this
+     */
+    public function setIndexListAfterDo(callable $func): self
+    {
+        $this->indexListAfterDo=$func;
+        return $this;
+    }
+    public function doIndexListAfterDo(array &$list,ModelField $field): self
+    {
+        $func=$this->indexListAfterDo?? static function(){};
+        $func($list,$field);
         return $this;
     }
 
@@ -296,6 +388,47 @@ class FieldDo
         });
     }
 
+
+    ##################################################################################################################
+
+    /**
+     * 设置详情页字段事件
+     * @param callable $func
+     * @return $this
+     */
+    public function setShowInfoAfterDo(callable $func): self
+    {
+        $this->showInfoAfterDo=$func;
+        return $this;
+    }
+
+    /**
+     * @param array $info
+     * @param BaseModel|null $base
+     * @param ModelField $field
+     * @return $this
+     */
+    public function doShowInfoAfterDo(array &$info,?BaseModel $base,ModelField $field): self
+    {
+        $func=$this->showInfoAfterDo?? static function(){};
+        $func($info,$base,$field);
+        return $this;
+    }
+
+    /**
+     * 详情页字段钩子 方便函数
+     * @param FieldCollection $fields
+     * @param array $info
+     * @param BaseModel|null $base
+     */
+    public static function doShowAfter(FieldCollection $fields,array &$info,?BaseModel $base):void{
+        $fields->each(static function(ModelField $field)use($base,&$info){
+            foreach ($field->getFieldDoList() as $fieldDo){
+                $fieldDo->doShowInfoAfterDo($info,$base,$field);
+            }
+        });
+    }
+
     ##################################################################################################################
 
     /**
@@ -356,7 +489,7 @@ class FieldDo
 
     /**
      * 数据保存前字段钩子
-     * @param array $postData   提交上来的数据
+     * @param array $saveData
      * @param BaseModel|null $before
      * @param BaseModel|null $base
      * @param ModelField $field
