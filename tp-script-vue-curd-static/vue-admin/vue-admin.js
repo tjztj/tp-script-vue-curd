@@ -2100,7 +2100,7 @@ define(requires, function (axios, Qs) {
                     return this.canDel && (!row.__auth || typeof row.__auth.del === 'undefined' || row.__auth.del === true)
                 },
                 isCanAddChildren(row) {
-                    return this.isTreeIndex && this.canAdd;
+                    return this.isTreeIndex && this.canAdd&&row.can_add_children!==false;
                 },
                 onExpand(expanded, record) {
                     if (expanded) {
