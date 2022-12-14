@@ -4,6 +4,7 @@
 namespace tpScriptVueCurd\option;
 
 
+use think\Collection;
 use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
@@ -65,7 +66,7 @@ abstract class FieldStepBase
             ),
             $config,
         )->auth(
-            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null) => $this->auth($info, $parentInfo, $fields),
+            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null,$list=null) => $this->auth($info, $parentInfo, $fields,$list),
             function (BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step){
                 $fn=$step->getAuthCheckAndCheckBeforeDefVal();
                 if($fn($info,$parentInfo,$fields)){
@@ -129,15 +130,15 @@ abstract class FieldStepBase
     abstract protected function beforeCheck(): array;
 
 
-
     /**
      * 数据是否具有提交这一步的权限（根据beforeAuthCheckFunc判断，这一步是【下一步提交】还是【当前步骤修改】）
      * @param BaseModel|null $info
      * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
+     * @param Collection|\think\model\Collection|null $list
      * @return bool
      */
-    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):bool;
+    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,$list=null):bool;
 
 
     /**

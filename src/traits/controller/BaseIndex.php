@@ -449,7 +449,7 @@ trait BaseIndex
      * @return Collection|\think\model\Collection
      */
     protected function setListDataStep($list,$parentInfo){
-        return $list->map(function(BaseModel $info)use($parentInfo){
+        return $list->map(function(BaseModel $info)use($parentInfo,$list){
             if(!$this->fields->stepIsEnable()){
                 return $info;
             }
@@ -465,12 +465,12 @@ trait BaseIndex
             $nextStepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
             $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo));
+            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo),$list);
 
 
             $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
-            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $parentInfo, $stepFields);
+            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $parentInfo, $stepFields,$list);
 
 
             return $info;

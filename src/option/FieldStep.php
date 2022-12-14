@@ -5,7 +5,9 @@ namespace tpScriptVueCurd\option;
 
 
 
+use think\Collection;
 use think\db\Query;
+use think\Exception;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
@@ -216,9 +218,11 @@ class FieldStep
      * @param BaseModel|null $info
      * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
+     * @param Collection|\think\model\Collection|null $list
      * @return bool
+     * @throws Exception
      */
-    public function authCheck(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):bool{
+    public function authCheck(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,$list=null):bool{
         //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
         if(!isset($this->authCheckAndCheckBefore)||is_null($this->authCheckAndCheckBefore)){
             $this->setAuthCheckAndCheckBefore(null);
@@ -231,7 +235,7 @@ class FieldStep
             return true;
         }
         $auth=$this->auth;
-        return $auth($info,$parentInfo,$fields,$this);
+        return $auth($info,$parentInfo,$fields,$this,$list);
     }
 
 
