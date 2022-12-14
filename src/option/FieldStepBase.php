@@ -66,8 +66,8 @@ abstract class FieldStepBase
             ),
             $config,
         )->auth(
-            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null,$list=null) => $this->auth($info, $parentInfo, $fields,$list),
-            function (BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step){
+            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null,FieldStep $step=null,$list=null) => $this->auth($info, $parentInfo, $fields,$step,$list),
+            function (BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step=null,$list=null){
                 $fn=$step->getAuthCheckAndCheckBeforeDefVal();
                 if($fn($info,$parentInfo,$fields)){
                     $step->config['canEditReturn']=null;
@@ -135,10 +135,11 @@ abstract class FieldStepBase
      * @param BaseModel|null $info
      * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
+     * @param FieldStep|null $step
      * @param Collection|\think\model\Collection|null $list
      * @return bool
      */
-    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,$list=null):bool;
+    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step=null,$list=null):bool;
 
 
     /**
