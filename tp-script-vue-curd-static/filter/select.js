@@ -139,8 +139,8 @@ display: none;
                 this.doFilter('');
             }
         },
-        template: `<div style="padding: 0 0.5em;margin: 0 0.1em;">
-                    <div v-if="config.url!==''">
+        template: `<div>
+                    <div v-if="config.url!==''" style="padding: 0 0.5em;margin: 0 0.1em;">
                          <a-select style="width: 236px" 
                             v-model:value="inputValue"
                             allow-clear
