@@ -831,7 +831,8 @@ a.red:hover,a.yellow:hover{
 
 .curd-filter-box .filter-box-div {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /*grid-template-columns: 1fr 1fr;*/
+    grid-template-columns: 50% 50%;
     align-items: stretch;
 }
 
@@ -845,7 +846,7 @@ a.red:hover,a.yellow:hover{
 }
 
 .curd-filter-box .filter-item-box:nth-of-type(odd) {
-    padding-left: 32px;
+    padding-left: 24px;
 }
 
 .curd-filter-box .filter-item-box:nth-of-type(even) {
@@ -868,8 +869,10 @@ a.red:hover,a.yellow:hover{
 .curd-filter-box .filter-item-l {
     padding: .2em .5em .2em 0;
     color: #000;
-    width: 7em;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.05);
+    line-height: 1.147;
+    width: 7em;
+    max-width: calc(100% - 256px);
 }
 
 .curd-filter-box .filter-item-r {
@@ -958,6 +961,10 @@ a.red:hover,a.yellow:hover{
     border-left: 2px solid #2f54eb;
     padding-left: 4px;
 }
+.filter-sub-btn-box .ant-divider-horizontal.ant-divider-with-text{
+    margin: 0;
+}
+
 /****************************************************************/
 .curd-table-row-step-div{
     display: flex;
@@ -991,6 +998,7 @@ a.red:hover,a.yellow:hover{
 .field-tips-item{
     margin-bottom: 2px;
 }
+
 /****************************************************************/
 .table-color-them .curd-table thead.ant-table-thead{
     background: linear-gradient(to right, #f6f0ff, #dde0ff 18%, #f7f9ff);
@@ -1068,6 +1076,9 @@ a.red:hover,a.yellow:hover{
 }
 .table-color-them .curd-table .ant-table-bordered .ant-table-thead>tr{
     border-left: 1px solid #cfd7f1;
+}
+.curd-table .ant-table-thead>tr>th{
+    font-weight: 600;
 }
 /****************************************************************/
 .curd-table .ant-table-row-expand-icon+div{

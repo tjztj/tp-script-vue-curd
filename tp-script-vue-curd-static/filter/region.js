@@ -35,7 +35,7 @@ define([],function(){
         },
         template:`<div>
                   <div class="region-value-div">
-                    <a-cascader
+                    <a-cascader style="width: 236px"
                         v-model:value="regionValue"
                         :options="config.regionTree"
                         :placeholder="'请选择'+this.config.title"

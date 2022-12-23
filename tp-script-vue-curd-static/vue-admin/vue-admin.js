@@ -2350,6 +2350,7 @@ define(requires, function (axios, Qs) {
                     childFilterData: Vue.ref({}),
                     showMoreFilter: Vue.ref(false),
                     oldFilterConfig:Vue.ref({}),
+                    titleMaxLen:Vue.ref({}),
                 }
             },
             computed: {
@@ -2483,22 +2484,38 @@ define(requires, function (axios, Qs) {
                         return !this.filterValues[vo.name];
                     })
                 },
+                setTitleMaxLenZero(key){
+                    this.titleMaxLen[key]=0;
+                },
+                setTitleMaxLen(key,title){
+                    let len=title.toString().length;
+                    if(!this.titleMaxLen[key]||this.titleMaxLen[key]<len){
+                        this.titleMaxLen[key]=len;
+                    }
+                    return this.titleMaxLen[key];
+                },
+                getLeftWidth(key){
+                    return 15*this.titleMaxLen[key]+'px';
+                }
             },
             template: `<div class="curd-filter-box">
                     <a-spin :spinning="loading">
                             <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
-                            <div class="filter-box-div" v-if="filterGroupIsShow(base)">
+                            <div class="filter-box-div" v-if="filterGroupIsShow(base)" :set-l-w="setTitleMaxLenZero('filterConfig')">
                                 <transition-group name="bounce">
                                     <template v-for="(item,index) in filterSource.filterConfig">
                                         <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name">
-                                            <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
-                                             <component v-if="item.rest!==true"
-                                                        :is="item.type" 
-                                                        :config="item"
-                                                        :ref="'filters.filterConfig.'+item.name"
-                                                        @search="search($event,item)"
-                                                ></component>
-                                            </div></div>
+                                            <div class="filter-item" :set-l-w="setTitleMaxLen('filterConfig',item.title)">
+                                                <div class="filter-item-l" :style="{width: getLeftWidth('filterConfig')}">{{item.title}}</div> 
+                                                <div class="filter-item-r">
+                                                 <component v-if="item.rest!==true"
+                                                            :is="item.type" 
+                                                            :config="item"
+                                                            :ref="'filters.filterConfig.'+item.name"
+                                                            @search="search($event,item)"
+                                                    ></component>
+                                                </div>
+                                            </div>
                                         </div>
                                     </template>
                                 </transition-group>
@@ -2506,18 +2523,21 @@ define(requires, function (axios, Qs) {
                             <template v-if="childFilterEmptys.length>0">
                                 <template v-for="child in childFilterEmptys">
                                     <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
-                                    <div class="filter-box-div" v-show="filterGroupIsShow(child)">
+                                    <div class="filter-box-div" v-show="filterGroupIsShow(child)" :set-l-w="setTitleMaxLenZero(child)">
                                         <transition-group name="bounce">
                                             <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
                                                 <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
-                                                    <div class="filter-item"><div class="filter-item-l">{{item.title}}</div> <div class="filter-item-r">
-                                                     <component v-if="item.rest!==true"
-                                                                :is="item.type" 
-                                                                :config="item"
-                                                                :ref="'filters.'+child.name+'.'+item.name"
-                                                                @search="search($event,item)"
-                                                        ></component>
-                                                    </div></div>
+                                                    <div class="filter-item" :set-l-w="setTitleMaxLen(child,item.title)">
+                                                        <div class="filter-item-l" :style="{width: getLeftWidth(child)}">{{item.title}}</div> 
+                                                        <div class="filter-item-r">
+                                                            <component v-if="item.rest!==true"
+                                                                    :is="item.type" 
+                                                                    :config="item"
+                                                                    :ref="'filters.'+child.name+'.'+item.name"
+                                                                    @search="search($event,item)"
+                                                            ></component>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </template>
                                         </transition-group>

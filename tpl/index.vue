@@ -5,12 +5,12 @@
 }
 
 .head {
-    padding-top: 18px;
-    padding-bottom: 18px;
+    padding-top: 16px;
+    padding-bottom: 16px;
     background-color: #fff;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     border: 1px solid #91d5ff;
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 .body {
