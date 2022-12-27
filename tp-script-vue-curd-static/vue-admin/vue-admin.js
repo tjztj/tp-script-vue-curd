@@ -2504,7 +2504,7 @@ define(requires, function (axios, Qs) {
                             <div class="filter-box-div" v-if="filterGroupIsShow(base)" :set-l-w="setTitleMaxLenZero('filterConfig')">
                                 <transition-group name="bounce">
                                     <template v-for="(item,index) in filterSource.filterConfig">
-                                        <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name">
+                                        <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name" :style="item.gridCol">
                                             <div class="filter-item" :set-l-w="setTitleMaxLen('filterConfig',item.title)">
                                                 <div class="filter-item-l" :style="{width: getLeftWidth('filterConfig')}">{{item.title}}</div> 
                                                 <div class="filter-item-r">
@@ -2526,7 +2526,7 @@ define(requires, function (axios, Qs) {
                                     <div class="filter-box-div" v-show="filterGroupIsShow(child)" :set-l-w="setTitleMaxLenZero(child)">
                                         <transition-group name="bounce">
                                             <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
-                                                <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)">
+                                                <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)" :style="item.gridCol">
                                                     <div class="filter-item" :set-l-w="setTitleMaxLen(child,item.title)">
                                                         <div class="filter-item-l" :style="{width: getLeftWidth(child)}">{{item.title}}</div> 
                                                         <div class="filter-item-r">
@@ -2545,6 +2545,7 @@ define(requires, function (axios, Qs) {
                                 </template>
                             </template>
                         </a-spin>
+                        <div class="filter-box-bottom-do"></div>
                         <div class="filter-sub-btn-box">
                             <a-divider v-if="showMoreFilter">
                                 <a-dropdown trigger="click">

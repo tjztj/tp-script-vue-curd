@@ -6,6 +6,7 @@ namespace tpScriptVueCurd;
 
 use tpScriptVueCurd\filter\EmptyFilter;
 use think\db\Query;
+use tpScriptVueCurd\option\grid\GridCol;
 use tpScriptVueCurd\traits\Func;
 
 /**
@@ -22,6 +23,7 @@ abstract class ModelFilter
     protected bool $show=true;//默认显示
     protected ?string $title=null;
     protected ?string $group=null;
+    public GridCol $gridCol;
 
     public function __construct(ModelField $field=null){
         if(static::class===EmptyFilter::class){
@@ -32,6 +34,7 @@ abstract class ModelFilter
         }
         $this->field=&$field;
         $this->type=class_basename(static::class);
+        $this->gridCol=new GridCol();
     }
 
 
@@ -52,6 +55,7 @@ abstract class ModelFilter
         $config['group']=$this->getGroup();
         $config['type']=$this->getType();
         $config['show']=$this->getShow();
+        $config['gridCol']=$this->gridCol->toArray();
         return $config;
     }
 
