@@ -4,7 +4,8 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    return this.value.toString()
+                    let val=this.value.toString();
+                    return val==='0'?'':val
                 },
                 set(val){
                     this.$emit('update:value', val);
