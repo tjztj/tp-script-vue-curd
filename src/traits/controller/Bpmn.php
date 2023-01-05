@@ -18,26 +18,54 @@ trait Bpmn
      */
     public function bpmn(){
         $steps=[];
-        $this->fields->each(function (ModelField $field)use(&$steps){
+        $allSteps=[];
+        $stepAlias=[];
+        $this->fields->each(function (ModelField $field)use(&$steps,&$allSteps,&$stepAlias){
             foreach ($field->steps() as $v){
                 /**
                  * @var FieldStep $v
                  */
-                if(isset($steps[$v->getStep()])||!isset($v->getBeforeChecks)){
+                if(isset($allSteps[$v->getStep()])||!isset($v->getBeforeChecks)){
                     continue;
                 }
+                $allSteps[$v->getStep()]=$v;
+
                 $stepName=$v->getStep();
                 $befores=[];
+                $stepHave=null;
                 foreach (($v->getBeforeChecks)() as $key=>$val){
-                    $befores[$key]=[
-                        'remark'=>$val->remark
+                    $beforeName=$key?$key::name():'';
+                    $beforeInfo=[
+                        'remark'=>$val->remark,
+                        'name'=>$beforeName,
+                    ];
+
+                    if($val->title){
+                        $stepHave===null&&$stepHave=false;
+                        $sn=$stepName.'-'.$val->title;
+                        if(!isset($steps[$sn])){
+                            $steps[$sn]=[
+                                'title'=>$val->title,
+                                'name'=>$sn,
+                                'source_name'=>$stepName,
+                                'befores'=>[],
+                            ];
+                            isset($stepAlias[$stepName])||$stepAlias[$stepName]=[];
+                            $stepAlias[$stepName][]=$sn;
+                        }
+                        $steps[$sn]['befores'][$beforeName]=$beforeInfo;
+                    }else{
+                        $stepHave=true;
+                        $befores[$beforeName]=$beforeInfo;
+                    }
+                }
+                if($stepHave||$stepHave===null){
+                    $steps[$stepName]=[
+                        'title'=>$v->getTitle(),
+                        'name'=>$stepName,
+                        'befores'=>$befores,
                     ];
                 }
-                $steps[$v->stepClass??$stepName]=[
-                    'title'=>$v->getTitle(),
-                    'name'=>$stepName,
-                    'befores'=>$befores,
-                ];
             }
         });
 
@@ -54,6 +82,11 @@ trait Bpmn
             foreach ($v['befores'] as $key=>$val){
                 isset($nextSteps[$key])||$nextSteps[$key]=[];
                 $nextSteps[$key][]=$k;
+                if(!empty($stepAlias[$key])){
+                    foreach ($stepAlias[$key] as $vv){
+                        $nextSteps[$vv][]=$k;
+                    }
+                }
             }
         }
 
@@ -64,7 +97,15 @@ trait Bpmn
                     $isFirst=true;
                     continue;
                 }
-                $data['edges'][]=['source'=>$key,'target'=>$k,'label'=>$val['remark']];
+
+                if($key!==$k){
+                    $data['edges'][]=['source'=>$key,'target'=>$k,'label'=>$val['remark']];
+                    if(!empty($stepAlias[$key])){
+                        foreach ($stepAlias[$key] as $vv){
+                            $data['edges'][]=['source'=>$vv,'target'=>$k,'label'=>$val['remark']];
+                        }
+                    }
+                }
             }
             $node=['id'=>$k,'label'=>$v['title'],'type'=>$isFirst||empty($nextSteps[$k])?'rect':'ellipse'];
             if($node['type']==='rect'){

@@ -4,6 +4,8 @@ namespace tpScriptVueCurd\option;
 
 class FieldStepBeforeCheck
 {
+
+    public string $title='';
     /**
      * 逻辑说明
      * @var string
@@ -21,10 +23,11 @@ class FieldStepBeforeCheck
      * @param string $remark 当前步骤必须要写说明，方便阅读
      * @param callable $func
      */
-    public function __construct(string $remark,callable $func)
+    public function __construct(string $remark,callable $func,string $title='')
     {
         $this->remark=$remark;
         $this->func=$func;
+        $this->title=$title;
     }
 
     /**
@@ -33,8 +36,8 @@ class FieldStepBeforeCheck
      * @param string $remark 逻辑说明
      * @return FieldStepBeforeCheck
      */
-    public static function make(string $remark,callable $func): FieldStepBeforeCheck
+    public static function make(string $remark,callable $func,string $title=''): FieldStepBeforeCheck
     {
-        return new self($remark,$func);
+        return new self($remark,$func,$title);
     }
 }
