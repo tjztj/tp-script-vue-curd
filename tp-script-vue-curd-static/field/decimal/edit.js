@@ -1,14 +1,26 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        setup(props,ctx){
-            if(typeof props.value==='undefined'||props.value===null){
-                ctx.emit('update:value','');
-            }else if(typeof props.value==='number'){
-                ctx.emit('update:value',props.value.toString());
-            }
-            return {
-                modelVal:Vue.ref(props.value)
+        setup(props,ctx){},
+        computed:{
+            modelVal:{
+                get(){
+                    let val=this.value;
+                    if(typeof val==='undefined'||val===null){
+                        val='';
+                        this.emit('update:value',val);
+                    }else if(typeof val==='number'&&val!==val.toString()){
+                        val=val.toString();
+                        this.emit('update:value',val);
+                    }
+                    return val;
+                },
+                set(val){
+                    if(val===null||val===this.field.nullVal){
+                        val='';
+                    }
+                    this.$emit('update:value',val.toString());
+                }
             }
         },
         methods:{
@@ -18,7 +30,6 @@ define([],function(){
                 }else{
                     this.modelVal=parseFloat(Number(val).toFixed(this.field.precision)).toString();
                 }
-                this.$emit('update:value',this.modelVal);
             }
         },
         template:`<div class="field-box">
