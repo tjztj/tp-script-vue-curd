@@ -142,7 +142,7 @@ class GenerateTableOption extends Collection
             $pf->setComment('当前步骤');
             $this->push($pf);
             $pf=new GenerateColumnOption($model::getStepPastsField());
-            $pf->setTypeVarchar(300);
+            $pf->setTypeVarchar(600);
             $pf->setComment('已走步骤');
             $this->push($pf);
         }
