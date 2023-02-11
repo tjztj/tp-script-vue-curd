@@ -1572,18 +1572,23 @@ define(requires, function (axios, Qs) {
                         let oldVal=typeof formValOld[field.name]==='undefined'||formValOld[field.name]===null?'':formValOld[field.name].toString();
                         let newVal=typeof formVal[field.name]==='undefined'||formVal[field.name]===null?'':formVal[field.name].toString();
                         if(oldVal!==newVal){
-                            this.ajaxGetFormChangeSet(field);
+                            this.ajaxGetFormChangeSet(field,oldVal);
                         }
                     })
                     this.formValOld=JSON.parse(JSON.stringify(formVal));
                 },
                 '$post': vueDefMethods.$post,
-                ajaxGetFormChangeSet(field){
+                ajaxGetFormChangeSet(field,oldVal){
                     let fieldKeys={};
                     this.groupFieldItems.forEach((field,key) => {
                         fieldKeys[field.name]=key;
                     });
-                    this.$post(field.editOnChange,{formChangeSetField:field.name,form:this.formVal}).then(res=>{
+                    this.$post(field.editOnChange,{
+                        formChangeSetField:field.name,
+                        pageGuid:VUE_CURD.GUID,
+                        oldVal,
+                        form:this.formVal
+                    }).then(res=>{
                         let updateFormView=false;
                         if(res.data.fields){
                             for(let fieldName in res.data.fields){
