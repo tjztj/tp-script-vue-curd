@@ -1962,7 +1962,7 @@ define(requires, function (axios, Qs) {
             },
             methods: {
                 getActionWidthByProps() {
-                    let btnWidth = 28, defW = 0;
+                    let btnWidth = 28;
                     this.data.forEach(record => {
                         let stepWidth = 0;
                         if (this.stepBtnShow(record) && record.nextStepInfo.config.listBtnText) {
@@ -2003,23 +2003,22 @@ define(requires, function (axios, Qs) {
                         if (this.isCanDel(record)) {
                             delW = 31;
                         }
-                        const btnW = stepWidth + childW + childAddW + showW + editW + delW + this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
-                        if (btnW > btnWidth) {
-                            btnWidth = btnW;
-                        }
 
+                        let defW=0;
                         if (typeof this.actionWidth === 'function') {
-                            const newdefW = this.actionWidth(record);
-                            if (newdefW > defW) {
-                                defW = newdefW;
-                            }
+                            defW = this.actionWidth(record);
                         } else if (this.actionWidth) {
                             defW = this.actionWidth;
+                        }
+
+                        const btnW = defW+stepWidth + childW + childAddW + showW + editW + delW + this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
+                        if (btnW > btnWidth) {
+                            btnWidth = btnW;
                         }
                     })
 
 
-                    this.actionW = 32 + btnWidth + defW;
+                    this.actionW = 32 + btnWidth;
                 },
                 handleTableChange(pagination, filters, sorter) {
                     this.$emit('change', pagination, filters, sorter, this.data)
