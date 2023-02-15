@@ -582,7 +582,9 @@ define(['vueAdmin'], function (va) {
                 doFilter(){
                     this.pagination.current = 1;
                     this.myFilters.page=1;
-                    this.fetch()
+                    this.fetch( (url,where,data)=>{
+                        this.rowSelection.selectedRowKeys=[];
+                    })
                 },
                 openChildList(row,modelInfo,btn){
                     this.openBox({
