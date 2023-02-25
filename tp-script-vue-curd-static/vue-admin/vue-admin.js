@@ -1758,7 +1758,7 @@ define(requires, function (axios, Qs) {
                             defW = this.actionWidth;
                         }
 
-                        const btnW = defW+stepWidth + childW + childAddW + showW + editW + delW + this.getBeforeBtnsW(record) + this.getAfterBtnsW(record) - 14;//要删掉一个间隔
+                        const btnW = defW+stepWidth + childW + childAddW + showW + editW + delW + this.getBeforeBtnsW(record) + this.getAfterBtnsW(record);//要删掉一个间隔
                         if (btnW > btnWidth) {
                             btnWidth = btnW;
                         }
