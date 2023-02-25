@@ -2332,6 +2332,11 @@ define(requires, function (axios, Qs) {
         for (let componentName in filterComponents) {
             app.component(componentName, require(filterComponents[componentName]));
         }
+        if(window.vueComponents){
+            for(let componentName in window.vueComponents){
+                app.component(componentName, window.vueComponents[componentName]);
+            }
+        }
         app.mount('#app')
     };
 });
