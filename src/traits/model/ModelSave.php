@@ -6,7 +6,6 @@ namespace tpScriptVueCurd\traits\model;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
-use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldDo;
@@ -35,10 +34,7 @@ trait ModelSave
         #########################################################################################
         ######  此方法不能有数据库查询操作，要获取其他数据，一律传参。因为我批量添加的时候也是执行此方法  ######
         #########################################################################################
-
-        if($parentInfo){
-            $fields=$fields->filter(fn(ModelField $v)=>!$v instanceof RegionField);
-        }
+        
 
         if(!$this->checkRowAuth($fields,$parentInfo,'add')){
             throw new \think\Exception('不能添加此栏目信息');
@@ -93,11 +89,6 @@ trait ModelSave
         if($parentInfo){
             $data[static::parentField()]=$parentInfo->id;
             $allFields=static::getTableFields();
-            $this->fields()->each(function (ModelField $v)use($allFields,$parentInfo,&$data){
-                if($v instanceof RegionField&&isset($parentInfo[$v->name()])&&in_array($v->name(),$allFields,true)){
-                    $data[$v->name()]=$parentInfo[$v->name()];
-                }
-            });
         }
 
         if(static::getCreateLoginUserField()){
@@ -208,13 +199,7 @@ trait ModelSave
         if(static::getDeleteLoginUserField()){
             unset($data[static::getDeleteLoginUserField()]);
         }
-
-        //地区处理
-        $fields->each(function (ModelField $v)use(&$data){
-            if($v instanceof RegionField&&$v->canEdit()===false){
-                unset($data[$v->name()]);
-            }
-        });
+        
 
         //onEditBefore请用doSaveDataAfter
         $info=clone $beforeInfo;

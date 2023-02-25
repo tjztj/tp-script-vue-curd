@@ -13,7 +13,7 @@ define([],function(){
             return {
                 start,
                 end,
-                separator:'',
+                separator:'-',
                 onParentSearch,
             }
         },
@@ -51,23 +51,26 @@ define([],function(){
                     <div class="filter-item-check-item" @click="val('','')" :class="{active:start===''&&end===''}"><div class="filter-item-check-item-value">全部</div></div>
                         <div v-for="(vo,key) in config.items" class="filter-item-check-item" @click="val(vo.start,vo.end)" :class="{active:start==vo.start&&end==vo.end}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
                         <div class="filter-item-check-item filter-item-input-group" :class="{active:inputCheck}">
-                            <a-input-group compact size="small">
+                            <a-input-group>
                                   <a-input
-                                    v-model:value="start"
-                                    style="width: 80px; text-align: center"
+                                    v-model:model-value="start"
+                                    style="width: 80px; text-align: center; border-right: 0;"
                                     placeholder="开始值"
+                                    size="mini"
                                   />
                                   <a-input
-                                    v-model:value="separator"
-                                    style=" width: 30px; border-left: 0; pointer-events: none; background-color: #fff"
+                                    v-model:model-value="separator"
+                                    style=" width: 30px; pointer-events: none;border-left: 0;border-right: 0"
                                     placeholder="~"
                                     disabled
+                                    size="mini"
                                   />
                                   <a-input
-                                    v-model:value="end"
+                                    v-model:model-value="end"
                                     style="width: 80px; text-align: center; border-left: 0"
+                                    size="mini"
                                     placeholder="结束值"/>
-                                    <a-button @click="search" size="small">确定</a-button>
+                                    <a-button @click="search" type="primary" size="mini">确定</a-button>
                                 </a-input-group>
                         </div>
 </div>`,

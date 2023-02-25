@@ -1,11 +1,11 @@
 {block name="extend"}{/block}
 <style>
-
+#app{padding: 24px;}
 </style>
 {block name="style"}{/block}
 <div class="vuecurd-def-box">
-<a-spin :spinning="loading">
-    <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm">
+<a-spin :loading="loading" style="display: block">
+    <a-form :model="form" :label-col-props="labelCol" :wrapper-col-props="wrapperCol" ref="pubForm">
       {block name="formBefore"}{/block}
         <template v-for="(groupFieldItems,groupTitle) in groupFields">
             <template v-if="showGroup">
@@ -43,10 +43,10 @@
 </a-spin>
 
 <div class="foot">
-    <a-divider dashed style="margin-top: 0"></a-divider>
+    <a-divider style="margin-top: 0;border-bottom-style: dotted"></a-divider>
     {block name="footBefore"}{/block}
     <div class="btns">
-        <a-button type="primary" @click="onSubmit" :loading="loading"><check-outlined v-show="!loading"></check-outlined> <span>{{form.id?'{$isStepNext?"提交":"确定修改"}':'执行添加'}}</span></a-button>
+        <a-button type="primary" @click="onSubmit" :loading="loading"><icon-check v-show="!loading"></icon-check> <span>{{form.id?'{$isStepNext?"提交":"确定修改"}':'执行添加'}}</span></a-button>
     </div>
     {block name="footAfter"}{/block}
 </div>

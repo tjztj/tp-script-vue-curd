@@ -84,10 +84,11 @@ define([], function () {
                 if (!this.openBox) {
                     this.openBox = window.vueDefMethods.openBox;
                 }
+                let v=vueData.vueCurdDebug?((new Date()).valueOf()):vueData.vueCurdVersion;
                 this.openBox({
                     title: '请选择相关地点',
                     offset: 'lt',
-                    content: '/tp-script-vue-curd-static.php?field/coordinate/BMapGL/map_open.html&center='+this.centerArr.join(','),
+                    content: '/tp-script-vue-curd-static.php?field/coordinate/BMapGL/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
                 }).on('success', (layero, index) => {
                     let mapWindow;
                     if(layero.iframe&&layero.iframe.contentWindow){
@@ -96,9 +97,7 @@ define([], function () {
                         mapWindow=layero.find('iframe')[0].contentWindow;
                     }
 
-                    let v=vueData.vueCurdDebug?((new Date()).valueOf()):vueData.vueCurdVersion;
-                    ['/tp-script-vue-curd-static.php?ant-design-vue/antd.min.css?v='+v,
-                        '/tp-script-vue-curd-static.php?css/vue.css?v='+v,
+                    [
                         vueData.themCssPath
                     ].forEach(val=>{
                         if(!val)return;
@@ -125,9 +124,9 @@ define([], function () {
             }
         },
         template: `<div style="position: relative" :style="sizeStyle">
-                        <a-spin :spinning="!isInited">
-                            <div v-show="!disabled"><a-button size="small" style="position: absolute;right: 6px;top: 6px;z-index: 1031" @click="openSelect">{{value===''?'选择':'更改'}}</a-button></div>
-                            <div v-show="value===''" :style="{lineHeight:sizeStyle.height}" style="position: absolute;z-index: 1030;background-color: rgba(0,0,0,.45);left: 0;right: 0;top: 0;bottom: 0;text-align: center;color:#fff">{{placeholder}}</div>
+                        <a-spin :loading="!isInited">
+                            <div v-show="!disabled"><a-button size="small" style="position: absolute;right: 6px;top: 6px;z-index: 999" @click="openSelect">{{value===''?'选择':'更改'}}</a-button></div>
+                            <div v-show="value===''" :style="{lineHeight:sizeStyle.height}" style="position: absolute;z-index: 998;background-color: rgba(0,0,0,.45);left: 0;right: 0;top: 0;bottom: 0;text-align: center;color:#fff">{{placeholder}}</div>
                             <div :id="mapId" :style="sizeStyle" style="border-radius: 2px;overflow: hidden"></div>
                         </a-spin>
                       </div>`

@@ -17,45 +17,11 @@ define([],function(){
         }
         return value;
     }
-
-    function closest(el, selector) {
-        const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
-
-        while (el) {
-            if (matchesSelector.call(el, selector)) {
-                return el;
-            } else {
-                el = el.parentElement;
-            }
-        }
-        return null;
-    }
-
-    function setCheckedDisabledStyle(){
-        let docs=document.querySelectorAll('.a-tree-select-disabled-text');
-        if(!docs){
-            return;
-        }
-        docs.forEach(doc=>{
-            let item=closest(doc,'.ant-select-selection-item')
-            if(!item){
-                return;
-            }
-            item.style.cursor='not-allowed';
-            item.style.opacity='0.75';
-            let clseItem=item.querySelector('.ant-select-selection-item-remove');
-            if(clseItem){
-                item.removeChild(clseItem)
-            }
-        })
-    }
-
     return {
         props:['field','value','validateStatus','form','info'],
         data(){
             return {
-                val:undefined,
-                treeExpandedKeys:[],
+                val:null,
                 infos:{},
             }
         },
@@ -82,14 +48,7 @@ define([],function(){
                     this.val=vals;
                 }
 
-                if( this.val){
-                    this.setExpandedKeys(getValToString(this.val));
-                    this.$nextTick(e=>{
-                        setCheckedDisabledStyle()
-                    });
-                }
             })
-
         },
         computed:{
             values:{
@@ -123,9 +82,6 @@ define([],function(){
                     }
                     this.val=val;
                     this.$emit('update:value',getValToString(val));
-                    this.$nextTick(e=>{
-                        setCheckedDisabledStyle()
-                    });
                 },
                 get(){
                     return this.val;
@@ -134,18 +90,21 @@ define([],function(){
             treeData(){
                 const doTreeItem=(arr)=>{
                     arr.map(item=>{
+                        item.key=item.value;
                         this.infos[item.value]=item;
                         if(item.children){
                             item.selectable=this.field.canCheckParent;
-                            item.disableCheckbox=!this.field.canCheckParent;
+                            if(!this.field.multiple){
+                                item.disableCheckbox=!this.field.canCheckParent;
+                            }
                             item.children=doTreeItem(item.children);
                         }else{
                             item.selectable=typeof item.selectable==='undefined'?true:item.selectable;
                             item.disableCheckbox=false;
                         }
-                        item.customTitle=item.title;
-                        item.title=undefined;
-                        item.slots={ title: 'custom-title'};
+                        // item.customTitle=item.title;
+                        // item.title=undefined;
+                        // item.slots={ title: 'custom-title'};
                         return item;
                     })
                     return arr;
@@ -154,35 +113,8 @@ define([],function(){
             }
         },
         methods:{
-            filterTreeNode(inputValue,treeNode){
-                inputValue=inputValue.trim();
-                if(inputValue===''){
-                    return true;
-                }
-                return treeNode.props.customTitle.indexOf(inputValue)!==-1;
-            },
-            setExpandedKeys(val){
-                const that=this;
-                function setExpanded(val,arr){
-                    val=val.toString();
-                    arr=arr||[];
-                    if(!that.infos[val]){
-                        return;
-                    }
-                    if(that.infos[that.infos[val].pvalue]&&!arr.includes(that.infos[val].pvalue)){
-                        arr.push(that.infos[val].pvalue);
-                        setExpanded(that.infos[val].pvalue,arr);
-                    }
-                }
-                if(val){
-                    const treeExpandedKeys=[];
-                    val.split(',').forEach(v=>{
-                        setExpanded(v,treeExpandedKeys);
-                    })
-                    this.treeExpandedKeys=treeExpandedKeys;
-                }else{
-                    this.treeExpandedKeys=[];
-                }
+            filterTreeNode(searchValue, nodeData) {
+                return nodeData.title.toLowerCase().indexOf(searchValue.toLowerCase()) > -1;
             },
             log(v){
                 console.log(v)
@@ -190,28 +122,20 @@ define([],function(){
         },
         template:`<div class="field-box">
  <div class="l">
- <a-tree-select
- v-model:value="values"
- v-model:tree-expanded-keys="treeExpandedKeys"
- :tree-data="treeData"
- :dropdown-style="{ maxHeight: field.dropdownMaxHeight+'px', overflow: 'auto' }"
- :placeholder="field.placeholder||'请选择'+field.title"
-  :disabled="field.readOnly"
-  tree-node-filter-prop="label"
-  style="width: 100%"
-  allow-clear
-  show-search
-  :label-in-value="true"
-  :tree-checkable="field.multiple"
-  :tree-check-strictly="field.multiple&&field.treeCheckStrictly"
-  :show-checked-strategy="field.showCheckedStrategy"
-  :filter-tree-node="filterTreeNode"
- >
-   <template #custom-title="item">
-   <span v-if="item.disabled" class="a-tree-select-disabled-text">{{item.customTitle}}</span>
-   <span v-else>{{item.customTitle}}</spanv>
-   </template>
-</a-tree-select>
+  <a-tree-select
+    :data="treeData"
+    v-model="values"
+    :dropdown-style="{ maxHeight: field.dropdownMaxHeight+'px', overflow: 'auto' }"
+    :disabled="field.readOnly"
+    allow-search
+    :filter-tree-node="filterTreeNode"
+    label-in-value
+    allow-clear
+    :multiple="field.multiple"
+    :tree-checkable="field.multiple"
+    :tree-check-strictly="field.multiple&&field.treeCheckStrictly"
+    :tree-checked-strategy="field.treeCheckedStrategy"
+  ></a-tree-select>
 </div>
 <div class="r"><span v-if="field.ext" class="ext-span">{{ field.ext }}</span></div>
 </div>`

@@ -3,7 +3,7 @@
 namespace tpScriptVueCurd\option;
 
 use think\db\Query;
-use tpScriptVueCurd\field\TreeSelect;
+use tpScriptVueCurd\field\TreeSelectField;
 use tpScriptVueCurd\option\index_row_btn\OpenBtn;
 
 class LeftCate
@@ -101,7 +101,7 @@ class LeftCate
 
     public function getTree():array{
         if(empty($this->tree)){
-            $this->tree=isset($this->listCall)?TreeSelect::listToTree(($this->listCall)(),'value','pvalue'):[];
+            $this->tree=isset($this->listCall)?TreeSelectField::listToTree(($this->listCall)(),'value','pvalue'):[];
         }
         return $this->tree;
     }
@@ -113,7 +113,7 @@ class LeftCate
      */
     public function getList():array{
         if(empty($this->list)){
-            $this->list=TreeSelect::treeToList($this->getTree(),'value');
+            $this->list=TreeSelectField::treeToList($this->getTree(),'value');
         }
         return $this->list;
     }

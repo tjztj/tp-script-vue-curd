@@ -45,17 +45,10 @@ define([],function(){
             },
         },
         template:`<div style="display: inline">
-                    <a-tooltip placement="topLeft" v-if="record.record['_showText_'+field.name]">
-                        <template #title>{{record.record['_showText_'+field.name]}}</template>
-                        <span :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
-                    </a-tooltip>
-                    <a-tooltip placement="topLeft" v-else-if="record.text">
-                        <a-tooltip placement="topLeft"><template #title>
+                    <span v-if="record.record['_showText_'+field.name]" :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
+                    <template v-else-if="record.record[field.name]">
                         <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
-                        </template>
-                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
-                        </a-tooltip>
-                    </a-tooltip>
+                    </template>
                 </div>`,
     }
 });

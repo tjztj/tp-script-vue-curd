@@ -24,7 +24,7 @@ define(['qs'], function (Qs) {
                         [this.field.name]: value
                     }).then(res => {
                         if (res.msg) {
-                            antd.message.success(res.msg);
+                            this.$message.success(res.msg);
                         }
                         this.record.record[this.field.name]=value;
                     }).finally(() => {
@@ -54,9 +54,12 @@ define(['qs'], function (Qs) {
             },
         },
         template: `<div>
-                    <a-spin :spinning="loading" size="small">
-                     <a-switch v-model:checked="checked" :checked-children="field.items[1].title" :un-checked-children="field.items[0].title" :disabled="field.readOnly||field.indexChangeUrl===''"/>
-                    <span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
+                    <a-spin :loading="loading" size="small" style="display: block">
+                        <a-switch v-model="checked" :disabled="field.readOnly||field.indexChangeUrl===''">
+                            <template #checked>{{field.items[1].title}}</template>
+                            <template #unchecked>{{field.items[0].title}}</template>
+                        </a-switch>
+                        <span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
                     </a-spin>
                 </div>`,
     }

@@ -7,24 +7,25 @@ define([],function(){
                     if(typeof this.value==='number'){
                         this.$emit('update:value',this.value.toString());
                     }
-                    return this.value;
+                    if(this.value===''||this.value===null||this.value===undefined){
+                        return;
+                    }
+                    let val=parseInt(this.value);
+                    return isNaN(val)?0:val;
                 },
                 set(val){
-                    if(val===null||val===this.field.nullVal){
+                    if(val===null||val===undefined||val===this.field.nullVal){
                         val='';
                     }
                     this.$emit('update:value',val.toString());
                 }
             }
         },
-        template:`<div class="field-box">
-                    <div class="l">
-                        <a-input-number v-model:value="modelVal" :min="field.min" :max="field.max"
-                                        :placeholder="field.placeholder||'输入整数'" :disabled="field.readOnly" style="width: 100%;"/>
-                    </div>
-                    <div class="r">
-                        <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                    </div>
+        template:`<div>
+                    <a-input-number v-model="modelVal" :min="field.min" :max="field.max"
+                            :placeholder="field.placeholder||'输入整数'" :disabled="field.readOnly" style="width: 100%;">
+                        <template v-if="field.ext" #suffix>{{field.ext}}</template>
+                    </a-input-number>
                 </div>`,
     }
 });

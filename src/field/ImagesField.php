@@ -22,7 +22,6 @@ class ImagesField extends ModelField
 {
 
     protected string $url='';//默认值是 tpScriptVueCurdUploadDefaultUrl
-    protected bool $removeMissings;//默认值是 tpScriptVueCurdImageRemoveMissings
     protected bool $multiple=true;//是否可多选
 
     /**
@@ -39,6 +38,7 @@ class ImagesField extends ModelField
         'show'=>false,
     ];//是否在列表中已图片格式显示
 
+    protected string $accept='image/*';//上传文件类型
     /**最小值
      * @param string|null $url
      * @return $this|string
@@ -50,6 +50,21 @@ class ImagesField extends ModelField
         }
         $this->url=$url;
         $this->fieldPushAttrByWhere('url',$this->url);
+        return $this;
+    }
+
+
+    /**
+     * 文件上传类型
+     * @param string|null $accept
+     * @return $this|string
+     */
+    public function accept(string $accept=null){
+        if(is_null($accept)){
+            return $this->accept;
+        }
+        $this->accept=str_replace(' ','',$accept);
+        $this->fieldPushAttrByWhere('accept',$this->accept);
         return $this;
     }
 
@@ -86,25 +101,6 @@ class ImagesField extends ModelField
         $this->fieldPushAttrByWhere('listShowImg',$this->listShowImg);
         return $this;
     }
-    /**
-     * 图片丢失了，在编辑、查看、列表中是否显示出来
-     * @param bool|null $removeMissings
-     * @return $this|bool
-     */
-    public function removeMissings(bool $removeMissings = null)
-    {
-        if(is_null($removeMissings)){//获取
-            if(!isset($this->removeMissings)||is_null($this->removeMissings)){
-                return tpScriptVueCurdImageRemoveMissings();
-            }
-            return $this->removeMissings;
-        }
-
-        //设置
-        $this->removeMissings=$removeMissings;
-        $this->fieldPushAttrByWhere('removeMissings',$this->removeMissings);
-        return $this;
-    }
 
 
     /**
@@ -116,8 +112,23 @@ class ImagesField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];
-            if(FilesField::checkFilesLocal($this->save)===false){
+            if($this->checkFilesIsLocal()&&!FilesField::checkFilesLocal($this->save)){
                 throw new \think\Exception('图片路径非法');
+            }
+            $accepts=explode(',',$this->accept);
+
+            $urls=$this->multiple()?explode('|',$this->save):[$this->save];
+            foreach ($urls as $k=>$v){
+                $have=false;
+                foreach ($accepts as $val){
+                    if(FilesField::checkUrlIsMimeOrExt($v,$val)){
+                        $have=true;
+                        break;
+                    }
+                }
+                if(!$have){
+                    throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件不符合要求');
+                }
             }
         }
         $this->defaultCheckRequired($this->save,'请上传图片');

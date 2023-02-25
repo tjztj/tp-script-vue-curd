@@ -3,34 +3,17 @@ define([],function(){
         props:['record','field'],
         setup(props,ctx){
             const show=Vue.ref(true);
-            if(props.field.removeMissings&&props.record.text){
-                let fileList=props.record.text.split('|');
-                //删掉丢失的图片
-                setTimeout(()=>{
-                    for(let i in fileList){
-                        let ImgObj=new Image();
-                        ImgObj.onerror=()=>{
-                            fileList=fileList.filter(v=>{
-                                return v!==fileList[i]
-                            })
-                            if(fileList.length===0){
-                                show.value=false;
-                            }
-                        }
-                        ImgObj.src= fileList[i];
-                    }
-                },1)
-            }
+
             return {
                 show
             }
         },
         computed:{
             imgs(){
-                if(!this.record.text){
+                if(!this.record.record[this.field.name]){
                     return [];
                 }
-                return this.record.text.split('|').filter(v=>v)||[];
+                return this.record.record[this.field.name].split('|').filter(v=>v)||[];
             }
         },
         methods:{
@@ -38,16 +21,18 @@ define([],function(){
                 window.top.showImages(imgs, start);
             },
         },
-        template:`<div style="display: inline">
-                    <a-tooltip placement="topLeft" v-if="record.text&&show">
-                        <template #title>查看图片</template>
-                        
-                         <a-image-preview-group v-if="field.listShowImg.show">
-                            <a-image class="list-img-field-box" :src="item" v-for="item in imgs" :style="{'max-width': field.listShowImg.maxWidth,height: field.listShowImg.height}"></a-image>
-                         </a-image-preview-group>
-                         
-                        <a v-else @click="showImages(record.text)"><file-image-outlined></file-image-outlined> 查看</a>
-                    </a-tooltip>
+        template:`<div>
+                    <template v-if="record.record[field.name]&&show">
+                        <a-image-preview-group infinite v-if="field.listShowImg.show&&imgs.length>0">
+                            <div style="display: flex;align-items: center">
+                                <a-space v-for="item in imgs" style="flex: 1">
+                                    <a-image class="list-img-field-box" :src="item" :style="{'max-width': field.listShowImg.maxWidth,'max-height': field.listShowImg.maxHeight}"></a-image>
+                                </a-space>
+                            </div>
+                            
+                        </a-image-preview-group>
+                        <a v-else @click="showImages(record.record[field.name])"><icon-file-image /> 查看</a>
+                    </template>
                     <span v-else style="color: #d9d9d9">无</span>
                 </div>`,
     }

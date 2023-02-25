@@ -1,50 +1,43 @@
 define([],function(){
     return {
         props:['field','value','validateStatus'],
-        setup(props,ctx){},
+        setup(props,ctx){
+            return {
+            }
+        },
         computed:{
             modelVal:{
                 get(){
                     let val=this.value;
                     if(typeof val==='undefined'||val===null){
                         val='';
-                        this.emit('update:value',val);
-                    }else if(typeof val==='number'&&val!==val.toString()){
+                        this.$emit('update:value',val);
+                    }else if(typeof val==='number'){
                         val=val.toString();
-                        this.emit('update:value',val);
+                        this.$emit('update:value',val);
                     }
-                    return val;
+                    return val===''?'':parseFloat(val);
                 },
                 set(val){
-                    if(val===null||val===this.field.nullVal){
+                    if(val===null||val===undefined||val===this.field.nullVal){
                         val='';
+                    }else{
+                        val=parseFloat(Number(val).toFixed(this.field.precision)).toString();
                     }
-                    this.$emit('update:value',val.toString());
+                    this.$emit('update:value',val);
                 }
             }
         },
-        methods:{
-            change(val){
-                if(val===null||val===this.field.nullVal){
-                    this.modelVal='';
-                }else{
-                    this.modelVal=parseFloat(Number(val).toFixed(this.field.precision)).toString();
-                }
-            }
-        },
-        template:`<div class="field-box">
-                        <div class="l">
-                            <a-input-number v-model:value="modelVal"
-                                            :min="field.min"
-                                            :max="field.max"
-                                            :placeholder="field.placeholder||(field.precision?'保留'+field.precision+'位小数':'填入整数')"
-                                            :disabled="field.readOnly"
-                                            @change="change"
-                                            style="width: 100%;"/>
-                        </div>
-                        <div class="r">
-                            <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                        </div>
-                    </div>`,
+        template:`<div>
+                   <a-input-number v-model:model-value="modelVal"
+                        :min="field.min"
+                        :max="field.max"
+                        :precision="field.precision"
+                        :placeholder="field.placeholder||(field.precision?'保留'+field.precision+'位小数':'填入整数')"
+                        :disabled="field.readOnly"
+                        style="width: 100%;">
+                           <template v-if="field.ext" #suffix>{{field.ext}}</template>
+                        </a-input-number>
+                </div>`,
     }
 });

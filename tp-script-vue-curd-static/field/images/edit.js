@@ -1,51 +1,82 @@
 define([],function(){
+    const fileList=[];
+    let fid=0;
     return {
-        props:['field','value','validateStatus'],
+        props:['field','value','validateStatus','info'],
         setup(props,ctx){
-            let fileList=Vue.ref([]),id='upload-class-'+window.guid();
-            if(props.value){
-                let imgList=props.value.split('|'),fid=0;
-                fileList.value=imgList.map(function(v){
-                    let url=v.toLowerCase();
-                    if(document.location.protocol==='https'&&url.indexOf('http://'+ document.location.host+'/')===0){
-                        v=v.substring(5);
-                    }
-
-                    fid--;
-                    return {
-                        uid:fid,
-                        name:v.substring(v.lastIndexOf("/")+1,v.length),
-                        status: 'done',
-                        url:v,
-                    };
-                })
-
-                if(props.field.removeMissings){
-                    //删掉丢失的图片
-                    setTimeout(()=>{
-                        for(let i in fileList.value){
-                            let ImgObj=new Image();
-                            ImgObj.onerror=()=>{
-                                fileList.value=fileList.value.filter(v=>{
-                                    return v.url!==fileList.value[i].url
-                                })
-                            }
-                            ImgObj.src= fileList.value[i].url;
-                        }
-                    },1)
-                }
-            }
+            
             return {
-                fileList,
-                id
+                id:'upload-class-'+window.guid(),
+                fileList:Vue.ref([]),
             }
         },
-        methods:{
-            handleRemove(){
-                return file => {
-                    if(file.url){
-                        this.$emit('update:value',this.value.split('|').filter(url=>url&&url!==file.url).join('|'));
+        watch:{
+            value:{
+                handler(value){
+                    if(!value){
+                        return [];
                     }
+                    let vals=value.split('|');
+                    let fileOkObjs={};
+                    this.fileList.forEach((v,i)=>{
+                        if(v.status==='done'){
+                            if(!vals.includes(v.url)){
+                                this.fileList.splice(i,1)
+                            }else{
+                                fileOkObjs[v.url]=v;
+                            }
+                        }
+                    })
+                    vals.forEach(v=>{
+                        if(fileOkObjs[v]){
+                            return;
+                        }
+                        fid--;
+                        this.fileList.push({
+                            uid:fid,
+                            name:this.getUrlTitle(v),
+                            status: 'done',
+                            url:v,
+                        })
+                    })
+                },
+                immediate:true,
+            }
+        },
+        computed:{
+        },
+        methods:{
+            getUrlTitle(url) {
+                if(!this.info||!this.info[this.field.name+'InfoArr']||!this.info[this.field.name+'InfoArr'][url]||!this.info[this.field.name+'InfoArr'][url].original_name){
+                    let arr=url.split('/');
+                    return arr[arr.length-1];
+                }
+                return this.info[this.field.name+'InfoArr'][url].original_name
+            },
+            responseUrlKey(fileItem){
+                return fileItem.response.data.url
+            },
+            uploadSuccess(fileItem){
+                if(fileItem.status==='done'){
+                    if(typeof fileItem.response!=='object'||!fileItem.response.code||fileItem.response.code==='0'){
+                        fileItem.status='error';
+                        this.$message.error({
+                            content:'文件[ '+fileItem.name+' ]：'+fileItem.response.msg,
+                            duration: 6*1000
+                        });
+                    }
+                }
+            },
+            change(fileList,fileItem){
+                let fileOkObjs={};
+                fileList.forEach(v=>{
+                    if(v.status==='done'){
+                        fileOkObjs[v.url]=v;
+                    }
+                })
+                let val=Object.keys(fileOkObjs).join('|');
+                if(val!==this.value){
+                    this.$emit('update:value',val);
                 }
             },
             handlePreview(file) {
@@ -56,56 +87,23 @@ define([],function(){
                 });
                 window.top.showImages(images,images.indexOf(file.url))
             },
-            handleChange(data,field) {
-                let urls=[];
-                if(!this.field.multiple){
-                    if(data.fileList.length>1){
-                        data.fileList=[data.fileList[data.fileList.length-1]];
-                    }
-                }
-
-
-                this.fileList =data.fileList.map(function(file){
-                    if(file.status==='done'){
-                        if(file.response){
-                            if(file.response.code==0){
-                                antd.message.error('文件[ '+file.name+' ]：'+file.response.msg,6);
-                            }else{
-                                file.url=file.response.data.url
-                            }
-                        }
-                    }
-                    return file;
-                }).filter(function(file){
-                    if(file.status==='done'){
-                        if(urls.indexOf(file.url)!==-1||!file.url){
-                            return false;
-                        }
-                        urls.push(file.url)
-                    }
-                    return true;
-                });
-
-                let value=urls.join('|');
-                this.$emit('update:value',value);
-                this.$emit('update:validateStatus',value?'success':'error');
-
-            },
         },
         template:`<div class="field-box" :class="[id]">
                     <div class="l">
                         <a-upload
                             :multiple="field.multiple"
                             :action="field.url"
-                            accept="image/*"
+                            :accept="field.accept"
                             list-type="picture-card"
-                            :file-list="fileList"
-                            :remove="handleRemove"
+                            v-model:file-list="fileList"
                             :disabled="field.readOnly"
-                            @preview="handlePreview"
-                            @change="handleChange"
+                            :response-url-key="responseUrlKey"
+                            with-credentials
+                            download
+                            @change="change"
+                            @success="uploadSuccess"
+                             @preview="handlePreview"
                         >
-                            <plus-outlined />
                         </a-upload>
                     </div>
                     <div class="r">

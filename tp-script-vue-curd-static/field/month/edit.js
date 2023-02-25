@@ -4,7 +4,7 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    if(this.value===0||this.value==='0'){
+                    if(this.value===0||this.value==='0'||this.value===null||this.value===undefined){
                         return '';
                     }
                     if(/^\d+$/g.test(this.value.toString())){
@@ -13,9 +13,8 @@ define([],function(){
                     return this.value
                 },
                 set(val){
-                    if(val===null){
-                        this.$emit('update:value', '');
-                        return;
+                    if(val===null||val===undefined){
+                        val='';
                     }
                     this.$emit('update:value', val);
                 }
@@ -26,13 +25,10 @@ define([],function(){
                 if (!val) {
                     return false;
                 }
-                if (!this.field.showTime) {
-                    val.set('hours', 0)
-                    val.set('minutes', 0)
-                    val.set('seconds', 0)
-                }
+                val.setHours(0,0,0,0);
+                val.setDate(1);
 
-                const values = val.unix()
+                const values = val.getTime()/1000
                 if (this.field.min !== null && values < this.field.min) {
                     return true;
                 }
@@ -44,8 +40,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-month-picker v-model:value="val" :placeholder="field.placeholder||'请选择月份'" 
-                        value-format="YYYY-MM" 
+                        <a-month-picker v-model:model-value="val" :placeholder="field.placeholder||'请选择月份'" 
                         :disabled="field.readOnly"
                          :disabled-date="disabledDate"
                          style="width: 100%"/>

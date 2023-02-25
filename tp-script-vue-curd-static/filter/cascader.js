@@ -29,13 +29,15 @@ define([],function(){
         template:`<div>
                   <div class="region-value-div">
                     <a-cascader
-                        v-model:value="val"
+                        style="width: 236px"
+                        v-model:model-value="val"
                         :options="items"
                         :placeholder="'请选择'+this.config.title"
                         :field-names="{label:'title',}"
-                        show-search
-                        size="small"
-                        change-on-select
+                        allow-search
+                        allow-clear
+                        size="mini"
+                        check-strictly
                     />
                  </div>
 </div>`,

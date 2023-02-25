@@ -61,15 +61,15 @@ define(['vueAdmin'], function (va) {
                         }
                         this.loading=true;
                         this.$post(vueData.saveUrl,this.form).then(async res=>{
-                            antd.message.success(res.msg);
+                            ArcoVue.Message.success(res.msg);
                         }).finally(()=>{
                             this.loading=false;
                         })
                     }).catch(error => {
                         if(error.errorFields&&error.errorFields[0]&&error.errorFields[0].errors&&error.errorFields[0].errors[0]){
-                            antd.message.warning(error.errorFields[0].errors[0])
+                            ArcoVue.Message.warning(error.errorFields[0].errors[0])
                         }else{
-                            antd.message.warning('请检测是否填写正确')
+                            ArcoVue.Message.warning('请检测是否填写正确')
                         }
                         console.log('error', error);
                     });

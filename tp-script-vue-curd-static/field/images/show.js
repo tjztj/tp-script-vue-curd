@@ -25,7 +25,7 @@ define([],function(){
         template:`<div>
                     <div class="img-box">
                         <template v-for="(vo,key) in infos">
-                            <div v-show="!(field.removeMissings&&errorUrls[vo])" class="img-box-item" :class="{'curd-img-error-url':errorUrls[vo]}" @click="showImages(infos,key)">
+                            <div class="img-box-item" :class="{'curd-img-error-url':errorUrls[vo]}" @click="showImages(infos,key)">
                                 <img :src="vo" @error="errorUrls[vo]=true"/>
                             </div>
                         </template>

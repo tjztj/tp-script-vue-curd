@@ -230,11 +230,7 @@ class FieldWhere
         }
 
         if(is_array($val)){
-            if($this->field->getType()==='RegionField'){
-                $val=end($val);
-            }else{
-                throw new \think\Exception('配置错误');
-            }
+            throw new \think\Exception('配置错误');
         }
 
         return $this->checkVal($val)!==$this->isNot;

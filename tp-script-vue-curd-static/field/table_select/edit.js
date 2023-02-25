@@ -1,34 +1,42 @@
 define([],function(){
     const style=`<style id="table-select-field-style">
-.select-table-dropdown{
-    background-color: #fff;
-    border-radius: 2px;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+#table-select-popup-container{
+width: 100%;
+position: relative;
 }
-.select-table-select-dropdown{
-display: none!important;
+#table-select-popup-container .arco-scrollbar-container{
+max-height: none;
+overflow-y: hidden;
+}
+#table-select-popup-container .arco-scrollbar-track{
+display: none;
+}
+.select-table-dropdown .arco-table-pagination{
+    margin-right: 12px;
 }
 </style>`
     const infos={};
-    const pagination={
-        pageSize: 5,
-        sortField: '',
-        sortOrder: '',
-    };
     const valDo=function (v){
         if(parseInt(v).toString()===v.toString()){
             return parseInt(v);
         }
         return v;
     };
+    const pageSize=5;
     return {
         props:['field','value','validateStatus'],
         data(){
             return {
                 data:[],
-                pagination:{...pagination,showSizeChanger:true,pageSizeOptions:['5','8','10','15','30','50']},
+                pagination:{
+                    pageSize,
+                    total:0,
+                    current:1,
+                    showPageSize:true,
+                    pageSizeOptions:['5','8','10','15','30','50']
+                },
                 myFilters:{
-                    ...pagination,
+                    pageSize,
                     page: 1,
                     keywords:'',
                 },
@@ -47,21 +55,19 @@ display: none!important;
             if(!document.querySelector('#table-select-field-style')){
                 document.head.insertAdjacentHTML('beforeend',style)
             }
+            if(!document.querySelector('#table-select-popup-container')){
+                document.body.insertAdjacentHTML('beforeend','<div id="table-select-popup-container"></div>')
+            }
 
-            document.body.addEventListener('click',e=>{
-                if(e.target&&!e.target.closest('#'+this.id)&&!e.target.closest('.'+this.id)){
-                    this.show=false;
-                }
-                this.setShowClass();
-            })
 
             let columns=[];
             for(let i in  this.field.fields){
                 columns.push({
                     title: this.field.fields[i],
+                    ellipsis: true,
+                    tooltip: true,
                     dataIndex: i,
                     key: i,
-                    ellipsis:true,
                 })
             }
             this.columns=columns;
@@ -70,6 +76,17 @@ display: none!important;
         watch:{
             show(){
                 this.setShowClass()
+            },
+            selectedRowKeys(selectedRowKeys){
+                const options=[];
+                selectedRowKeys.forEach(v=>{
+                    options.push({
+                        value: valDo(v),
+                        label: infos[valDo(v)][this.showField],
+                    })
+                })
+                this.options=options;
+                this.$emit('update:value', this.getValueStr());
             },
             value:{
                 handler(value, oldValue) {
@@ -88,7 +105,7 @@ display: none!important;
                     let vals=strVals.map(valDo);
                     this.$post(this.field.url,{ids:vals}).then(res=>{
                         if(typeof res.data==='undefined'){
-                            antd.message.warning('字段'+this.field.title+'未正确获取到选择的信息-001');
+                            ArcoVue.Message.warning('字段'+this.field.title+'未正确获取到选择的信息-001');
                             return;
                         }
                         let options=[];
@@ -122,7 +139,7 @@ display: none!important;
                             for(let k in res.data){
                                 let v=res.data[k];
                                 if(typeof v!=='string'&&typeof v!=='number'){
-                                    antd.message.warning('字段'+this.field.title+'未正确获取到选择的信息-002');
+                                    ArcoVue.Message.warning('字段'+this.field.title+'未正确获取到选择的信息-002');
                                     return;
                                 }
                                 if(!strVals.includes(k.toString())){
@@ -184,7 +201,8 @@ display: none!important;
                     if(showActions){
                         if(this.columnDefNum===this.columns.length){
                             this.columns.push({
-                                slots: {customRender: 'action', title: 'custom-title-action'},
+                                titleSlotName:'custom-title-action',
+                                slotName:'action',
                                 fixed: 'right',
                             })
                         }
@@ -212,55 +230,37 @@ display: none!important;
                 this.loading=true;
                 this.$nextTick(()=>this.getList());
             },
-            handleTableChange(pagination, filters, sorter) {
-                if(!pagination.pageSize){
-                    return;
-                }
-                this.pagination.current = pagination.current;
-                this.pagination.pageSize = pagination.pageSize;
-
-                this.myFilters.page=pagination.current;
-                this.myFilters.pageSize=pagination.pageSize;
-                this.myFilters.sortField=sorter.field;
-                this.myFilters.sortOrder=sorter.order;
+            pageChange(page){
+                this.pagination.current = page;
+                this.myFilters.page = page;
                 this.getList();
             },
-            onSelectChange (selectedRowKeys){
-                this.selectedRowKeys = selectedRowKeys.map(valDo);
-                const options=[];
-                selectedRowKeys.forEach(v=>{
-                    options.push({
-                        value: valDo(v),
-                        label: infos[valDo(v)][this.showField],
-                    })
-                })
-                this.options=options;
-                this.$emit('update:value', this.getValueStr());
+            pageSizeChange(pageSize){
+                this.pagination.pageSize = pageSize;
+                this.myFilters.pageSize = pageSize;
+                this.getList();
             },
+            sorterChange(dataIndex,direction){
+                this.myFilters.sortField=dataIndex;
+                this.myFilters.sortOrder=direction;
+                this.getList();
+            },
+
             setShowClass(){
+                let inputClass=document.querySelector('#input-'+this.id).classList;
                 if(this.show){
-                    if(document.querySelector('#input-'+this.id).closest('.ant-dropdown-open')){
-                        document.querySelector('#input-'+this.id).closest('.ant-dropdown-open').classList.add('ant-select-focused');
-                    }
+                    inputClass.add('arco-select-focused');
+                    inputClass.add('arco-select-view-focus');
                 }else{
-                    if(document.querySelector('#input-'+this.id).closest('.ant-dropdown-trigger')){
-                        document.querySelector('#input-'+this.id).closest('.ant-dropdown-trigger').classList.remove('ant-select-focused');
-                    }
+                    inputClass.remove('arco-select-focused');
+                    inputClass.remove('arco-select-view-focus');
                 }
             },
-            selectChange(vals,options){
+            selectChange(vals){
                 this.selectedRowKeys=vals.map(valDo);
-                this.options=options.map(v=>{
-                    v.value=valDo(v.value);
-                    return v;
-                });
                 this.$emit('update:value',this.getValueStr());
             },
             selectSearch(val){
-                if(window.event.type==='mousedown'&&window.event.target&&!window.event.target.closest('.ant-select-clear')){
-                    return;
-                }
-                // console.log(window.event,window.event.target.closest('.ant-select-clear'));
                 this.pagination.current = 1;
                 this.myFilters.page=1;
                 this.myFilters.keywords=val.toString().trim();
@@ -276,18 +276,18 @@ display: none!important;
                 return window.vueDefMethods.openBox.call(this,...params)
             },
             openOtherBtn(...params){
-                this.show=false;
+                // this.show=false;
                 this.$nextTick(()=>{
                     window.vueDefMethods.openOtherBtn.call(this,...params)
                 })
             },
         },
         template:`<div class="select-table-box" :id="id">
- <a-dropdown :trigger="['click']" :visible="show" :overlay-className="id" :disabled="disabled">
+ <a-dropdown v-model:popup-visible="show" :disabled="disabled" :hide-on-select="false" popup-container="#table-select-popup-container">
  
   <a-select
-    :value="selectedRowKeys"
-    :mode="field.multiple?'multiple':'default'"
+    :model-value="selectedRowKeys"
+    :multiple="field.multiple"
     style="width: 100%"
     :placeholder="field.placeholder||'请选择'+field.title"
     :disabled="disabled"
@@ -297,16 +297,15 @@ display: none!important;
     :options="options"
     @change="selectChange"
     @search="selectSearch"
+    @popup-visible-change="setShowClass"
     ref="select"
-    :search-value="myFilters.keywords" 
-    show-search
-    :open="show"
-    dropdown-class-name="select-table-select-dropdown"
+    allow-search
+    :popup-visible="false"
   >
   </a-select>
- <template #overlay>
-  <div class="select-table-dropdown" :style="{'max-width': maxW}">
-    <a-table :row-key="record => record.id" :loading="loading" :columns="columns" :data-source="data" :pagination="pagination" @change="handleTableChange" size="small" :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange,type:field.multiple?'checkbox':'radio' }">
+ <template #content>
+  <div class="select-table-dropdown" :style="{'max-width': maxW}" @click="setShowClass">
+    <a-table row-key="id" :loading="loading" :columns="columns" :data="data" :pagination="pagination" size="small"   v-model:selected-keys="selectedRowKeys" :row-selection="{showCheckedAll:true,type:field.multiple?'checkbox':'radio' }"  @page-change="pageChange" @page-size-change="pageSizeChange" @sorter-change="sorterChange">
         <template #custom-title-action>操作</template>
         <template #action="{ record }">   
             <template v-for="(btn,benKey) in record.__actions">

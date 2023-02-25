@@ -2,9 +2,7 @@ define([],function(){
     const styleId='filter-index-time-field-style';
     const style = `
 <style id="${styleId}">
-.time-filter-box .ant-input.ant-input-disabled+.ant-time-picker .ant-time-picker-input{
-border-left: 0;
-}
+
 </style>
 `;
 
@@ -41,6 +39,16 @@ border-left: 0;
                 }
                 return true;
             },
+            modelVal:{
+                get(){
+                    return [this.start,this.end];
+                },
+                set(val){
+                    this.start=val[0]||'';
+                    this.end=val[1]||'';
+                }
+            }
+
         },
         methods: {
             val(start,end){
@@ -63,16 +71,9 @@ border-left: 0;
                     <div class="filter-item-check-item" @click="val('','')" :class="{active:start===''&&end===''}"><div class="filter-item-check-item-value">全部</div></div>
                         <div v-for="(vo,key) in config.items" class="filter-item-check-item" @click="val(vo.start,vo.end)" :class="{active:start==vo.start&&end==vo.end}"><div class="filter-item-check-item-value">{{vo.title}}</div></div>
                         <div class="filter-item-check-item filter-item-input-group" :class="{active:inputCheck}">
-                            <a-input-group compact size="small">
-                                    <a-time-picker v-model:value="start" size="small" valueFormat="HH:mm:ss" placeholder="开始值" style="width: 82px; text-align: left"/>
-                                      <a-input
-                                        v-model:value="separator"
-                                        style=" width: 30px; border-left: 0; pointer-events: none; background-color: #fff"
-                                        placeholder="~"
-                                        disabled
-                                      />
-                                   <a-time-picker v-model:value="end" size="small" valueFormat="HH:mm:ss" placeholder="结束值" style="width: 82px; text-align: left;"/>
-                                    <a-button @click="search" size="small">确定</a-button>
+                                <a-input-group>
+                                      <a-time-picker size="mini"  type="time-range" v-model:model-value="modelVal" format="HH:mm" style="width: 150px"/>
+                                      <a-button @click="search" type="primary" size="mini">确定</a-button>
                                 </a-input-group>
                         </div>
 </div>`,

@@ -4,7 +4,6 @@ namespace tpScriptVueCurd\option\single;
 use think\App;
 use think\Model;
 use tpScriptVueCurd\field\FilesField;
-use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\traits\Func;
@@ -69,7 +68,7 @@ class Edit
         }
         $info=$this->info;
         //只处理地区
-        $this->fields->filter(fn(ModelField $v)=> ($v instanceof RegionField && $v->canEdit() === false) ||($v instanceof  FilesField))->doShowData($info);
+        $this->fields->filter(fn(ModelField $v)=>$v instanceof  FilesField)->doShowData($info);
         //原信息
         $info['sourceData']=$this->info;
 

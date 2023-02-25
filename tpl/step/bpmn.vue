@@ -4,6 +4,7 @@ body, html{
 }
 #app{
     background-color: transparent;
+    padding: 24px;
 }
 #tool-box{
     position: fixed;

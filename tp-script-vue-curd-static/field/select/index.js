@@ -13,7 +13,7 @@ define([],function(){
         computed:{
             lists(){
                 if(typeof this.record.record['_Original_'+this.field.name]==='undefined'||this.record.record['_Original_'+this.field.name].toString()===''){
-                    return this.record.text?[this.record.text]:[];
+                    return this.record.record[this.field.name]?[this.record.record[this.field.name]]:[];
                 }
                 return this.record.record['_Original_'+this.field.name].toString().split(',');
             }
@@ -49,24 +49,10 @@ define([],function(){
             },
         },
         template:`<div style="display: inline">
-                <template v-if="record.record['_showText_'+field.name]">
-                     <a-tooltip placement="topLeft">
-                        <template #title>{{record.record['_showText_'+field.name]}}</template>
-                        <span :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
-                     </a-tooltip>
-                </template>
-                <template v-else-if="record.text">
-                    <a-tooltip placement="topLeft">
-                        <template #title>
-                            <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
-                        </template>
-                        <span>
-                            <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
-                        </span>
-                    </a-tooltip>
-               </template>
-
-                   
+                    <span  v-if="record.record['_showText_'+field.name]" :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
+                    <span  v-else-if="record.record[this.field.name]">
+                        <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
+                    </span>
                 </div>`,
     }
 });

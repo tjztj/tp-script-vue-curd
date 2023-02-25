@@ -4,7 +4,6 @@ namespace tpScriptVueCurd\option;
 
 class FieldStepBeforeCheck
 {
-
     public string $title='';
     /**
      * 逻辑说明

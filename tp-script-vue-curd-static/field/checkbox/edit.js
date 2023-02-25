@@ -19,7 +19,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-checkbox-group v-model:value="modelVal"  :disabled="field.readOnly">
+                        <a-checkbox-group v-model:model-value="modelVal"  :disabled="field.readOnly">
                         <transition-group name="bounce-min">
                             <template v-for="checkboxItem in field.items">
                                 <a-checkbox :value="checkboxItem.value" v-show="checkboxItem.showItem===undefined||checkboxItem.showItem" v-if="!checkboxItem.hide"><span :style="{color:checkboxItem.color}">{{checkboxItem.text}}</span></a-checkbox>

@@ -2,9 +2,7 @@ define([],function(){
     const styleId='filter-index-field-style';
     const style = `
 <style id="${styleId}">
-.filter-input-field-box .ant-input-group-sm span.ant-input-affix-wrapper{
-    padding: 1px 7px;
-}
+
 </style>
 `;
 
@@ -38,10 +36,14 @@ define([],function(){
         },
         template:`<div>
                 <div class="input-value-div filter-input-field-box">
-                     <a-input-group compact size="small">
-                        <a-input v-model:value="inputValue" style="max-width: 188px;" :placeholder="'填写 '+config.title+(config.type=='ValueFilter'?' 信息':' 关键字')" allow-clear ></a-input>
-                        <a-button @click="search" size="small">确定</a-button>
-                     </a-input-group>
+                    <a-input-search style="max-width: 236px;" :placeholder="'填写 '+config.title+(config.type=='ValueFilter'?' 信息':' 关键字')" 
+                        allow-clear 
+                        button-text="确定" 
+                        v-model:model-value ="inputValue"
+                        size="mini"
+                        @search="search"
+                        search-button
+                        />
                 </div>
 </div>`,
     }

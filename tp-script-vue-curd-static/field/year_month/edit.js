@@ -29,11 +29,13 @@ define([],function(){
         },
         template:`<div class="field-box">
                    <div class="l year-month-field-box">
-                        <a-input-group compact>
-                            <a-input-number v-model:value="val[0]" min="0" max="999" placeholder="输入年数" :disabled="field.readOnly"/>
-                            <a-input value="年" :disabled="true"/>
-                            <a-input-number v-model:value="val[1]" min="0" max="12" placeholder="输入月数" :disabled="field.readOnly"/>
-                            <a-input value="个月" :disabled="true"/>
+                        <a-input-group>
+                            <a-input-number v-model="val[0]" :min="0" :max="999" placeholder="输入年数" :disabled="field.readOnly"  allow-clear hide-button>
+                                <template #suffix>年</template>
+                            </a-input-number>
+                            <a-input-number v-model="val[1]" :min="0" :max="12" placeholder="输入月数" :disabled="field.readOnly"  allow-clear hide-button>
+                                <template #suffix>个月</template>
+                            </a-input-number>
                         </a-input-group>
                     </div>
                     <div class="r">

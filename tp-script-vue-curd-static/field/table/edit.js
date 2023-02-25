@@ -167,12 +167,26 @@ max-height: 92%;
                 this.setEditForm(row);
                 this.editShow=true
             },
-            editSub(option){
+            clickEditSub(done){
+                this.editSub(null,done);
+            },
+            editSub(option,done){
                 option=option||{};
-                this.$refs.tableEditPubForm.validate().then(async() => {
+                this.$refs.tableEditPubForm.validate(async (errors)=>{
+                    if(errors&&Object.keys(errors).length>0){
+                        this.$message.warning(errors[Object.keys(errors)[0]].message);
+                        if(done){
+                            done(false);
+                        }
+                        return;
+                    }
                     for(let i in this.editData.groupFields){
                         if(this.$refs['tableEditFieldGroup'+i]){
-                            if(await this.$refs['tableEditFieldGroup'+i].validateListForm()===false){
+                            let form=this.$refs['tableEditFieldGroup'+i];
+                            if(typeof form.validateListForm==='undefined'&&form[0]&&typeof form[0].validateListForm==='function'){
+                                form=form[0];
+                            }
+                            if(await form.validateListForm()===false){
                                 return;
                             }
                         }
@@ -196,12 +210,10 @@ max-height: 92%;
                         option.success(res)
                     }
                     this.$refs['tablefieldeditcurdtable'].getActionWidthByProps()
-                    this.editShow=false;
-                }).catch(error => {
-                    if(error.errorFields&&error.errorFields[0]&&error.errorFields[0].errors&&error.errorFields[0].errors[0]){
-                        antd.message.warning(error.errorFields[0].errors[0])
+                    if(done){
+                        done(true);
                     }else{
-                        antd.message.warning('请检测是否填写正确')
+                        this.editShow=false;
                     }
                 });
             },
@@ -236,15 +248,15 @@ max-height: 92%;
         },
         template:`<div>
                     <div class="table-field-box" v-if="isInit">
-                        <div class="table-field-box-add" v-if="!isDisabled"><a-button shape="circle" size="small" @click="showAdd"><template #icon><plus-outlined></plus-outlined></template></a-button></div>
+                        <div class="table-field-box-add" v-if="!isDisabled"><a-button shape="circle" size="small" @click="showAdd"><icon-plus></icon-plus></a-button></div>
                         <div class="table-field-box-table" v-show="list.length>0">
                             <curd-table
                                 :data="list"
                                 :pagination="{
                                     pageSize: field.pageSize,
-                                    sortField: '',
-                                    sortOrder: '',
-                                    showSizeChanger:false,
+                                    total:0,
+                                    current:1,
+                                    showPageSize:false,
                                 }"
                                 :loading="tableLoading"
                                 :list-columns="listColumns"
@@ -261,9 +273,9 @@ max-height: 92%;
                                 ref="tablefieldeditcurdtable">
                             </curd-table>
                         </div>
-                            <a-modal class="table-field-show-modal" width="95%" v-model:visible="editShow" destroy-on-close :title="editInfo&&editInfo.id?'修改'+field.title:'添加'+field.title" @ok="editSub()">
+                            <a-modal modal-class="table-field-show-modal" width="95%" v-model:visible="editShow" unmount-on-close :title="editInfo&&editInfo.id?'修改'+field.title:'添加'+field.title" :on-before-ok="clickEditSub">
                                 <div class="vuecurd-def-box">
-                                        <a-form :model="editForm" :label-col="editLabelCol" :wrapper-col="editWrapperCol" ref="tableEditPubForm">
+                                        <a-form :model="editForm" :label-col-props="editLabelCol" :wrapper-col-props="editWrapperCol" ref="tableEditPubForm">
                                             <template v-for="(groupFieldItems,groupTitle) in editData.groupFields">
                                                 <template v-if="editShowGroup">
                                                     <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
@@ -296,27 +308,29 @@ max-height: 92%;
                                         </a-form>
                                 </div>
                             </a-modal>
-                            <a-modal class="table-field-show-modal" width="95%" v-model:visible="showLook" destroy-on-close :title="'查看'+field.title" :footer="null">
+                            <a-modal modal-class="table-field-show-modal" width="95%" v-model:visible="showLook" unmount-on-close :title="'查看'+field.title" :footer="false">
                                 <div class="vuecurd-def-box vuecurd-show-def-box">
                                     <template v-for="(groupFieldItems,groupTitle) in showData.groupFields">
                                         <fieldset class="field-group-fieldset" :class="{'show-group':showData.haveGroup}">
                                             <div class="legend-box">
                                                 <legend>{{groupTitle}}</legend>
                                             </div>
-                                            <template v-for="showField in groupFieldItems">
-                                                <div class="row" v-if="!showField.showUseComponent">
-                                                    <div class="l">{{showField.title}}：</div>
-                                                    <div class="r">
-                                                        <curd-show-field :field="showField" :info="showInfo"></curd-show-field>
-                                                    </div>
-                                                </div>
-                                                <component
-                                                    v-else-if="fieldComponents['VueCurdShow'+showField.type]"
-                                                    :is="'VueCurdShow'+showField.type"
-                                                    :field="showField"
-                                                    :info="showInfo"
-                                                ></component>
-                                            </template>
+                                            <div class="show-group-field-rows">
+                                                <template v-for="showField in groupFieldItems">
+                                                    <a-row class="row" v-if="!showField.showUseComponent">
+                                                        <a-col class="l" span="4">{{showField.title}}：</a-col>
+                                                        <a-col class="r" span="20">
+                                                            <curd-show-field :field="showField" :info="showInfo"></curd-show-field>
+                                                        </a-col>
+                                                    </a-row>
+                                                    <component
+                                                        v-else-if="fieldComponents['VueCurdShow'+showField.type]"
+                                                        :is="'VueCurdShow'+showField.type"
+                                                        :field="showField"
+                                                        :info="showInfo"
+                                                    ></component>
+                                                </template>
+                                            </div>
                                         </fieldset>
                                     </template>
                                 </div>

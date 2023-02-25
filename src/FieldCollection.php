@@ -10,10 +10,9 @@ use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\field\CheckboxField;
 use tpScriptVueCurd\field\ListField;
 use tpScriptVueCurd\field\PasswordField;
-use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\field\SelectField;
 use tpScriptVueCurd\field\StringField;
-use tpScriptVueCurd\field\TreeSelect;
+use tpScriptVueCurd\field\TreeSelectField;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldNumHideField;
 use tpScriptVueCurd\option\FieldNumHideFieldCollection;
@@ -145,14 +144,14 @@ class FieldCollection extends Collection
                 return;
             }
             $items=[];
-           foreach ($v instanceof TreeSelect?$v->getSourceItems():$v->items() as $key=>$val){
+           foreach ($v instanceof TreeSelectField?$v->getSourceItems():$v->items() as $key=> $val){
                 $items[$key]=$val;
                 if(empty($val['showItemBy'])){
                     continue;
                 }
                 if(!$val['showItemBy']->check($data,true,$old)){
                     if(isset($data[$v->name()])&&$data[$v->name()]!==''){
-                        if($v instanceof CheckboxField||(($v instanceof SelectField||$v instanceof TreeSelect)&&$v->multiple())){
+                        if($v instanceof CheckboxField||(($v instanceof SelectField||$v instanceof TreeSelectField)&&$v->multiple())){
                             $valArr=is_array($data[$v->name()])?$data[$v->name()]:explode(',',$data[$v->name()]);
                             $data[$v->name()]=implode(',',array_filter($valArr, static fn($vv)=>(string)$vv!==(string)$val['value']));
                         }else if((string)$data[$v->name()]===(string)$val['value']){
@@ -681,14 +680,6 @@ class FieldCollection extends Collection
      */
     public function excelFilter():self{
         return $this->filter(function(ModelField $v){
-            if($v instanceof RegionField){
-                foreach ($v->getAboutRegions() as $val){
-                    if($val->editShow()){
-                        return true;
-                    }
-                }
-                return false;
-            }
             if(!$v->canExcelImport()){
                 return false;
             }

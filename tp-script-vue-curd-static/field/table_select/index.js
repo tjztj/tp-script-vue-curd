@@ -107,12 +107,7 @@ define([],function(){
 
         },
         template:`<div style="display: inline">
-     <a-tooltip placement="topLeft">
-        <template #title>
-          <div>{{text}}</div>
-        </template>
-         <div style="display: initial">{{text}}</div>
-    </a-tooltip>
+    <div style="display: initial">{{text}}</div>
 </div>`,
     }
 });

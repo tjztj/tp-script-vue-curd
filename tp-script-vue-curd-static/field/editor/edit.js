@@ -102,6 +102,6 @@ pointer-events: none;
             editor.txt.html(textArea.value)
             this.spinning=false;
         },
-        template: `<div> <a-spin :spinning="spinning" tip="Loading..."><div :id="editorId" style="display: block"></div></a-spin></div>`,
+        template: `<div> <a-spin :loading="spinning" tip="Loading..."><div :id="editorId" style="display: block"></div></a-spin></div>`,
     }
 });

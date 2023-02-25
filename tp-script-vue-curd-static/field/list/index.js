@@ -82,7 +82,7 @@ padding: 6px;
 
             let list=[];
             if(props.record.record&&props.record.record[props.field.name+'List']){
-                list=props.record.record[props.field.name+'List'];
+                list=Object.values(props.record.record[props.field.name+'List']);
             }
             return {
                 list,
@@ -109,7 +109,7 @@ padding: 6px;
                 }
             },
         },
-        template:`<div>
+        template:`<div style="display: initial">
 <a v-if="list.length>0" @click="visible=true">查看</a> 
 <span v-else style="color: #d9d9d9">无</span>
  <a-drawer
@@ -117,11 +117,13 @@ padding: 6px;
     :title="field.title"
     placement="left"
     v-model:visible="visible"
-    :after-visible-change="afterVisibleChange"
+    @open="afterVisibleChange"
     width="550px"
     style="left: 0"
+    :footer="false"
+    unmount-on-close
   >
-     <div style="height: calc(100vh - 55px);overflow: auto;padding: 24px"><div class="curd-list-show-field-box" v-if="canShow"><list-show :info="record.record" :field="field"></list-show></div><div v-else>加载中...</div></div>
+     <div style="overflow: auto;padding: 24px"><div class="curd-list-show-field-box" v-if="canShow"><list-show :info="record.record" :field="field"></list-show></div><div v-else>加载中...</div></div>
   </a-drawer>
 
 </div>`,

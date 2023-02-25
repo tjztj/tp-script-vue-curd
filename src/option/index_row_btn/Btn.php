@@ -5,8 +5,9 @@ namespace tpScriptVueCurd\option\index_row_btn;
 class Btn
 {
     public string $btnTitle='';
-    public string $btnType='a';//''（空）；'a'；'danger'；'warning'；'info'；'primary'；'dashed'；'text'；'link'
+    public string $btnType='a';//''（空）；'a'；'primary'；'secondary'；'outline'；'dashed'；'text'
     public string $btnColor='';//btnType==='a'有效
+    public string $btnStatus='';//btnType!=='a'有效，'normal' | 'warning' | 'success' | 'danger'
     public string $btnSvg='';//按钮图片，特定情况下有效
 
     public string $modalW='45vw';
@@ -22,6 +23,7 @@ class Btn
             'btnTitle'=>$this->btnTitle,
             'btnType'=>$this->btnType,
             'btnColor'=>$this->btnColor,
+            'btnStatus'=>$this->btnStatus,
             'btnSvg'=>$this->btnSvg,
 
             'modalW'=>$this->modalW,

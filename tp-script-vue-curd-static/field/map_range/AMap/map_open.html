@@ -137,7 +137,7 @@
         color: #000;
     }
 
-    .search-rel .ant-pagination {
+    .search-rel .arco-pagination {
         margin-bottom: 8px;
     }
 </style>
@@ -151,12 +151,7 @@
         <div class="top">
             <div class="msg-box"><a-alert message="请先在地图范围类点击三个点以此生成多边形，长按多边形白色的点进行拖动，改变其形状。其中不透明的点，点击时会删除！鼠标滚轮放大缩小地图。" type="warning" show-icon ></a-alert></div>
             <div class="input-box" @click="relShow=true">
-                <a-input type="text" id="map-select-search-input" placeholder="输入关键字查找地区" v-model:value="searchValue"
-                         @press-enter="doSearch">
-                    <template #prefix>
-                        <search-outlined type="user"></search-outlined>
-                    </template>
-                </a-input>
+                <a-input-search id="map-select-search-input" placeholder="输入关键字查找地区" v-model:model-value="searchValue" @press-enter="doSearch" @search="doSearch"></a-input-search>
             </div>
             <div class="search-rel" v-show="searchValue&&searchValue!==''&&relShow">
                 <div v-if="list.length>0">
@@ -191,13 +186,14 @@
                 </a-button>
             </div>
             <div class="foot-r">
-                <a-button type="primary" shape="check" @click="submit"><check-outlined></check-outlined> 确定</a-button>
+                <a-button type="primary" shape="check" @click="submit"><icon-check></icon-check> 确定</a-button>
             </div>
         </div>
     </div>
 </div>
-<script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js" charset="utf-8"></script>
-<script src="/tp-script-vue-curd-static.php?ant-design-vue/antd.min.js" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js?3.2.45" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?arco/arco-vue.min.js?2.40.1" charset="utf-8"></script>
+<script src="/tp-script-vue-curd-static.php?arco/arco-vue-icon.min.js?2.40.1" charset="utf-8"></script>
 <script>
     function getQueryVariable(variable)
     {
@@ -258,7 +254,7 @@
             jsapi.src = 'https://webapi.amap.com/maps?v=2.0&key=103028a8c0d4cbd05993f251c2a2ead7&&callback=' + initFunc + '&';
             document.head.appendChild(jsapi);
             document.addEventListener('click', e => {
-                if (e.target.closest('.search-rel') || e.target.matches('.search-rel') || e.target.closest('.input-box') || e.target.matches('.input-box')||(e.target.closest('li')&&e.target.closest('li').matches('.ant-pagination-item'))) {
+                if (e.target.closest('.search-rel') || e.target.matches('.search-rel') || e.target.closest('.input-box') || e.target.matches('.input-box')||(e.target.closest('li')&&e.target.closest('li').matches('.arco-pagination-item'))) {
                     return;
                 }
 
@@ -388,7 +384,7 @@
                     district.search(window.mapDistrict,(status, result)=> {
                         console.log(result);
                         if(!result.districtList||!result.districtList[0]||!result.districtList[0].boundaries||result.districtList[0].boundaries.length===0){
-                            antd.notification.error({message: '无相关范围', duration: 0});
+                            ArcoVue.Notification.error({content: '无相关范围'});
                             //点击事件
                             window.map.on("click", addPolygonFun);
                             initSet();
@@ -453,7 +449,7 @@
                 }
             },
             doSearch(){
-                if(this.searchValue.replace(/\n/g,'')===''){
+                if (this.searchValue===null||this.searchValue.replace(/\n/g, '') === '') {
                     return;
                 }
                 window.placeSearch.setPageIndex(1)
@@ -591,10 +587,8 @@
     };
 
     window.app = Vue.createApp(option)
-    app.use(antd)
-    app.component('SearchOutlined', {
-        template: `<span role="img" aria-label="search" class="anticon anticon-search"><svg class="" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span>`
-    })
+    app.use(ArcoVue);
+    app.use(ArcoVueIcon);
     app.mount('#app')
 </script>
 </body>

@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
-use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -53,7 +52,7 @@ trait Excel
             return $this->fields;
         }
         //不需要村社，父表已经有村社了
-        return $this->fields->filter(fn(ModelField $v)=>!$v instanceof RegionField);
+        return $this->fields;
     }
 
 
@@ -88,7 +87,6 @@ trait Excel
             $modelName=class_basename($model);
             $fields=$fields->merge(
                 $model->fields()
-                    ->filter(fn(ModelField $v)=>!$v instanceof RegionField)
                     ->map(function(ModelField $field)use($modelName,$v){
                         $field=clone $field;
                         $field->name($modelName.'|'.$field->name());
@@ -435,19 +433,7 @@ trait Excel
             }
 
             if(!$v->editShow()){
-                if(!$v instanceof RegionField){
-                    return;
-                }
-                $hasShow=false;
-                foreach ($v->getAboutRegions() as $val){
-                    if($val->editShow()){
-                        $hasShow=true;
-                        break;
-                    }
-                }
-                if(!$hasShow){
-                    return;
-                }
+                return;
             }
 
             $excelFieldTpl=new ExcelFieldTpl($v->name(),$v->title());
@@ -501,7 +487,7 @@ trait Excel
                     ->setName($th['fontName']);
                 $th['value']=$objRichText;
             }
-            if($v->items||$v->type==='RegionField'){
+            if($v->items){
                 $th['format']= static function ($row, ExportCell $cell)use($v){
                     if($cell instanceof ExportThCell){
                         return '';
@@ -514,171 +500,9 @@ trait Excel
                             $excel->addSheet($checkSheet);
                         }
 
-                        if($v->type==='RegionField'){
-                            static $regionChilds=null;
-                            static $regionNameobj=[];
-                            static $regionFields=null;
-                            $fieldName=explode('|',$v->name);
-                            $fieldName=end($fieldName);
-                            if(is_null($regionChilds)){
-                                $regionLevelObj=[];
-                                $pKey=null;
-                                $regionFields=$v->field->getAboutRegions();
-                                foreach ($regionFields as $key=>$val){
-                                    if($val->canExcelImport()){
-                                        $fName=explode('|',$val->name());
-                                        $fName=end($fName);
-                                        if(is_null($pKey)){
-                                            $regionLevelObj[$key+1]=[
-                                                'level'=>$key+1,
-                                                'plevel'=>0,
-                                                'pname'=>'',
-                                                'name'=>$fName
-                                            ];
-                                        }else{
-                                            $pfName=explode('|',$regionFields[$pKey]->name());
-                                            $pfName=end($pfName);
-                                            $regionLevelObj[$key+1]=[
-                                                'level'=>$key+1,
-                                                'plevel'=>$pKey+1,
-                                                'pname'=>$pfName,
-                                                'name'=>$fName
-                                            ];
-                                        }
-
-                                        $regionNameobj[$fName]=$regionLevelObj[$key+1];
-                                        $pKey=$key;
-                                    }
-                                }
-
-                                $regionChilds=[];
-                                $regionArr=$v->field->getTreeToList();
-
-                                $needAddPSelectIds=[];
-                                foreach ($regionArr as $val){
-                                    $pIds=array_filter(explode(',',$val['pids']));
-                                    foreach ($regionLevelObj as $kk=>$vv){
-                                        if(isset($pIds[$kk+1])&&!isset($regionArr[$kk+1])){
-                                            $needAddPSelectIds[]=$pIds[$kk+1];
-                                        }
-                                    }
-                                }
-                                if($needAddPSelectIds){
-                                    $allRegionInfos=\app\admin\model\SystemRegion::getAll();
-                                    $allRegions = [];
-                                    foreach ($allRegionInfos as $key => $data) $allRegions[$data['id']] =& $allRegionInfos[$key];
-                                    foreach ($allRegionInfos as $data) {
-                                        // 判断是否存在parent
-                                        if (isset($allRegions[$data['pid']])) {
-                                            isset($allRegions[$data['pid']]['children'])||$allRegions[$data['pid']]['children']=[];
-                                            $allRegions[$data['pid']]['children'][$data['id']] =& $allRegions[$data['id']];
-                                        }
-                                    }
-                                    $needAddPSelectIds=array_unique($needAddPSelectIds);
-                                    foreach ($needAddPSelectIds as $vv){
-                                        isset($allRegions[$vv])&&$regionArr[$vv]=$allRegions[$vv];
-                                    }
-                                }
-                                foreach ($regionArr as $val){
-                                    $pIds=explode(',',$val['pids']);
-                                    $titles=[];
-                                    foreach ($pIds as $pid){
-                                        empty($regionArr[$pid])||$titles[]=$regionArr[$pid]['name'];
-                                    }
-                                    if($titles){
-                                        $pKey=count($titles);
-                                        $cKey=$pKey+1;
-                                        if(!isset($regionLevelObj[$cKey])){
-                                            //如果没有本级（本级不导出）
-                                            continue;
-                                        }
-                                        $titleStrArr=$titles;
-                                        if(!isset($regionLevelObj[$pKey])){
-                                            for($i=$pKey;$i>=0;$i--){
-                                                unset($titleStrArr[$i]);
-                                                if(isset($regionLevelObj[$i])){
-                                                    $pKey=$i;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        $pTitleStr=implode('-',$titleStrArr);
-                                        if(isset($regionLevelObj[$pKey])){
-                                            $pname=$regionLevelObj[$pKey]['name'];
-                                            isset($regionChilds[$pname])||$regionChilds[$pname]=[];
-                                            isset($regionChilds[$pname][$pTitleStr])||$regionChilds[$pname][$pTitleStr]=[];
-                                            $regionChilds[$pname][$pTitleStr][]=$val['name'];
-                                        }
-                                    }
-                                }
-                            }
-
-
-                            if(isset($regionNameobj[$fieldName])){
-                                if(empty($regionNameobj[$fieldName]['pname'])){
-                                    $items=array_keys($regionChilds[$fieldName]);
-                                    $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
-                                    $prompt='';
-                                }else{
-                                    static $isInit=[];
-                                    if(!isset($isInit[$fieldName])){
-                                        $isInit[$fieldName]=true;
-                                        $childIndex=0;
-                                        $items=[];
-                                        $pname=$regionNameobj[$fieldName]['pname'];
-
-                                        foreach ($regionChilds[$pname] as $key=>$vals){
-                                            $pTitles=[];
-                                            $npname=$pname;
-                                            while (!empty($regionNameobj[$npname]['pname'])){
-                                                $npname=$regionNameobj[$npname]['pname'];
-                                                if(isset($regionChilds[$npname])){
-                                                    foreach ($regionChilds[$npname] as $kk=>$vv){
-                                                        if(in_array($key,$vv,true)){
-                                                            array_unshift($pTitles,$kk);
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            $pTitles[]=$key;
-                                            $excel->addNamedRange(new NamedRange(str_replace('-','',implode('-',$pTitles))
-                                                ,$checkSheet
-                                                ,$cell->col.($childIndex+1).':'.$cell->col.($childIndex+=count($vals))
-                                            ));
-                                            array_push($items,...$vals);
-                                        }
-                                    }
-                                    $col=$cell->col;
-                                    $pCols=[];
-                                    $lastKK=-1;
-                                    foreach ($regionFields as $kk=>$vv){
-                                        if(!$vv->canExcelImport()){
-                                            continue;
-                                        }
-                                        $fName=explode('|',$vv->name());
-                                        $fName=end($fName);
-                                        if($fName===$fieldName){
-                                            $prompt=isset($regionFields[$lastKK])?'需先选择'.$regionFields[$lastKK]->title():'';
-                                            break;
-                                        }
-                                        $col=ExportOperation::operationSub($col,1);
-                                        array_unshift($pCols,'$'.$col.'$'.$cell->row);
-                                        $lastKK=$kk;
-                                    }
-                                    $formula1='=INDIRECT('.implode('&',$pCols).')';
-                                }
-                            }else{
-                                $items=[];
-                                $formula1='""';
-                                $prompt='';
-                            }
-
-                        }else{
-                            $items=$v->items ;
-                            $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
-                            $prompt='';
-                        }
+                        $items=$v->items ;
+                        $formula1='=选项!$'.$cell->col.'$1:$'.$cell->col.'$'.count($items);
+                        $prompt='';
 
 
                         if(!$checkSheet->getCell($cell->col .'1')->getValue()){

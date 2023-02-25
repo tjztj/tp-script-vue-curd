@@ -85,15 +85,15 @@ define(['vueAdmin'], function (va) {
     }
 
     function getStepJustDo(row,that){
-        const modal = antd.Modal.confirm({
+        ArcoVue.Modal.warning({
             title: Vue.createVNode('b',{},'操作确认'),
-            content:row.nextStepInfo.listDirectSubmit,
-            icon:warnIcon('#faad14'),
-            onOk:()=> {
+            content: row.nextStepInfo.listDirectSubmit,
+            hideCancel:false,
+            onBeforeOk() {
                 return new Promise((resolve, reject) => {
                     let url=setUrlParams(row.nextStepInfo.config.listBtnUrl,{id:row.id});
                     that.$post(url,{id:row.id}).then(res=>{
-                        antd.message.success(res.msg);
+                        ArcoVue.Message.success(res.msg);
                         if(!res.data.refreshList&&that.refreshId){
                             that.refreshId(row.id);
                         }else{
@@ -104,10 +104,7 @@ define(['vueAdmin'], function (va) {
                         reject()
                     });
                 });
-            },
-            onCancel:()=> {
-                modal.destroy();
-            },
+            }
         });
     }
 
@@ -213,12 +210,11 @@ define(['vueAdmin'], function (va) {
                 return getThisActionOhterSetup(props,ctx);
             },
             data(){
-                let rowSelecteds=Vue.ref([]);
                 const pagination={
                     pageSize: vueData.indexPageOption.pageSize,
-                    sortField: '',
-                    sortOrder: '',
-                    showSizeChanger:vueData.indexPageOption.canGetRequestOption,
+                    showPageSize:vueData.indexPageOption.canGetRequestOption,
+                    total:0,
+                    current:1,
                 }
                 return {
                     listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
@@ -228,6 +224,8 @@ define(['vueAdmin'], function (va) {
                     data: [],
                     myFilters:{
                         ...pagination,
+                        sortField: '',
+                        sortOrder: '',
                         page: 1,
                     },
                     showFilter:vueData.showFilter,
@@ -244,15 +242,10 @@ define(['vueAdmin'], function (va) {
                         filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
                     },
                     showMultipleSelection:typeof vueData.showMultipleSelection==='undefined'?null:vueData.showMultipleSelection,
+                    selectedRowKeys:[],
                     rowSelection:{
-                        selectedRowKeys:rowSelecteds,
-                        onChange(selectedRowKeys,selectedRows) {
-                            if(window.rowSelection){
-                                //可其他页面操作的钩子
-                                window.rowSelection(selectedRowKeys,rowSelecteds,selectedRows)
-                            }
-                            rowSelecteds.value=selectedRowKeys;
-                        },
+                        type:'checkbox',
+                        showCheckedAll:true,
                     },
                     fieldStepConfig:vueData.fieldStepConfig,
                     actionDefWidth:0,
@@ -292,7 +285,7 @@ define(['vueAdmin'], function (va) {
                 ...getThisActionOhterComputeds(),
                 delSelectedIds(){
                     const ids=[];
-                    this.rowSelection.selectedRowKeys.forEach(id=>{
+                    this.selectedRowKeys.forEach(id=>{
                         if(typeof infos[id]==='undefined'){
                             return;
                         }
@@ -469,30 +462,28 @@ define(['vueAdmin'], function (va) {
                     let url=vueData.delUrl;
                     let where={ids:this.delSelectedIds,delChilds:delChilds?1:0};
                     this.$post(url,where).then(res=>{
-                        antd.message.success(res.msg);
+                        ArcoVue.Message.success(res.msg);
                         this.refreshTable();
-                        this.rowSelection.selectedRowKeys=[];
+                        this.selectedRowKeys=[];
                         if(typeof window.onDel==='function'){
                             window.onDel(url,where,res);
                         }
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
-                            antd.message.destroy();
+                            ArcoVue.Message.destroy();
                             let childsText='';
                             if(vueData.childs){
                                 childsText='（'+vueData.childs.map(v=>v.title).join('、')+'）';
                             }
-                            const modal = antd.Modal.confirm({
+                            ArcoVue.Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据'+childsText+'？',
-                                icon:warnIcon(),
-                                onOk:()=> {
+                                okText: '确定删除',
+                                cancelText: '取消',
+                                onOk() {
                                     this.delSelectedRows(e,true)
                                 },
-                                onCancel:()=> {
-                                    modal.destroy();
-                                },
-                            });
+                            })
                         }
                     })
                 },
@@ -501,7 +492,7 @@ define(['vueAdmin'], function (va) {
                     let url=vueData.delUrl;
                     let where={ids:[row.id],delChilds:delChilds?1:0};
                     this.$post(url,where).then(res=>{
-                        antd.message.success(res.msg);
+                        ArcoVue.Message.success(res.msg);
                         this.refreshTable();
                         if(typeof window.onDel==='function'){
                             window.onDel(url,where,res);
@@ -509,12 +500,12 @@ define(['vueAdmin'], function (va) {
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
-                            antd.message.destroy();
+                            ArcoVue.Message.destroy();
                             let childsText='';
                             if(vueData.childs){
                                 childsText='（'+vueData.childs.map(v=>v.title).join('、')+'）';
                             }
-                            const modal = antd.Modal.confirm({
+                            const modal = ArcoVue.Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除本条数据及下面所有子数据'+childsText+'？',
                                 icon:warnIcon(),
                                 onOk:()=> {
@@ -582,8 +573,8 @@ define(['vueAdmin'], function (va) {
                 doFilter(){
                     this.pagination.current = 1;
                     this.myFilters.page=1;
-                    this.fetch( (url,where,data)=>{
-                        this.rowSelection.selectedRowKeys=[];
+                    this.fetch((url,where,data)=>{
+                        this.selectedRowKeys=[];
                     })
                 },
                 openChildList(row,modelInfo,btn){
@@ -601,7 +592,7 @@ define(['vueAdmin'], function (va) {
                         url:vueData.importExcelTplUrl,
                         accept:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
                         success:res=> {
-                            antd.message.success(res.msg);
+                            ArcoVue.Message.success(res.msg);
                             this.refreshTable()
                         }
                     }).trigger();
@@ -613,7 +604,7 @@ define(['vueAdmin'], function (va) {
                         return;
                     }
                     //如果数据大于1万条，提出警告
-                    antd.Modal.confirm({
+                    ArcoVue.Modal.confirm({
                         title: '导出提示',
                         icon:warnIcon('#faad14'),
                         content: '当前结果数据较多，可能会发生不能正确导出数据的情况，建议筛选后再导出',
@@ -739,12 +730,12 @@ define(['vueAdmin'], function (va) {
                     this.leftCateObj.showTools[row.value]=false;
                     this.leftCateObj.loading=true;
                     this.$post(this.leftCate.rmUrl,{ids:[row.value],id:row.value,delChilds:delChilds?1:0}).then(res=>{
-                        antd.message.success(res.msg);
+                        ArcoVue.Message.success(res.msg);
                         this.leftCateRefresh();
                     }).catch(err=>{
                         this.leftCateObj.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
-                            antd.message.error('当前项已有关联数据，不可删除');
+                            ArcoVue.Message.error('当前项已有关联数据，不可删除');
                         }
                     })
                 },
@@ -813,7 +804,12 @@ define(['vueAdmin'], function (va) {
                     //我想要子组件可以不关闭当前窗口提交（就是自定义的字段可以新增数据后继续编辑）
                     option=option||{};
 
-                    this.$refs.pubForm.validate().then(async() => {
+                    this.$refs.pubForm.validate(async errors =>{
+                        if(errors&&Object.keys(errors).length>0){
+                            this.$message.warning(errors[Object.keys(errors)[0]].message);
+                            return;
+                        }
+
                         for(let i in this.groupFields){
                             if(this.$refs['fieldGroup'+i]&&this.$refs['fieldGroup'+i].validateListForm){
                                 if(await this.$refs['fieldGroup'+i].validateListForm()===false){
@@ -825,7 +821,7 @@ define(['vueAdmin'], function (va) {
                             this.loading=true;
                         }
                         this.$post(window.location.href,this.form).then(async res=>{
-                            parentWindow.antd.message.success(res.msg);
+                            (parentWindow||window).ArcoVue.Message.success(res.msg);
                             if(this.form&&this.form.id&&!res.data.refreshList){
                                 window.listVue.refreshId(this.form.id);
                             }else{
@@ -854,14 +850,8 @@ define(['vueAdmin'], function (va) {
                                 option.finally()
                             }
                         })
-                    }).catch(error => {
-                        if(error.errorFields&&error.errorFields[0]&&error.errorFields[0].errors&&error.errorFields[0].errors[0]){
-                            antd.message.warning(error.errorFields[0].errors[0])
-                        }else{
-                            antd.message.warning('请检测是否填写正确')
-                        }
-                        console.log('error', error);
-                    });
+                    })
+
                 },
                 close(){
                     document.body.dispatchEvent(new Event('closeIframe'));

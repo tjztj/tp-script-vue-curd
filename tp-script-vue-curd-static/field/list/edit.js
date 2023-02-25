@@ -38,6 +38,14 @@ define([], function () {
 
             },
         },
+        computed:{
+          fields(){
+              return this.field.fields.map(v=>{
+                  v.editLabelAlign='left'
+                  return v;
+              })
+          }
+        },
         beforeMount(){
             this.setVal(this.value)
         },
@@ -76,16 +84,16 @@ define([], function () {
                     <div class="list-field-box">
                         <transition-group name="slide-fade">
                             <div class="list-field-box-item-box" v-for="(item,key) in listFieldObjs" :key="key">
-                                <a-divider class="list-field-box-item-divider" dashed></a-divider>
-                                 <a-form class="list-field-box-item-form" :model="item" :label-col="listFieldLabelCol" :wrapper-col="listFieldWrapperCol" :ref="'listFieldForm'+key">
-                                   <div class="list-field-box-remove"><close-outlined class="remove-list-field-box-item-icon" @click="removeListField(key)"></close-outlined></div>
-                                   <field-group-item class="list-field-box-item" :group-field-items="field.fields" :info="item" v-model:form="item" v-model:field-hide-list="currentFieldHideList[key]"></field-group-item>
+                                <a-divider class="list-field-box-item-divider" style="border-bottom-style: dashed" />
+                                 <a-form class="list-field-box-item-form" :model="item" :label-col-props="listFieldLabelCol" :wrapper-col-props="listFieldWrapperCol" :ref="'listFieldForm'+key">
+                                   <div class="list-field-box-remove"><icon-close class="remove-list-field-box-item-icon" @click="removeListField(key)" /></div>
+                                   <field-group-item class="list-field-box-item" :group-field-items="fields" :info="item" v-model:form="item" v-model:field-hide-list="currentFieldHideList[key]"></field-group-item>
                                  </a-form>
                             </div>
                         </transition-group>
                     </div>
                     <div class="list-field-add-btn-box" v-if="!field.readOnly">
-                         <plus-outlined class="add-list-field-box-item-icon" @click="addListField"></plus-outlined>                                        
+                        <icon-plus class="add-list-field-box-item-icon" @click="addListField" />              
                     </div>
                 </div>`,
     }

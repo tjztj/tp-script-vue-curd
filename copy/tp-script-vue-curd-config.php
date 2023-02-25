@@ -74,16 +74,6 @@ if (!function_exists('tpScriptVueCurdPublicActionJsPathBase')) {
 
 }
 
-if (!function_exists('tpScriptVueCurdImageRemoveMissings')) {
-    /**
-     * 自定义vue页面时可能使用
-     * @return string
-     */
-    function tpScriptVueCurdImageRemoveMissings():bool{
-        return false;
-    }
-
-}
 
 
 ########################################################################################################################

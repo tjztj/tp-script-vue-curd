@@ -81,37 +81,24 @@ define(requires, function (axios, Qs) {
         }
         if (res.confirm && res.confirm.show) {
             return await new Promise((resolve, reject) => {
-                antd.Modal.confirm({
-                    content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
+                ArcoVue.Modal.warning({
                     title: Vue.createVNode('b', {}, res.confirm.title),
-                    icon: (Vue.openBlock(), Vue.createBlock("svg", {
-                        t: "1615779502296",
-                        class: "icon anticon",
-                        viewBox: "0 0 1024 1024",
-                        version: "1.1",
-                        xmlns: "http://www.w3.org/2000/svg",
-                        width: "22",
-                        height: "22"
-                    }, [
-                        Vue.createVNode("path", {
-                            d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
-                            fill: '#faad14',
-                        })
-                    ])),
+                    content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
+                    hideCancel:false,
                     onOk() {
                         response.config.headers['confirm-error-code'] = res.errorCode;
                         resolve(service(response.config))
                     }, onCancel() {
                         reject({code: 0, msg: '已取消执行', data: [],})
                     }
-                })
+                });
             })
         }
 
 
-        antd.message.error(res.msg || '失败');
+        ArcoVue.Message.error(res.msg || '失败');
         if (res.url && res.url.indexOf(vueData.loginUrl) !== -1) {
-            antd.Modal.confirm({
+            ArcoVue.Modal.confirm({
                 content: '登录或已过期，可以取消以留在此页，或重新登录', okText: '确认退出', cancelText: '取消', onOk() {
                     location.href = res.url
                 }
@@ -125,7 +112,10 @@ define(requires, function (axios, Qs) {
             console.error(error);
             error = {code: 0, msg: '发生错误', data: [],}
         }
-        antd.message.error(error.msg, 6);
+        ArcoVue.Message.error({
+            content:error.msg,
+            duration: 6*1000
+        });
         return Promise.reject(error)
     })
 
@@ -282,11 +272,7 @@ define(requires, function (axios, Qs) {
                             body.on('closeIframe', function () {
                                 layero.close();
                             })
-                            // layero.find('iframe').css('padding', '0px 0 28px 0')
-                            layero.find('iframe').css('padding', '0px')
-                            box.$.each(body, function (i, v) {
-                                box.$(v).before('<style>html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}</style>');
-                            });
+                            layero.find('iframe').css('padding', '0px');
                         }
                         trigger('success', layero, index);
                     },
@@ -386,10 +372,6 @@ define(requires, function (axios, Qs) {
                     body.addEventListener("closeIframe", e => {
                         paramData.close()
                     });
-                    let style = iframe.contentWindow.document.createElement('style');
-                    style.type = 'text/css';
-                    style.innerHTML = 'html, body {background: #ffffff;}body{padding:24px 24px 0 24px;}body #app{padding:0 24px;}';
-                    iframe.contentWindow.document.querySelector('head').appendChild(style);
                     trigger('success', paramData);
                 }
                 openInfo.visible = true;
@@ -492,7 +474,7 @@ define(requires, function (axios, Qs) {
                         data = JSON.parse(evt.target.responseText);
                     } catch (e) {
                         that.hideLoadMsg();
-                        antd.notification.error({message: '服务器发生错误'});
+                        ArcoVue.Notification.error({title:'失败',content: '服务器发生错误'});
                         if ($error) {
                             $error(e);
                         }
@@ -507,7 +489,7 @@ define(requires, function (axios, Qs) {
                         }
                     } else {
                         that.hideLoadMsg();
-                        antd.notification.error({message: data.msg,});
+                        ArcoVue.Notification.error({title:'失败',content:data.msg});
                         if ($error) {
                             $error(data);
                         }
@@ -517,7 +499,7 @@ define(requires, function (axios, Qs) {
 
             function uploadFailed(evt) {
                 let msg = '上传文件发生了错误尝试!';
-                antd.notification.error({message: msg,});
+                ArcoVue.Notification.error({title:'失败',content:msg});
                 if ($error) {
                     $error({
                         code: 0,
@@ -530,7 +512,7 @@ define(requires, function (axios, Qs) {
 
             function uploadCanceled(evt) {
                 let msg = '上传被用户取消或者浏览器断开连接!';
-                antd.notification.error({message: msg,});
+                ArcoVue.Notification.error({title:'失败',content:msg});
                 if ($error) {
                     $error({
                         code: 0,
@@ -655,91 +637,13 @@ define(requires, function (axios, Qs) {
                                 index = imgs.indexOf(index);
                             }
                         }
-                        document.querySelectorAll('#vue-curd-imgs-show-box .ant-image-img')[index].click()
+                        document.querySelectorAll('#vue-curd-imgs-show-box .arco-image-img')[index].click()
                     })
                 }
             }
         },
         showImages(imgs, start) {
             window.top.showImages(imgs, start);
-        },
-        zhCn() {
-            const Pagination = {
-                items_per_page: '条/页',
-                jump_to: '跳至',
-                jump_to_confirm: '确定',
-                page: '页',
-                prev_page: '上一页',
-                next_page: '下一页',
-                prev_5: '向前 5 页',
-                next_5: '向后 5 页',
-                prev_3: '向前 3 页',
-                next_3: '向后 3 页',
-            };
-            const DatePicker = {
-                lang: {
-                    placeholder: '请选择日期',
-                    rangePlaceholder: ['开始日期', '结束日期'],
-                    today: '今天',
-                    now: '此刻',
-                    backToToday: '返回今天',
-                    ok: '确定',
-                    timeSelect: '选择时间',
-                    dateSelect: '选择日期',
-                    weekSelect: '选择周',
-                    clear: '清除',
-                    month: '月',
-                    year: '年',
-                    previousMonth: '上个月 (翻页上键)',
-                    nextMonth: '下个月 (翻页下键)',
-                    monthSelect: '选择月份',
-                    yearSelect: '选择年份',
-                    decadeSelect: '选择年代',
-                    yearFormat: 'YYYY年',
-                    dayFormat: 'D日',
-                    dateFormat: 'YYYY年M月D日',
-                    dateTimeFormat: 'YYYY年M月D日 HH时mm分ss秒',
-                    previousYear: '上一年 (Control键加左方向键)',
-                    nextYear: '下一年 (Control键加右方向键)',
-                    previousDecade: '上一年代',
-                    nextDecade: '下一年代',
-                    previousCentury: '上一世纪',
-                    nextCentury: '下一世纪',
-                }, timePickerLocale: {placeholder: '请选择时间',},
-            };
-            return {
-                locale: 'zh-cn',
-                Pagination,
-                DatePicker,
-                TimePicker: {placeholder: '请选择时间',},
-                Calendar: DatePicker,
-                ColorPicker: {'btn:save': '保存', 'btn:cancel': '取消', 'btn:clear': '清除',},
-                global: {placeholder: '请选择',},
-                Table: {
-                    filterTitle: '筛选',
-                    filterConfirm: '确定',
-                    filterReset: '重置',
-                    selectAll: '全选当页',
-                    selectInvert: '反选当页',
-                    sortTitle: '排序',
-                    expand: '展开行',
-                    collapse: '关闭行',
-                },
-                Modal: {okText: '确定', cancelText: '取消', justOkText: '知道了',},
-                Popconfirm: {cancelText: '取消', okText: '确定',},
-                Transfer: {searchPlaceholder: '请输入搜索内容', itemUnit: '项', itemsUnit: '项',},
-                Upload: {
-                    uploading: '文件上传中',
-                    removeFile: '删除文件',
-                    uploadError: '上传错误',
-                    previewFile: '预览文件',
-                    downloadFile: '下载文件',
-                },
-                Empty: {description: '暂无数据',},
-                Icon: {icon: '图标',},
-                Text: {edit: '编辑', copy: '复制', copied: '复制成功', expand: '展开',},
-                PageHeader: {back: '返回',},
-            }
         },
         log(obj) {
             return console.log(obj);
@@ -764,31 +668,17 @@ define(requires, function (axios, Qs) {
 
 
             if (!btn.modalFields) {
-                antd.Modal.confirm({
-                    content: btn.modalTitle,
-                    title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
-                    icon: (Vue.openBlock(), Vue.createBlock("svg", {
-                        t: "1615779502296",
-                        class: "icon anticon",
-                        viewBox: "0 0 1024 1024",
-                        version: "1.1",
-                        xmlns: "http://www.w3.org/2000/svg",
-                        width: "22",
-                        height: "22"
-                    }, [
-                        Vue.createVNode("path", {
-                            d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
-                            fill: '#faad14',
-                        })
-                    ])),
-                    onOk: () => {
+                ArcoVue.Modal.warning({
+                    title: Vue.createVNode('b', {}, res.confirm.title),
+                    content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
+                    hideCancel:false,
+                    onBeforeOk() {
                         return new Promise((resolve, reject) => {
                             let option = {};
                             if (row) {
                                 option.id = row.id;
                             }
                             this.$post(btn.saveUrl, option).then(res => {
-
                                 if (btn.refreshPage) {
                                     if (top.layer && top.layer.msg) {
                                         top.layer.msg(res.msg, {
@@ -803,7 +693,7 @@ define(requires, function (axios, Qs) {
                                             window.location.reload();
                                         }, 80)
                                     } else {
-                                        window.antd.message.success(res.msg);
+                                        ArcoVue.Message.success(res.msg);
                                         window.vueDefMethods.showLoadMsg('', window.document.querySelector('#app>.box>.body'))
                                         window.setTimeout(() => {
                                             window.location.reload();
@@ -812,7 +702,7 @@ define(requires, function (axios, Qs) {
                                     resolve()
                                     return;
                                 }
-                                antd.message.success(res.msg);
+                                ArcoVue.Message.success(res.msg);
                                 if (btn.refreshList) {
                                     this.refreshTable();
                                 } else if (row) {
@@ -823,19 +713,19 @@ define(requires, function (axios, Qs) {
                                 reject(err)
                             })
                         });
-                    },
-                })
+                    }
+                });
+
                 return;
             }
             this.openBox({
                 title: btn.modalTitle,
                 area: [w, h],
                 offset: offset,
-                content: '/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue',
+                content: '/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue?'+(window.VUE_CURD.DEBUG?'t='+(new Date()).getTime():'v='+(window.VUE_CURD.VERSION||'')),
             }).on('success', function (layero) {
                 const iframe = layero.iframe ? layero.iframe : layero.find('iframe')[0];
                 const win = iframe.contentWindow;
-
 
                 function runScript(script) {
                     return new Promise((reslove, rejected) => {
@@ -852,6 +742,7 @@ define(requires, function (axios, Qs) {
                         newScript.onerror = err => rejected();
                         win.document.head.appendChild(newScript);
                         win.document.head.removeChild(newScript);
+
                         if (!src) {
                             // 如果是 inline script 执行是同步的
                             reslove();
@@ -869,7 +760,6 @@ define(requires, function (axios, Qs) {
                 }
 
                 win.VUE_CURD = window.VUE_CURD;
-                win.moment = moment;
                 win.thatBtn = btn;
                 win.beforeInit = function () {
                     win.vueData.title = btn.modalTitle;
@@ -933,134 +823,14 @@ define(requires, function (axios, Qs) {
 
         option.methods = Object.assign(vueDefMethods, option.methods || {});
         window.app = Vue.createApp(option)
-        app.use(antd)
-        app.component('PlusOutlined', {
-            template: `<span role="img" aria-label="plus" class="anticon anticon-plus"><svg class="" data-icon="plus" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><defs><style></style></defs><path d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"></path><path d="M176 474h672q8 0 8 8v60q0 8-8 8H176q-8 0-8-8v-60q0-8 8-8z"></path></svg></span>`
-        })
-        app.component('ReloadOutlined', {
-            template: `<span role="img" aria-label="reload" class="anticon anticon-reload"><svg class="" data-icon="reload" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M909.1 209.3l-56.4 44.1C775.8 155.1 656.2 92 521.9 92 290 92 102.3 279.5 102 511.5 101.7 743.7 289.8 932 521.9 932c181.3 0 335.8-115 394.6-276.1 1.5-4.2-.7-8.9-4.9-10.3l-56.7-19.5a8 8 0 00-10.1 4.8c-1.8 5-3.8 10-5.9 14.9-17.3 41-42.1 77.8-73.7 109.4A344.77 344.77 0 01655.9 829c-42.3 17.9-87.4 27-133.8 27-46.5 0-91.5-9.1-133.8-27A341.5 341.5 0 01279 755.2a342.16 342.16 0 01-73.7-109.4c-17.9-42.4-27-87.4-27-133.9s9.1-91.5 27-133.9c17.3-41 42.1-77.8 73.7-109.4 31.6-31.6 68.4-56.4 109.3-73.8 42.3-17.9 87.4-27 133.8-27 46.5 0 91.5 9.1 133.8 27a341.5 341.5 0 01109.3 73.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.6 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c-.1-6.6-7.8-10.3-13-6.2z"></path></svg></span>`
-        })
-        app.component('CheckOutlined', {
-            template: `<span role="img" aria-label="check" class="anticon anticon-check"><svg class="" data-icon="check" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M912 190h-69.9c-9.8 0-19.1 4.5-25.1 12.2L404.7 724.5 207 474a32 32 0 00-25.1-12.2H112c-6.7 0-10.4 7.7-6.3 12.9l273.9 347c12.8 16.2 37.4 16.2 50.3 0l488.4-618.9c4.1-5.1.4-12.8-6.3-12.8z"></path></svg></span>`
-        })
-        app.component('PictureOutlined', {
-            template: `<span role="img" aria-label="picture" class="anticon anticon-picture"><svg class="" data-icon="picture" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M928 160H96c-17.7 0-32 14.3-32 32v640c0 17.7 14.3 32 32 32h832c17.7 0 32-14.3 32-32V192c0-17.7-14.3-32-32-32zm-40 632H136v-39.9l138.5-164.3 150.1 178L658.1 489 888 761.6V792zm0-129.8L664.2 396.8c-3.2-3.8-9-3.8-12.2 0L424.6 666.4l-144-170.7c-3.2-3.8-9-3.8-12.2 0L136 652.7V232h752v430.2zM304 456a88 88 0 100-176 88 88 0 000 176zm0-116c15.5 0 28 12.5 28 28s-12.5 28-28 28-28-12.5-28-28 12.5-28 28-28z"></path></svg></span>`
-        })
-        app.component('FileImageOutlined', {
-            template: `<span role="img" aria-label="file-image" class="anticon anticon-file-image"><svg class="" data-icon="file-image" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M553.1 509.1l-77.8 99.2-41.1-52.4a8 8 0 00-12.6 0l-99.8 127.2a7.98 7.98 0 006.3 12.9H696c6.7 0 10.4-7.7 6.3-12.9l-136.5-174a8.1 8.1 0 00-12.7 0zM360 442a40 40 0 1080 0 40 40 0 10-80 0zm494.6-153.4L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0042 42h216v494z"></path></svg></span>`
-        })
-        app.component('FileExcelOutlined', {
-            template: `<span role="img" aria-label="file-excel" class="anticon anticon-file-excel"><svg class="" data-icon="file-excel" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M854.6 288.6L639.4 73.4c-6-6-14.1-9.4-22.6-9.4H192c-17.7 0-32 14.3-32 32v832c0 17.7 14.3 32 32 32h640c17.7 0 32-14.3 32-32V311.3c0-8.5-3.4-16.7-9.4-22.7zM790.2 326H602V137.8L790.2 326zm1.8 562H232V136h302v216a42 42 0 0042 42h216v494zM514.1 580.1l-61.8-102.4c-2.2-3.6-6.1-5.8-10.3-5.8h-38.4c-2.3 0-4.5.6-6.4 1.9-5.6 3.5-7.3 10.9-3.7 16.6l82.3 130.4-83.4 132.8a12.04 12.04 0 0010.2 18.4h34.5c4.2 0 8-2.2 10.2-5.7L510 664.8l62.3 101.4c2.2 3.6 6.1 5.7 10.2 5.7H620c2.3 0 4.5-.7 6.5-1.9 5.6-3.6 7.2-11 3.6-16.6l-84-130.4 85.3-132.5a12.04 12.04 0 00-10.1-18.5h-35.7c-4.2 0-8.1 2.2-10.3 5.8l-61.2 102.3z"></path></svg></span>`
-        })
-        app.component('DownloadOutlined', {
-            template: `<span role="img" aria-label="download" class="anticon anticon-download"><svg class="" data-icon="download" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M505.7 661a8 8 0 0012.6 0l112-141.7c4.1-5.2.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z"></path></svg></span>`
-        })
-        app.component('DownOutlined', {
-            template: `<span role="img" aria-label="down" class="anticon anticon-down"><svg class="" data-icon="down" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path></svg></span>`
-        })
-        app.component('SettingOutlined', {
-            template: `<span role="img" aria-label="setting" class="anticon anticon-setting"><svg class="" data-icon="setting" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M924.8 625.7l-65.5-56c3.1-19 4.7-38.4 4.7-57.8s-1.6-38.8-4.7-57.8l65.5-56a32.03 32.03 0 009.3-35.2l-.9-2.6a443.74 443.74 0 00-79.7-137.9l-1.8-2.1a32.12 32.12 0 00-35.1-9.5l-81.3 28.9c-30-24.6-63.5-44-99.7-57.6l-15.7-85a32.05 32.05 0 00-25.8-25.7l-2.7-.5c-52.1-9.4-106.9-9.4-159 0l-2.7.5a32.05 32.05 0 00-25.8 25.7l-15.8 85.4a351.86 351.86 0 00-99 57.4l-81.9-29.1a32 32 0 00-35.1 9.5l-1.8 2.1a446.02 446.02 0 00-79.7 137.9l-.9 2.6c-4.5 12.5-.8 26.5 9.3 35.2l66.3 56.6c-3.1 18.8-4.6 38-4.6 57.1 0 19.2 1.5 38.4 4.6 57.1L99 625.5a32.03 32.03 0 00-9.3 35.2l.9 2.6c18.1 50.4 44.9 96.9 79.7 137.9l1.8 2.1a32.12 32.12 0 0035.1 9.5l81.9-29.1c29.8 24.5 63.1 43.9 99 57.4l15.8 85.4a32.05 32.05 0 0025.8 25.7l2.7.5a449.4 449.4 0 00159 0l2.7-.5a32.05 32.05 0 0025.8-25.7l15.7-85a350 350 0 0099.7-57.6l81.3 28.9a32 32 0 0035.1-9.5l1.8-2.1c34.8-41.1 61.6-87.5 79.7-137.9l.9-2.6c4.5-12.3.8-26.3-9.3-35zM788.3 465.9c2.5 15.1 3.8 30.6 3.8 46.1s-1.3 31-3.8 46.1l-6.6 40.1 74.7 63.9a370.03 370.03 0 01-42.6 73.6L721 702.8l-31.4 25.8c-23.9 19.6-50.5 35-79.3 45.8l-38.1 14.3-17.9 97a377.5 377.5 0 01-85 0l-17.9-97.2-37.8-14.5c-28.5-10.8-55-26.2-78.7-45.7l-31.4-25.9-93.4 33.2c-17-22.9-31.2-47.6-42.6-73.6l75.5-64.5-6.5-40c-2.4-14.9-3.7-30.3-3.7-45.5 0-15.3 1.2-30.6 3.7-45.5l6.5-40-75.5-64.5c11.3-26.1 25.6-50.7 42.6-73.6l93.4 33.2 31.4-25.9c23.7-19.5 50.2-34.9 78.7-45.7l37.9-14.3 17.9-97.2c28.1-3.2 56.8-3.2 85 0l17.9 97 38.1 14.3c28.7 10.8 55.4 26.2 79.3 45.8l31.4 25.8 92.8-32.9c17 22.9 31.2 47.6 42.6 73.6L781.8 426l6.5 39.9zM512 326c-97.2 0-176 78.8-176 176s78.8 176 176 176 176-78.8 176-176-78.8-176-176-176zm79.2 255.2A111.6 111.6 0 01512 614c-29.9 0-58-11.7-79.2-32.8A111.6 111.6 0 01400 502c0-29.9 11.7-58 32.8-79.2C454 401.6 482.1 390 512 390c29.9 0 58 11.6 79.2 32.8A111.6 111.6 0 01624 502c0 29.9-11.7 58-32.8 79.2z"></path></svg></span>`
-        })
-        app.component('SearchOutlined', {
-            template: `<span role="img" aria-label="search" class="anticon anticon-search"><svg class="" data-icon="search" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.7-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path></svg></span>`
-        })
-        app.component('EditOutlined', {
-            template: `<span role="img" aria-label="edit" class="anticon anticon-edit"><svg class="" data-icon="edit" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 000-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 009.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg></span>`
-        })
-        app.component('CloseOutlined', {
-            template: `<span role="img" aria-label="close" class="anticon anticon-close"><svg class="" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M563.8 512l262.5-312.9c4.4-5.2.7-13.1-6.1-13.1h-79.8c-4.7 0-9.2 2.1-12.3 5.7L511.6 449.8 295.1 191.7c-3-3.6-7.5-5.7-12.3-5.7H203c-6.8 0-10.5 7.9-6.1 13.1L459.4 512 196.9 824.9A7.95 7.95 0 00203 838h79.8c4.7 0 9.2-2.1 12.3-5.7l216.5-258.1 216.5 258.1c3 3.6 7.5 5.7 12.3 5.7h79.8c6.8 0 10.5-7.9 6.1-13.1L563.8 512z"></path></svg></span>`
-        })
-        app.component('delOutlined', {
-            template: `<span role="img" aria-label="close" class="anticon anticon-close"><svg class="" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896" focusable="false"><path d="M977.455 279.273H47.11c-20.311 0-46.264-26.517-46.264-46.264-0.564-20.875 25.953-46.827 46.264-46.827H233.29V93.09C232.727 32.723 265.451 0 325.818 0h369.543c59.804 0 95.348 32.723 95.348 93.09v93.092H976.89c20.311 0 46.264 26.517 46.264 46.263 0.564 20.31-25.389 46.828-45.7 46.828zM698.182 139.918c0-20.31-26.517-46.263-46.264-46.263H372.646c-20.311 0-46.264 26.517-46.264 46.263v46.264h372.364l-0.564-46.264zM465.737 372.364v465.454h-93.091V372.364h93.09z m186.181 0v465.454h-93.09V372.364h93.09z m-465.454-46.828c20.31 0 46.827 26.517 46.827 46.263v511.718c0 20.311 26.517 46.264 46.264 46.264h465.454c20.311 0 46.264-26.517 46.264-46.264V372.364c0-20.311 26.517-46.264 46.263-46.264 20.31 0 46.263 26.517 46.263 46.264v558.545c0 60.368-32.722 93.091-93.09 93.091H232.163c-60.368 0-93.09-32.723-93.09-93.09V372.363c0.563-20.311 27.08-46.828 47.39-46.828z m0 0"></path></svg></span>`
-        })
-        app.component('exportOutlined', {
-            template: `<span role="img" aria-label="close" class="anticon anticon-close"><svg class="" data-icon="close" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="13493"><path d="M710.208 0.512H210.56v887.04H960V237.184H710.208V0.512z m187.328 531.84v59.328L647.744 768.96V651.008H397.952v-177.28h249.792V355.136l249.792 177.28z" p-id="13494"></path><path d="M772.672 0.512v177.28H960zM152.96 125.056H64V1024h721.92v-87.168H152.96z" p-id="13495"></path></svg></span>`
-        })
-        app.component('ShrinkOutlined', {
-            template: `<span role="img" aria-label="shrink" class="anticon anticon-shrink"><svg focusable="false" class="" data-icon="shrink" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896"><path d="M881.7 187.4l-45.1-45.1a8.03 8.03 0 00-11.3 0L667.8 299.9l-54.7-54.7a7.94 7.94 0 00-13.5 4.7L576.1 439c-.6 5.2 3.7 9.5 8.9 8.9l189.2-23.5c6.6-.8 9.3-8.8 4.7-13.5l-54.7-54.7 157.6-157.6c3-3 3-8.1-.1-11.2zM439 576.1l-189.2 23.5c-6.6.8-9.3 8.9-4.7 13.5l54.7 54.7-157.5 157.5a8.03 8.03 0 000 11.3l45.1 45.1c3.1 3.1 8.2 3.1 11.3 0l157.6-157.6 54.7 54.7a7.94 7.94 0 0013.5-4.7L447.9 585a7.9 7.9 0 00-8.9-8.9z"></path></svg></span>`
-        })
-        app.component('ArrowsAltOutlined', {
-            template: `<span role="img" aria-label="arrows-alt" class="anticon anticon-arrows-alt"><svg focusable="false" class="" data-icon="arrows-alt" width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="64 64 896 896"><path d="M855 160.1l-189.2 23.5c-6.6.8-9.3 8.8-4.7 13.5l54.7 54.7-153.5 153.5a8.03 8.03 0 000 11.3l45.1 45.1c3.1 3.1 8.2 3.1 11.3 0l153.6-153.6 54.7 54.7a7.94 7.94 0 0013.5-4.7L863.9 169a7.9 7.9 0 00-8.9-8.9zM416.6 562.3a8.03 8.03 0 00-11.3 0L251.8 715.9l-54.7-54.7a7.94 7.94 0 00-13.5 4.7L160.1 855c-.6 5.2 3.7 9.5 8.9 8.9l189.2-23.5c6.6-.8 9.3-8.8 4.7-13.5l-54.7-54.7 153.6-153.6c3.1-3.1 3.1-8.2 0-11.3l-45.2-45z"></path></svg></span>`
-        })
-
-        /*** 年选择器 ***/
-        app.component('AYearPicker', {
-            data() {
-                return {yearOpen: false,}
-            },
-            props: ['value'],
-            methods: {
-                handleOpenChange(status) {
-                    this.yearOpen = status
-                }, handlePanelChange(value) {
-                    this.$emit('update:value', value.format('YYYY'));
-                    this.handleOpenChange(false)
-                }, clearYear() {
-                    this.$emit('update:value', '')
-                },
-            },
-            template: `<a-date-picker v-model:value="value"mode="year"format="YYYY"value-format="YYYY"placeholder="请选择年份"style="width: 100%":open="yearOpen"@open-change="handleOpenChange"@panel-change="handlePanelChange"@change="clearYear"></a-date-picker>`,
-        })
-
-
-        /*** 周选择器 ***/
-        app.component('WeekSelect', {
-            props: ['value', 'placeholder'],
-            setup(props, ctx) {
-                let momentVal = null;
-                let isOpen = Vue.ref(false);
-                let format = () => {
-                    if (isOpen.value) {
-                        return parseTime(/^\d+$/g.test(props.value.toString())&&Math.abs(props.value).toString().length<=10?props.value*1000:props.value, ' {y}年')
-                    }
-                    let week = getLastWeek(props.value);
-                    return getMonthWeek(props.value) + '（' + week[0] + ' ~ ' + week[1] + '）'
-                };
-                if (props.value) {
-                    if (/^\d+$/g.test(props.value.toString())) {
-                        momentVal = parseTime(/^\d+$/g.test(props.value.toString())&&Math.abs(props.value).toString().length<=10?props.value*1000:props.value, '{y}-{m}-{d}');
-                        props.value = momentVal
-                    } else {
-                        momentVal = props.value
-                    }
-                    momentVal = moment(momentVal);
-                    momentVal.format = format
-                }
-                return {momentVal: Vue.ref(momentVal), isOpen: isOpen, format}
-            },
-            watch: {
-                value(val) {
-                    if (!val) {
-                        this.momentVal = Vue.ref(null);
-                        return
-                    }
-                    let momentVal = moment(val);
-                    momentVal.format = this.format;
-                    this.momentVal = Vue.ref(momentVal)
-                },
-            },
-            methods: {
-                weekChange(date) {
-                    this.$emit('update:value', date.weekday(0).format('YYYY-MM-DD'));
-                    date.format = () => {
-                        return this.format()
-                    }
-                }, openWeekChange(status) {
-                    this.isOpen = status
-                }
-            },
-            template: `<div><a-week-picker v-model:value="momentVal"type="date":placeholder="placeholder||'请选择周'"style="width: 100%;"@change="weekChange"@open-change="openWeekChange"></a-week-picker></div>`,
-        });
-
+        app.use(ArcoVue);
+        app.use(ArcoVueIcon);
+    
 
         app.component('FieldGroupItem', {
             name: 'fieldGroupItem',
             props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info','grid'],
             setup(props, ctx) {
-
-
-
-
                 return {
                     formVal: Vue.ref(props.form),
                     validateStatus: Vue.ref({}),
@@ -1135,7 +905,7 @@ define(requires, function (axios, Qs) {
                             }
                             let val = null;
                             let formValue = formVal[fieldWhere.field.name];
-                            if ((fieldWhere.field.type === 'RegionField' || fieldWhere.field.type === 'FilesField')
+                            if (fieldWhere.field.type === 'FilesField'
                                 && fieldWhere.field.editShow === false
                                 && this.info.sourceData && typeof this.info.sourceData[fieldWhere.field.name] !== 'undefined') {
                                 formValue = this.info.sourceData[fieldWhere.field.name];
@@ -1162,13 +932,7 @@ define(requires, function (axios, Qs) {
                                 }
                             }
 
-
-                            if (typeof val === 'object') {
-                                if (fieldWhere.field.type === 'RegionField') {
-                                    const regionKeys = Object.keys(val);
-                                    val = regionKeys.length ? val[regionKeys[regionKeys.length - 1]] : 0;
-                                }
-                            }
+                            
                             return checkVal(fieldWhere, val) !== fieldWhere.isNot;
                         };
                         const checkFieldWhere = function (fieldWhere) {
@@ -1334,9 +1098,6 @@ define(requires, function (axios, Qs) {
                                         } else if (checkVal < 10000) {
                                             inputVal = moment(checkVal + '-01-01').unix()
                                         }
-                                    } else if (field.type === 'RegionField' && typeof checkVal !== 'number' && typeof checkVal !== 'string') {
-                                        const regionKeys = Object.keys(checkVal);
-                                        inputVal = regionKeys.length ? checkVal[regionKeys[regionKeys.length - 1]] : 0;
                                     }
                                 }
 
@@ -1526,17 +1287,15 @@ define(requires, function (axios, Qs) {
                             for (let i in this.form[field.name]) {
                                 if (this.$refs['listFieldForm' + i]) {
                                     isNotErr = await new Promise(resolve => {
-                                        this.$refs['listFieldForm' + i].validate().then(res => {
-                                            resolve(true);
-                                        }).catch(error => {
-                                            if (error.errorFields && error.errorFields[0] && error.errorFields[0].errors && error.errorFields[0].errors[0]) {
-                                                antd.message.warning(field.title + ':' + error.errorFields[0].errors[0])
-                                            } else {
-                                                antd.message.warning('请检测' + field.title + '是否填写正确')
+                                        this.$refs['listFieldForm' + i].validate(errors=>{
+                                            if(errors&&Object.keys(errors).length>0){
+                                                ArcoVue.Message.warning(errors[Object.keys(errors)[0]].message);
+                                                console.log('error', error);
+                                                resolve(false);
+                                            }else{
+                                                resolve(true);
                                             }
-                                            console.log('error', error);
-                                            resolve(false);
-                                        });
+                                        })
                                     })
                                 }
                             }
@@ -1625,14 +1384,14 @@ define(requires, function (axios, Qs) {
                         <div :style="gridStyle">
                             <div v-for="field in groupFieldItems" :data-name="field.name" :style="fieldStyle(field)">
                                 <transition name="slide-fade">
-                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :name="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col="field.editLabelCol" :wrapper-col="field.editWrapperCol" :label-align="field.editLabelAlign" :colon="field.editColon" class="form-item-row">
+                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :hide-label="fieldLabel(field)===''" :field="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col-props="field.editLabelCol" :wrapper-col-props="field.editWrapperCol" :label-col-style="{'justify-content':field.editLabelAlign==='left'?'flex-start':'flex-end'}" :show-colon="field.editColon" class="form-item-row">
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.editTipArr&&field.editTipArr.length>0}">
                                         <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
                                     </div>
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.tipArr&&field.tipArr.length>0}">
                                         <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.tipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
                                     </div>
-                                    <component 
+                                    <div style="flex: 1"><component 
                                         :is="'VueCurdEdit'+field.type" 
                                         :field="field" 
                                         v-model:value="formVal[field.name]" 
@@ -1644,9 +1403,9 @@ define(requires, function (axios, Qs) {
                                         :list-field-wrapper-col="listFieldWrapperCol"
                                         :group-field-items="groupFieldItems"
                                         @submit="$emit('submit',$event)"
-                                    ></component>
+                                    ></component></div>
                                     <transition name="to-right">
-                                    <div v-if="field.editExplain" style="color: #bfbfbf">{{field.editExplain}}</div>
+                                    <div v-if="field.editExplain" style="color: rgb(134,144,156)">{{field.editExplain}}</div>
                                     </transition>
                                     <transition name="to-right">
                                     <div v-if="field.explain" :style="{color:field.explainColor}">{{field.explain}}</div>
@@ -1710,7 +1469,7 @@ define(requires, function (axios, Qs) {
 
         /*** 公开表table组件 ***/
         app.component('CurdTable', {
-            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex','showAction'],
+            props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection','selectedKeys', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex','showAction'],
             setup(props, ctx) {
                 const listColumns = props.listColumns;
                 let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
@@ -1724,21 +1483,27 @@ define(requires, function (axios, Qs) {
                         titleItems[customTitle] = item;
                         let col = {
                             dataIndex: item.name,
+                            name:item.name,
                             // title:item.title,
-                            slots: {title: customTitle},
+                            titleSlotName: customTitle,
                             ellipsis: true,
-                            sorter: item.listSort,
+                            tooltip: true,
                             fixed: item.listFixed ? item.listFixed : false,
                         };
                         if (fieldComponents['VueCurdIndex' + item.type]) {
                             listFieldComponents[item.name] = item;
-                            col.slots.customRender = 'field-component-' + item.name;
+                            col.slotName = 'field-component-' + item.name;
                         } else {
-                            col.slots.customRender = 'default-value';
+                            col.slotName = 'default-value';
                         }
 
                         if (item.listColumnWidth) {
                             col.width = item.listColumnWidth;
+                        }
+                        if(item.listSort){
+                            col.sortable={
+                                sortDirections: ['ascend', 'descend']
+                            };
                         }
                         columnsCount++;
                         column.children.push(col);
@@ -1755,10 +1520,14 @@ define(requires, function (axios, Qs) {
                 const createTimeCol = {
                     // title:'创建时间',
                     ellipsis: true,
+                    tooltip: true,
                     dataIndex: "create_time",
-                    slots: {customRender: 'create-time', title: 'custom-title-create_time'},
+                    titleSlotName:'custom-title-create_time',
+                    slotName:'create-time',
                     width: 152,
-                    sorter: true,
+                    sortable: {
+                        sortDirections: ['ascend', 'descend']
+                    },
                 };
 
                 if (props.fieldStepConfig && props.fieldStepConfig.enable && props.fieldStepConfig.listShow === true) {
@@ -1766,9 +1535,13 @@ define(requires, function (axios, Qs) {
                         // title:'当前步骤',
                         ellipsis: true,
                         dataIndex: "stepInfo",
-                        slots: {customRender: 'step-info', title: 'custom-title-step-info'},
-                        fixed: props.fieldStepConfig.listFixed ? props.fieldStepConfig.listFixed : false,
+                        titleSlotName:'custom-title-step-info',
+                        slotName:'step-info',
                     };
+                    if(props.fieldStepConfig.listFixed){
+                        stepCol.fixed=props.fieldStepConfig.listFixed;
+                    }
+
                     if (props.fieldStepConfig.width && props.fieldStepConfig.width > 0) {
                         stepCol.width = props.fieldStepConfig.width;
                     }
@@ -1799,7 +1572,8 @@ define(requires, function (axios, Qs) {
                 if(props.showAction!==false){
                     columns.push({
                         // title:'操作',
-                        slots: {customRender: 'action', title: 'custom-title-action'},
+                        titleSlotName:'custom-title-action',
+                        slotName:'action',
                         width: newActionW,
                         fixed: 'right',
                     })
@@ -1811,63 +1585,28 @@ define(requires, function (axios, Qs) {
                 let scrollX = Vue.ref(undefined);
                 let scrollY = Vue.ref(undefined);
                 let getX = function () {
-                    if (document.body.clientWidth > 1640) {
-                        return undefined;
-                    }
-                    if (columnsCount <= 3) {
-                        return document.body.clientWidth > 370 ? undefined : 420;
-                    }
-                    if (columnsCount <= 4) {
-                        return document.body.clientWidth > 450 ? undefined : 500;
-                    }
-                    if (columnsCount <= 5) {
-                        return document.body.clientWidth > 680 ? undefined : 960;
-                    }
-                    if (columnsCount < 7) {
-                        return document.body.clientWidth > 790 ? undefined : 1080;
-                    }
-                    if (columnsCount < 9) {
-                        return document.body.clientWidth > 910 ? undefined : 1240;
-                    }
-                    if (columnsCount < 12) {
-                        return document.body.clientWidth > 1460 ? undefined : 1560;
-                    }
+                    let w=document.body.querySelector('#'+id).clientWidth;
+                    if (w > 1640)return undefined;
+                    if (columnsCount <= 3)return w > 370 ? undefined : 420;
+                    if (columnsCount <= 4)return w > 450 ? undefined : 500;
+                    if (columnsCount <= 5)return w > 680 ? undefined : 960;
+                    if (columnsCount < 6)return w > 780 ? undefined : 1080;
+                    if (columnsCount < 7)return w > 880 ? undefined : 1120;
+                    if (columnsCount < 8)return w > 960 ? undefined : 1180;
+                    if (columnsCount < 9)return w > 1020 ? undefined : 1240;
+                    if (columnsCount < 12)return w > 1460 ? undefined : 1560;
                     return 1640;
                 }
-                let getY = async function () {
-                    let h = undefined;
-                    await Vue.nextTick(async function () {
-                        await new Promise(async function (resolve) {
-                            setTimeout(function () {
-                                let parent = document.getElementById(id).parentNode;
-                                let elH = (parent.querySelector('.ant-table-body .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-tbody')).clientHeight;
-                                let theadH = (parent.querySelector('.ant-table-header .ant-table-fixed') || parent.querySelector('.ant-table-body .ant-table-thead') || parent.querySelector('.ant-table-header .ant-table-thead')).clientHeight;
-                                let pageH = parent.querySelector('ul.ant-table-pagination') ? parent.querySelector('ul.ant-table-pagination').clientHeight : 0;
-                                if (pageH) {
-                                    pageH += 32;
-                                } else {
-                                    pageH = 0;
-                                }
-                                if (document.body.clientHeight >= elH && (parent.clientHeight - theadH - pageH) >= elH) {
-                                    resolve()
-                                    return;
-                                }
-                                h = parent.clientHeight - theadH - pageH;
-                                resolve()
-                            }, 40)
-                        })
-                    })
-                    return h;
-                };
+
 
                 const columnsVals = Vue.ref(columns);
                 let onresize = () => {
                     scrollX.value = getX();
                     if (scrollX.value === undefined) {
-                        const tablePath = '#' + id + '>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
+                        const tablePath = '#' + id + '>.curd-table table.arco-table-element';
                         if (!document.querySelector('#' + id)
                         || !document.querySelector('#' + id), document.querySelector(tablePath)) {
-                            if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table .ant-table-body')) {
+                            if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table tbody')) {
                                 setTimeout(() => {
                                     onresize();
                                 }, 40)
@@ -1892,9 +1631,7 @@ define(requires, function (axios, Qs) {
                     })
 
                     if (props.setScrollY) {
-                        getY().then(res => {
-                            scrollY.value = res;
-                        })
+                        scrollY.value='100%'
                     }
                 };
                 Vue.nextTick(function () {
@@ -1914,9 +1651,10 @@ define(requires, function (axios, Qs) {
                         childsObjs[v.name] = v;
                     })
                 }
-
                 const guid=window.guid();
                 Vue.provide('table-guid',guid)
+
+
                 return {
                     actionW: newActionW,
                     columns: columnsVals,
@@ -1958,6 +1696,16 @@ define(requires, function (axios, Qs) {
                         setPids(data);
                     }
                     this.expandedRowKeys = expandedRowKeys;
+                },
+            },
+            computed:{
+                tableSelectedKeys:{
+                    get(){
+                        return this.selectedKeys
+                    },
+                    set(val){
+                        this.$emit('update:selectedKeys', val)
+                    }
                 }
             },
             methods: {
@@ -2001,9 +1749,8 @@ define(requires, function (axios, Qs) {
 
                         let delW = 0;
                         if (this.isCanDel(record)) {
-                            delW = 31;
+                            delW = 14;
                         }
-
                         let defW=0;
                         if (typeof this.actionWidth === 'function') {
                             defW = this.actionWidth(record);
@@ -2046,7 +1793,7 @@ define(requires, function (axios, Qs) {
                 },
                 getTextWidthByBtn(text) {
                     text = text || '';
-                    return 17 + (text.split('').length * 14);
+                    return 18 + (text.split('').length * 14);
                 },
                 addChildrenBtnText(row) {
                     return row.childAddBtn && row.childAddBtn.btnTitle ? row.childAddBtn.btnTitle : '添加下级';
@@ -2106,7 +1853,7 @@ define(requires, function (axios, Qs) {
                 isCanAddChildren(row) {
                     return this.isTreeIndex && this.canAdd&&row.can_add_children!==false;
                 },
-                onExpand(expanded, record) {
+                onExpand(record, expanded) {
                     if (expanded) {
                         // 设置展开窗Key，代表展开操作
                         this.expandedRowKeys.push(record.id)
@@ -2153,23 +1900,28 @@ define(requires, function (axios, Qs) {
                 colStyle(field,row){
                     return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style&&row.__style[field.name]&&typeof row.__style[field.name]==='object'?row.__style[field.name]:{})
                 },
+                log(...data){
+                    console.log(...data)
+                },
             },
             template: `<div :id="id">
                         <a-table
-                            :row-key="record => record.id"
+                            row-key="id"
                             :columns="columns"
-                            :data-source="data"
+                            :data="data"
                             :pagination="pagination&&(!isTreeIndex)&&pagination.pageSize?pagination:false"
                             :loading="loading"
                             @change="handleTableChange"
                             class="curd-table"
-                            :bordered="isGroup"
+                            :bordered="isGroup?{headerCell:true,bodyCell:false,wrapper:false}:false"
                             :scroll="{ x: scrollX ,y:scrollY}"
                             :row-selection="rowSelection"
                             :children-column-name="childrenColumnName"
                             :indent-size="indentSize"
                             v-model:expanded-row-keys="expandedRowKeys"
-                            @expand="onExpand"
+                            v-model:selected-keys="tableSelectedKeys"
+                            column-resizable
+                            on-expand="onExpand"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
@@ -2192,7 +1944,7 @@ define(requires, function (axios, Qs) {
                                         :style="colStyle(item,record.record)"
                                         :list="data"
                                         @refresh-table="$emit('refreshTable')"
-                                    ></component>
+                                    ></component>     
                                 </slot>
                              </template>
                
@@ -2202,10 +1954,7 @@ define(requires, function (axios, Qs) {
                                 <slot :name="'f-'+record.column.dataIndex"
                                     :field="fieldObjs[record.column.dataIndex]" 
                                     :record="record">
-                                    <a-tooltip placement="topLeft">
-                                        <template #title>{{record.text}}</template>
-                                        <span :style="colStyle(fieldObjs[record.column.dataIndex],record.record)">{{record.text}}</span>
-                                    </a-tooltip>
+                                        <span :style="colStyle(fieldObjs[record.column.dataIndex],record.record)">{{record.record[record.column.dataIndex]}}</span>
                                 </slot>
                              </template>
                              
@@ -2214,8 +1963,8 @@ define(requires, function (axios, Qs) {
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
                                             <div class="curd-table-row-step-title">
-                                                <a-tooltip v-if="stepInfo" placement="leftTop">
-                                                    <template #title>{{ stepInfo.title }}</template>
+                                                <a-tooltip v-if="stepInfo" position="lt">
+                                                    <template #content>{{ stepInfo.title }}</template>
                                                     <span :style="{color:stepInfo.config.color||'inherit'}">{{ stepInfo.title }}</span>
                                                 </a-tooltip>
                                             </div>
@@ -2235,10 +1984,7 @@ define(requires, function (axios, Qs) {
                              <template #custom-title-create_time><slot name="custom-title-create_time" :columns="columns">创建时间</slot></template>
                              <template #create-time="{ text: create_time }">
                                     <slot name="f-create_time">
-                                        <a-tooltip>
-                                            <template #title>{{ create_time }}</template>
-                                            {{ create_time }}
-                                        </a-tooltip>
+                                       {{ create_time }}
                                     </slot>
                              </template>
                              
@@ -2246,69 +1992,55 @@ define(requires, function (axios, Qs) {
                               
                              <template #custom-title-action><slot name="custom-title-action" :columns="columns">操作</slot></template>
                              <template #action="{ record }">
-                                    <slot name="do-before" :record="record">
-                                   
-                                    </slot>
-                                    
-                                    <template v-for="btn in getBeforeBtns(record)">
-                                        <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                        <a-divider type="vertical"></a-divider>
-                                    </template>
-                                    
-                                    <slot name="do" :record="record">
-                                        <a v-if="isCanShowInfo(record)" @click="openShow(record)" :style="{color: showBtnColor(record)}">{{showBtnText(record)}}</a>
-                                          
-                                        <template v-if="isCanEdit(record)">
-                                            <a-divider v-if="isCanShowInfo(record)" type="vertical"></a-divider>
-                                            <a @click="openEdit(record)" :style="{color: editBtnColor(record)}">{{editBtnText(record)}}</a>
+                                    <a-space>
+                                        <template #split>
+                                          <a-divider direction="vertical" class="curd-table-action-divider" />
                                         </template>
-                                    </slot>
-                                    
-                                    <template v-if="stepBtnShow(record)">
-                                         <slot name="step-next-btn" :record="record">
-                                            <template v-if="record.nextStepInfo.config.listBtnText">
-                                                <a-divider type="vertical"></a-divider>
-                                                <a @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}" :class="record.nextStepInfo.config.listBtnClass" class="open-step-a-class">{{record.nextStepInfo.config.listBtnText}}</a>
+                                        
+                                        <slot name="do-before" :record="record"></slot>
+                                        
+                                        <template v-for="btn in getBeforeBtns(record)"><a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a></template>
+                                        
+                                        <slot name="do" :record="record">
+                                            <a v-if="isCanShowInfo(record)" @click="openShow(record)" :style="{color: showBtnColor(record)}">{{showBtnText(record)}}</a>
+                                            <template v-if="isCanEdit(record)">
+                                                <a @click="openEdit(record)" :style="{color: editBtnColor(record)}">{{editBtnText(record)}}</a>
                                             </template>
-                                         </slot>
-                                    </template>
-                                    
-                                    <slot name="child-btns" :record="record">
-                                        <template v-if="record.childBtns">
-                                        <template v-for="(vo,kk) in record.childBtns">
-                                        <template v-if="vo.show">
-                                            <a-divider type="vertical"></a-divider>
-                                            <a @click="openChildList(record,childsObjs[kk],vo)" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
+                                        </slot>
+                                        
+                                        
+                                        <template v-if="stepBtnShow(record)">
+                                            <slot name="step-next-btn" :record="record">
+                                                <a v-if="record.nextStepInfo.config.listBtnText" @click="openNext(record)" :style="{color:record.nextStepInfo.config.listBtnColor}" :class="record.nextStepInfo.config.listBtnClass" class="open-step-a-class">{{record.nextStepInfo.config.listBtnText}}</a>
+                                            </slot>
                                         </template>
-                                        </template>
-                                        </template>
-                                    </slot>
-                                    
-                                    
-                                    <template v-if="isCanAddChildren(record)">
-                                        <a-divider type="vertical"></a-divider>
-                                        <a @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
-                                    </template>
-                                    
-                                      <template v-for="btn in getAfterBtns(record)">
-                                        <a-divider type="vertical"></a-divider>
-                                         <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                      </template>
-                                    
-                                    <slot name="do-after" :record="record">
-                                     
-                                    </slot>
-                                    
-                                    <template v-if="isCanDel(record)">
-                                            <a-divider type="vertical"></a-divider>
-                                            <a-popconfirm
-                                                placement="left"
-                                                title="您确定要删除这条数据吗？"
-                                                @confirm="onDelete(record)"
-                                              >
-                                              <del-outlined class="pub-remove-icon"></del-outlined>
-                                            </a-popconfirm>
-                                    </template>
+                                        
+                                        
+                                        <slot name="child-btns" :record="record">
+                                            <template v-if="record.childBtns">
+                                                <template v-for="(vo,kk) in record.childBtns">
+                                                       <a v-if="vo.show" @click="openChildList(record,childsObjs[kk],vo)" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
+                                                </template>
+                                            </template>
+                                        </slot>
+                                        
+                                        
+                                        <a v-if="isCanAddChildren(record)" @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
+                                        <a  v-for="btn in getAfterBtns(record)" @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                        
+                                        <slot name="do-after" :record="record"></slot>
+                                        
+                                        
+                                        <a-popconfirm
+                                            type="warning"
+                                            v-if="isCanDel(record)"
+                                            position="left"
+                                            content="您确定要删除这条数据吗？"
+                                            @ok="onDelete(record)"
+                                        >
+                                            <icon-delete class="pub-remove-icon" />
+                                        </a-popconfirm>
+                                    </a-space>
                             </template>
                                 
                             <template v-if="$slots.footer" #footer><slot name="footer" :columns="columns" :current-page-data="data"></slot></template>
@@ -2354,7 +2086,6 @@ define(requires, function (axios, Qs) {
                     childFilterData: Vue.ref({}),
                     showMoreFilter: Vue.ref(false),
                     oldFilterConfig:Vue.ref({}),
-                    titleMaxLen:Vue.ref({}),
                 }
             },
             computed: {
@@ -2488,29 +2219,42 @@ define(requires, function (axios, Qs) {
                         return !this.filterValues[vo.name];
                     })
                 },
-                setTitleMaxLenZero(key){
-                    this.titleMaxLen[key]=0;
-                },
-                setTitleMaxLen(key,title){
-                    let len=title.toString().length;
-                    if(!this.titleMaxLen[key]||this.titleMaxLen[key]<len){
-                        this.titleMaxLen[key]=len;
+                getItems(items,group,child){
+                    const w={l:0,r:0};
+                    const newItems=child?items.filter(item=>this.filterGroupItemIsShow(item, child)):items.filter(item=>item.show&&(!this.filterValues||!this.filterValues[item.name]));
+                    const widthElId='filter-lable-width-el';
+                    let widthEl=document.getElementById(widthElId);
+                    if(!widthEl){
+                        widthEl=document.createElement('span');
+                        widthEl.style='font-size:14px;position:fixed;z-index:-1;opacity:0;'
+                        widthEl.id=widthElId;
+                        document.body.appendChild(widthEl);
                     }
-                    return this.titleMaxLen[key];
-                },
-                getLeftWidth(key){
-                    return 15*this.titleMaxLen[key]+'px';
+                    newItems.forEach((item,index)=>{
+                        widthEl.innerText=item.title.toString();
+                        const width=widthEl.clientWidth;
+                        const n=index%2>0?'r':'l';
+                        if(w[n]<width){
+                            w[n]=width;
+                        }
+                    })
+                    widthEl.innerText='';
+                    return newItems.map((item,index)=>{
+                        const n=index%2>0?'r':'l';
+                        item.labelWidth=w[n];
+                        return item;
+                    });
                 }
             },
             template: `<div class="curd-filter-box">
-                    <a-spin :spinning="loading">
+                    <a-spin :loading="loading">
                             <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
-                            <div class="filter-box-div" v-if="filterGroupIsShow(base)" :set-l-w="setTitleMaxLenZero('filterConfig')">
+                            <div class="filter-box-div" v-if="filterGroupIsShow(base)">
                                 <transition-group name="bounce">
-                                    <template v-for="(item,index) in filterSource.filterConfig">
-                                        <div class="filter-item-box" v-if="item.show&&(!filterValues||!filterValues[item.name])" :key="item.name" :style="item.gridCol">
-                                            <div class="filter-item" :set-l-w="setTitleMaxLen('filterConfig',item.title)">
-                                                <div class="filter-item-l" :style="{width: getLeftWidth('filterConfig')}">{{item.title}}</div> 
+                                    <template v-for="(item,index) in getItems(filterSource.filterConfig,'filterConfig')">
+                                        <div class="filter-item-box" :key="item.name" :style="item.gridCol">
+                                            <div class="filter-item">
+                                                <div class="filter-item-l" :style="{width: item.labelWidth+'px'}">{{item.title}}</div> 
                                                 <div class="filter-item-r">
                                                  <component v-if="item.rest!==true"
                                                             :is="item.type" 
@@ -2527,12 +2271,12 @@ define(requires, function (axios, Qs) {
                             <template v-if="childFilterEmptys.length>0">
                                 <template v-for="child in childFilterEmptys">
                                     <div class="filter-box-title" v-show="filterGroupIsShow(child)">{{child.title}}：</div>
-                                    <div class="filter-box-div" v-show="filterGroupIsShow(child)" :set-l-w="setTitleMaxLenZero(child)">
+                                    <div class="filter-box-div" v-show="filterGroupIsShow(child)">
                                         <transition-group name="bounce">
-                                            <template v-for="(item,index) in filterSource[child.name]" :key="item.name">
-                                                <div class="filter-item-box" v-if="filterGroupItemIsShow(item,child)" :style="item.gridCol">
-                                                    <div class="filter-item" :set-l-w="setTitleMaxLen(child,item.title)">
-                                                        <div class="filter-item-l" :style="{width: getLeftWidth(child)}">{{item.title}}</div> 
+                                            <template v-for="(item,index) in getItems(filterSource[child.name],child.name,child)" :key="item.name">
+                                                <div class="filter-item-box" :style="item.gridCol">
+                                                    <div class="filter-item">
+                                                        <div class="filter-item-l" :style="{width:item.labelWidth+'px'}">{{item.title}}</div> 
                                                         <div class="filter-item-r">
                                                             <component v-if="item.rest!==true"
                                                                     :is="item.type" 
@@ -2552,29 +2296,29 @@ define(requires, function (axios, Qs) {
                         <div class="filter-box-bottom-do"></div>
                         <div class="filter-sub-btn-box">
                             <a-divider v-if="showMoreFilter">
-                                <a-dropdown trigger="click">
-                                    <a class="ant-dropdown-link" style="font-size: 14px"> 更多筛选
-                                        <down-outlined></down-outlined>
+                                <a-dropdown trigger="click" class="filter-box-dropdown">
+                                    <a class="arco-dropdown-link" style="font-size: 14px"> 更多筛选
+                                      <icon-down/>
                                     </a>
-                                    <template #overlay>
-                                        <a-menu id="filter-menu-box">
+                                    <template #content>
+                                        <div id="filter-menu-box">
                                             <template v-for="(vo,key) in filterSource">
                                             <template v-if="moreShowItems(vo).length>0">
                                                 <div v-if="modelTitles[key]" class="filter-select-show-item-title">{{modelTitles[key]}}</div>
                                                 <div class="filter-select-show-item-box">
-                                                    <a-menu-item v-for="item in moreShowItems(vo)">
+                                                    <a-doption v-for="item in moreShowItems(vo)">
                                                         <a href="javascript:;"
                                                            class="filter-select-show-item"
                                                            :class="{checked:item.show}"
                                                            @click="item.show=!item.show">
                                                             <div class="filter-select-show-title">{{ item.title }}</div>
-                                                            <check-outlined></check-outlined>
+                                                           <icon-check class="anticon"></icon-check>
                                                         </a>
-                                                    </a-menu-item>
+                                                    </a-doption>
                                                 </div>
                                             </template>
                                             </template>
-                                        </a-menu>
+                                        </div>
                                     </template>
                                 </a-dropdown>
                             </a-divider>

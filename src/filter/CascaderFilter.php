@@ -3,7 +3,7 @@
 namespace tpScriptVueCurd\filter;
 
 use think\db\Query;
-use tpScriptVueCurd\field\TreeSelect;
+use tpScriptVueCurd\field\TreeSelectField;
 use tpScriptVueCurd\ModelFilter;
 
 class CascaderFilter extends ModelFilter
@@ -50,7 +50,7 @@ class CascaderFilter extends ModelFilter
             $this->items=[];
             return $this;
         }
-        $this->items=TreeSelect::listToTree(TreeSelect::treeToList($items,$this->valueName,$this->childrenName),$this->valueName,$this->pvalueName,$this->childrenName);
+        $this->items=TreeSelectField::listToTree(TreeSelectField::treeToList($items,$this->valueName,$this->childrenName),$this->valueName,$this->pvalueName,$this->childrenName);
         return $this;
     }
 
@@ -69,7 +69,7 @@ class CascaderFilter extends ModelFilter
 
     public function generateWhere(Query $query,$value):void{
         if(!isset($this->lists)){
-            $this->lists=TreeSelect::treeToList($this->getItems(),$this->valueName,$this->childrenName);
+            $this->lists=TreeSelectField::treeToList($this->getItems(),$this->valueName,$this->childrenName);
         }
         
         if($value||$value===0||$value==='0'){

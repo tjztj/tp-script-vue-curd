@@ -20,20 +20,9 @@ require.config({
     paths: {
         "vue": ["tp-script-vue-curd-static.php?vue3/vue.global.prod.js"],
         "vueAdmin": ["tp-script-vue-curd-static.php?vue-admin/vue-admin.js"],
-        "axios": ["tp-script-vue-curd-static.php?axios-0.19.2/axios.min.js"],
+        "axios": ["tp-script-vue-curd-static.php?axios/axios.min.js"],
         "qs": ["tp-script-vue-curd-static.php?qs-6.9.4/qs.min.js"],
-        'antDesignVue': ["tp-script-vue-curd-static.php?ant-design-vue/antd.min.js"],
-        "moment": ["tp-script-vue-curd-static.php?moment/moment.min.js"],
         "g6": ["tp-script-vue-curd-static.php?antv/g6.min.js"],
         ...window.VUE_CURD.REQUIRES,
     },
-    //css 依赖
-    shim:{
-        'common':{
-            deps: ['css!tp-script-vue-curd-static.php?common/common']
-        },
-        'antDesignVue':{
-            deps: ['css!tp-script-vue-curd-static.php?ant-design-vue/antd.min']
-        },
-    }
 });

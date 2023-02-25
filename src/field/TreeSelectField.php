@@ -12,7 +12,7 @@ use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
 
-class TreeSelect extends ModelField
+class TreeSelectField extends ModelField
 {
 
     protected string $defaultFilterClass=CascaderFilter::class;
@@ -21,7 +21,7 @@ class TreeSelect extends ModelField
     protected bool $multiple=false;//是否多选
     protected int $dropdownMaxHeight=400;//弹出框最高高度
     protected bool $treeCheckStrictly=false;//多选的时候才会有效，checkable 状态下节点选择完全受控（父子节点选中状态不再关联）
-    protected string $showCheckedStrategy='SHOW_ALL';//SHOW_CHILD、SHOW_PARENT、SHOW_ALL。定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). SHOW_CHILD只显示子节点.
+    protected string $treeCheckedStrategy='child';//child、parent、all。定义选中项回填的方式。all: 显示所有选中节点(包括父节点). parent: 只显示父节点(当父节点下所有子节点都选中时). child只显示子节点.
     protected array $items=[];
     protected bool $justShowLast=false;
 
@@ -58,7 +58,7 @@ class TreeSelect extends ModelField
     /**
      * 弹出框最高高度
      * @param int|null $dropdownMaxHeight
-     * @return TreeSelect
+     * @return TreeSelectField
      */
     public function dropdownMaxHeight(int $dropdownMaxHeight = null)
     {
@@ -69,7 +69,7 @@ class TreeSelect extends ModelField
     /**
      * 多选的时候才会有效，checkable 状态下节点选择完全受控（父子节点选中状态不再关联）
      * @param bool|null $treeCheckStrictly
-     * @return TreeSelect
+     * @return TreeSelectField
      */
     public function treeCheckStrictly(bool $treeCheckStrictly=null){
         return $this->doAttr('treeCheckStrictly',$treeCheckStrictly);
@@ -78,7 +78,7 @@ class TreeSelect extends ModelField
     /**
      * 展示的时候是否只展示最底级
      * @param bool|null $justShowLast
-     * @return TreeSelect
+     * @return TreeSelectField
      */
     public function justShowLast(bool $justShowLast=null){
         return $this->doAttr('justShowLast',$justShowLast);
@@ -86,12 +86,12 @@ class TreeSelect extends ModelField
 
 
     /**
-     * 定义选中项回填的方式。SHOW_ALL: 显示所有选中节点(包括父节点). SHOW_PARENT: 只显示父节点(当父节点下所有子节点都选中时). 默认只显示子节点.
-     * @param string|null $showCheckedStrategy
-     * @return TreeSelect
+     * 定义选中项回填的方式。all: 显示所有选中节点(包括父节点). parent: 只显示父节点(当父节点下所有子节点都选中时). child：只显示子节点.
+     * @param string|null $treeCheckedStrategy
+     * @return TreeSelectField
      */
-    public function showCheckedStrategy(string $showCheckedStrategy=null){
-        return $this->doAttr('showCheckedStrategy',$showCheckedStrategy);
+    public function treeCheckedStrategy(string $treeCheckedStrategy=null){
+        return $this->doAttr('treeCheckedStrategy',$treeCheckedStrategy);
     }
 
     /**

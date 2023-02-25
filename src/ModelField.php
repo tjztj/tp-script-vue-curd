@@ -42,7 +42,7 @@ abstract class ModelField
     protected string $placeholder = '';//输入提示
     protected string $editExplain = '';//字段编辑时下方的说明
     protected string $explain='';//字段编辑和显示时，底部显示
-    protected string $explainColor='#bfbfbf';//字段编辑和显示时，底部显示
+    protected string $explainColor='rgb(134,144,156)';//字段编辑和显示时，底部显示
     protected bool $listShow = false;//是否在列表中显示
     protected int $listColumnWidth = 0;//指定列宽（0，不指定）
     protected bool $listSort = true;//列表中时候可排序

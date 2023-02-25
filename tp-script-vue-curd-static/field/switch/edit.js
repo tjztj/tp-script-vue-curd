@@ -24,7 +24,10 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-switch v-model:checked="checked" :checked-children="field.items[1].title" :un-checked-children="field.items[0].title" :disabled="field.readOnly"/>
+                        <a-switch v-model="checked" :disabled="field.readOnly">
+                            <template #checked>{{field.items[1].title}}</template>
+                            <template #unchecked>{{field.items[0].title}}</template>
+                        </a-switch>
                     </div>
                     <div class="r">
                         <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>

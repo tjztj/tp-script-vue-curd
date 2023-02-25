@@ -58,29 +58,15 @@
     </svg>
 </div>
 <div id="app" style="display: none">
-    <a-config-provider :locale="zhCn()">
-        <div class="vuecurd-def-box">
-            <a-spin :spinning="loading">
-                <a-form :model="form" :label-col="labelCol" :wrapper-col="wrapperCol" ref="pubForm">
-                    <template v-for="(groupFieldItems,groupTitle) in groupFields">
-                        <template v-if="showGroup">
-                            <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
-                                <div class="legend-box">
-                                    <legend>{{groupTitle}}</legend>
-                                </div>
-                                <field-group-item
-                                    :list-field-label-col="labelCol"
-                                    :list-field-wrapper-col="wrapperCol"
-                                    :group-field-items="groupFieldItems"
-                                    :info="info"
-                                    :grid="groupGrids[groupTitle]"
-                                    v-model:field-hide-list="fieldHideList"
-                                    v-model:form="form"
-                                    @submit="onSubmit($event)"
-                                    :ref="'fieldGroup'+groupTitle"></field-group-item>
-                            </fieldset>
-                        </template>
-                        <template v-else>
+    <div class="vuecurd-def-box">
+        <a-spin :loading="loading" style="display: block">
+            <a-form :model="form" :label-col-props="labelCol" :wrapper-col-props="wrapperCol" ref="pubForm">
+                <template v-for="(groupFieldItems,groupTitle) in groupFields">
+                    <template v-if="showGroup">
+                        <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
+                            <div class="legend-box">
+                                <legend>{{groupTitle}}</legend>
+                            </div>
                             <field-group-item
                                 :list-field-label-col="labelCol"
                                 :list-field-wrapper-col="wrapperCol"
@@ -91,31 +77,43 @@
                                 v-model:form="form"
                                 @submit="onSubmit($event)"
                                 :ref="'fieldGroup'+groupTitle"></field-group-item>
-                        </template>
+                        </fieldset>
                     </template>
-                </a-form>
-            </a-spin>
+                    <template v-else>
+                        <field-group-item
+                            :list-field-label-col="labelCol"
+                            :list-field-wrapper-col="wrapperCol"
+                            :group-field-items="groupFieldItems"
+                            :info="info"
+                            :grid="groupGrids[groupTitle]"
+                            v-model:field-hide-list="fieldHideList"
+                            v-model:form="form"
+                            @submit="onSubmit($event)"
+                            :ref="'fieldGroup'+groupTitle"></field-group-item>
+                    </template>
+                </template>
+            </a-form>
+        </a-spin>
 
-            <div class="foot">
-                <a-divider dashed style="margin-top: 0"></a-divider>
-                <div class="btns">
-                    <a-button type="primary" @click="onSubmit" :loading="loading"><check-outlined v-show="!loading"></check-outlined> <span>{{subBtnTitle}}</span></a-button>
-                </div>
+        <div class="foot">
+            <a-divider style="margin-top: 0;border-bottom-style: dotted"></a-divider>
+            <div class="btns">
+                <a-button type="primary" @click="onSubmit" :loading="loading"><icon-check v-show="!loading"></icon-check> <span>{{subBtnTitle}}</span></a-button>
             </div>
         </div>
-    </a-config-provider>
+    </div>
     <a-modal
         v-for="bodyModal in bodyModals"
-        wrap-class-name="body-iframe-modal"
-        :destroy-on-close="true"
-        v-model:visible="bodyModal.visible"
-        :footer="null"
-        :keyboard="false"
-        :mask-closable="false"
+        modal-class="body-iframe-modal"
+        unmount-on-close
         :width="bodyModal.width"
         :height="bodyModal.height"
+        :mask-closable="false"
+        :esc-to-close="false"
+        :footer="false"
+        v-model:visible="bodyModal.visible"
         :z-index="bodyModal.zIndex"
-        :after-close="bodyModal.onclose"
+        @close="bodyModal.onclose"
     >
         <template #title>
             <div v-html="bodyModal.title"></div>
@@ -124,15 +122,17 @@
     </a-modal>
     <a-drawer
         v-for="bodyDrawer in bodyDrawers"
-        wrap-class-name="body-iframe-drawer"
-        :destroy-on-close="true"
-        :mask-closable="false"
+        v-model:visible="bodyDrawer.visible"
+        class="body-iframe-drawer"
         :width="bodyDrawer.width"
         :height="bodyDrawer.height"
-        :z-index="bodyDrawer.zIndex"
+        :visible="bodyDrawer.visible"
         :placement="bodyDrawer.placement"
-        v-model:visible="bodyDrawer.visible"
-        :keyboard="false"
+        :esc-to-close="false"
+        :mask-closable="false"
+        :footer="false"
+        hide-cancel
+        unmount-on-close
         @close="bodyDrawer.onclose"
     >
         <template #title>
@@ -140,7 +140,7 @@
         </template>
         <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyDrawer.url" :onload="bodyDrawer.onload"></iframe>
     </a-drawer>
-    <div style="display: none" id="vue-curd-imgs-show-box">
+    <div v-if="imgShowConfig.list&&imgShowConfig.list.length>0" id="vue-curd-imgs-show-box">
         <a-image-preview-group>
             <a-image v-for="item in imgShowConfig.list" :src="item" />
         </a-image-preview-group>

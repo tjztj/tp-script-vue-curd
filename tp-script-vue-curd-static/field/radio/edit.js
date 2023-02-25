@@ -13,8 +13,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-radio-group v-model:value="val"
-                         :disabled="field.readOnly">
+                        <a-radio-group v-model="val" :disabled="field.readOnly">
                           <transition-group name="bounce-min">
                             <template v-for="radioItem in field.items">
                                 <a-radio :value="radioItem.value" v-show="radioItem.showItem===undefined||radioItem.showItem" v-if="!radioItem.hide"><span :style="{color:radioItem.color}">{{radioItem.text}}</span></a-radio>

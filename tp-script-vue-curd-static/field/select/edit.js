@@ -6,7 +6,7 @@ define([],function(){
                 return option.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
             };
             return {
-                filterOption
+                filterOption,
             }
         },
         computed:{
@@ -36,57 +36,64 @@ define([],function(){
                     this.$emit('update:value', typeof val==='object'?val.join(','):val);
                 }
             },
-            groupItems(){
-                let items={};
+            option(){
+                let groupItems={'':[]};
+                let haveGroup=false;
                 this.field.items.forEach(v=>{
                     if(v.showItem===false||v.hide){
                         return;
                     }
-                    v.group=v.group||'';
-                    if(!items[v.group]){
-                        items[v.group]=[];
+                    if(v.group){
+                        haveGroup=true;
+                    }else{
+                        v.group='';
                     }
-                    items[v.group].push(v);
-                })
-                return items;
-            },
-            haveGroup(){
-                for(let i in this.field.items){
-                    if(this.field.items[i].group){
-                        return true;
+                    if(!groupItems[v.group]){
+                        groupItems[v.group]=[];
+                    }
+                    v.label=v.title||v.text;
+                    groupItems[v.group].push(v);
+                });
+
+                if(!haveGroup){
+                    return groupItems[''];
+                }
+
+                let optionGroups=[];
+                for(let n in groupItems){
+                    if(n){
+                        optionGroups.push(...groupItems[n]);
+                    }else{
+                        optionGroups.push({
+                            isGroup:true,
+                            label:n,
+                            options:groupItems[n],
+                        })
                     }
                 }
-                return false;
+                return optionGroups;
             },
+
+
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-select :mode="field.multiple?'multiple':'default'"
+                        <a-select :multiple="field.multiple"
                                   :default-value="val"
-                                  v-model:value="val"
+                                  v-model="val"
                                   :placeholder="field.placeholder||'请选择'+field.title"
                                    :disabled="field.readOnly"
                                    :filter-option="filterOption"
                                    :allow-clear="!field.required"
-                                  show-search>
-                                  
-                                  <template v-if="haveGroup">
-                                         <template v-for="(items,key) in groupItems">
-                                            <template v-if="key">
-                                                 <a-select-opt-group :label="key" :key="key">
-                                                     <a-select-option v-for="optionItem in items" :value="optionItem.value" :key="optionItem.value" :label="optionItem.text" :title="optionItem.text"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                                 </a-select-opt-group>
-                                            </template>
-                                             <template v-else>
-                                                <a-select-option v-for="optionItem in items" :value="optionItem.value" :key="optionItem.value" :label="optionItem.text" :title="optionItem.text"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                             </template>
-                                         </template>
-                                   </template>
-                                   <template v-else>
-                                        <template v-for="optionItem in field.items">
-                                            <a-select-option :value="optionItem.value" :key="optionItem.value" :label="optionItem.text" :title="optionItem.text" v-if="(optionItem.showItem===undefined||optionItem.showItem)&&(!optionItem.hide)"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
-                                        </template>
-                                    </template>
+                                   allow-search
+                                   :options="option"
+                                   :virtual-list-props="{height:240}">
+                                <template #option="vo">
+                                  <span :style="{color:vo.data.color}">{{vo.data.label}}</span>
+                                </template>
+                                <template #label="vo">
+                                  <span :style="{color:vo.data.color}">{{vo.data.label}}</span>
+                                </template>
                         </a-select>
                     </div>
                     <div class="r">

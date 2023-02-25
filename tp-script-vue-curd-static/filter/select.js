@@ -2,16 +2,7 @@ define([], function () {
     const styleId='filter-select-field-style';
     const style = `
 <style id="${styleId}">
-.region-value-div .ant-select-single.ant-select-sm:not(.ant-select-customize-input) .ant-select-selector{
-    padding: 2px 7px;
-    height: 26px;
-}
-.filter-select-url-dropdown .rc-virtual-list-holder{
-overflow-y: auto!important;
-}
-.filter-select-url-dropdown .rc-virtual-list-scrollbar-show{
-display: none;
-}
+
 </style>
 `;
     return {
@@ -89,7 +80,7 @@ display: none;
                 this.$emit('search', this.inputValue);
             },
             filterOption(input, option) {
-                return option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+                return option.label.toLowerCase().indexOf(input.toLowerCase()) >= 0;
             },
             handlePopupScroll(e){
                 const { scrollHeight, scrollTop, clientHeight } = e.target
@@ -142,63 +133,48 @@ display: none;
         template: `<div>
                     <div v-if="config.url!==''" style="padding: 0 0.5em;margin: 0 0.1em;">
                          <a-select style="width: 236px" 
-                            v-model:value="inputValue"
+                            v-model:model-value="inputValue"
                             allow-clear
-                            show-search 
-                            size="small"
+                            allow-search 
+                            size="mini"
                             placeholder="输入筛选信息"
-                            :default-active-first-option="false"
-                            :filter-option="false"
-                            :mode="config.multiple?'multiple':null"
+                            :multiple="config.multiple"
                             :options="supplyBatch"
-                            dropdown-class-name="filter-select-url-dropdown"
+                            :loading="fetching"
+                            :filter-option="false"
                             @search="doFilter"
                             @change="search"
-                            @popupScroll="handlePopupScroll"
+                            @dropdown-scroll="handlePopupScroll"
                             @focus="onFocus"
                          >
-                          <template #dropdownRender="{ menuNode: menu }">
-                                <v-nodes :vnodes="menu" />
-                                <template v-if="fetching">
-                                    <template v-if="supplyBatch.length>0">
-                                        <div style="padding: 4px 16px;">
-                                            <a-spin size="small" />
-                                        </div>
-                                    </template>
-                                     <div v-else style="padding: 12px 16px"><a-spin size="small" /></div>
-                                </template>
-                          </template>
-                          <template  v-if="fetching" #notFoundContent>
-                              <span></span>
-                          </template>
                         </a-select>
                     </div>
                     <div v-else class="region-value-div">
                         <a-select style="width: 236px" 
                               v-model:value="inputValue"
                               allow-clear
-                              show-search 
-                              size="small"
+                              allow-search 
+                              size="mini"
                               placeholder="选择相关信息"
-                              :mode="config.multiple?'multiple':null"
+                              :multiple="config.multiple"
                               :filter-option="filterOption"
                               @change="search"
                               >
                               <template v-if="haveGroup">
-                                 <a-select-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-select-option>
+                                 <a-option value=""><span style="color: rgba(0,0,0,.35);">&nbsp;&nbsp;全部</span></a-option>
                                  <template v-for="(items,key) in groupItems">
                                     <template v-if="key">
-                                         <a-select-opt-group :label="key" :key="key">
-                                             <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                         <a-optgroup :label="key" :key="key">
+                                             <a-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-option>
                                          </a-select-opt-group>
                                     </template>
                                      <template v-else>
-                                        <a-select-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-select-option>
+                                        <a-option v-for="optionItem in items" :key="optionItem.value" :value="optionItem.value"><span :style="{color:optionItem.color}">{{optionItem.text}}</span></a-option>
                                      </template>
                                  </template>
                              </template>
                              <template v-else>
-                                 <a-select-option :value="optionItem.value" :key="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-select-option>
+                                 <a-option :value="optionItem.value" :key="optionItem.value" v-for="optionItem in config.items" :title="optionItem.title"><span :style="{color:optionItem.color}">{{optionItem.title}}</span></a-option>
                              </template>
                         </a-select>
                     </div>

@@ -4,7 +4,7 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    if(this.value===0||this.value==='0'){
+                    if(this.value===0||this.value==='0'||this.value===undefined||this.value===null){
                         return '';
                     }
                     if(/^\d+$/g.test(this.value.toString())){
@@ -13,7 +13,7 @@ define([],function(){
                     return this.value
                 },
                 set(val){
-                    if(val===null){
+                    if(val===null||val===undefined){
                         this.$emit('update:value', '');
                         return;
                     }
@@ -23,7 +23,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <week-select v-model:value="val" :placeholder="field.placeholder" :disabled="field.readOnly"></week-select>
+                        <a-week-picker v-model="val" :placeholder="field.placeholder" :disabled="field.readOnly"></a-week-picker>
                     </div>
                     <div class="r">
                         <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>

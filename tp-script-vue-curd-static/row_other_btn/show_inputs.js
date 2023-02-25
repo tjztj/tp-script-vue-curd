@@ -69,19 +69,19 @@ define(['vueAdmin'], function (va) {
                         if(window.thatBtn&&window.thatBtn.refreshPage){
                             if(top.layer&&top.layer.msg){
                                 top.layer.msg(res.msg, {icon: 1, shade:  [0.02, '#000'], scrollbar: false, time: 1500, shadeClose: true})
-                                parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('body'))
-                                parentWindow.setTimeout(()=>{
-                                    parentWindow.location.reload();
+                                (parentWindow||window).vueDefMethods.showLoadMsg('', (parentWindow||window).document.querySelector('body'))
+                                (parentWindow||window).setTimeout(()=>{
+                                    (parentWindow||window).location.reload();
                                 },80)
                             }else{
-                                parentWindow.antd.message.success(res.msg);
-                                parentWindow.vueDefMethods.showLoadMsg('', parentWindow.document.querySelector('#app>.box>.body'))
-                                parentWindow.setTimeout(()=>{
-                                    parentWindow.location.reload();
+                                (parentWindow||window).ArcoVue.Message.success(res.msg);
+                                (parentWindow||window).vueDefMethods.showLoadMsg('', (parentWindow||window).document.querySelector('#app>.box>.body'))
+                                (parentWindow||window).setTimeout(()=>{
+                                    (parentWindow||window).location.reload();
                                 },200)
                             }
                         }else{
-                            parentWindow.antd.message.success(res.msg);
+                            (parentWindow||window).ArcoVue.Message.success(res.msg);
                             if(this.form&&this.form.id&&!res.data.refreshList&&(!window.thatBtn||!window.thatBtn.refreshList)){
                                 window.listVue.refreshId(this.form.id);
                             }else{
@@ -110,9 +110,9 @@ define(['vueAdmin'], function (va) {
                     })
                 }).catch(error => {
                     if(error.errorFields&&error.errorFields[0]&&error.errorFields[0].errors&&error.errorFields[0].errors[0]){
-                        antd.message.warning(error.errorFields[0].errors[0])
+                        ArcoVue.Message.warning(error.errorFields[0].errors[0])
                     }else{
-                        antd.message.warning('请检测是否填写正确')
+                        ArcoVue.Message.warning('请检测是否填写正确')
                     }
                     console.log('error', error);
                 });

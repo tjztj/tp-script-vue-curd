@@ -2,7 +2,7 @@
 
 namespace tpScriptVueCurd\traits\controller;
 
-use tpScriptVueCurd\field\TreeSelect;
+use tpScriptVueCurd\field\TreeSelectField;
 
 trait TreeIndex
 {
@@ -39,6 +39,6 @@ trait TreeIndex
 
         $curRow=current($list);
         $pidField=isset($curRow['_Original_'.$this->treePidField])?'_Original_'.$this->treePidField:$this->treePidField;
-        return TreeSelect::listToTree($list,'id',$pidField,$this->childrenColumnName);
+        return TreeSelectField::listToTree($list,'id',$pidField,$this->childrenColumnName);
     }
 }

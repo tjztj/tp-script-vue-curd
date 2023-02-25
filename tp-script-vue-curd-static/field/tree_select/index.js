@@ -64,16 +64,9 @@ define([], function () {
 
             },
         },
-        template: `<div style="width: 100%;overflow: hidden; white-space: nowrap;  text-overflow: ellipsis;">
-        <a-tooltip placement="topLeft">
-        <template #title>
-          <div style="display: initial" v-if="!this.field.multiple">{{showText.length>0?showText.toString():''}}</div>
-          <div style="display: initial" v-else><div v-for="item in showText" style="display: inline-block;margin: 2px 4px;padding: 0 4px;border: 1px solid #d9d9d9;border-radius: 2px;" v-html="item"></div></div>
-                    
-        </template>
+        template: `<div style="display: initial">
         <div style="display: initial" v-if="!this.field.multiple">{{showText.length>0?showText.toString():''}}</div>
-        <div style="display: initial" v-else><div v-for="item in showText" style="display: inline-block;margin: 2px 4px;padding: 0 4px;border: 1px solid #d9d9d9;background-color: #fff;border-radius: 2px;max-width: 95%;overflow: hidden; white-space: nowrap;  text-overflow: ellipsis;" v-html="item"></div></div>   
-      </a-tooltip>
+        <div style="display: initial" v-else><div v-for="item in showText" style="display: inline-block;margin: 2px 4px;padding: 0 4px;border: 1px solid #d9d9d9;background-color: #fff;border-radius: 2px;max-width: 95%;overflow: hidden; white-space: nowrap;  text-overflow: ellipsis;" v-html="item"></div></div>  
 </div>`,
     }
 });
