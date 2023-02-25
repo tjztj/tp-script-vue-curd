@@ -54,6 +54,9 @@ define(['vueAdmin'], function (va) {
         }
         return setup;
     }
+    function getThisActionOhterComponents(){
+        return window.thisAction.components||{};
+    }
     ////--------------////
 
 
@@ -206,6 +209,7 @@ define(['vueAdmin'], function (va) {
             })
         };
         return {
+            components:{...getThisActionOhterComponents},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
@@ -758,6 +762,7 @@ define(['vueAdmin'], function (va) {
             form.id=vueData.info.id;
         }
         return {
+            components:{...getThisActionOhterComponents},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
@@ -872,6 +877,7 @@ define(['vueAdmin'], function (va) {
 
     actions.show=function(){
         return {
+            components:{...getThisActionOhterComponents},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
