@@ -11,6 +11,9 @@ overflow-y: hidden;
 #table-select-popup-container .arco-scrollbar-track{
 display: none;
 }
+.select-table-dropdown{
+    margin: 0 4px;
+}
 .select-table-dropdown .arco-table-pagination{
     margin-right: 12px;
 }

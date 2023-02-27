@@ -815,6 +815,14 @@ a.red:hover,a.yellow:hover{
     transition: all .5s;
     box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.08)
 }
+.curd-show-field-box .list-field-item>.list-field-item-row:first-child{
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.curd-show-field-box .list-field-item>.list-field-item-row:last-child{
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
 .curd-show-field-box .list-field-item>.list-field-item-row:nth-child(odd){
     background-image: linear-gradient(to right, #fff, #fcfcff);
 }

@@ -19,7 +19,7 @@ body{
 
 .body {
     background-color: #fff;
-    border-radius: 2px;
+    border-radius: 6px;
 }
 
 .foot {
@@ -53,7 +53,7 @@ body{
 }
 .box .head{
     margin: 0 12px 12px 12px;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 .box .body{
     width: 100%;
