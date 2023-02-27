@@ -27,7 +27,7 @@ legend {
 
 #app{
     background-color: #fff;
-    border-radius: 2px;
+    border-radius: 6px;
 }
 #app *{
     -webkit-font-smoothing: antialiased;
@@ -252,7 +252,7 @@ a.red:hover,a.yellow:hover{
 .left-cate-div{
     background-color: #fff;
     height: 100%;
-    border-radius: 2px;
+    border-radius: 6px;
     max-height: calc(100vh - 48px);
     min-width: 240px;
     display: flex;
@@ -330,7 +330,7 @@ a.red:hover,a.yellow:hover{
     cursor: pointer;
     border: 1px solid transparent;
     padding: 0 .5em;
-    border-radius: 2px;
+    border-radius: 6px;
     transition: all .3s;
 }
 
@@ -597,7 +597,7 @@ a.red:hover,a.yellow:hover{
     content: ' ';
     width: 4px;
     background-color: rgb(var(--primary-6));
-    border-radius: 4px;
+    border-radius: 6px;
     margin-right: 1px;
 }
 .vuecurd-def-box .field-group-fieldset legend{
@@ -606,7 +606,7 @@ a.red:hover,a.yellow:hover{
     color: #031A79;
     margin: 0;
     background-image: linear-gradient(to right, #E8F3FF , #fff);
-    border-radius: 4px;
+    border-radius: 6px;
     border-left: 1px solid #9FD4FD;
     text-shadow: 1px 1px 1px rgba(0,0 ,0 , .08);
 }
@@ -645,10 +645,9 @@ a.red:hover,a.yellow:hover{
 }
 .vuecurd-def-box .list-field-box-item{
     padding: 18px 18px 6px 18px;
-    border-radius: 2px;
+    border-radius: 6px;
     transition: all .5s;
     border: 1px solid var(--color-neutral-3);
-    border-radius: var(--border-radius-small);
 }
 .vuecurd-def-box .list-field-box-item-form:hover .list-field-box-item{
     box-shadow: 0 4px 10px rgb(var(--gray-2));
@@ -727,7 +726,7 @@ a.red:hover,a.yellow:hover{
     max-width: 72px;
     margin-right: 2px;
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 6px;
     transition: all .3s;
 }
 .list-img-field-box:hover{
@@ -756,7 +755,7 @@ a.red:hover,a.yellow:hover{
     margin: 0 8px 8px 0;
     padding: 8px;
     border: 1px solid #e5e6eb;
-    border-radius: 2px;
+    border-radius: 6px;
     position: relative;
     cursor: pointer;
     transition: border .6s;
@@ -792,7 +791,7 @@ a.red:hover,a.yellow:hover{
 .more-string-auto-complete-rm{
     width: 40px;
     text-align: center;
-    border-radius: 2px;
+    border-radius: 6px;
     cursor: pointer;
 }
 .more-string-auto-complete-rm:hover{
@@ -812,7 +811,7 @@ a.red:hover,a.yellow:hover{
 .curd-show-field-box .list-field-item{
     background-image: linear-gradient(to left, #fff, #fcfcff);
     border: 1px solid #c9cdd4;
-    border-radius: 2px;
+    border-radius: 6px;
     transition: all .5s;
     box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.08)
 }
@@ -822,7 +821,7 @@ a.red:hover,a.yellow:hover{
 .field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item{
     background-image: linear-gradient(to left, #fefffa, #fffcf9);
     border: 1px solid #ffe7ba;
-    border-radius: 4px;
+    border-radius: 6px;
     box-shadow: 0 2px 5px 1px rgba(0, 0, 0, 0.04)
 }
 .field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item:hover{
@@ -846,7 +845,7 @@ a.red:hover,a.yellow:hover{
 }
 .field-group-fieldset>.show-group-field-rows>.row:nth-child(odd) .curd-show-field-box .list-field-item-row:hover{
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 .curd-show-field-box .list-field-item-row-l{
     padding-right: .5em;

@@ -37,7 +37,7 @@ padding: 6px;
 }
 .curd-list-show-field-box>div>.list-field-box>.list-field-item>.list-field-item-row:nth-child(even) .curd-show-field-box .list-field-item-row:hover{
     background-color: #fff;
-    border-radius: 4px;
+    border-radius: 6px;
 }
 .curd-list-show-field-box .list-field-item-row-l{
     padding-right: .5em;

@@ -1,4 +1,7 @@
 <style>
+body{
+    padding: 24px;
+}
 #app{
     padding: 24px;
 }

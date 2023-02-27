@@ -155,7 +155,7 @@ define([], function () {
                         <a-spin :loading="!isInited">
                             <div v-show="!disabled"><a-button size="small" style="position: absolute;right: 6px;top: 6px;z-index: 1031" @click="openSelect">{{paths.length<3?'选择':'更改'}}</a-button></div>
                             <div v-show="paths.length<3" :style="{lineHeight:sizeStyle.height}" style="position: absolute;z-index: 1030;background-color: rgba(0,0,0,.45);left: 0;right: 0;top: 0;bottom: 0;text-align: center;color:#fff">{{placeholder}}</div>
-                            <div :id="mapId" :style="sizeStyle" style="border-radius: 2px;overflow: hidden"></div>
+                            <div :id="mapId" :style="sizeStyle" style="border-radius: 6px;overflow: hidden"></div>
                         </a-spin>
                       </div>`
     }

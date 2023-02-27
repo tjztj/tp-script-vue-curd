@@ -64,7 +64,7 @@ define([],function(){
         },
         template:`<div>
                     <div style="display: inline-block" v-if="!this.field.multiple">{{showText.length>0?showText.toString():''}}</div>
-                    <div style="display: inline-block" v-else><div v-for="item in showText" style="display: inline-block;margin: 2px 4px;padding: 0 4px;border: 1px solid #d9d9d9;background-color: #fff;border-radius: 2px;" v-html="item"></div></div>
+                    <div style="display: inline-block" v-else><div v-for="item in showText" style="display: inline-block;margin: 2px 4px;padding: 0 4px;border: 1px solid #d9d9d9;background-color: #fff;border-radius: 6px;" v-html="item"></div></div>
                     <span class="ext-box" v-if="field.ext">（{{field.ext}}）</span>
                 </div>`,
     }
