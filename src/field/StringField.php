@@ -11,6 +11,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\listEdit;
 
 
 /**
@@ -21,6 +22,7 @@ use tpScriptVueCurd\tool\field_tpl\Show;
  */
 class StringField extends ModelField
 {
+    use listEdit;
     protected string $defaultFilterClass=LikeFilter::class;
 
     protected bool $readOnlyJustShowText=false;
@@ -107,7 +109,7 @@ class StringField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,''),
+            new Show($type,'/tp-script-vue-curd-static.php?field/string/index.js'),
             new Edit($type,'/tp-script-vue-curd-static.php?field/string/edit.js')
         );
     }

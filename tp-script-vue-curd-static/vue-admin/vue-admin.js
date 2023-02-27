@@ -1942,7 +1942,7 @@ define(requires, function (axios, Qs) {
                                         :field="item" 
                                         :record="record"
                                         :style="colStyle(item,record.record)"
-                                        :list="data"
+                                        v-model:list="data"
                                         @refresh-table="$emit('refreshTable')"
                                     ></component>     
                                 </slot>
