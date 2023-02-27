@@ -33,7 +33,7 @@ legend {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-#app-loading {
+.app-loading {
     position: fixed;
     z-index: 100000000;
     top: 0;
@@ -45,13 +45,13 @@ legend {
     height: 3.3em;
 }
 
-#app-loading svg {
+.app-loading svg {
     width: 100%;
     transform-origin: center;
     animation: rotate 2s linear infinite;
 }
 
-#app-loading circle {
+.app-loading circle {
     fill: none;
     stroke: rgb(var(--primary-6));
     stroke-width: 2;

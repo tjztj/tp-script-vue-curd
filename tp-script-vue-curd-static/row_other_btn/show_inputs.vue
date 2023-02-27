@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <style>
-        #app-loading {
+        .app-loading {
             position: fixed;
             z-index: 100000000;
             top: 0;
@@ -14,13 +14,13 @@
             height: 3.3em;
         }
 
-        #app-loading svg {
+        .app-loading svg {
             width: 100%;
             transform-origin: center;
             animation: rotate 2s linear infinite;
         }
 
-        #app-loading circle {
+        .app-loading circle {
             fill: none;
             stroke: #2196f3;
             stroke-width: 2;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body style="background-color: #fff">
-<div id="app-loading">
+<div id="app-loading" class="app-loading">
     <svg viewBox="25 25 50 50">
         <circle cx="50" cy="50" r="20"></circle>
     </svg>
