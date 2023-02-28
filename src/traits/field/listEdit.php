@@ -2,7 +2,7 @@
 
 namespace tpScriptVueCurd\traits\field;
 
-trait listEdit
+trait ListEdit
 {
     /**
      * 是否可在列表中编辑当前字段的值
@@ -20,7 +20,7 @@ trait listEdit
      * @param string $refreshPage
      * @return $this|array|string[]
      */
-    public function listEdit(string $saveUrl=null,string $refreshPage='row'){
+    public function listEdit(string $saveUrl=null,string $refreshPage=''){
         if(is_null($saveUrl)){
             return $this->listEdit;
         }

@@ -1486,10 +1486,12 @@ define(requires, function (axios, Qs) {
                             name:item.name,
                             // title:item.title,
                             titleSlotName: customTitle,
-                            ellipsis: true,
-                            tooltip: true,
                             fixed: item.listFixed ? item.listFixed : false,
                         };
+                        if(!(item.listEdit&&item.listEdit.saveUrl)){
+                            col.ellipsis=true;
+                            col.tooltip=true;
+                        }
                         if (fieldComponents['VueCurdIndex' + item.type]) {
                             listFieldComponents[item.name] = item;
                             col.slotName = 'field-component-' + item.name;
@@ -1943,7 +1945,8 @@ define(requires, function (axios, Qs) {
                                         :record="record"
                                         :style="colStyle(item,record.record)"
                                         v-model:list="data"
-                                        @refresh-table="$emit('refreshTable')"
+                                        @refresh-table="refreshTable"
+                                        @refresh-id="refreshId"
                                     ></component>     
                                 </slot>
                              </template>

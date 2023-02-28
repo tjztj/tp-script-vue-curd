@@ -1,6 +1,9 @@
-define([],function(){
+define(['/tp-script-vue-curd-static.php?listEdit/select.js'],function(listEdit){
     return {
-        props:['record','field'],
+        components:{
+            listEdit,
+        },
+        props:['record','field','list'],
         setup(props,ctx){
             const items={};
             props.field.items.forEach(item=>{
@@ -48,11 +51,11 @@ define([],function(){
                 return {color:color};
             },
         },
-        template:`<div style="display: inline">
+        template:`<list-edit :record="record" :field="field" v-model:list="list" :multiple="field.multiple">
                     <span  v-if="record.record['_showText_'+field.name]" :style="oneStyle()">{{record.record['_showText_'+field.name]}}</span>
                     <span  v-else-if="record.record[this.field.name]">
                         <template v-for="(item,key) in lists"><span :style="{color:color(item)}">{{text(item)}}</span><span v-if="lists[key+1]" style="padding: 0 4px">,</span></template>
                     </span>
-                </div>`,
+                </list-edit>`,
     }
 });

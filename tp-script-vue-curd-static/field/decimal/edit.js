@@ -16,6 +16,7 @@ define([],function(){
                         val=val.toString();
                         this.$emit('update:value',val);
                     }
+                    
                     return val===''?'':parseFloat(val);
                 },
                 set(val){

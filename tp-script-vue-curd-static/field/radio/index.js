@@ -1,6 +1,9 @@
-define([],function(){
+define(['/tp-script-vue-curd-static.php?listEdit/select.js'],function(listEdit){
     return {
-        props:['record','field'],
+        components:{
+            listEdit,
+        },
+        props:['record','field','list'],
         methods:{
           color(){
               if(typeof this.record.record['_Original_'+this.field.name]==='undefined'||this.record.record['_Original_'+this.field.name]===''){
@@ -15,9 +18,9 @@ define([],function(){
               }
           },
         },
-        template:`<div style="display: inline">
+        template:`<list-edit :record="record" :field="field" v-model:list="list" :multiple="false">
                      <span :style="{color:color()}" v-if="record.record['_showText_'+field.name]">{{record.record['_showText_'+field.name]}}</span>
                      <span :style="{color:color()}" v-else-if="record.record[field.name]">{{record.record[field.name]}}</span>
-                </div>`,
+                </list-edit>`,
     }
 });

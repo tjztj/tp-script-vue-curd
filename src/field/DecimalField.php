@@ -12,6 +12,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\ListEdit;
 use tpScriptVueCurd\traits\field\NumHideFields;
 
 /**两位小数
@@ -21,7 +22,7 @@ use tpScriptVueCurd\traits\field\NumHideFields;
  */
 class DecimalField extends ModelField
 {
-    use NumHideFields;
+    use NumHideFields,ListEdit;
     protected float $min = 0.00;//最小值
     protected float $max = 99999999999999.99;//最大值
     protected int $listColumnWidth=110;//设置默认值
@@ -117,7 +118,7 @@ class DecimalField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,''),
+            new Index($type,'/tp-script-vue-curd-static.php?field/decimal/index.js'),
             new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/decimal/edit.js')
         );

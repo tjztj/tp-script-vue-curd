@@ -12,6 +12,7 @@ use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
+use tpScriptVueCurd\traits\field\ListEdit;
 use tpScriptVueCurd\traits\field\NumHideFields;
 
 
@@ -23,7 +24,7 @@ use tpScriptVueCurd\traits\field\NumHideFields;
  */
 class IntField extends ModelField
 {
-    use NumHideFields;
+    use NumHideFields,ListEdit;
     protected int $min = 0;//最小值
     protected int $max = 9999999999;//最大值
     protected int $listColumnWidth=85;//设置默认值
@@ -100,7 +101,7 @@ class IntField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,''),
+            new Index($type,'/tp-script-vue-curd-static.php?field/int/index.js'),
             new Show($type,''),
             new Edit($type,'/tp-script-vue-curd-static.php?field/int/edit.js')
         );

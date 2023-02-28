@@ -12,6 +12,7 @@ use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
 use tpScriptVueCurd\tool\field_tpl\Show;
 use tpScriptVueCurd\traits\field\CheckField;
+use tpScriptVueCurd\traits\field\ListEdit;
 
 
 /**
@@ -22,7 +23,7 @@ use tpScriptVueCurd\traits\field\CheckField;
  */
 class SelectField extends ModelField
 {
-    use CheckField;
+    use CheckField,ListEdit;
 
     protected bool $multiple=false;//是否可多选
     protected string $defaultFilterClass=SelectFilter::class;

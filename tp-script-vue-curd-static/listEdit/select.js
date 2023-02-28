@@ -1,20 +1,30 @@
 define([],function(){
     return {
-        props:['field','value'],
-        setup(props,ctx){
+        props:['record','field','list','multiple'],
+        setup:function (props,ctx){
+            // const val=Vue.ref(null);
+            // Vue.watch(()=>props.list[props.record.rowIndex],()=>{
+            //     val.value=null;
+            // })
+
             const filterOption = (input, option) => {
                 return option.title.toLowerCase().indexOf(input.toLowerCase()) >= 0;
             };
+
             return {
-                filterOption,
+                disabled:Vue.ref(false),
+                filterOption
             }
         },
         computed:{
+            value(){
+                return this.record.record['_Original_'+this.field.name];
+            },
             val:{
                 get(){
                     const nullValue=typeof this.field.nullVal==='string'||typeof this.field.nullVal==='number'?this.field.nullVal.toString():null;
 
-                    if(this.field.multiple){
+                    if(this.multiple){
                         if(this.value===''){
                             return [];
                         }
@@ -30,10 +40,10 @@ define([],function(){
                 },
                 set(val){
                     if(val===undefined){
-                        this.$emit('update:value', '');
+                        this.change('');
                         return;
                     }
-                    this.$emit('update:value', typeof val==='object'?val.join(','):val);
+                    this.change( typeof val==='object'?val.join(','):val);
                 }
             },
             option(){
@@ -73,18 +83,40 @@ define([],function(){
                 }
                 return optionGroups;
             },
-
-
         },
-        template:`<div class="field-box">
-                    <div class="l">
-                        <a-select :multiple="field.multiple"
+        methods:{
+            log(...data){
+                console.log(...data)
+            },
+            '$post'(...params){
+                return window.vueDefMethods.$post.call(this,...params,)
+            },
+            change(val){
+                if(val===this.record.record['_Original_'+this.field.name]||val===null){
+                    return;
+                }
+                this.disabled=true;
+                this.$post(this.field.listEdit.saveUrl,{id:this.record.record.id,name:this.field.name,value:val}).then(res=>{
+                    if(this.field.listEdit.refreshPage==='table'){
+                        this.$emit('refresh-table')
+                    }else if(this.field.listEdit.refreshPage==='row'){
+                        this.$emit('refresh-id',this.record.record.id)
+                    }else{
+                        this.list[this.record.rowIndex]['_Original_'+this.field.name]=val;
+                    }
+                    this.disabled=false;
+                }).catch(()=>{
+                    this.disabled=false;
+                })
+            },
+        },
+        template:`<span>
+                    <template v-if="field.listEdit&&field.listEdit.saveUrl">
+                        <a-select :multiple="multiple"
                                   :default-value="val"
                                   v-model="val"
-                                  :placeholder="field.placeholder||'请选择'+field.title"
-                                   :disabled="field.readOnly"
+                                   :disabled="disabled"
                                    :filter-option="filterOption"
-                                   :allow-clear="!field.required"
                                    allow-search
                                    :options="option"
                                    :virtual-list-props="{height:240}">
@@ -95,10 +127,8 @@ define([],function(){
                                   <span :style="{color:vo.data.color}">{{vo.data.label}}</span>
                                 </template>
                         </a-select>
-                    </div>
-                    <div class="r">
-                        <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>
-                    </div>
-                </div>`,
+                    </template>
+                    <template v-else><slot></slot></template>
+    </span>`,
     }
 });
