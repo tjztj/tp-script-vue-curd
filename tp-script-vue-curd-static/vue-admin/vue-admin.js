@@ -291,6 +291,9 @@ define(requires, function (axios, Qs) {
                 box.layer.open(option);
             })
         } else {
+            if(box.appPage&&!box.appParam){
+                box.appParam=box.appPage;
+            }
             if (!box.appParam.bodyModals || !box.appParam.bodyDrawers) {
                 box.appParam = box.appPage;
             }

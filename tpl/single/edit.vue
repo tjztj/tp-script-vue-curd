@@ -1,9 +1,12 @@
+{if $bgColor}
+<style>body{background-color: {$bgColor};}</style>
+{/if}
 <style>
 body{
     padding: 24px;
 }
 #app{
-    padding: 24px;
+    padding: {$padding};
 }
 .vuecurd-def-box .ext-span{
     display: inline-block;
@@ -64,7 +67,3 @@ body{
 
 
 </div>
-
-{if $bgColor}
-<style>body{background-color: {$bgColor};}</style>
-{/if}
