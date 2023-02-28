@@ -22,7 +22,9 @@ class Edit
     public string $refreshBtnTitle='刷新页面';//刷新按钮名称，如果设置为空，不显示刷新按钮
     public string $saveUrl='';//提交地址
     public string $bgColor='#f0f2f5';//页面背景色
-    public string $padding='25px';//内间距
+    public string $padding='24px';//内间距
+    public string $margin='24px';//外间距
+
 
 
     public string $formLayout='horizontal';//表单布局	'horizontal'|'vertical'|'inline'
@@ -117,6 +119,7 @@ class Edit
             'saveUrl'=>$this->saveUrl,
             'bgColor'=>$this->bgColor,
             'padding'=>$this->padding,
+            'margin'=>$this->margin,
             'formLeft'=>$this->formLeft,
             'formLayout'=>$this->formLayout,
             'formMaxWidth'=>$this->formMaxWidth,

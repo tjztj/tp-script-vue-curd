@@ -2,10 +2,8 @@
 <style>body{background-color: {$bgColor};}</style>
 {/if}
 <style>
-body{
-    padding: 24px;
-}
 #app{
+    margin: {$margin};
     padding: {$padding};
 }
 .vuecurd-def-box .ext-span{
