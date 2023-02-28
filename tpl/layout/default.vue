@@ -54,7 +54,7 @@
         <template #title>
             <div v-html="bodyModal.title"></div>
         </template>
-        <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyModal.url" :onload="bodyModal.onload" :style="{height:bodyModal.height==='auto'?'auto':'calc('+bodyModal.height+' - 56px)'}"></iframe>
+        <iframe scrolling="auto" allowtransparency="true" class="" frameborder="0" :src="bodyModal.url" :onload="bodyModal.onload" :style="{height:bodyModal.height==='auto'?'auto':'calc('+bodyModal.height+' - 96px)'}"></iframe>
     </a-modal>
     <a-drawer
         v-for="bodyDrawer in bodyDrawers"
