@@ -81,7 +81,7 @@ define(requires, function (axios, Qs) {
         }
         if (res.confirm && res.confirm.show) {
             return await new Promise((resolve, reject) => {
-                ArcoVue.Modal.warning({
+                (top.ArcoVue||ArcoVue).Modal.warning({
                     title: Vue.createVNode('b', {}, res.confirm.title),
                     content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
                     hideCancel:false,
@@ -96,9 +96,9 @@ define(requires, function (axios, Qs) {
         }
 
 
-        ArcoVue.Message.error(res.msg || '失败');
+        (top.ArcoVue||ArcoVue).Message.error(res.msg || '失败');
         if (res.url && res.url.indexOf(vueData.loginUrl) !== -1) {
-            ArcoVue.Modal.confirm({
+            (top.ArcoVue||ArcoVue).Modal.confirm({
                 content: '登录或已过期，可以取消以留在此页，或重新登录', okText: '确认退出', cancelText: '取消', onOk() {
                     location.href = res.url
                 }
@@ -112,7 +112,7 @@ define(requires, function (axios, Qs) {
             console.error(error);
             error = {code: 0, msg: '发生错误', data: [],}
         }
-        ArcoVue.Message.error({
+        (top.ArcoVue||ArcoVue).Message.error({
             content:error.msg,
             duration: 6*1000
         });
@@ -477,7 +477,7 @@ define(requires, function (axios, Qs) {
                         data = JSON.parse(evt.target.responseText);
                     } catch (e) {
                         that.hideLoadMsg();
-                        ArcoVue.Notification.error({title:'失败',content: '服务器发生错误'});
+                        (top.ArcoVue||ArcoVue).Notification.error({title:'失败',content: '服务器发生错误'});
                         if ($error) {
                             $error(e);
                         }
@@ -492,7 +492,7 @@ define(requires, function (axios, Qs) {
                         }
                     } else {
                         that.hideLoadMsg();
-                        ArcoVue.Notification.error({title:'失败',content:data.msg});
+                        (top.ArcoVue||ArcoVue).Notification.error({title:'失败',content:data.msg});
                         if ($error) {
                             $error(data);
                         }
@@ -502,7 +502,7 @@ define(requires, function (axios, Qs) {
 
             function uploadFailed(evt) {
                 let msg = '上传文件发生了错误尝试!';
-                ArcoVue.Notification.error({title:'失败',content:msg});
+                (top.ArcoVue||ArcoVue).Notification.error({title:'失败',content:msg});
                 if ($error) {
                     $error({
                         code: 0,
@@ -515,7 +515,7 @@ define(requires, function (axios, Qs) {
 
             function uploadCanceled(evt) {
                 let msg = '上传被用户取消或者浏览器断开连接!';
-                ArcoVue.Notification.error({title:'失败',content:msg});
+                (top.ArcoVue||ArcoVue).Notification.error({title:'失败',content:msg});
                 if ($error) {
                     $error({
                         code: 0,
@@ -671,9 +671,9 @@ define(requires, function (axios, Qs) {
 
 
             if (!btn.modalFields) {
-                ArcoVue.Modal.warning({
-                    title: Vue.createVNode('b', {}, res.confirm.title),
-                    content: res.msg, okText: res.confirm.okText, cancelText: res.confirm.cancelText,
+                (top.ArcoVue||ArcoVue).Modal.warning({
+                    title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
+                    content: btn.modalTitle,
                     hideCancel:false,
                     onBeforeOk() {
                         return new Promise((resolve, reject) => {
@@ -696,7 +696,7 @@ define(requires, function (axios, Qs) {
                                             window.location.reload();
                                         }, 80)
                                     } else {
-                                        ArcoVue.Message.success(res.msg);
+                                        (top.ArcoVue||ArcoVue).Message.success(res.msg);
                                         window.vueDefMethods.showLoadMsg('', window.document.querySelector('#app>.box>.body'))
                                         window.setTimeout(() => {
                                             window.location.reload();
@@ -705,7 +705,7 @@ define(requires, function (axios, Qs) {
                                     resolve()
                                     return;
                                 }
-                                ArcoVue.Message.success(res.msg);
+                                (top.ArcoVue||ArcoVue).Message.success(res.msg);
                                 if (btn.refreshList) {
                                     this.refreshTable();
                                 } else if (row) {
@@ -1292,7 +1292,7 @@ define(requires, function (axios, Qs) {
                                     isNotErr = await new Promise(resolve => {
                                         this.$refs['listFieldForm' + i].validate(errors=>{
                                             if(errors&&Object.keys(errors).length>0){
-                                                ArcoVue.Message.warning(errors[Object.keys(errors)[0]].message);
+                                                (top.ArcoVue||ArcoVue).Message.warning(errors[Object.keys(errors)[0]].message);
                                                 console.log('error', error);
                                                 resolve(false);
                                             }else{
