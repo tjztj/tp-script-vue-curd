@@ -114,6 +114,9 @@ define([],function(){
         },
         methods:{
             filterTreeNode(searchValue, nodeData) {
+                if(typeof nodeData.title==='undefined'){
+                    return false;
+                }
                 return nodeData.title.toLowerCase().indexOf(searchValue.toLowerCase()) > -1;
             },
             log(v){

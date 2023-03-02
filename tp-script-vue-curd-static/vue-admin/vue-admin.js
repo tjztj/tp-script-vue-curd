@@ -1698,7 +1698,6 @@ define(requires, function (axios, Qs) {
                                 }
                             })
                         }
-                        setPids(data);
                     }
                     this.expandedRowKeys = expandedRowKeys;
                 },
@@ -1858,19 +1857,6 @@ define(requires, function (axios, Qs) {
                 isCanAddChildren(row) {
                     return this.isTreeIndex && this.canAdd&&row.can_add_children!==false;
                 },
-                onExpand(record, expanded) {
-                    if (expanded) {
-                        // 设置展开窗Key，代表展开操作
-                        this.expandedRowKeys.push(record.id)
-                    } else {
-                        // 代表折叠操作
-                        if (this.expandedRowKeys.length) {
-                            this.expandedRowKeys = this.expandedRowKeys.filter(v => {
-                                return v !== record.id
-                            })
-                        }
-                    }
-                },
                 getBeforeBtns(row) {
                     return row.otherBtns ? row.otherBtns.before : [];
                 },
@@ -1923,10 +1909,9 @@ define(requires, function (axios, Qs) {
                             :row-selection="rowSelection"
                             :children-column-name="childrenColumnName"
                             :indent-size="indentSize"
-                            v-model:expanded-row-keys="expandedRowKeys"
+                            v-model:expanded-keys="expandedRowKeys"
                             v-model:selected-keys="tableSelectedKeys"
                             column-resizable
-                            on-expand="onExpand"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
