@@ -675,13 +675,13 @@ define(requires, function (axios, Qs) {
                     title: Vue.createVNode('b', {}, '您确定要执行此操作吗？'),
                     content: btn.modalTitle,
                     hideCancel:false,
-                    onBeforeOk() {
+                    onBeforeOk:()=> {
                         return new Promise((resolve, reject) => {
                             let option = {};
                             if (row) {
                                 option.id = row.id;
                             }
-                            window.vueDefMethods.$post(btn.saveUrl, option).then(res => {
+                            this.$post(btn.saveUrl, option).then(res => {
                                 if (btn.refreshPage) {
                                     if (top.layer && top.layer.msg) {
                                         top.layer.msg(res.msg, {
