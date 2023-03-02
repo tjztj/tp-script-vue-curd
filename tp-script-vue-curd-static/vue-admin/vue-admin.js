@@ -681,7 +681,7 @@ define(requires, function (axios, Qs) {
                             if (row) {
                                 option.id = row.id;
                             }
-                            this.$post(btn.saveUrl, option).then(res => {
+                            window.vueDefMethods.$post(btn.saveUrl, option).then(res => {
                                 if (btn.refreshPage) {
                                     if (top.layer && top.layer.msg) {
                                         top.layer.msg(res.msg, {
