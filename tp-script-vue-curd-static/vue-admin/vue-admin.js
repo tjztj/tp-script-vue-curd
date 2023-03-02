@@ -1698,6 +1698,7 @@ define(requires, function (axios, Qs) {
                                 }
                             })
                         }
+                        setPids(data);
                     }
                     this.expandedRowKeys = expandedRowKeys;
                 },
