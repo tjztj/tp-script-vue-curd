@@ -12,7 +12,7 @@ define([],function(){
             }
         },
         mounted() {
-            if (!this.form.id) {
+            if (!this.form.id&&this.value==='') {
                 //如果是新增页面
                 if(this.field.items[1].default){
                     //如果选项默认选中
