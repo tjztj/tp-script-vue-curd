@@ -2211,17 +2211,27 @@ define(requires, function (axios, Qs) {
                         return !this.filterValues[vo.name];
                     })
                 },
+                createWidthEl(box,widthElId){
+                    let widthEl=box.document.getElementById(widthElId);
+                    if(!widthEl){
+                        widthEl=box.document.createElement('span');
+                        widthEl.style='font-size:14px;position:fixed;z-index:-1;opacity:0;'
+                        widthEl.id=widthElId;
+                        box.document.body.appendChild(widthEl);
+                    }
+                    return widthEl;
+                },
                 getItems(items,group,child){
                     const w={l:0,r:0};
                     const newItems=child?items.filter(item=>this.filterGroupItemIsShow(item, child)):items.filter(item=>item.show&&(!this.filterValues||!this.filterValues[item.name]));
                     const widthElId='filter-lable-width-el';
-                    let widthEl=document.getElementById(widthElId);
-                    if(!widthEl){
-                        widthEl=document.createElement('span');
-                        widthEl.style='font-size:14px;position:fixed;z-index:-1;opacity:0;'
-                        widthEl.id=widthElId;
-                        document.body.appendChild(widthEl);
+
+                    let widthEl=this.createWidthEl(window,widthElId);
+                    widthEl.innerText='check-width';
+                    if(widthEl.clientWidth===0){
+                        widthEl=this.createWidthEl(top,widthElId);
                     }
+
                     newItems.forEach((item,index)=>{
                         widthEl.innerText=item.title.toString();
                         const width=widthEl.clientWidth;
