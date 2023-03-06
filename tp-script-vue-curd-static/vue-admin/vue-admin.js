@@ -1951,7 +1951,7 @@ define(requires, function (axios, Qs) {
                              </template>
                              
                              <template #custom-title-step-info><slot name="custom-title-step-info" :columns="columns">当前步骤</slot></template>
-                             <template #step-info="{ text: stepInfo }">
+                             <template #step-info="{ record: {stepInfo} }">
                                     <slot name="step-info">
                                         <div class="curd-table-row-step-div">
                                             <div class="curd-table-row-step-title">
@@ -1974,7 +1974,7 @@ define(requires, function (axios, Qs) {
                              
                              
                              <template #custom-title-create_time><slot name="custom-title-create_time" :columns="columns">创建时间</slot></template>
-                             <template #create-time="{ text: create_time }">
+                             <template #create-time="{ record: {create_time} }">
                                     <slot name="f-create_time">
                                        {{ create_time }}
                                     </slot>
