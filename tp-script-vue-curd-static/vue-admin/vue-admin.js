@@ -1984,7 +1984,7 @@ define(requires, function (axios, Qs) {
                               
                              <template #custom-title-action><slot name="custom-title-action" :columns="columns">操作</slot></template>
                              <template #action="{ record }">
-                                    <a-space>
+                                    <a-space class="curd-table-action-btns">
                                         <template #split>
                                           <a-divider direction="vertical" class="curd-table-action-divider" />
                                         </template>

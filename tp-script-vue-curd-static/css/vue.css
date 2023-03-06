@@ -901,3 +901,6 @@ a.red:hover,a.yellow:hover{
     color: #A1151E;
 }
 /****************************************************************/
+.curd-table-action-btns .arco-divider-vertical.curd-table-action-divider{
+    margin: 0;
+}
