@@ -904,3 +904,11 @@ a.red:hover,a.yellow:hover{
 .curd-table-action-btns .arco-divider-vertical.curd-table-action-divider{
     margin: 0;
 }
+.arco-table.curd-table .arco-table-cell{
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.curd-table .arco-table-cell{
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
