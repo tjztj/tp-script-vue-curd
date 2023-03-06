@@ -42,14 +42,13 @@ body{
 </style>
 {if $childTpl}
 <style>
+body{
+    background: #fff;
+}
 .box {
     background-color: #fff;
-    margin-left: -48px;
-    margin-right: -48px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 25px);
-    width: calc(100% + 96px);
 }
 .box .head{
     margin: 0 12px 12px 12px;
@@ -67,6 +66,8 @@ body{
     width: 100%;
     flex: 1;
     height: 0;
+    box-sizing: border-box;
+    padding: 0 0 6px 0;
 }
 .childTitle{
     color: rgba(0, 0, 0, .85);
@@ -161,161 +162,161 @@ body{
 </div>
 
 <div class="box" :style="leftCate.show?'flex:1;width:0':''">
-<div class="head" v-if="showFilter">
-    <curd-filter ref="filter"
-                 @search="doFilter"
-                 :filter-config="filterBase.filterConfig"
-                 :name="filterBase.name" :class="filterBase.class"
-                 :title="filterBase.title"
-                 :childs="childs"
-                 :filter-values="filterBase.filterValues"
-                 :loading="loading"></curd-filter>
-</div>
-<div class="body">
-    <div class="arco-table-list-toolbar" v-if="showTableTool">
-        <div class="arco-table-list-toolbar-container">
-            <div class="arco-table-list-toolbar-left">
-                {block name="toolTitleLeft"}{/block}
+    <div class="head" v-if="showFilter">
+        <curd-filter ref="filter"
+                     @search="doFilter"
+                     :filter-config="filterBase.filterConfig"
+                     :name="filterBase.name" :class="filterBase.class"
+                     :title="filterBase.title"
+                     :childs="childs"
+                     :filter-values="filterBase.filterValues"
+                     :loading="loading"></curd-filter>
+    </div>
+    <div class="body">
+        <div class="arco-table-list-toolbar" v-if="showTableTool">
+            <div class="arco-table-list-toolbar-container">
+                <div class="arco-table-list-toolbar-left">
+                    {block name="toolTitleLeft"}{/block}
 
-                <a-space size="mini">
-                    <template #split>
-                        <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
-                    </template>
+                    <a-space size="mini">
+                        <template #split>
+                            <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
+                        </template>
 
-                    <a-button v-for="(btn,index) in toolTitleLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
-                        <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
-                        <span> {{btn.btnTitle}}</span>
-                    </a-button>
-
-
-                    {block name="toolTitleMid"}
-                    {if $childTpl}
-                    <div class="childTitle">{{titleByLeftCateSelect('详细列表')}}</div>
-                    {else/}
-                    <div class="arco-table-list-toolbar-title" :style="{width: leftCate.show?'calc('+titleByLeftCateSelect('{$title}').length+'em * 1.08 + 2px)':'auto'}">
-                        <div style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 100%;">{{titleByLeftCateSelect('{$title}')}}</div>
-                    </div>
-                    {/if}
-                    {/block}
-
-
-                    <template v-if="canDel&&delSelectedIds.length>0">
-                        <div class="arco-space-item">
-                            <a-divider type="vertical"></a-divider>
-                        </div>
-                        <a-popconfirm
-                            position="left"
-                            :content="'您确定要删除勾选的这'+delSelectedIds.length+'条数据吗？'"
-                            @ok="delSelectedRows"
-                        >
-                            <div class="arco-space-item">
-                                <a-button type="primary" status="danger">
-                                    <template #icon><icon-delete></icon-delete></template>
-                                    <span> 批量删除 ({{delSelectedIds.length}}条数据)</span>
-                                </a-button>
-                            </div>
-                        </a-popconfirm>
-                    </template>
-
-
-
-                    <a-button v-for="(btn,index) in toolTitleRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
-                        <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
-                        <span> {{btn.btnTitle}}</span>
-                    </a-button>
-
-                    {block name="toolTitleRight"}{/block}
-                </a-space>
-            </div>
-            <div class="arco-table-list-toolbar-right">
-                <a-space size="mini">
-                    <template #split>
-                        <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
-                    </template>
-                    {block name="toolBtnLeft"}{/block}
-                    <a-button v-for="(btn,index) in toolBtnLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
-                        <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
-                        <span> {{btn.btnTitle}}</span>
-                    </a-button>
-
-                    <template v-if="canAdd">
-                        {block name="toolAddBtn"}
-                        <a-button type="{$addBtn['btnType']==='a'?'text':$addBtn['btnType']}" status="{$addBtn['btnStatus']}" @click="openAdd">
-                            <template #icon><icon-plus></icon-plus></template>
-                            <span> {$addBtn.btnTitle}</span>
+                        <a-button v-for="(btn,index) in toolTitleLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                            <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
+                            <span> {{btn.btnTitle}}</span>
                         </a-button>
+
+
+                        {block name="toolTitleMid"}
+                        {if $childTpl}
+                        <div class="childTitle">{{titleByLeftCateSelect('详细列表')}}</div>
+                        {else/}
+                        <div class="arco-table-list-toolbar-title" :style="{width: leftCate.show?'calc('+titleByLeftCateSelect('{$title}').length+'em * 1.08 + 2px)':'auto'}">
+                            <div style="overflow: hidden;white-space: nowrap;text-overflow: ellipsis;max-width: 100%;">{{titleByLeftCateSelect('{$title}')}}</div>
+                        </div>
+                        {/if}
                         {/block}
-                    </template>
 
-                    <a-button v-if="auth.importExcelTpl" type="primary" status="warning"  @click="importExcelTpl">
-                        <template #icon><icon-import></icon-import></template>
-                        <span> Excel导入数据</span>
-                    </a-button>
-                    <a-button v-if="auth.downExcelTpl" type="primary" status="success"  @click="downExcelTpl">
-                        <template #icon><icon-download></icon-download></template>
-                        <span> Excel模板下载</span>
-                    </a-button>
 
-                    <a-button v-if="auth.downExcelTpl" @click="exportData" :disabled="!pagination.total">
-                        <template #icon><icon-export></icon-export></template>
-                        <span> 导出当前数据</span>
-                    </a-button>
+                        <template v-if="canDel&&delSelectedIds.length>0">
+                            <div class="arco-space-item">
+                                <a-divider type="vertical"></a-divider>
+                            </div>
+                            <a-popconfirm
+                                position="left"
+                                :content="'您确定要删除勾选的这'+delSelectedIds.length+'条数据吗？'"
+                                @ok="delSelectedRows"
+                            >
+                                <div class="arco-space-item">
+                                    <a-button type="primary" status="danger">
+                                        <template #icon><icon-delete></icon-delete></template>
+                                        <span> 批量删除 ({{delSelectedIds.length}}条数据)</span>
+                                    </a-button>
+                                </div>
+                            </a-popconfirm>
+                        </template>
 
-                    <a-button v-for="(btn,index) in toolBtnRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
-                        <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
-                        <span> {{btn.btnTitle}}</span>
-                    </a-button>
 
-                    {block name="toolBtnRight"}{/block}
 
-                    <a-tooltip>
-                        <template #content>刷新</template>
-                        <icon-refresh @click="refreshTable" style="cursor: pointer;font-size: 18px"></icon-refresh>
-                    </a-tooltip>
-                </a-space>
+                        <a-button v-for="(btn,index) in toolTitleRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                            <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
+                            <span> {{btn.btnTitle}}</span>
+                        </a-button>
 
+                        {block name="toolTitleRight"}{/block}
+                    </a-space>
+                </div>
+                <div class="arco-table-list-toolbar-right">
+                    <a-space size="mini">
+                        <template #split>
+                            <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
+                        </template>
+                        {block name="toolBtnLeft"}{/block}
+                        <a-button v-for="(btn,index) in toolBtnLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                            <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
+                            <span> {{btn.btnTitle}}</span>
+                        </a-button>
+
+                        <template v-if="canAdd">
+                            {block name="toolAddBtn"}
+                            <a-button type="{$addBtn['btnType']==='a'?'text':$addBtn['btnType']}" status="{$addBtn['btnStatus']}" @click="openAdd">
+                                <template #icon><icon-plus></icon-plus></template>
+                                <span> {$addBtn.btnTitle}</span>
+                            </a-button>
+                            {/block}
+                        </template>
+
+                        <a-button v-if="auth.importExcelTpl" type="primary" status="warning"  @click="importExcelTpl">
+                            <template #icon><icon-import></icon-import></template>
+                            <span> Excel导入数据</span>
+                        </a-button>
+                        <a-button v-if="auth.downExcelTpl" type="primary" status="success"  @click="downExcelTpl">
+                            <template #icon><icon-download></icon-download></template>
+                            <span> Excel模板下载</span>
+                        </a-button>
+
+                        <a-button v-if="auth.downExcelTpl" @click="exportData" :disabled="!pagination.total">
+                            <template #icon><icon-export></icon-export></template>
+                            <span> 导出当前数据</span>
+                        </a-button>
+
+                        <a-button v-for="(btn,index) in toolBtnRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                            <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
+                            <span> {{btn.btnTitle}}</span>
+                        </a-button>
+
+                        {block name="toolBtnRight"}{/block}
+
+                        <a-tooltip>
+                            <template #content>刷新</template>
+                            <icon-refresh @click="refreshTable" style="cursor: pointer;font-size: 18px"></icon-refresh>
+                        </a-tooltip>
+                    </a-space>
+
+                </div>
             </div>
         </div>
-    </div>
-    <div :class="{'curd-table-box':true,'table-color-them':tableThemIsColor}">
-        <curd-table :data="data"
-                    :pagination="pagination"
-                    :loading="loading"
-                    :list-columns="listColumns"
-                    :childs="childs"
-                    :can-add="canAdd"
-                    :can-edit="canEdit"
-                    :can-del="canDel"
-                    :action-width="actionWidth"
-                    :row-selection="showMultipleSelection===true||(canDel&&showMultipleSelection===null)?rowSelection:null"
-                    v-model:selected-keys="selectedRowKeys"
-                    :field-step-config="fieldStepConfig"
-                    :action-def-width="actionDefWidth"
-                    :show-create-time="showCreateTime"
-                    :children-column-name="childrenColumnName"
-                    :indent-size="indentSize"
-                    :expand-all-rows="expandAllRows"
-                    :is-tree-index="isTreeIndex"
-                    @refresh-table="refreshTable"
-                    @change="handleTableChange"
-                    @on-delete="deleteRow"
-                    @open-edit="openEdit"
-                    @open-add-children="openAddChildren"
-                    @open-next="openNext"
-                    @open-show="openShow"
-                    @open-child-list="openChildList"
-                    @refresh-id="refreshId"
-                    @refresh-table="refreshTable"
-                    ref="indexcurdtable">
-            <!--    配合actionWidth使用-->
-            {block name="tableSlot"}{/block}
+        <div :class="{'curd-table-box':true,'table-color-them':tableThemIsColor}">
+            <curd-table :data="data"
+                        :pagination="pagination"
+                        :loading="loading"
+                        :list-columns="listColumns"
+                        :childs="childs"
+                        :can-add="canAdd"
+                        :can-edit="canEdit"
+                        :can-del="canDel"
+                        :action-width="actionWidth"
+                        :row-selection="showMultipleSelection===true||(canDel&&showMultipleSelection===null)?rowSelection:null"
+                        v-model:selected-keys="selectedRowKeys"
+                        :field-step-config="fieldStepConfig"
+                        :action-def-width="actionDefWidth"
+                        :show-create-time="showCreateTime"
+                        :children-column-name="childrenColumnName"
+                        :indent-size="indentSize"
+                        :expand-all-rows="expandAllRows"
+                        :is-tree-index="isTreeIndex"
+                        @refresh-table="refreshTable"
+                        @change="handleTableChange"
+                        @on-delete="deleteRow"
+                        @open-edit="openEdit"
+                        @open-add-children="openAddChildren"
+                        @open-next="openNext"
+                        @open-show="openShow"
+                        @open-child-list="openChildList"
+                        @refresh-id="refreshId"
+                        @refresh-table="refreshTable"
+                        ref="indexcurdtable">
+                <!--    配合actionWidth使用-->
+                {block name="tableSlot"}{/block}
 
-        </curd-table>
+            </curd-table>
+        </div>
     </div>
-</div>
-<!--<div class="foot">-->
+    <!--<div class="foot">-->
 
-<!--</div>-->
+    <!--</div>-->
 </div>
 {if isset($leftCate)&&!empty($leftCate['show'])}
 </div>
