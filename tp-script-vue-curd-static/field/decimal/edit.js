@@ -8,10 +8,10 @@ define([],function(){
                     let val=this.value;
                     if(typeof val==='undefined'||val===null){
                         val='';
-                        this.emit('update:value',val);
+                        this.$emit('update:value',val);
                     }else if(typeof val==='number'&&val!==val.toString()){
                         val=val.toString();
-                        this.emit('update:value',val);
+                        this.$emit('update:value',val);
                     }
                     return val;
                 },
