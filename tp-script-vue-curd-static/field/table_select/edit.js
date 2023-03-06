@@ -98,7 +98,7 @@ display: none;
                     if(selects===value){
                         return;
                     }
-                    if(value===''){
+                    if(value===''||value==='undefined'){
                         this.selectedRowKeys=[];
                         this.options=[];
                         return;
