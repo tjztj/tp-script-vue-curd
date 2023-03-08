@@ -227,6 +227,7 @@ trait Vue
         if ($type === 'html') {
             $tpl=app('config')->get('app.dispatch_error_tmpl');
             if($tpl){
+                $this->app->view->engine()->layout(false);
                 $response = view($tpl, $result);
             }else{
                 $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'jump.vue');
@@ -271,6 +272,7 @@ trait Vue
         if ($type === 'html') {
             $tpl=app('config')->get('app.dispatch_success_tmpl');
             if($tpl){
+                $this->app->view->engine()->layout(false);
                 $response = view($tpl, $result);
             }else{
                 $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'jump.vue');
