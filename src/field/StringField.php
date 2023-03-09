@@ -70,7 +70,7 @@ class StringField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
-            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMin($old[$this->name()])){
+            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMin($old[$this->name()],$this->disengageSensitivityFormat)){
                 $this->save=$old[$this->name()];
             }
 
@@ -93,6 +93,11 @@ class StringField extends ModelField
         if(isset($dataBaseData[$name])&&$this->disengageSensitivity()){
             $dataBaseData[$name]=self::tuoMin($dataBaseData[$name],$this->disengageSensitivityFormat);
         }
+    }
+
+
+    public function getDisengageSensitivityFormat():string{
+        return $this->disengageSensitivityFormat;
     }
 
     /**
@@ -274,4 +279,5 @@ class StringField extends ModelField
 
         return str_replace(['a','b'],'',$format);
     }
+
 }
