@@ -59,6 +59,8 @@ class StringField extends ModelField
         return $this->doAttr('disengageSensitivity', $disengageSensitivity);
     }
 
+
+
     /**
      * 设置保存的值
      * @param array $data  数据值集合
@@ -68,7 +70,7 @@ class StringField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=trim($data[$this->name()]);
-            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMin($old[$this->name()])){
+            if($this->disengageSensitivity()&&!empty($old->id)&&$this->save===self::tuoMin($old[$this->name()],$this->disengageSensitivityFormat)){
                 $this->save=$old[$this->name()];
             }
 
@@ -79,6 +81,11 @@ class StringField extends ModelField
             $this->defaultCheckRequired('');
         }
         return $this;
+    }
+
+
+    public function getDisengageSensitivityFormat():string{
+        return $this->disengageSensitivityFormat;
     }
 
     /**
