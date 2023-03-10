@@ -282,8 +282,8 @@ define(requires, function (axios, Qs) {
 
                         let body = box.layui.layer.getChildFrame('body', index);
                         layero.css('overflow', 'hidden');
-                        layero.find('iframe')[0].contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
-                        layero.find('iframe')[0].contentWindow.parentWindow = window;
+                        iframe.contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
+                        iframe.contentWindow.parentWindow = window;
                         layero.close = function () {
                             box.layui.layer.close(index);
                         }
@@ -295,6 +295,9 @@ define(requires, function (axios, Qs) {
                             layero.find('iframe').css('padding', '0px');
                         }
                         trigger('success', layero, index);
+                        if(iframe.contentWindow.iframeLoad){
+                            iframe.contentWindow.iframeLoad(layero, index);
+                        }
                     },
                     end() {
                         trigger('close');
@@ -414,6 +417,9 @@ define(requires, function (axios, Qs) {
                         paramData.close()
                     });
                     trigger('success', paramData);
+                    if(iframe.contentWindow.iframeLoad){
+                        iframe.contentWindow.iframeLoad(e);
+                    }
                 }
                 openInfo.visible = true;
                 appObj[key].push(openInfo);
