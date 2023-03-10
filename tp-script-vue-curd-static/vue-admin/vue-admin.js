@@ -263,7 +263,8 @@ define(requires, function (axios, Qs) {
                     offset: 'rt',
                     success(layero, index) {
                         let iframe = layero.find('iframe')[0];
-                        if(iframe.contentWindow.performance.navigation.type===0){
+                        let navigationType=iframe.contentWindow.performance.getEntriesByType("navigation")[0].type;
+                        if(navigationType==='navigate'||navigationType==='prerender'){
                             //正常跳转
                             if(history.length===0){
                                 historyIndex=0;
@@ -272,7 +273,7 @@ define(requires, function (axios, Qs) {
                                 historyIndex++;
                             }
                             history.push(iframe.contentWindow.location.href);
-                        }else if(iframe.contentWindow.performance.navigation.type===2){
+                        }else if(navigationType==='back_forward'){
                             //后退或者前进
                             historyIndex=history.indexOf(iframe.contentWindow.location.href)
                         }
@@ -384,7 +385,8 @@ define(requires, function (axios, Qs) {
                 let historyIndex=0;
                 openInfo.onload = (e) => {
                     let iframe = e.target;
-                    if(iframe.contentWindow.performance.navigation.type===0){
+                    let navigationType=iframe.contentWindow.performance.getEntriesByType("navigation")[0].type;
+                    if(navigationType==='navigate'||navigationType==='prerender'){
                         //正常跳转
                         if(history.length===0){
                             historyIndex=0;
@@ -393,7 +395,7 @@ define(requires, function (axios, Qs) {
                             historyIndex++;
                         }
                         history.push(iframe.contentWindow.location.href);
-                    }else if(iframe.contentWindow.performance.navigation.type===2){
+                    }else if(navigationType==='back_forward'){
                         //后退或者前进
                         historyIndex=history.indexOf(iframe.contentWindow.location.href)
                     }
