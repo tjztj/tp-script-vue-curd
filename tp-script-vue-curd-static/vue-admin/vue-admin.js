@@ -250,6 +250,8 @@ define(requires, function (axios, Qs) {
         if (box.layer) {
             //iframe layui情况下
             return MyPromise(function (trigger) {
+                let history=[];
+                let historyIndex=0;
                 option = Object.assign({
                     title: '',
                     type: 2,
@@ -260,6 +262,24 @@ define(requires, function (axios, Qs) {
                     anim: 2,
                     offset: 'rt',
                     success(layero, index) {
+                        let iframe = layero.find('iframe')[0];
+                        if(iframe.contentWindow.performance.navigation.type===0){
+                            //正常跳转
+                            if(history.length===0){
+                                historyIndex=0;
+                            }else{
+                                history=history.slice(0,historyIndex+1)
+                                historyIndex++;
+                            }
+                            history.push(iframe.contentWindow.location.href);
+                        }else if(iframe.contentWindow.performance.navigation.type===2){
+                            //后退或者前进
+                            historyIndex=history.indexOf(iframe.contentWindow.location.href)
+                        }
+                        iframe.contentWindow.getHistory=function (){return {list:history,index:historyIndex};};
+
+
+
                         let body = box.layui.layer.getChildFrame('body', index);
                         layero.css('overflow', 'hidden');
                         layero.find('iframe')[0].contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
@@ -357,8 +377,26 @@ define(requires, function (axios, Qs) {
                     trigger('close');
                 }
 
+                let history=[];
+                let historyIndex=0;
                 openInfo.onload = (e) => {
                     let iframe = e.target;
+                    if(iframe.contentWindow.performance.navigation.type===0){
+                        //正常跳转
+                        if(history.length===0){
+                            historyIndex=0;
+                        }else{
+                            history=history.slice(0,historyIndex+1)
+                            historyIndex++;
+                        }
+                        history.push(iframe.contentWindow.location.href);
+                    }else if(iframe.contentWindow.performance.navigation.type===2){
+                        //后退或者前进
+                        historyIndex=history.indexOf(iframe.contentWindow.location.href)
+                    }
+                    iframe.contentWindow.getHistory=function (){return {list:history,index:historyIndex};};
+
+
                     let body = iframe.contentWindow.document.querySelector('body');
                     iframe.contentWindow.listVue = vueObj;//将当前页面的this保存到新页面的window里面
                     iframe.contentWindow.parentWindow = window;
@@ -828,7 +866,7 @@ define(requires, function (axios, Qs) {
         window.app = Vue.createApp(option)
         app.use(ArcoVue);
         app.use(ArcoVueIcon);
-    
+
 
         app.component('FieldGroupItem', {
             name: 'fieldGroupItem',
@@ -935,7 +973,7 @@ define(requires, function (axios, Qs) {
                                 }
                             }
 
-                            
+
                             return checkVal(fieldWhere, val) !== fieldWhere.isNot;
                         };
                         const checkFieldWhere = function (fieldWhere) {
