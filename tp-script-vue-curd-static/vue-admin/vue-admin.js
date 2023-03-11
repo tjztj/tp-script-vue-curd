@@ -112,7 +112,7 @@ define(requires, function (axios, Qs) {
             console.error(error);
             error = {code: 0, msg: '发生错误', data: [],}
         }
-        (top.ArcoVue||ArcoVue).Message.error({
+        ArcoVue.Message.error({
             content:error.msg,
             duration: 6*1000
         });

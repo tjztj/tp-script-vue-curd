@@ -826,7 +826,11 @@ define(['vueAdmin'], function (va) {
                             this.loading=true;
                         }
                         this.$post(window.location.href,this.form).then(async res=>{
-                            (parentWindow||window).ArcoVue.Message.success(res.msg);
+                            const message = top.ArcoVue || (parentWindow || window).ArcoVue;
+                            if(message){
+                                message.Message.success(res.msg);
+                            }
+
                             if(this.form&&this.form.id&&!res.data.refreshList){
                                 window.listVue.refreshId(this.form.id);
                             }else{

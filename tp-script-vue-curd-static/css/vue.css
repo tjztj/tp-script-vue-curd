@@ -912,3 +912,7 @@ a.red:hover,a.yellow:hover{
     padding-top: 12px;
     padding-bottom: 12px;
 }
+/****************************************************************/
+#vue-curd-imgs-show-box{
+    display: none;
+}
