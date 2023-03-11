@@ -1,5 +1,6 @@
 <?php
 
+use think\facade\Env;
 use tpScriptVueCurd\base\model\BaseModel;
 
 
@@ -198,4 +199,24 @@ if (!function_exists('create_guid')) {
  */
 function getVCurdDir():string{
     return dirname(__DIR__).DIRECTORY_SEPARATOR;
+}
+
+/**
+ * 是否开启了debug
+ * @return bool
+ */
+function appIsDebug():bool{
+    return \think\facade\App::isDebug();
+}
+
+/**
+ * 报错时，是否直接抛出异常
+ * @throws Exception
+ */
+function errorShowThrow(\Exception $error=null):bool{
+    $isThrow=appIsDebug()&& Env::get('TP_SCRIPT_VUE_CURD.DEBUG', false);
+    if(!is_null($error) && $isThrow) {
+        throw $error;
+    }
+    return $isThrow;
 }

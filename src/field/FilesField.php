@@ -119,23 +119,26 @@ class FilesField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];
-            if($this->save&&$this->accept){
-                $accepts=explode(',',$this->accept);
+            if($this->save){
                 $arr=explode('|',$this->save);
                 foreach ($arr as $k=>$v){
                     if($this->checkFilesIsLocal()&&!self::checkFilesLocal($v)){
                         throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件路径非法');
                     }
-
-                    $have=false;
-                    foreach ($accepts as $val){
-                        if(self::checkUrlIsMimeOrExt($v,$val)){
-                            $have=true;
-                            break;
+                }
+                if($this->accept){
+                    $accepts=explode(',',$this->accept);
+                    foreach ($arr as $k=>$v){
+                        $have=false;
+                        foreach ($accepts as $val){
+                            if(self::checkUrlIsMimeOrExt($v,$val)){
+                                $have=true;
+                                break;
+                            }
                         }
-                    }
-                    if(!$have){
-                        throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件不符合要求');
+                        if(!$have){
+                            throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件不符合要求');
+                        }
                     }
                 }
             }

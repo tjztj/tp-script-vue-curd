@@ -106,7 +106,7 @@ class Edit
             'themCssPath'=>tsvcThemCssPath(),
             'guid'=>$this->guid,
             'loginUrl'=>tpScriptVueCurdGetLoginUrl(),
-            'vueCurdDebug'=>\think\facade\App::isDebug(),
+            'vueCurdDebug'=>appIsDebug(),
             'groupFields'=>$groupFields,
             'groupGrids'=>$groupGrids,
             'jsPath'=>$this->jsPath,

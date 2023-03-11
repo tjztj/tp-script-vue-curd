@@ -143,12 +143,17 @@ trait Vue
 
     /**
      * 失败且设置 errorCode
-     * @param string $msg
+     * @param string|Exception $msg
      * @param int $errorCode
      * @param bool|array $confirm 是否是返回给前台确认框
      * @throws \think\Exception
      */
-    public function errorAndCode(string $msg,int $errorCode=0,$confirm=false):void{
+    public function errorAndCode($msg,int $errorCode=0,$confirm=false):void{
+        if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
+            errorShowThrow($msg);
+            $msg=$msg->getMessage();
+        }
+
         if($confirm){
             if(empty($errorCode)){
                 throw new \think\Exception('confirm为true时，errorCode不可为0，且是要唯一');
@@ -180,6 +185,7 @@ trait Vue
         }
 
         if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
+            errorShowThrow($msg);
             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
                 'okText'=>$msg->okText,
                 'cancelText'=>$msg->cancelText,
@@ -325,6 +331,6 @@ trait Vue
      * @return bool
      */
     public static function debug():bool{
-        return \think\facade\App::isDebug();
+        return appIsDebug();
     }
 }

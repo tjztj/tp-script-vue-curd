@@ -46,7 +46,7 @@ trait BaseShow
         try{
             $canShow=$data->checkRowAuth($fields,$parentInfo,'show');
         }catch (\Exception $exception){
-            return $this->errorAndCode($exception->getMessage());
+            return $this->errorAndCode($exception);
         }
         if($canShow===false){
             return $this->errorAndCode('您不能查看当前数据信息');

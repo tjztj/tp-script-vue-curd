@@ -22,7 +22,7 @@ trait GenerateTable
      * 执行表的 自动生成
      */
     private function doGenerateTable():void{
-        if(!app()->isDebug()){
+        if(!appIsDebug()){
             return;
         }
 

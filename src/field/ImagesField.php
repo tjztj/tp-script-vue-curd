@@ -112,24 +112,27 @@ class ImagesField extends ModelField
     {
         if(isset($data[$this->name()])){
             $this->save=$data[$this->name()];
-            if($this->checkFilesIsLocal()&&!FilesField::checkFilesLocal($this->save)){
-                throw new \think\Exception('图片路径非法');
-            }
-            $accepts=explode(',',$this->accept);
+            if($this->save){
+                if($this->checkFilesIsLocal()&&!FilesField::checkFilesLocal($this->save)){
+                    throw new \think\Exception('图片路径非法');
+                }
+                $accepts=explode(',',$this->accept);
 
-            $urls=$this->multiple()?explode('|',$this->save):[$this->save];
-            foreach ($urls as $k=>$v){
-                $have=false;
-                foreach ($accepts as $val){
-                    if(FilesField::checkUrlIsMimeOrExt($v,$val)){
-                        $have=true;
-                        break;
+                $urls=$this->multiple()?explode('|',$this->save):[$this->save];
+                foreach ($urls as $k=>$v){
+                    $have=false;
+                    foreach ($accepts as $val){
+                        if(FilesField::checkUrlIsMimeOrExt($v,$val)){
+                            $have=true;
+                            break;
+                        }
+                    }
+                    if(!$have){
+                        throw new \think\Exception((count($urls)>1?('第'.($k+1).'个'):'').'文件不符合要求');
                     }
                 }
-                if(!$have){
-                    throw new \think\Exception((count($arr)>1?('第'.($k+1).'个'):'').'文件不符合要求');
-                }
             }
+
         }
         $this->defaultCheckRequired($this->save,'请上传图片');
         return $this;
