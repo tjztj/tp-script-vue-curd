@@ -21,7 +21,9 @@ trait FieldCollectionStep
         'showSortSteps'=>'dataStepHistory',
         'listFixed'=>'',//列表中，列是否浮动，'left'/'right'
         'width'=>0,//0为自动
-        'showFilter'=>true,//显示筛选
+        'showFilter'=>true,//是否启用步骤筛选筛选
+        'currentFilterDefaultShow'=>true,//默认显示筛选
+        'nextFilterDefaultShow'=>true,//显示筛选
     ];
 
 

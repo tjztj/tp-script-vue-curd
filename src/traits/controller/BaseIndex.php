@@ -530,73 +530,89 @@ trait BaseIndex
      */
     protected function setIndexFilterAddStep(FieldCollection $filterFields,?array $filterData): void
     {
-        if($filterFields->stepIsEnable()&&$filterFields->getStepConfig()['showFilter']){
-            $steps=[];
-            $filterFields->each(function (ModelField $v)use(&$steps){
-                /**
-                 * @var FieldStepCollection $stepList
-                 */
-                $stepList=$v->steps();
-                $stepList&&$stepList->each(function (FieldStep $step)use(&$steps){
-                    isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step->getTitle();
-                });
+        if(!$filterFields->stepIsEnable()){
+            return;
+        }
+        $stepConfig=$filterFields->getStepConfig();
+        if(!$stepConfig['showFilter']){
+            return;
+        }
+
+        $steps=[];
+        $filterFields->each(function (ModelField $v)use(&$steps){
+            /**
+             * @var FieldStepCollection $stepList
+             */
+            $stepList=$v->steps();
+            $stepList&&$stepList->each(function (FieldStep $step)use(&$steps){
+                isset($steps[$step->getStep()])||$steps[$step->getStep()]=$step->getTitle();
             });
+        });
 
-            $nextStepFieldName=$this->md::getNextStepField();
-            if($nextStepFieldName&&in_array($nextStepFieldName,$this->md::getTableFields())){
-                $nextStepField=SelectField::init($nextStepFieldName,'下一个步骤')->multiple(true)->items($steps);
-                $nextStepField->filter()->multiple(true);
-                $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
-                    $nextStepFieldName=$field->name();
-                    if(empty($filterData[$nextStepFieldName])){
-                        return;
-                    }
-                    $val=$filterData[$nextStepFieldName];
-                    unset($filterData[$nextStepFieldName]);
-                    is_array($val)||$val=[$val];
-                    $query->whereIn($nextStepFieldName,$val);
-                });
-
-                $filterFields->unshift($nextStepField);
-            }
-
-
-
-            if($this->md::hasCurrentStepField()){
-                $stepNameIsCurrentStep=true;
-                $stepFieldName=$this->md::getCurrentStepField();
+        $nextStepFieldName=$this->md::getNextStepField();
+        if($nextStepFieldName&&in_array($nextStepFieldName,$this->md::getTableFields())){
+            $nextStepField=SelectField::init($nextStepFieldName,'下一个步骤')->multiple(true)->items($steps);
+            if($stepConfig['nextFilterDefaultShow']){
+                $nextStepField->filterShow();
             }else{
-                $stepNameIsCurrentStep=false;
-                $stepFieldName=$this->md::getStepField();
+                $nextStepField->filterHide();
             }
-
-
-            $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
-            $stepField->filter()->multiple(true);
-            $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepNameIsCurrentStep){
-                $stepFieldName=$field->name();
-                if(empty($filterData[$stepFieldName])){
+            $nextStepField->filter()->multiple(true);
+            $nextStepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData){
+                $nextStepFieldName=$field->name();
+                if(empty($filterData[$nextStepFieldName])){
                     return;
                 }
-                $val=$filterData[$stepFieldName];
-                unset($filterData[$stepFieldName]);
-
+                $val=$filterData[$nextStepFieldName];
+                unset($filterData[$nextStepFieldName]);
                 is_array($val)||$val=[$val];
-
-                if($stepNameIsCurrentStep){
-                    $query->whereIn($stepFieldName,$val);
-                }else{
-                    $sqls=[];
-                    foreach ($val as $stepVal){
-                        $stepVal=str_replace(["'",'\\','"'],'',$stepVal);
-                        $sqls[]="JSON_EXTRACT(`$stepFieldName`,CONCAT(\"$[\",JSON_LENGTH(`$stepFieldName` ->> '$')-1,\"].step\"))='$stepVal'";
-                    }
-                    $query->whereRaw(implode(" OR ",$sqls));
-                }
+                $query->whereIn($nextStepFieldName,$val);
             });
 
-            $filterFields->unshift($stepField);
+            $filterFields->unshift($nextStepField);
         }
+
+
+
+        if($this->md::hasCurrentStepField()){
+            $stepNameIsCurrentStep=true;
+            $stepFieldName=$this->md::getCurrentStepField();
+        }else{
+            $stepNameIsCurrentStep=false;
+            $stepFieldName=$this->md::getStepField();
+        }
+
+
+        $stepField=SelectField::init($stepFieldName,'当前步骤')->multiple(true)->items($steps);
+        if($stepConfig['currentFilterDefaultShow']){
+            $stepField->filterShow();
+        }else{
+            $stepField->filterHide();
+        }
+        $stepField->filter()->multiple(true);
+        $stepField->pushFieldDo()->setIndexFilterBeforeDo(function (ModelField $field,Query $query,array &$filterData)use($stepNameIsCurrentStep){
+            $stepFieldName=$field->name();
+            if(empty($filterData[$stepFieldName])){
+                return;
+            }
+            $val=$filterData[$stepFieldName];
+            unset($filterData[$stepFieldName]);
+
+            is_array($val)||$val=[$val];
+
+            if($stepNameIsCurrentStep){
+                $query->whereIn($stepFieldName,$val);
+            }else{
+                $sqls=[];
+                foreach ($val as $stepVal){
+                    $stepVal=str_replace(["'",'\\','"'],'',$stepVal);
+                    $sqls[]="JSON_EXTRACT(`$stepFieldName`,CONCAT(\"$[\",JSON_LENGTH(`$stepFieldName` ->> '$')-1,\"].step\"))='$stepVal'";
+                }
+                $query->whereRaw(implode(" OR ",$sqls));
+            }
+        });
+
+        $filterFields->unshift($stepField);
     }
 
     /**
