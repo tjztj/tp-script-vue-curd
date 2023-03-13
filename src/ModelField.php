@@ -915,7 +915,7 @@ abstract class ModelField
      * 设置当前字段在列表中默认不显示筛选
      * @return $this
      */
-    public function setDefaultHideFilter(): self
+    public function filterShow(): self
     {
         $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(false));
         return $this;
@@ -925,9 +925,18 @@ abstract class ModelField
      * 设置当前字段在列表中默认不显示筛选
      * @return $this
      */
-    public function setDefaultShowFilter(): self
+    public function filterHide(): self
     {
         $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(true));
+        return $this;
+    }
+
+    /**
+     * 设置字段没有筛选
+     * @return $this
+     */
+    public function filterEmpty(): self{
+        $this->filter(new EmptyFilter());
         return $this;
     }
 
