@@ -917,7 +917,7 @@ abstract class ModelField
      */
     public function filterShow(): self
     {
-        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(false));
+        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(true));
         return $this;
     }
 
@@ -927,7 +927,7 @@ abstract class ModelField
      */
     public function filterHide(): self
     {
-        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(true));
+        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(false));
         return $this;
     }
 
