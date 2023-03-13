@@ -19,7 +19,9 @@ define([],function(){
         },
         watch:{
             val(val){
-                if(val&&val.length===0){
+                if(typeof val==='string'||typeof val==='number'){
+                    this.$emit('search',val);
+                }else if(val&&val.length===0){
                     this.$emit('search','');
                 }else{
                     this.$emit('search',val[val.length-1]);
