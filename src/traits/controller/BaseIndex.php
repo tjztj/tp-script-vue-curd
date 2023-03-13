@@ -239,7 +239,7 @@ trait BaseIndex
         $data=[
             'model'=>get_class($this->md),
             'modelName'=>class_basename($this->md),
-            'createTimeField'=>$this->fields->findByName('create_time',false),
+            'createTimeField'=>$this->fields->findByName('create_time',false)->toArray(),
             'indexPageOption'=>$this->indexPageOption,
             'listColumns'=>$listColumns,
             'groupGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
