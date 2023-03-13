@@ -284,7 +284,7 @@ body{
                             <span> Excel模板下载</span>
                         </a-button>
 
-                        <a-button v-if="auth.downExcelTpl" @click="exportData" :disabled="!pagination.total">
+                        <a-button v-if="auth.export" @click="exportData" :disabled="!pagination.total">
                             <template #icon><icon-export></icon-export></template>
                             <span> 导出当前数据</span>
                         </a-button>
