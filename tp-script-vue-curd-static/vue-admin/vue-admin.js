@@ -1607,8 +1607,10 @@ define(requires, function (axios, Qs) {
                     } else {
                         columns.push(stepCol)
                         columnsCount++;
-                        columns.push(createTimeCol)
-                        columnsCount++;
+                        if (props.showCreateTime === undefined || props.showCreateTime) {
+                            columns.push(createTimeCol)
+                            columnsCount++;
+                        }
                     }
                 } else {
                     if (props.showCreateTime === undefined || props.showCreateTime) {

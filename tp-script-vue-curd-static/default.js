@@ -256,7 +256,7 @@ define(['vueAdmin'], function (va) {
                     tableThemIsColor:vueData.tableThemIsColor,
                     indexUrl:vueData.listUrl,
                     cWindow:vueData.cWindow||{},
-                    showCreateTime:!vueData.createTimeField,
+                    showCreateTime:(!vueData.createTimeField)||vueData.createTimeField.listShow,
                     childrenColumnName:vueData.childrenColumnName,
                     indentSize:vueData.indentSize,
                     expandAllRows:vueData.expandAllRows,
