@@ -19,7 +19,7 @@ define([],function(){
         },
         watch:{
             val(val){
-                if(typeof val==='string'){
+                if(typeof val==='string'||typeof val==='number'){
                     this.$emit('search',val);
                 }else if(val&&val.length===0){
                     this.$emit('search','');
