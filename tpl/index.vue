@@ -19,10 +19,15 @@ body{
 .head:not(.have-filter-items){
     border: 0;
     padding: 0;
+    margin: 0;
+    height: 0;
     background-color: transparent;
+    position: relative;
+}
+.head:not(.have-filter-items) .filter-sub-btn-box{
     position: absolute;
-    right: 60px;
-    top: 26px;
+    right: 36px;
+    top: 27px;
     animation: bounce-in .8s;
 }
 .head:not(.have-filter-items) .filter-sub-btn-box .arco-dropdown-link{
