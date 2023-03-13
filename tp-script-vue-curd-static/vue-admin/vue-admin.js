@@ -2140,6 +2140,18 @@ define(requires, function (axios, Qs) {
                     }
                     return this.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0);
                 },
+                haveFielter(){
+                    return this.filterSource.filterConfig.some(item => this.filterGroupBaseItemIsShow(item)) ||
+                        this.childFilterEmptys.some(child => Object.values(this.filterSource[child.name]).some(item => this.filterGroupItemIsShow(item,child)));
+                },
+            },
+            watch:{
+                haveFielter:{
+                    immediate: true,
+                    handler(newVal) {
+                        this.$emit('haveFielterShowChange',newVal);
+                    },
+                },
             },
             created(){
 
@@ -2180,6 +2192,9 @@ define(requires, function (axios, Qs) {
                 },
                 filterGroupItemIsShow(item, child) {
                     return item.show && (!child.filterData || !child.filterData[item.name]);
+                },
+                filterGroupBaseItemIsShow(item){
+                    return item.show&&(!this.filterValues||!this.filterValues[item.name]);
                 },
                 search(val, item) {
                     item.activeValue = val;
@@ -2269,7 +2284,7 @@ define(requires, function (axios, Qs) {
                 },
                 getItems(items,group,child){
                     const w={l:0,r:0};
-                    const newItems=child?items.filter(item=>this.filterGroupItemIsShow(item, child)):items.filter(item=>item.show&&(!this.filterValues||!this.filterValues[item.name]));
+                    const newItems=child?items.filter(item=>this.filterGroupItemIsShow(item, child)):items.filter(item=>this.filterGroupBaseItemIsShow(item));
                     const widthElId='filter-lable-width-el';
 
                     let widthEl=this.createWidthEl(window,widthElId);
@@ -2294,7 +2309,7 @@ define(requires, function (axios, Qs) {
                     });
                 }
             },
-            template: `<div class="curd-filter-box">
+            template: `<div class="curd-filter-box" :class="{'empty-filter-items':!haveFielter}">
                     <a-spin :loading="loading">
                             <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
                             <div class="filter-box-div" v-if="filterGroupIsShow(base)">
@@ -2345,8 +2360,9 @@ define(requires, function (axios, Qs) {
                         <div class="filter-sub-btn-box">
                             <a-divider v-if="showMoreFilter">
                                 <a-dropdown trigger="click" class="filter-box-dropdown">
-                                    <a class="arco-dropdown-link" style="font-size: 14px"> 更多筛选
-                                      <icon-down/>
+                                    <a class="arco-dropdown-link" style="font-size: 14px" >
+                                        <template v-if="haveFielter">更多筛选 <icon-down/></template>
+                                        <icon-search v-else />
                                     </a>
                                     <template #content>
                                         <div id="filter-menu-box">

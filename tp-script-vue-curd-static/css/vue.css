@@ -429,6 +429,12 @@ a.red:hover,a.yellow:hover{
 .filter-box-dropdown .arco-dropdown-list-wrapper{
     max-height: 99vh;
 }
+.curd-filter-box.empty-filter-items .filter-box-bottom-do{
+    display: none;
+}
+.curd-filter-box.empty-filter-items .arco-spin{
+    display: none;
+}
 /****************************************************************/
 .arco-table-list-toolbar{
     overflow-x: auto;

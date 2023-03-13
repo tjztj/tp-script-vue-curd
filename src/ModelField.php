@@ -921,6 +921,16 @@ abstract class ModelField
         return $this;
     }
 
+    /**
+     * 设置当前字段在列表中默认不显示筛选
+     * @return $this
+     */
+    public function setDefaultShowFilter(): self
+    {
+        $this->doFilter(fn(ModelFilter $filter) => $filter->setShow(true));
+        return $this;
+    }
+
 
     /**
      * 模板导入时备注

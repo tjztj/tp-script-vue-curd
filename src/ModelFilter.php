@@ -20,7 +20,7 @@ abstract class ModelFilter
 
     protected ModelField $field;
     protected string $type;
-    protected bool $show=true;//默认显示
+    protected bool $show=false;//默认显示
     protected ?string $title=null;
     protected ?string $group=null;
     public GridCol $gridCol;

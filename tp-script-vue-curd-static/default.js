@@ -274,6 +274,7 @@ define(['vueAdmin'], function (va) {
                         loading:false,
                         showTools:leftCateShowTools,
                     },
+                    haveFielterShow:true,
                     //其他配置
                     ...getThisActionOhterData(),
                 }

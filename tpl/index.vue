@@ -16,6 +16,26 @@ body{
     border: 1px solid #91d5ff;
     border-radius: 4px;
 }
+.head:not(.have-filter-items){
+    border: 0;
+    padding: 0;
+    background-color: transparent;
+    position: absolute;
+    right: 60px;
+    top: 26px;
+    animation: bounce-in .8s;
+}
+.head:not(.have-filter-items) .filter-sub-btn-box .arco-dropdown-link{
+    font-size: 22px!important;
+}
+.head:not(.have-filter-items) .filter-sub-btn-box .arco-divider-text{
+    background-color: transparent;
+}
+
+.head:not(.have-filter-items)+.body .arco-table-list-toolbar{
+    padding-right: 28px;
+}
+
 
 .body {
     background-color: #fff;
@@ -162,7 +182,7 @@ body{
 </div>
 
 <div class="box" :style="leftCate.show?'flex:1;width:0':''">
-    <div class="head" v-if="showFilter">
+    <div class="head" :class="{'have-filter-items':haveFielterShow}" v-if="showFilter">
         <curd-filter ref="filter"
                      @search="doFilter"
                      :filter-config="filterBase.filterConfig"
@@ -170,7 +190,9 @@ body{
                      :title="filterBase.title"
                      :childs="childs"
                      :filter-values="filterBase.filterValues"
-                     :loading="loading"></curd-filter>
+                     :loading="loading"
+                     @have-fielter-show-change="haveFielterShow=$event"
+        ></curd-filter>
     </div>
     <div class="body">
         <div class="arco-table-list-toolbar" v-if="showTableTool">
@@ -273,6 +295,8 @@ body{
                             <template #content>刷新</template>
                             <icon-refresh @click="refreshTable" style="cursor: pointer;font-size: 18px"></icon-refresh>
                         </a-tooltip>
+
+                        <span class="filter-btn-placeholder" v-if="!haveFielterShow"></span>
                     </a-space>
 
                 </div>
