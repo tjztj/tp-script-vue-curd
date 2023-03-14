@@ -974,7 +974,11 @@ define(requires, function (axios, Qs) {
                             if (val) {
                                 if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
                                     if (!/^\d+$/.test(val.toString())) {
-                                        val = (new Date(val)).getTime()/1000
+                                        const d=new Date(val);
+                                        if(!fieldWhere.field.showTime){
+                                            d.setHours(0,0,0)
+                                        }
+                                        val = d.getTime()/1000;
                                     }
                                 }
                             }
@@ -1141,7 +1145,11 @@ define(requires, function (axios, Qs) {
                                     //如果是时间格式
                                     if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
                                         if (!/^\d+$/.test(checkVal.toString())) {
-                                            inputVal = (new Date(checkVal)).getTime()/1000
+                                            const d=new Date(checkVal);
+                                            if(!field.showTime){
+                                                d.setHours(0,0,0)
+                                            }
+                                            inputVal = d.getTime()/1000;
                                         }
                                     }
                                 }
