@@ -572,8 +572,8 @@ a.red:hover,a.yellow:hover{
     margin-bottom: 24px;
 }
 .vuecurd-def-box .arco-form-item-label{
-    line-height:1.5715;
-    /*padding-top: 9px;*/
+    line-height:1.57;
+    padding-top: 5px;
 }
 .vuecurd-def-box .arco-form-item-label label{
     white-space: normal;
