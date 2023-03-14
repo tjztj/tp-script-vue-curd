@@ -31,6 +31,7 @@ define([],function(){
         },
         template:`<div>
                    <a-input-number v-model:model-value="modelVal"
+                        :hide-button="!!field.ext"
                         :min="field.min"
                         :max="field.max"
                         :precision="field.precision"

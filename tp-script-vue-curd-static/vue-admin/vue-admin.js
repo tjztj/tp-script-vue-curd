@@ -974,9 +974,7 @@ define(requires, function (axios, Qs) {
                             if (val) {
                                 if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
                                     if (!/^\d+$/.test(val.toString())) {
-                                        val = moment(val).unix()
-                                    } else if (val < 10000) {
-                                        val = moment(val + '-01-01').unix()
+                                        val = (new Date(val)).getTime()/1000
                                     }
                                 }
                             }
@@ -1143,9 +1141,7 @@ define(requires, function (axios, Qs) {
                                     //如果是时间格式
                                     if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
                                         if (!/^\d+$/.test(checkVal.toString())) {
-                                            inputVal = moment(checkVal).unix()
-                                        } else if (checkVal < 10000) {
-                                            inputVal = moment(checkVal + '-01-01').unix()
+                                            inputVal = (new Date(checkVal)).getTime()/1000
                                         }
                                     }
                                 }

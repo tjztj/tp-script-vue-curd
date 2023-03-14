@@ -22,7 +22,7 @@ define([],function(){
             }
         },
         template:`<div>
-                    <a-input-number v-model="modelVal" :min="field.min" :max="field.max"
+                    <a-input-number v-model="modelVal" :min="field.min" :max="field.max" :hide-button="!!field.ext"
                             :placeholder="field.placeholder||'输入整数'" :disabled="field.readOnly" style="width: 100%;">
                         <template v-if="field.ext" #suffix>{{field.ext}}</template>
                     </a-input-number>
