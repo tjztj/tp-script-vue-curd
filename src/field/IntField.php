@@ -62,13 +62,13 @@ class IntField extends ModelField
         $name=$this->name();
         if(isset($data[$name])){
             $data[$name]=trim($data[$name]);
-            if($this->required()&&$data[$name]===''){
+            if($this->required()&&($data[$name]===''||$data[$name]===$this->nullVal()||str_replace(['0','.'],'',$data[$name])==='')){
 //                $this->defaultCheckRequired($this->save);
                 throw new \think\Exception('不能为空');
             }
             if($data[$name]||($this->nullVal()===''&&$data[$name]!=='')){
                 $data[$name]=(int)$data[$name];
-                $rule=['between'=>$this->min().','.$this->max()];
+                $rule=['between'=>number_format($this->min(),0,'.','').','.number_format($this->max(),0,'.','')];
                 $rule[]='integer';
                 $validate=Validate::rule($name,$rule);
                 if(!$validate->check($data)){

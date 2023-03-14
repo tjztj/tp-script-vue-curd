@@ -68,7 +68,7 @@ class DecimalField extends ModelField
         $name=$this->name();
         if(isset($data[$name])){
             $data[$name]=trim($data[$name]);
-            if($this->required()&&$data[$name]===''){
+            if($this->required()&&($data[$name]===''||$data[$name]===$this->nullVal()||str_replace(['0','.'],'',$data[$name])==='')){
                 throw new \think\Exception('不能为空');
             }
 
