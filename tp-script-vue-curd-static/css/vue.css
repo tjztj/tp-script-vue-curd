@@ -918,6 +918,9 @@ a.red:hover,a.yellow:hover{
     padding-top: 12px;
     padding-bottom: 12px;
 }
+.curd-table .arco-table-element>colgroup>col{
+    min-width: 84px;
+}
 /****************************************************************/
 #vue-curd-imgs-show-box{
     display: none;
