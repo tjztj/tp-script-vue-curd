@@ -337,6 +337,22 @@ define(['vueAdmin'], function (va) {
                 ...getThisActionOhterWatchs(),
             },
             methods:{
+                openChildPageBox(option,success){
+                    let childIframe = null;
+                    this.openBox(option).on('success',function(paramData) {
+                        let iframe = typeof paramData.find === 'function' ? layero.find('iframe')[0] : paramData.iframe;
+                        if (iframe) {
+                            childIframe = iframe;
+                        }
+                        if(success){
+                            success(iframe);
+                        }
+                    }).on('close',function() {
+                        if (childIframe && childIframe.contentWindow.onClose) {
+                            childIframe.contentWindow.onClose();
+                        }
+                    }).end();
+                },
                 keyValueStr(obj){
                     const arr=[];
                     for(let i in obj){
@@ -427,7 +443,7 @@ define(['vueAdmin'], function (va) {
                     if(vueData.addBtn&&vueData.addBtn.modalUrl){
                         url=vueData.addBtn.modalUrl;
                     }
-                    this.openBox(openParam(row.childAddBtn,'新增 '+vueData.title,url)).end();
+                    this.openChildPageBox(openParam(row.childAddBtn,'新增 '+vueData.title,url));
                 },
                 openAdd(){
                     let url=vueData.defaultUrlTpl.replace('___URL_TPL___','edit');
@@ -438,7 +454,7 @@ define(['vueAdmin'], function (va) {
                     if(vueData.addBtn&&vueData.addBtn.modalUrl){
                         vueData.addBtn.modalUrl=url;
                     }
-                    this.openBox(openParam(vueData.addBtn,'新增 '+vueData.title,url)).end();
+                    this.openChildPageBox(openParam(vueData.addBtn,'新增 '+vueData.title,url));
                 },
                 openEdit(row){
                     if(row.stepInfo&&row.stepInfo.title){
@@ -446,20 +462,20 @@ define(['vueAdmin'], function (va) {
                         if(row.stepInfo.config.titleEdit!==''){
                             config.title=row.stepInfo.config.titleEdit;
                         }
-                        this.openBox(config).end();
+                        this.openChildPageBox(config);
                     }else{
-                        this.openBox(openParam(
+                        this.openChildPageBox(openParam(
                             row.editBtn,
                             '修改 '+vueData.title+' 相关信息',
                             setUrlParams(vueData.defaultUrlTpl.replace('___URL_TPL___','edit'),{id:row.id})
-                        )).end();
+                        ));
                     }
                 },
                 openNext(row){
                     if(row.nextStepInfo&&row.nextStepInfo.listDirectSubmit!==''){
                         getStepJustDo(row,this)
                     }else{
-                        this.openBox(getStepNextOpenConfig(row,'rt')).end();
+                        this.openChildPageBox(getStepNextOpenConfig(row,'rt'));
                     }
                 },
                 openShow(row){
@@ -471,11 +487,11 @@ define(['vueAdmin'], function (va) {
                     if(vueData.showBtn&&vueData.showBtn.modalUrl){
                         vueData.showBtn.modalUrl=url;
                     }
-                    this.openBox(openParam(
+                    this.openChildPageBox(openParam(
                         row.showBtn,
                         '查看 '+vueData.title+' 相关信息',
                         setUrlParams(url,{id:row.id})
-                    )).end();
+                    ));
                 },
                 delSelectedRows(e,delChilds){
                     this.loading = true;
@@ -598,11 +614,11 @@ define(['vueAdmin'], function (va) {
                     })
                 },
                 openChildList(row,modelInfo,btn){
-                    this.openBox({
+                    this.openChildPageBox({
                         title:modelInfo.title,
                         offset:btn.pageOffset,
                         content: btn.url,
-                    }).end();
+                    });
                 },
                 downExcelTpl(){
                     window.open(vueData.downExcelTplUrl);
@@ -713,17 +729,9 @@ define(['vueAdmin'], function (va) {
                     if(!this.leftCate.addBtn.modalUrl||this.leftCate.addBtn.modalUrl.trim()===''){
                         return;
                     }
-                    this.openBox(openParam(this.leftCate.addBtn,'新增 '+this.leftCate.title,this.leftCate.addBtn.modalUrl))
-                        .on('success', (layero, index)=>{
-                            let win;
-                            if(layero.iframe&&layero.iframe.contentWindow){
-                                win=layero.iframe.contentWindow;
-                            }else{
-                                win=layero.find('iframe')[0].contentWindow;
-                            }
-                            win.listVue={refreshTable:this.leftCateRefresh,}
-                        })
-                        .end();
+                    this.openChildPageBox(openParam(this.leftCate.addBtn,'新增 '+this.leftCate.title,this.leftCate.addBtn.modalUrl),function (iframe){
+                        iframe.contentWindow.listVue={refreshTable:this.leftCateRefresh,}
+                    });
                 },
                 leftCateOpenEdit(row){
                     if(!this.leftCate.editBtn.modalUrl||this.leftCate.editBtn.modalUrl.trim()===''){
@@ -731,17 +739,9 @@ define(['vueAdmin'], function (va) {
                     }
                     this.leftCateObj.showTools[row.value]=false;
                     this.leftCate.editBtn.modalUrl=setUrlParams(this.leftCate.editBtn.modalUrl,{id:row.value});
-                    this.openBox(openParam(this.leftCate.editBtn,'修改 '+this.leftCate.title,this.leftCate.editBtn.modalUrl))
-                        .on('success', (layero, index)=>{
-                            let win;
-                            if(layero.iframe&&layero.iframe.contentWindow){
-                                win=layero.iframe.contentWindow;
-                            }else{
-                                win=layero.find('iframe')[0].contentWindow;
-                            }
-                            win.listVue={refreshTable:this.leftCateRefresh,refreshId:this.leftCateRefresh}
-                        })
-                        .end();
+                    this.openChildPageBox(openParam(this.leftCate.editBtn,'修改 '+this.leftCate.title,this.leftCate.editBtn.modalUrl),function (iframe){
+                        iframe.contentWindow.listVue={refreshTable:this.leftCateRefresh,refreshId:this.leftCateRefresh}
+                    });
                 },
                 leftCateDeleteRow(row,delChilds){
                     if(!this.leftCate.rmUrl||this.leftCate.rmUrl.trim()===''){
