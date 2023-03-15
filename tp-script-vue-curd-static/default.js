@@ -337,18 +337,33 @@ define(['vueAdmin'], function (va) {
                 ...getThisActionOhterWatchs(),
             },
             methods:{
-                handleTableChange(pagination, filters, sorter) {
-                    if(!pagination.pageSize){
-                        return;
+                keyValueStr(obj){
+                    const arr=[];
+                    for(let i in obj){
+                        if(typeof obj[i]==='object'){
+                            arr.push(this.keyValueStr(obj[i]))
+                        }else if(typeof obj[i]==='string'||typeof obj[i]==='number'||(obj[i]&&typeof obj[i].toString!=='undefined')){
+                            arr.push(obj[i].toString());
+                        }else{
+                            arr.push('');
+                        }
                     }
-                    this.pagination.current = pagination.current;
-                    this.pagination.pageSize = pagination.pageSize;
-
-                    this.myFilters.page=pagination.current;
-                    this.myFilters.pageSize=pagination.pageSize;
-                    this.myFilters.sortField=sorter.field;
-                    this.myFilters.sortOrder=sorter.order;
+                    return arr.join('|');
+                },
+                pageChange(page){
+                    this.pagination.current = page;
+                    this.myFilters.page = page;
                     this.fetch();
+                },
+                pageSizeChange(pageSize){
+                    this.pagination.pageSize = pageSize;
+                    this.myFilters.pageSize = pageSize;
+                    this.pageChange(1);
+                },
+                sorterChange(dataIndex,direction){
+                    this.myFilters.sortField=dataIndex;
+                    this.myFilters.sortOrder=direction;
+                    this.pageChange(1);
                 },
                 fetch(resolve) {
                     this.loading = true;

@@ -210,7 +210,7 @@ body{
                             <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
                         </template>
 
-                        <a-button v-for="(btn,index) in toolTitleLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                        <a-button v-for="(btn,index) in toolTitleLeftBtns" :key="keyValueStr(btn)" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
                             <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -247,7 +247,7 @@ body{
 
 
 
-                        <a-button v-for="(btn,index) in toolTitleRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                        <a-button v-for="(btn,index) in toolTitleRightBtns" :key="keyValueStr(btn)" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
                             <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -261,7 +261,7 @@ body{
                             <a-divider direction="vertical" style="margin: 0 6px"></a-divider>
                         </template>
                         {block name="toolBtnLeft"}{/block}
-                        <a-button v-for="(btn,index) in toolBtnLeftBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                        <a-button v-for="(btn,index) in toolBtnLeftBtns" :key="keyValueStr(btn)" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
                             <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -289,7 +289,7 @@ body{
                             <span> 导出当前数据</span>
                         </a-button>
 
-                        <a-button v-for="(btn,index) in toolBtnRightBtns" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
+                        <a-button v-for="(btn,index) in toolBtnRightBtns" :key="keyValueStr(btn)" :type="btn.btnType==='a'?'text':btn.btnType" :status="btn.btnStatus" @click="openOtherBtn(btn)" class="my-other-btn">
                             <template #icon v-if="btn.btnSvg"><span v-html="btn.btnSvg" role="img" aria-label class="anticon"></span></template>
                             <span> {{btn.btnTitle}}</span>
                         </a-button>
@@ -327,7 +327,9 @@ body{
                         :expand-all-rows="expandAllRows"
                         :is-tree-index="isTreeIndex"
                         @refresh-table="refreshTable"
-                        @change="handleTableChange"
+                        @page-change="pageChange"
+                        @page-size-change="pageSizeChange"
+                        @sorter-change="sorterChange"
                         @on-delete="deleteRow"
                         @open-edit="openEdit"
                         @open-add-children="openAddChildren"

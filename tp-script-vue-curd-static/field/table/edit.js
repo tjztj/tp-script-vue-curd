@@ -160,8 +160,20 @@ max-height: 92%;
             refreshTable(){
 
             },
-            handleTableChange(pagination, filters, sorter){
-
+            pageChange(page){
+                // this.pagination.current = page;
+                // this.myFilters.page = page;
+                // this.fetch();
+            },
+            pageSizeChange(pageSize){
+                // this.pagination.pageSize = pageSize;
+                // this.myFilters.pageSize = pageSize;
+                // this.pageChange(1);
+            },
+            sorterChange(dataIndex,direction){
+                // this.myFilters.sortField=dataIndex;
+                // this.myFilters.sortOrder=direction;
+                // this.pageChange(1);
             },
             openShow(row){
                 this.showInfo=row;
@@ -278,7 +290,9 @@ max-height: 92%;
                                 :show-create-time="false"
                                 :show-action="field.showAction"
                                 @refresh-table="refreshTable"
-                                @change="handleTableChange"
+                                @page-change="pageChange"
+                                @page-size-change="pageSizeChange"
+                                @sorter-change="sorterChange"
                                 @open-show="openShow"
                                 @on-delete="deleteRow"
                                 @open-edit="openEdit"

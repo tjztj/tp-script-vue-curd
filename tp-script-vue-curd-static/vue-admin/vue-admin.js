@@ -1780,13 +1780,9 @@ define(requires, function (axios, Qs) {
 
 
                         let childW = 0;
-                        if (record.childBtns) {
-                            for (let childName in record.childBtns) {
-                                if (record.childBtns[childName].show) {
-                                    childW += this.getTextWidthByBtn(record.childBtns[childName].text);
-                                }
-                            }
-                        }
+                        this.getChildBtnsByRow(record).forEach(vv=>{
+                            childW += this.getTextWidthByBtn(vv.text);
+                        })
 
                         let childAddW = 0;
                         if (this.isCanAddChildren(record)) {
@@ -1823,9 +1819,6 @@ define(requires, function (axios, Qs) {
 
 
                     this.actionW = 32 + btnWidth;
-                },
-                handleTableChange(pagination, filters, sorter) {
-                    this.$emit('change', pagination, filters, sorter, this.data)
                 },
                 openAddChildren(row) {
                     this.$emit('openAddChildren', row)
@@ -1944,6 +1937,34 @@ define(requires, function (axios, Qs) {
                 colStyle(field,row){
                     return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style&&row.__style[field.name]&&typeof row.__style[field.name]==='object'?row.__style[field.name]:{})
                 },
+                keyValueStr(obj){
+                    const arr=[];
+                    for(let i in obj){
+                        if(typeof obj[i]==='object'){
+                            arr.push(this.keyValueStr(obj[i]))
+                        }else if(typeof obj[i]==='string'||typeof obj[i]==='number'||(obj[i]&&typeof obj[i].toString!=='undefined')){
+                            arr.push(obj[i].toString());
+                        }else{
+                            arr.push('');
+                        }
+                    }
+                    return arr.join('|');
+                },
+                getChildBtnsByRow(row){
+                    if(!row.childBtns){
+                        return [];
+                    }
+                    const arr=[];
+                    for(let i in row.childBtns){
+                        if(row.childBtns[i].show){
+                            arr.push({
+                                key:i,
+                                ...row.childBtns[i]
+                            })
+                        }
+                    }
+                    return arr;
+                },
                 log(...data){
                     console.log(...data)
                 },
@@ -1955,7 +1976,6 @@ define(requires, function (axios, Qs) {
                             :data="data"
                             :pagination="pagination&&(!isTreeIndex)&&pagination.pageSize?pagination:false"
                             :loading="loading"
-                            @change="handleTableChange"
                             class="curd-table"
                             :bordered="isGroup?{headerCell:true,bodyCell:false,wrapper:false}:false"
                             :scroll="{ x: scrollX ,y:scrollY}"
@@ -1965,6 +1985,10 @@ define(requires, function (axios, Qs) {
                             v-model:expanded-keys="expandedRowKeys"
                             v-model:selected-keys="tableSelectedKeys"
                             column-resizable
+                            @change="(...$parameter)=>$emit('change', ...$parameter)"
+                            @page-change="(...$parameter)=>$emit('pageChange', ...$parameter)" 
+                            @page-size-change="(...$parameter)=>$emit('pageSizeChange', ...$parameter)" 
+                            @sorter-change="(...$parameter)=>$emit('sorterChange', ...$parameter)"
                         >
                             <template #[key] v-for="(item,key) in titleItems">
                                 <slot :name="key" :field="item" :columns="columns">
@@ -2043,7 +2067,7 @@ define(requires, function (axios, Qs) {
                                         
                                         <slot name="do-before" :record="record"></slot>
                                         
-                                        <template v-for="btn in getBeforeBtns(record)"><a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a></template>
+                                        <a v-for="btn in getBeforeBtns(record)" :key="keyValueStr(btn)" @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
                                         
                                         <slot name="do" :record="record">
                                             <a v-if="isCanShowInfo(record)" @click="openShow(record)" :style="{color: showBtnColor(record)}">{{showBtnText(record)}}</a>
@@ -2061,16 +2085,12 @@ define(requires, function (axios, Qs) {
                                         
                                         
                                         <slot name="child-btns" :record="record">
-                                            <template v-if="record.childBtns">
-                                                <template v-for="(vo,kk) in record.childBtns">
-                                                       <a v-if="vo.show" @click="openChildList(record,childsObjs[kk],vo)" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
-                                                </template>
-                                            </template>
+                                            <a v-for="vo in getChildBtnsByRow(record)" :key="keyValueStr(vo)" @click="openChildList(record,childsObjs[vo.key],vo)" :style="{color: vo.color}" class="open-child-a-class">{{vo.text}}</a>
                                         </slot>
                                         
                                         
                                         <a v-if="isCanAddChildren(record)" @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
-                                        <a  v-for="btn in getAfterBtns(record)" @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                        <a  v-for="btn in getAfterBtns(record)" :key="keyValueStr(btn)" @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
                                         
                                         <slot name="do-after" :record="record"></slot>
                                         

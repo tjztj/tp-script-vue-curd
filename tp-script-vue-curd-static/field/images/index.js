@@ -24,12 +24,9 @@ define([],function(){
         template:`<div>
                     <template v-if="record.record[field.name]&&show">
                         <a-image-preview-group infinite v-if="field.listShowImg.show&&imgs.length>0">
-                            <div style="display: flex;align-items: center">
-                                <a-space v-for="item in imgs" style="flex: 1">
-                                    <a-image class="list-img-field-box" :src="item" :style="{'max-width': field.listShowImg.maxWidth,'max-height': field.listShowImg.maxHeight}"></a-image>
-                                </a-space>
+                           <div style="display: flex;align-items: center">
+                               <a-image v-for="item in imgs" style="flex: 1" :key="item" class="list-img-field-box" :src="item" :style="{'max-width': field.listShowImg.maxWidth,'max-height': field.listShowImg.maxHeight}"></a-image>
                             </div>
-                            
                         </a-image-preview-group>
                         <a v-else @click="showImages(record.record[field.name])"><icon-file-image /> 查看</a>
                     </template>

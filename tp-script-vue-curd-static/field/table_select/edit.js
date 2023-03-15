@@ -241,12 +241,12 @@ display: none;
             pageSizeChange(pageSize){
                 this.pagination.pageSize = pageSize;
                 this.myFilters.pageSize = pageSize;
-                this.getList();
+                this.pageChange(1);
             },
             sorterChange(dataIndex,direction){
                 this.myFilters.sortField=dataIndex;
                 this.myFilters.sortOrder=direction;
-                this.getList();
+                this.pageChange(1);
             },
 
             setShowClass(){
