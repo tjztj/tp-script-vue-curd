@@ -3,8 +3,9 @@ define(['vueAdmin'], function (va) {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    const warnIcon=function(color){
+    const warnIcon=function(color,size){
         color=color||"#FF4343";
+        size=size||36;
         return (Vue.openBlock(), Vue.createBlock("svg", {
             t: "1615779502296",
             class: "icon anticon",
@@ -12,8 +13,8 @@ define(['vueAdmin'], function (va) {
             version: "1.1",
             xmlns: "http://www.w3.org/2000/svg",
             "p-id": "2345",
-            width: "22",
-            height: "22"
+            width: size,
+            height: size
         }, [
             Vue.createVNode("path", {
                 d: "M460.8 666.916571h99.693714v99.620572H460.8V666.916571z m0-398.482285h99.693714v298.861714H460.8V268.434286zM510.756571 19.382857C236.690286 19.382857 12.580571 243.565714 12.580571 517.485714c0 273.993143 221.622857 498.102857 498.102858 498.102857s498.102857-224.109714 498.102857-498.102857c0-273.92-224.182857-498.102857-498.102857-498.102857z m0 896.585143c-219.209143 0-398.482286-179.273143-398.482285-398.482286 0-219.136 179.346286-398.482286 398.482285-398.482285 219.136 0 398.482286 179.346286 398.482286 398.482285 0 219.209143-179.346286 398.482286-398.482286 398.482286z",
@@ -22,6 +23,22 @@ define(['vueAdmin'], function (va) {
             })
         ]))
     };
+
+    const warnIconContent=function (content,iconColor,isOneRow){
+        let boxStyle={};
+        if(isOneRow){
+            boxStyle.display='flex';
+            boxStyle.alignItems='center';
+            boxStyle.justifyContent='center '
+        }else{
+            boxStyle.textAlign='center';
+        }
+
+        return (Vue.openBlock(), Vue.createElementBlock("div", { style:boxStyle  }, [
+            warnIcon(iconColor,isOneRow?24:36),
+            isOneRow?Vue.createElementVNode("span", { style: {"padding-left":"12px"}}, content):Vue.createElementVNode("div", { style: {"margin-top":"12px"}}, content),
+        ]));
+    }
 
 
 
@@ -88,7 +105,7 @@ define(['vueAdmin'], function (va) {
     }
 
     function getStepJustDo(row,that){
-        ArcoVue.Modal.warning({
+        (top.ArcoVue||ArcoVue).Modal.warning({
             title: Vue.createVNode('b',{},'操作确认'),
             content: row.nextStepInfo.listDirectSubmit,
             hideCancel:false,
@@ -285,7 +302,7 @@ define(['vueAdmin'], function (va) {
             },
             computed:{
                 canAdd(){
-                  return this.auth.add&&this.auth.stepAdd&&this.auth.rowAuthAdd;
+                    return this.auth.add&&this.auth.stepAdd&&this.auth.rowAuthAdd;
                 },
                 ...getThisActionOhterComputeds(),
                 delSelectedIds(){
@@ -507,12 +524,15 @@ define(['vueAdmin'], function (va) {
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
-                            ArcoVue.Message.destroy();
+                            ArcoVue.Message.clear();
+                            if(top.ArcoVue){
+                                top.ArcoVue.Message.clear();
+                            }
                             let childsText='';
                             if(vueData.childs){
                                 childsText='（'+vueData.childs.map(v=>v.title).join('、')+'）';
                             }
-                            ArcoVue.Modal.confirm({
+                            (top.ArcoVue||ArcoVue).Modal.confirm({
                                 content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据'+childsText+'？',
                                 okText: '确定删除',
                                 cancelText: '取消',
@@ -536,14 +556,16 @@ define(['vueAdmin'], function (va) {
                     }).catch(err=>{
                         this.loading = false;
                         if(!delChilds&&vueData.deleteHaveChildErrorCode&&err.errorCode==vueData.deleteHaveChildErrorCode){
-                            ArcoVue.Message.destroy();
+                            ArcoVue.Message.clear();
+                            if(top.ArcoVue){
+                                top.ArcoVue.Message.clear();
+                            }
                             let childsText='';
                             if(vueData.childs){
                                 childsText='（'+vueData.childs.map(v=>v.title).join('、')+'）';
                             }
-                            const modal = ArcoVue.Modal.confirm({
-                                content: '已有子数据，将删除下面所有子数据。确定删除本条数据及下面所有子数据'+childsText+'？',
-                                icon:warnIcon(),
+                            const modal = (top.ArcoVue||ArcoVue).Modal.confirm({
+                                content:warnIconContent('已有子数据，将删除下面所有子数据。确定删除本条数据及下面所有子数据'+childsText+'？'),
                                 onOk:()=> {
                                     this.deleteRow(row,true)
                                 },
@@ -640,9 +662,8 @@ define(['vueAdmin'], function (va) {
                         return;
                     }
                     //如果数据大于1万条，提出警告
-                    ArcoVue.Modal.confirm({
-                        title: '导出提示',
-                        icon:warnIcon('#faad14'),
+                    (top.ArcoVue||ArcoVue).Modal.confirm({
+                        title: warnIconContent('导出提示','#faad14',true),
                         content: '当前结果数据较多，可能会发生不能正确导出数据的情况，建议筛选后再导出',
                         okText: '仍然导出',
                         cancelText: '取消导出',
