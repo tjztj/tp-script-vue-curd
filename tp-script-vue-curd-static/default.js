@@ -536,7 +536,7 @@ define(['vueAdmin'], function (va) {
                                 content: '已有子数据，将删除下面所有子数据。确定删除所选数据及下面所有子数据'+childsText+'？',
                                 okText: '确定删除',
                                 cancelText: '取消',
-                                onOk() {
+                                onOk:()=> {
                                     this.delSelectedRows(e,true)
                                 },
                             })
