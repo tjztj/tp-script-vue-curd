@@ -741,6 +741,7 @@ a.red:hover,a.yellow:hover{
 .list-img-field-box .arco-image-img{
     max-width: 100%;
     max-height: 100%;
+    background-color: rgba(0,0,0,0.03);
 }
 /***************************************************/
 .arco-table-container:not(.arco-table-has-fixed-col-left) th.arco-table-checkbox.arco-table-col-fixed-left,.arco-table-container:not(.arco-table-has-fixed-col-left) td.arco-table-checkbox.arco-table-col-fixed-left{
@@ -775,6 +776,9 @@ a.red:hover,a.yellow:hover{
     height: 100%;
     position: static;
     object-fit: cover;
+    background-color: rgba(0,0,0,0.02);
+    border-radius: 8px;
+    overflow: hidden;
 }
 .vuecurd-def-box .field-group-fieldset .legend-box{
     display: none;
@@ -924,4 +928,7 @@ a.red:hover,a.yellow:hover{
 /****************************************************************/
 #vue-curd-imgs-show-box{
     display: none;
+}
+.field-box .arco-upload-list-picture img{
+    background-color: rgba(0,0,0,0.03);
 }
