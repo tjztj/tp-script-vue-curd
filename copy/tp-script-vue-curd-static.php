@@ -36,7 +36,7 @@ $path=VUE_CURD_STATIC_PATH.DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR,$dirs
 if(!is_file($path)){
     header("HTTP/1.1 404 Not Found");
     header("Status: 404 Not Found");
-    echo '未找到:'.$path;
+//    echo '未找到:'.$path;
     exit;
 }
 
