@@ -2170,6 +2170,33 @@ define(requires, function (axios, Qs) {
                     return this.filterSource.filterConfig.some(item => this.filterGroupBaseItemIsShow(item)) ||
                         this.childFilterEmptys.some(child => Object.values(this.filterSource[child.name]).some(item => this.filterGroupItemIsShow(item,child)));
                 },
+                hideFilterList(){
+                    const returns=[];
+                    for(const key in this.filterSource){
+                        const vo=this.filterSource[key];
+                        const items=this.moreShowItems(vo);
+                        if(items.length===0){
+                            continue;
+                        }
+                        returns.push({
+                            key:key,
+                            modelTitle:this.modelTitles[key]||'',
+                            items:items,
+                        })
+                    }
+                    return returns;
+                },
+                filterMenuBoxClass(){
+                    const count = this.hideFilterList.reduce((count, vo) => count + vo.items.length, 0);
+                    const GRID_CLASSES = {
+                        1: ['no-grid'],
+                        2: ['grid-column-2'],
+                        3: ['grid-column-3'],
+                        4: ['grid-column-4']
+                    };
+                    const countClass = Math.ceil(count / 16);
+                    return GRID_CLASSES[countClass]||GRID_CLASSES[4];
+                }
             },
             watch:{
                 haveFielter:{
@@ -2336,7 +2363,7 @@ define(requires, function (axios, Qs) {
                 }
             },
             template: `<div class="curd-filter-box" :class="{'empty-filter-items':!haveFielter}">
-                    <a-spin :loading="loading">
+                        <a-spin :loading="loading">
                             <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
                             <div class="filter-box-div" v-if="filterGroupIsShow(base)">
                                 <transition-group name="bounce">
@@ -2391,12 +2418,11 @@ define(requires, function (axios, Qs) {
                                         <icon-search v-else />
                                     </a>
                                     <template #content>
-                                        <div id="filter-menu-box">
-                                            <template v-for="(vo,key) in filterSource">
-                                            <template v-if="moreShowItems(vo).length>0">
-                                                <div v-if="modelTitles[key]" class="filter-select-show-item-title">{{modelTitles[key]}}</div>
+                                        <div class="filter-menu-box" :class="filterMenuBoxClass">
+                                            <template v-for="vo in hideFilterList">
+                                                <div v-if="vo.modelTitle" class="filter-select-show-item-title">{{vo.modelTitle}}</div>
                                                 <div class="filter-select-show-item-box">
-                                                    <a-doption v-for="item in moreShowItems(vo)">
+                                                    <a-doption v-for="item in vo.items">
                                                         <a href="javascript:;"
                                                            class="filter-select-show-item"
                                                            :class="{checked:item.show}"
@@ -2406,7 +2432,6 @@ define(requires, function (axios, Qs) {
                                                         </a>
                                                     </a-doption>
                                                 </div>
-                                            </template>
                                             </template>
                                         </div>
                                     </template>
