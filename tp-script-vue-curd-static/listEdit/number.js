@@ -14,7 +14,7 @@ define([],function(){
         computed:{
             text:{
                 get(){
-                    let val=this.val===null?this.record.record[this.field.name]:this.val;
+                    let val=this.val===null||this.val===undefined?this.record.record[this.field.name]:this.val;
                     if(val===''){
                         return '';
                     }
@@ -34,7 +34,7 @@ define([],function(){
                 return window.vueDefMethods.$post.call(this,...params,)
             },
             change(){
-                if(this.val===null||this.val.toString()===this.record.record[this.field.name].toString()){
+                if(this.val===null||this.val===undefined||this.val.toString()===this.record.record[this.field.name].toString()){
                     return;
                 }
 
