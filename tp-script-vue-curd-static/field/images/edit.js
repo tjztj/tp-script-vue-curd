@@ -32,12 +32,17 @@ define([],function(){
                             return;
                         }
                         fid--;
-                        this.fileList.push({
+                        const finfo={
                             uid:fid,
                             name:this.getUrlTitle(v),
                             status: 'done',
                             url:v,
-                        })
+                        };
+                        if(this.field.multiple){
+                            this.fileList.push(finfo)
+                        }else{
+                            this.fileList=[finfo];
+                        }
                     })
                 },
                 immediate:true,
@@ -68,13 +73,14 @@ define([],function(){
                 }
             },
             change(fileList,fileItem){
-                let fileOkObjs={};
-                fileList.forEach(v=>{
-                    if(v.status==='done'){
-                        fileOkObjs[v.url]=v;
+                const fileOkObjs = {};
+                fileList.forEach(file => {
+                    if (file.status === 'done') {
+                        fileOkObjs[file.url] = file;
                     }
-                })
-                let val=Object.keys(fileOkObjs).join('|');
+                });
+                const vals = Object.keys(fileOkObjs);
+                const val = (vals.length > 1 && !this.field.multiple) ? vals[vals.length - 1] : vals.join('|');
                 if(val!==this.value){
                     this.$emit('update:value',val);
                 }

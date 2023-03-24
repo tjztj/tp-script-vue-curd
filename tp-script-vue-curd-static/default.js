@@ -692,7 +692,7 @@ define(['vueAdmin'], function (va) {
                 leftCateSelect(selectedKeys,e){
                     this.leftCateObj.selectedKeys=selectedKeys;
                     this.$refs['filter'].restFilter();
-                    this.refreshTable();
+                    this.doFilter();
                 },
                 leftCateRefresh(){
                     this.leftCateObj.loading=true;

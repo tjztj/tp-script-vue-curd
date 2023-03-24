@@ -1524,192 +1524,215 @@ define(requires, function (axios, Qs) {
         app.component('CurdTable', {
             props: ['childs', 'pagination', 'data', 'loading', 'listColumns', 'canAdd', 'canEdit', 'actionWidth', 'canDel', 'rowSelection','selectedKeys', 'fieldStepConfig', 'actionDefWidth', 'showCreateTime', 'setScrollY', 'childrenColumnName', 'indentSize', 'expandAllRows', 'isTreeIndex','showAction'],
             setup(props, ctx) {
-                const listColumns = props.listColumns;
-                let groupTitles = [], columns = [], titleItems = {}, columnsCount = 0, listFieldComponents = {},
-                    fieldObjs = {};
-                for (let groupTtitle in listColumns) {
-                    groupTitles.push(groupTtitle);
-                    let column = {title: groupTtitle, children: []};
-                    listColumns[groupTtitle].forEach(function (item) {
-                        fieldObjs[item.name] = item;
-                        let customTitle = 'custom-title-' + item.name;
-                        titleItems[customTitle] = item;
-                        let col = {
-                            dataIndex: item.name,
-                            name:item.name,
-                            // title:item.title,
-                            titleSlotName: customTitle,
-                            fixed: item.listFixed ? item.listFixed : false,
-                        };
-                        if(!(item.listEdit&&item.listEdit.saveUrl)){
-                            col.ellipsis=true;
-                            col.tooltip=true;
-                        }
-                        if (fieldComponents['VueCurdIndex' + item.type]) {
-                            listFieldComponents[item.name] = item;
-                            col.slotName = 'field-component-' + item.name;
-                        } else {
-                            col.slotName = 'default-value';
-                        }
-
-                        if (item.listColumnWidth) {
-                            col.width = item.listColumnWidth;
-                        }
-                        if(item.listSort){
-                            col.sortable={
-                                sortDirections: ['ascend', 'descend']
-                            };
-                        }
-                        columnsCount++;
-                        column.children.push(col);
-                    })
-                    columns.push(column);
-                }
-                const isGroup = groupTitles.length > 1 || (!listColumns[''] && groupTitles.length > 0);
-
-                if (!isGroup && columns[0]) {
-                    columns = columns[0].children;
-                }
-
-
-                const createTimeCol = {
-                    // title:'创建时间',
-                    ellipsis: true,
-                    tooltip: true,
-                    dataIndex: "create_time",
-                    titleSlotName:'custom-title-create_time',
-                    slotName:'create-time',
-                    width: 152,
-                    sortable: {
-                        sortDirections: ['ascend', 'descend']
-                    },
-                };
-
-                if (props.fieldStepConfig && props.fieldStepConfig.enable && props.fieldStepConfig.listShow === true) {
-                    const stepCol = {
-                        // title:'当前步骤',
-                        ellipsis: true,
-                        dataIndex: "stepInfo",
-                        titleSlotName:'custom-title-step-info',
-                        slotName:'step-info',
-                    };
-                    if(props.fieldStepConfig.listFixed){
-                        stepCol.fixed=props.fieldStepConfig.listFixed;
-                    }
-
-                    if (props.fieldStepConfig.width && props.fieldStepConfig.width > 0) {
-                        stepCol.width = props.fieldStepConfig.width;
-                    }
-                    if (props.fieldStepConfig.listFixed) {
-                        stepCol.width = stepCol.width || 180;
-                        if (props.showCreateTime === undefined || props.showCreateTime) {
-                            columns.push(createTimeCol)
-                            columnsCount++;
-                        }
-                        columns.push(stepCol)
-                        columnsCount++;
-                    } else {
-                        columns.push(stepCol)
-                        columnsCount++;
-                        if (props.showCreateTime === undefined || props.showCreateTime) {
-                            columns.push(createTimeCol)
-                            columnsCount++;
-                        }
-                    }
-                } else {
-                    if (props.showCreateTime === undefined || props.showCreateTime) {
-                        columns.push(createTimeCol)
-                        columnsCount++;
-                    }
-                }
-
-
-                //可prop动态设置宽度
-                const newActionW = Vue.ref(props.actionDefWidth || (32 + 28));
-                if(props.showAction!==false){
-                    columns.push({
-                        // title:'操作',
-                        titleSlotName:'custom-title-action',
-                        slotName:'action',
-                        width: newActionW,
-                        fixed: 'right',
-                    })
-                    columnsCount++;
-                }
-                let id = 'pub-default-table-' + window.guid();
-
-                //太小出现滚动条
-                let scrollX = Vue.ref(undefined);
-                let scrollY = Vue.ref(undefined);
-                let getX = function () {
-                    let w=document.body.querySelector('#'+id).clientWidth;
-                    if (w > 1640)return undefined;
-                    if (columnsCount <= 3)return w > 370 ? undefined : 420;
-                    if (columnsCount <= 4)return w > 450 ? undefined : 500;
-                    if (columnsCount <= 5)return w > 680 ? undefined : 960;
-                    if (columnsCount < 6)return w > 780 ? undefined : 1080;
-                    if (columnsCount < 7)return w > 880 ? undefined : 1120;
-                    if (columnsCount < 8)return w > 960 ? undefined : 1180;
-                    if (columnsCount < 9)return w > 1020 ? undefined : 1240;
-                    if (columnsCount < 12)return w > 1460 ? undefined : 1560;
-                    return 1640;
-                }
-
-
-                const columnsVals = Vue.ref(columns);
-                let onresize = () => {
-                    scrollX.value = getX();
-                    if (scrollX.value === undefined) {
-                        const tablePath = '#' + id + '>.curd-table table.arco-table-element';
-                        if (!document.querySelector('#' + id)
-                        || !document.querySelector('#' + id), document.querySelector(tablePath)) {
-                            if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table tbody')) {
-                                setTimeout(() => {
-                                    onresize();
-                                }, 40)
-                            }
-                        } else {
-                            scrollX.value = document.querySelector('#' + id).clientWidth;
-                        }
-                    }
-
-
-                    columnsVals.value.forEach(col => {
-                        if (typeof col.fixed !== 'undefined') {
-                            if (scrollX.value === undefined) {
-                                if (typeof col.fixedOld === 'undefined') {
-                                    col.fixedOld = col.fixed;
-                                }
-                                col.fixed = false;
-                            } else if (typeof col.fixedOld !== 'undefined') {
-                                col.fixed = col.fixedOld;
-                            }
-                        }
-                    })
-
-                    if (props.setScrollY) {
-                        scrollY.value='100%'
-                    }
-                };
-                Vue.nextTick(function () {
-                    onresize();
-                    const oldResize = window.onresize || function () {
-                    };
-                    window.onresize = (e) => {
-                        oldResize(e);
-                        onresize();
-                    };
-                })
-
-
-                let childsObjs = {};
-                if (props.childs) {
-                    props.childs.forEach(v => {
-                        childsObjs[v.name] = v;
-                    })
-                }
                 const guid=window.guid();
                 Vue.provide('table-guid',guid)
+
+                const newActionW =Vue.ref(0);
+                const columnsVals = Vue.ref([]);
+                const isGroup=Vue.ref(false);
+                const titleItems=Vue.ref({});
+                const listFieldComponents=Vue.ref({});
+                const fieldObjs=Vue.ref({});
+                const childsObjs=Vue.ref({});
+
+                const scrollX = Vue.ref(undefined);
+                const scrollY = Vue.ref(undefined);
+                const id = 'pub-default-table-' + guid;
+                let onresize;
+                const oldResize = window.onresize || function () {};
+
+                Vue.watchEffect(()=>{
+                    const listColumns = props.listColumns;
+                    let groupTitles = [], columns = [], ti = {}, columnsCount = 0, lfc = {},fo = {};
+                    for (let groupTtitle in listColumns) {
+                        groupTitles.push(groupTtitle);
+                        let column = {title: groupTtitle, children: []};
+                        listColumns[groupTtitle].forEach(function (item) {
+                            fo[item.name] = item;
+                            let customTitle = 'custom-title-' + item.name;
+                            ti[customTitle] = item;
+                            let col = {
+                                dataIndex: item.name,
+                                name:item.name,
+                                // title:item.title,
+                                titleSlotName: customTitle,
+                                fixed: item.listFixed ? item.listFixed : false,
+                            };
+                            if(!(item.listEdit&&item.listEdit.saveUrl)){
+                                col.ellipsis=true;
+                                col.tooltip=true;
+                            }
+                            if (fieldComponents['VueCurdIndex' + item.type]) {
+                                lfc[item.name] = item;
+                                col.slotName = 'field-component-' + item.name;
+                            } else {
+                                col.slotName = 'default-value';
+                            }
+
+                            if (item.listColumnWidth) {
+                                col.width = item.listColumnWidth;
+                            }
+                            if(item.listSort){
+                                col.sortable={
+                                    sortDirections: ['ascend', 'descend']
+                                };
+                            }
+                            columnsCount++;
+                            column.children.push(col);
+                        })
+                        columns.push(column);
+                    }
+                    isGroup.value = groupTitles.length > 1 || (!listColumns[''] && groupTitles.length > 0);
+
+                    if (!isGroup.value && columns[0]) {
+                        columns = columns[0].children;
+                    }
+
+
+                    const createTimeCol = {
+                        // title:'创建时间',
+                        ellipsis: true,
+                        tooltip: true,
+                        dataIndex: "create_time",
+                        titleSlotName:'custom-title-create_time',
+                        slotName:'create-time',
+                        width: 152,
+                        sortable: {
+                            sortDirections: ['ascend', 'descend']
+                        },
+                    };
+
+                    if (props.fieldStepConfig && props.fieldStepConfig.enable && props.fieldStepConfig.listShow === true) {
+                        const stepCol = {
+                            // title:'当前步骤',
+                            ellipsis: true,
+                            dataIndex: "stepInfo",
+                            titleSlotName:'custom-title-step-info',
+                            slotName:'step-info',
+                        };
+                        if(props.fieldStepConfig.listFixed){
+                            stepCol.fixed=props.fieldStepConfig.listFixed;
+                        }
+
+                        if (props.fieldStepConfig.width && props.fieldStepConfig.width > 0) {
+                            stepCol.width = props.fieldStepConfig.width;
+                        }
+                        if (props.fieldStepConfig.listFixed) {
+                            stepCol.width = stepCol.width || 180;
+                            if (props.showCreateTime === undefined || props.showCreateTime) {
+                                columns.push(createTimeCol)
+                                columnsCount++;
+                            }
+                            columns.push(stepCol)
+                            columnsCount++;
+                        } else {
+                            columns.push(stepCol)
+                            columnsCount++;
+                            if (props.showCreateTime === undefined || props.showCreateTime) {
+                                columns.push(createTimeCol)
+                                columnsCount++;
+                            }
+                        }
+                    } else {
+                        if (props.showCreateTime === undefined || props.showCreateTime) {
+                            columns.push(createTimeCol)
+                            columnsCount++;
+                        }
+                    }
+
+
+                    //可prop动态设置宽度
+                    newActionW.value = props.actionDefWidth || (32 + 28);
+                    if(props.showAction!==false){
+                        columns.push({
+                            // title:'操作',
+                            titleSlotName:'custom-title-action',
+                            slotName:'action',
+                            width: newActionW,
+                            fixed: 'right',
+                        })
+                        columnsCount++;
+                    }
+
+
+                    //太小出现滚动条
+
+                    let getX = function () {
+                        let w=document.body.querySelector('#'+id).clientWidth;
+                        if (w > 1640)return undefined;
+                        if (columnsCount <= 3)return w > 370 ? undefined : 420;
+                        if (columnsCount <= 4)return w > 450 ? undefined : 500;
+                        if (columnsCount <= 5)return w > 680 ? undefined : 960;
+                        if (columnsCount < 6)return w > 780 ? undefined : 1080;
+                        if (columnsCount < 7)return w > 880 ? undefined : 1120;
+                        if (columnsCount < 8)return w > 960 ? undefined : 1180;
+                        if (columnsCount < 9)return w > 1020 ? undefined : 1240;
+                        if (columnsCount < 12)return w > 1460 ? undefined : 1560;
+                        return 1640;
+                    }
+
+
+                    columnsVals.value = columns;
+                    onresize = () => {
+                        scrollX.value = getX();
+                        if (scrollX.value === undefined) {
+                            const tablePath = '#' + id + '>.curd-table table.arco-table-element';
+                            if (!document.querySelector('#' + id)
+                            || !document.querySelector('#' + id), document.querySelector(tablePath)) {
+                                if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table tbody')) {
+                                    setTimeout(() => {
+                                        onresize();
+                                    }, 40)
+                                }
+                            } else {
+                                scrollX.value = document.querySelector('#' + id).clientWidth;
+                            }
+                        }
+
+
+                        columnsVals.value.forEach(col => {
+                            if (typeof col.fixed !== 'undefined') {
+                                if (scrollX.value === undefined) {
+                                    if (typeof col.fixedOld === 'undefined') {
+                                        col.fixedOld = col.fixed;
+                                    }
+                                    col.fixed = false;
+                                } else if (typeof col.fixedOld !== 'undefined') {
+                                    col.fixed = col.fixedOld;
+                                }
+                            }
+                        })
+
+                        if (props.setScrollY) {
+                            scrollY.value='100%'
+                        }
+                    };
+                    Vue.nextTick(function () {
+                        onresize();
+                        window.onresize = (e) => {
+                            oldResize(e);
+                            onresize();
+                        };
+                    })
+
+
+                    let co = {};
+                    if (props.childs) {
+                        props.childs.forEach(v => {
+                            co[v.name] = v;
+                        })
+                    }
+
+
+                    titleItems.value=ti;
+                    listFieldComponents.value=lfc;
+                    fieldObjs.value=fo;
+                    childsObjs.value=co;
+                });
+
+
+
+
 
 
                 return {
@@ -2117,31 +2140,34 @@ define(requires, function (axios, Qs) {
         app.component('CurdFilter', {
             props: ['filterConfig', 'name', 'class', 'title', 'childs', 'filterValues', 'loading'],
             setup(props, ctx) {
-                let filterConfig = props.filterConfig.map(function (v) {
-                    if (v.group) {
-                        v.title = v.group + ' >' + v.title
-                    }
-                    return v;
-                })
-                let filterSource = Vue.ref({filterConfig});
-                let modelTitles = {
-                    [props.class]: props.title,
-                    [props.name]: props.title,
-                };
-
-
-                let childFList=props.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0)
-                for (let i in childFList) {
-                    filterSource.value[childFList[i].name] = childFList[i].filterConfig.map(function (v) {
+                const filterSource = Vue.ref({});
+                const modelTitles=Vue.ref({});
+                Vue.watchEffect(()=>{
+                    const fs = {filterConfig:props.filterConfig.map(function (v) {
                         if (v.group) {
                             v.title = v.group + ' >' + v.title
                         }
                         return v;
-                    })
+                    })}
+                    const mt = {
+                        [props.class]: props.title,
+                        [props.name]: props.title,
+                    };
+                    let childFList=props.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0)
+                    for (let i in childFList) {
+                        fs[childFList[i].name] = childFList[i].filterConfig.map(function (v) {
+                            if (v.group) {
+                                v.title = v.group + ' >' + v.title
+                            }
+                            return v;
+                        })
 
-                    modelTitles[childFList[i].class] = childFList[i].title;
-                    modelTitles[childFList[i].name] = childFList[i].title;
-                }
+                        mt[childFList[i].class] = childFList[i].title;
+                        mt[childFList[i].name] = childFList[i].title;
+                    }
+                    filterSource.value=fs;
+                    modelTitles.value=mt;
+                })
 
                 return {
                     filterSource,
@@ -2453,5 +2479,6 @@ define(requires, function (axios, Qs) {
             }
         }
         app.mount('#app')
+
     };
 });
