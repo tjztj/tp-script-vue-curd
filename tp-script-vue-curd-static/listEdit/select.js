@@ -102,7 +102,8 @@ define([],function(){
                     }else if(this.field.listEdit.refreshPage==='row'){
                         this.$emit('refresh-id',this.record.record.id)
                     }else{
-                        this.list[this.record.rowIndex]['_Original_'+this.field.name]=val;
+                        this.record.record['_Original_'+this.field.name]=this.val;
+                        // this.list[this.record.rowIndex]['_Original_'+this.field.name]=val;
                     }
                     this.disabled=false;
                 }).catch(()=>{
