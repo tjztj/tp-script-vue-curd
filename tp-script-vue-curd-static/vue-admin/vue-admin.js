@@ -1437,12 +1437,12 @@ define(requires, function (axios, Qs) {
                         <div :style="gridStyle">
                             <div v-for="field in groupFieldItems" :data-name="field.name" :style="fieldStyle(field)">
                                 <transition name="slide-fade">
-                                <a-form-item v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :hide-label="fieldLabel(field)===''" :field="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col-props="field.editLabelCol" :wrapper-col-props="field.editWrapperCol" :label-col-style="{'justify-content':field.editLabelAlign==='left'?'flex-start':'flex-end'}" :show-colon="field.editColon" class="form-item-row">
+                                <a-form-item class="curd-form-item" v-if="field.editShow" v-show="triggerShows(field.name)" :label="fieldLabel(field)" :hide-label="fieldLabel(field)===''" :field="field.name" :rules="fieldRules(field)" :validate-status="validateStatus[field.name]" :label-col-props="field.editLabelCol" :wrapper-col-props="field.editWrapperCol" :label-col-style="{'justify-content':field.editLabelAlign==='left'?'flex-start':'flex-end'}" :show-colon="field.editColon" class="form-item-row">
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.editTipArr&&field.editTipArr.length>0}">
-                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
+                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.editTipArr" :key="item.guid" :title="item.title" :banner="!item.border" :closable="item.closable" :show-icon="item.showIcon" :type="item.type">{{item.message}}</a-alert></transition-group>
                                     </div>
                                     <div :class="{'field-tips':true,'field-tips-have-items':field.tipArr&&field.tipArr.length>0}">
-                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.tipArr" :key="item.guid" :message="item.message" :title="item.title" :banner="!item.border" :closable="item.closable" :icon="item.icon" :show-icon="item.showIcon" :type="item.type"></a-alert></transition-group>
+                                        <transition-group name="to-right"><a-alert class="field-tips-item" v-for="item in field.tipArr" :key="item.guid"  :title="item.title" :banner="!item.border" :closable="item.closable" :show-icon="item.showIcon" :type="item.type">{{item.message}}</a-alert></transition-group>
                                     </div>
                                     <div style="flex: 1"><component 
                                         :is="'VueCurdEdit'+field.type" 
@@ -2144,11 +2144,11 @@ define(requires, function (axios, Qs) {
                 const modelTitles=Vue.ref({});
                 Vue.watchEffect(()=>{
                     const fs = {filterConfig:props.filterConfig.map(function (v) {
-                        if (v.group) {
-                            v.title = v.group + ' >' + v.title
-                        }
-                        return v;
-                    })}
+                            if (v.group) {
+                                v.title = v.group + ' >' + v.title
+                            }
+                            return v;
+                        })}
                     const mt = {
                         [props.class]: props.title,
                         [props.name]: props.title,

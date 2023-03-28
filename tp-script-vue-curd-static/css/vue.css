@@ -945,3 +945,10 @@ a.red:hover,a.yellow:hover{
 .field-box .arco-upload-list-picture img{
     background-color: rgba(0,0,0,0.03);
 }
+.curd-form-item .arco-form-item-content-wrapper .arco-form-item-content-flex{
+    flex-direction:column;
+    align-items:stretch;
+}
+.curd-form-item .field-tips{
+    padding-bottom: 1px;
+}
