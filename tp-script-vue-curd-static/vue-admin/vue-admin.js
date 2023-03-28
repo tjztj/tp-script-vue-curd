@@ -650,7 +650,7 @@ define(requires, function (axios, Qs) {
             return service({
                 url,
                 method: 'post',
-                data: Qs.stringify(data),
+                data: typeof data.append==='function'?data:Qs.stringify(data),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'X-REQUESTED-WITH': 'xmlhttprequest'
