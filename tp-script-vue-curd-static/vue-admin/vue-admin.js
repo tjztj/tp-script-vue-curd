@@ -328,6 +328,7 @@ define(requires, function (axios, Qs) {
                 let key;
                 const openInfo = {
                     visible: false,
+                    closable:true,
                 };
                 if (option.offset && option.offset === 'auto') {
                     key = 'bodyModals';
@@ -380,11 +381,20 @@ define(requires, function (axios, Qs) {
                 openInfo.onclose = function () {
                     trigger('close');
                 }
+                openInfo.onBeforeClose = ()=> {
+                    let iframe =  appObj[this.openType][this.openIndex].iframe;
+                    if(iframe.contentWindow.onOpenInfoBeforeClose){
+                        iframe.contentWindow.onOpenInfoBeforeClose(appObj[this.openType][this.openIndex]);
+                    }
+                }
 
                 let history=[];
                 let historyIndex=0;
                 openInfo.onload = (e) => {
                     let iframe = e.target;
+                    appObj[this.openType][this.openIndex].iframe=iframe;
+                    iframe.contentWindow.openInfo= appObj[this.openType][this.openIndex];
+                    
                     let navigationType=iframe.contentWindow.performance.getEntriesByType("navigation")[0].type;
                     if(navigationType==='navigate'||navigationType==='prerender'){
                         //正常跳转
