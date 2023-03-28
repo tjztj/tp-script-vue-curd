@@ -73,7 +73,7 @@
         hide-cancel
         unmount-on-close
         @close="bodyDrawer.onclose"
-        @before-close="bodyModal.onBeforeClose"
+        @before-close="bodyDrawer.onBeforeClose"
     >
         <template #title>
             <div v-html="bodyDrawer.title"></div>
