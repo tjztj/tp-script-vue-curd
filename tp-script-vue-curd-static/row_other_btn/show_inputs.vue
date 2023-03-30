@@ -110,10 +110,12 @@
         :height="bodyModal.height"
         :mask-closable="false"
         :esc-to-close="false"
+        :closable="bodyModal.closable"
         :footer="false"
         v-model:visible="bodyModal.visible"
         :z-index="bodyModal.zIndex"
         @close="bodyModal.onclose"
+        @before-close="bodyModal.onBeforeClose"
     >
         <template #title>
             <div v-html="bodyModal.title"></div>
@@ -130,10 +132,12 @@
         :placement="bodyDrawer.placement"
         :esc-to-close="false"
         :mask-closable="false"
+        :closable="bodyDrawer.closable"
         :footer="false"
         hide-cancel
         unmount-on-close
         @close="bodyDrawer.onclose"
+        @before-close="bodyDrawer.onBeforeClose"
     >
         <template #title>
             <div v-html="bodyDrawer.title"></div>
