@@ -750,7 +750,7 @@ define(['vueAdmin'], function (va) {
                     if(!this.leftCate.addBtn.modalUrl||this.leftCate.addBtn.modalUrl.trim()===''){
                         return;
                     }
-                    this.openChildPageBox(openParam(this.leftCate.addBtn,'新增 '+this.leftCate.title,this.leftCate.addBtn.modalUrl),function (iframe){
+                    this.openChildPageBox(openParam(this.leftCate.addBtn,'新增 '+this.leftCate.title,this.leftCate.addBtn.modalUrl),iframe=>{
                         iframe.contentWindow.listVue={refreshTable:this.leftCateRefresh,}
                     });
                 },
@@ -760,7 +760,7 @@ define(['vueAdmin'], function (va) {
                     }
                     this.leftCateObj.showTools[row.value]=false;
                     this.leftCate.editBtn.modalUrl=setUrlParams(this.leftCate.editBtn.modalUrl,{id:row.value});
-                    this.openChildPageBox(openParam(this.leftCate.editBtn,'修改 '+this.leftCate.title,this.leftCate.editBtn.modalUrl),function (iframe){
+                    this.openChildPageBox(openParam(this.leftCate.editBtn,'修改 '+this.leftCate.title,this.leftCate.editBtn.modalUrl),iframe=>{
                         iframe.contentWindow.listVue={refreshTable:this.leftCateRefresh,refreshId:this.leftCateRefresh}
                     });
                 },
