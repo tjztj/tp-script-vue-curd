@@ -108,13 +108,12 @@ body{
     <div class="left-cate-div" :style="{width:leftCate.width}">
         <div class="arco-pro-table-list-toolbar-title">
             <div class="arco-pro-table-list-toolbar-title-text">{{leftCate.title}}</div>
-            <a-tooltip v-if="leftCate.addBtn" position="right" :content="leftCate.addBtn.btnTitle">
-                <a-button @click="leftCateOpenAdd" type="dashed">
-                    <template #icon>
-                        <icon-plus></icon-plus>
-                    </template>
-                </a-button>
-            </a-tooltip>
+            <template v-if="leftCate.addBtn">
+                <a-tooltip v-if="leftCate.addBtn.btnTitle" position="right" :content="leftCate.addBtn.btnTitle">
+                    <a-button @click="leftCateOpenAdd" type="dashed"><template #icon><icon-plus></icon-plus></template></a-button>
+                </a-tooltip>
+                <a-button v-else @click="leftCateOpenAdd" type="dashed"><template #icon><icon-plus></icon-plus></template></a-button>
+            </template>
         </div>
         <div class="left-cate-tool">
             <div>

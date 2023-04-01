@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\traits\controller;
 use think\Exception;
 use tpScriptVueCurd\base\controller\Controller;
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\tool\ErrorCode;
 
 /**
  * @property BaseModel $md
@@ -62,7 +63,7 @@ trait BaseDel
         if($this->treePidField){
             $childId=$model->whereIn($this->treePidField,$ids)->value('id');
             if($childId){
-                throw new Exception('请先删除下级数据');
+                throw new Exception('请先删除下级数据',ErrorCode::DELETE_TREE_HAVE_CHILD);
 //                if(count($ids)>1){
 //                    throw new Exception('请先删除第'.(array_search((string)$childId, array_map('strval',$ids), true) +1).'条数据的下级数据');
 //                }else{

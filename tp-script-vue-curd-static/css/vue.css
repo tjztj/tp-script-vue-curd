@@ -261,6 +261,9 @@ a.red:hover,a.yellow:hover{
 .left-cate-div .arco-pro-table-list-toolbar-title{
     padding:8px 16px;
     border-bottom: 1px solid #f0f2f5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .left-cate-list{
     padding: 8px 16px 8px 16px;
