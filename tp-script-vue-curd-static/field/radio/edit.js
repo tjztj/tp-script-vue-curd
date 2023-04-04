@@ -11,7 +11,7 @@ define([],function(){
                 }
             }
         },
-        template:`<div class="field-box">
+        template:`<div class="field-box edit-padding-top-label">
                     <div class="l">
                         <a-radio-group v-model="val" :disabled="field.readOnly">
                           <transition-group name="bounce-min">

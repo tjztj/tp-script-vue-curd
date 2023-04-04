@@ -955,3 +955,9 @@ a.red:hover,a.yellow:hover{
 .curd-form-item .field-tips{
     padding-bottom: 1px;
 }
+.read-only-just-show-text{
+    display: inline-block;
+}
+.edit-padding-top-label{
+    padding-top: 5px;
+}

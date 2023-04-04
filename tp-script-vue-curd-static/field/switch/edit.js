@@ -22,7 +22,7 @@ define([],function(){
                 }
             }
         },
-        template:`<div class="field-box">
+        template:`<div class="field-box" style="padding-top: 2px">
                     <div class="l">
                         <a-switch v-model="checked" :disabled="field.readOnly">
                             <template #checked>{{field.items[1].title}}</template>

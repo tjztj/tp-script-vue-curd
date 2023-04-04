@@ -17,7 +17,7 @@ define([],function(){
                 this.$emit('update:value',val.join(','));
             },
         },
-        template:`<div class="field-box">
+        template:`<div class="field-box edit-padding-top-label">
                     <div class="l">
                         <a-checkbox-group v-model:model-value="modelVal"  :disabled="field.readOnly">
                         <transition-group name="bounce-min">
