@@ -6,13 +6,27 @@
 <div class="vuecurd-def-box">
 <a-spin :loading="loading" style="display: block">
     <a-form :model="form" :label-col-props="labelCol" :wrapper-col-props="wrapperCol" ref="pubForm">
-      {block name="formBefore"}{/block}
-        <template v-for="(groupFieldItems,groupTitle) in groupFields">
-            <template v-if="showGroup">
-                <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
-                    <div class="legend-box">
-                        <legend>{{groupTitle}}</legend>
-                    </div>
+        {block name="formBefore"}{/block}
+        {block name="formItems"}
+            <template v-for="(groupFieldItems,groupTitle) in groupFields">
+                <template v-if="showGroup">
+                    <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
+                        <div class="legend-box">
+                            <legend>{{groupTitle}}</legend>
+                        </div>
+                        <field-group-item
+                            :list-field-label-col="labelCol"
+                            :list-field-wrapper-col="wrapperCol"
+                            :group-field-items="groupFieldItems"
+                            :info="info"
+                            :grid="groupGrids[groupTitle]"
+                            v-model:field-hide-list="fieldHideList"
+                            v-model:form="form"
+                            @submit="onSubmit($event)"
+                            :ref="'fieldGroup'+groupTitle"></field-group-item>
+                    </fieldset>
+                </template>
+                <template v-else>
                     <field-group-item
                         :list-field-label-col="labelCol"
                         :list-field-wrapper-col="wrapperCol"
@@ -23,22 +37,10 @@
                         v-model:form="form"
                         @submit="onSubmit($event)"
                         :ref="'fieldGroup'+groupTitle"></field-group-item>
-                </fieldset>
+                </template>
             </template>
-            <template v-else>
-                <field-group-item
-                    :list-field-label-col="labelCol"
-                    :list-field-wrapper-col="wrapperCol"
-                    :group-field-items="groupFieldItems"
-                    :info="info"
-                    :grid="groupGrids[groupTitle]"
-                    v-model:field-hide-list="fieldHideList"
-                    v-model:form="form"
-                    @submit="onSubmit($event)"
-                    :ref="'fieldGroup'+groupTitle"></field-group-item>
-            </template>
-        </template>
-      {block name="formAfter"}{/block}
+        {/block}
+        {block name="formAfter"}{/block}
     </a-form>
 </a-spin>
 

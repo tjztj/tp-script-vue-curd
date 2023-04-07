@@ -5,14 +5,11 @@
 {block name="style"}{/block}
 {block name="bodyTop"}{/block}
 <div class="vuecurd-def-box vuecurd-show-def-box">
+{block name="formItems"}
 <template v-for="(groupFieldItems,groupTitle) in groupFields">
     <fieldset class="field-group-fieldset" :class="{'show-group':haveGroup}">
         <div class="legend-box">
-            <legend>
-                {block name="groupTitle"}
-                    {{groupTitle}}
-                {/block}
-            </legend>
+            <legend>{block name="groupTitle"}{{groupTitle}}{/block}</legend>
         </div>
         <div class="show-group-field-rows" :class="{'is-grid-box':!!groupGrids[groupTitle]}" :style="gridStyle(groupTitle)">
             <template v-for="field in groupFieldItems">
@@ -37,6 +34,7 @@
         </div>
     </fieldset>
 </template>
+{/block}
 </div>
 {block name="bodyBottom"}{/block}
 {block name="script"}{/block}
