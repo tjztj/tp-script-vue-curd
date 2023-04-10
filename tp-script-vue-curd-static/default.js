@@ -74,11 +74,11 @@ define(['vueAdmin'], function (va) {
     function getThisActionOhterComponents(){
         return window.thisAction.components||{};
     }
-    function getThisActionOhterProvides(){
+    function getThisActionOhterProvides(vueObj){
         if(!window.thisAction.provide){
             return {};
         }
-        return typeof window.thisAction.provide==='function'?window.thisAction.provide():window.thisAction.provide;
+        return typeof window.thisAction.provide==='function'?window.thisAction.provide.call(vueObj):window.thisAction.provide;
     }
 
     ////--------------////
@@ -303,7 +303,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
-            provide(){return getThisActionOhterProvides()},
+            provide(){return getThisActionOhterProvides(this)},
             mounted() {
                 this.pageIsInit();
                 this.fetch();
@@ -825,7 +825,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
-            provide(){return getThisActionOhterProvides()},
+            provide(){return getThisActionOhterProvides(this)},
             computed:{
                 showGroup(){
                     if(!this.haveGroup){
@@ -942,7 +942,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
-            provide(){return getThisActionOhterProvides()},
+            provide(){return getThisActionOhterProvides(this)},
             computed:{
                 ...getThisActionOhterComputeds(),
             },
