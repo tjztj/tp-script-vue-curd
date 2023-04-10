@@ -14,6 +14,8 @@ define([],function(){
             }
         }else if(val&&typeof val.value!=='undefined'){
             value=val.value;
+        }else if(typeof val==='string'){
+            value=val;
         }
         return value;
     }
@@ -27,6 +29,9 @@ define([],function(){
         },
         mounted(){
             this.$nextTick(e=>{
+                if(this.value===null||this.value===undefined){
+                    this.value='';
+                }
                 if(!this.field.multiple){
                     if(this.value!==''){
                         this.val={

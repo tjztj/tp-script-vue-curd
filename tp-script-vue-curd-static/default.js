@@ -74,6 +74,13 @@ define(['vueAdmin'], function (va) {
     function getThisActionOhterComponents(){
         return window.thisAction.components||{};
     }
+    function getThisActionOhterProvides(){
+        if(!window.thisAction.provide){
+            return {};
+        }
+        return typeof window.thisAction.provide==='function'?window.thisAction.provide():window.thisAction.provide;
+    }
+
     ////--------------////
 
 
@@ -296,6 +303,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides()},
             mounted() {
                 this.pageIsInit();
                 this.fetch();
@@ -817,6 +825,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides()},
             computed:{
                 showGroup(){
                     if(!this.haveGroup){
@@ -933,6 +942,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides()},
             computed:{
                 ...getThisActionOhterComputeds(),
             },
