@@ -101,8 +101,8 @@ trait ModelSave
             $data[$this->createTime]=time();
         }
         //onAddBefore请用doSaveDataAfter
-        $info=static::create($data);
-        $info->controller=$this->controller;
+        $info=clone $this;
+        $info->replace(false)->save($data);
 
         FieldDo::doSaveAfter($saveFields,$data,$this,$info,$parentInfo);
         $this->onAddAfter($info,$data,$parentInfo);
