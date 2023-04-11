@@ -141,54 +141,13 @@ trait BaseEdit
                             throw new \think\Exception('未找到所属数据');
                         }
                     }
-                    $this->editBefore($fields,$old,$parentInfo,$data);
-
-                    $isNext=true;
-                    //步骤字段
-                    $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
-                    $fields->saveStepInfo=$stepInfo;
-
-                    //步骤权限验证
-                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
-                        return $this->error('您不能进行此操作-01');
-                    }
-
-
-                    $fields->each(function (ModelField $v)use(&$data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
-                    $savedInfo=$model->addInfo($data,$parentInfo,$fields,false,$returnSaveData);
-                    $this->addAfter($savedInfo);
                 }else{
                     $old=(clone $model)->find($data['id']);
                     if($baseModel){
                         $parentInfo=$baseModel->find($old[$model::parentField()]);
                     }
-                    $this->editBefore($fields,$old,$parentInfo,$data);
-
-
-                    //步骤
-                    $isNext=$this->autoGetSaveStepIsNext($fields,$old,$parentInfo);
-                    if(is_null($isNext)){
-                        return $this->error('数据不满足当前步骤');
-                    }
-                    if($isNext){
-                        $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
-                    }else{
-                        $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
-                    }
-                    if(!$this->checkEditUrl($fields,$stepInfo)){
-                        return $this->error('您不能进行此操作-061');
-                    }
-                    $fields->saveStepInfo=$stepInfo;
-
-
-                    //步骤权限验证
-                    if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
-                        return $this->error('您不能进行此操作-02');
-                    }
-                    $fields->each(function (ModelField $v)use(&$data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
-                    $savedInfo=$model->saveInfo($data,$fields,$parentInfo,$old,$returnSaveData);
-                    $this->editAfter($savedInfo);
                 }
+                $savedInfo=$this->doEditSave($model,$fields,$old,$parentInfo,$data,$isNext,$returnSaveData);
             }catch (\Exception $e){
                 $model->rollback();
                 $this->error($e);
@@ -566,5 +525,64 @@ trait BaseEdit
 
         return url('edit')->build()===$this->request->baseUrl()
             || url('edit',[],true,true)->build()===$this->request->baseUrl();
+    }
+
+
+    /**
+     * 数据库保存操作
+     * @param BaseModel $model
+     * @param FieldCollection $fields
+     * @param BaseModel $old
+     * @param BaseModel|null $parentInfo
+     * @param array|null $data
+     * @param bool $isNext
+     * @param array $returnSaveData
+     * @return BaseModel|\tpScriptVueCurd\base\model\VueCurlModel
+     * @throws \think\Exception
+     */
+    protected function doEditSave(BaseModel $model,FieldCollection $fields,BaseModel $old,?BaseModel $parentInfo,?array $data,bool &$isNext,array &$returnSaveData)
+    {
+        $this->editBefore($fields,$old,$parentInfo,$data);
+        if(empty($old->id)){
+
+            $isNext=true;
+            //步骤字段
+            $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
+            $fields->saveStepInfo=$stepInfo;
+
+            //步骤权限验证
+            if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
+                $this->error('您不能进行此操作-01');
+            }
+
+
+            $fields->each(function (ModelField $v)use(&$data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
+            $savedInfo=$model->addInfo($data,$parentInfo,$fields,false,$returnSaveData);
+            $this->addAfter($savedInfo);
+        }else{
+            $isNext=$this->autoGetSaveStepIsNext($fields,$old,$parentInfo);
+            if(is_null($isNext)){
+                $this->error('数据不满足当前步骤');
+            }
+            if($isNext){
+                $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
+            }else{
+                $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
+            }
+            if(!$this->checkEditUrl($fields,$stepInfo)){
+                $this->error('您不能进行此操作-061');
+            }
+            $fields->saveStepInfo=$stepInfo;
+
+
+            //步骤权限验证
+            if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
+                $this->error('您不能进行此操作-02');
+            }
+            $fields->each(function (ModelField $v)use(&$data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
+            $savedInfo=$model->saveInfo($data,$fields,$parentInfo,$old,$returnSaveData);
+            $this->editAfter($savedInfo);
+        }
+        return $savedInfo;
     }
 }
