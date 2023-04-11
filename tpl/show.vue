@@ -15,9 +15,7 @@
             <template v-for="field in groupFieldItems">
                 <a-row class="row" v-if="!field.showUseComponent" :style="groupGrids[groupTitle]?fieldStyle(field,groupTitle):{}">
                     <a-col class="l" v-bind="groupGrids[groupTitle]?field.editLabelCol:{span:4}">
-                        {block name="fieldTitle"}
                         {{field.title}}：
-                        {/block}
                     </a-col>
                     <a-col class="r" v-bind="groupGrids[groupTitle]?field.editWrapperCol:{span:20}">
                         <curd-show-field :field="field" :info="info"></curd-show-field>
