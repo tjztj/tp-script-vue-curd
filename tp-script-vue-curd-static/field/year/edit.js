@@ -4,7 +4,7 @@ define([],function(){
         computed:{
             val:{
                 get(){
-                    let val=this.value.toString();
+                    let val=this.value===null||this.value===undefined?'':this.value.toString();
                     return val==='0'?'':val
                 },
                 set(val){

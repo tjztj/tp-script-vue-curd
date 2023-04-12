@@ -29,18 +29,19 @@ define([],function(){
         },
         mounted(){
             this.$nextTick(e=>{
-                if(this.value===null||this.value===undefined){
-                    this.value='';
+                let val=this.value;
+                if(val===null||val===undefined){
+                    val='';
                 }
                 if(!this.field.multiple){
-                    if(this.value!==''){
+                    if(val!==''){
                         this.val={
-                            value:this.value.toString(),
-                            label:this.infos[this.value.toString()]?this.infos[this.value.toString()].title:'',
+                            value:val.toString(),
+                            label:this.infos[val.toString()]?this.infos[val.toString()].title:'',
                         };
                     }
                 }else{
-                    const arr=typeof this.value==='string'?this.value.split(','):this.value;
+                    const arr=typeof val==='string'?val.split(','):val;
                     const vals=[];
                     arr.forEach(v=>{
                         if(v.toString()!==''){
