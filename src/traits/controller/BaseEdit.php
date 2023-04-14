@@ -540,7 +540,7 @@ trait BaseEdit
      * @return BaseModel|\tpScriptVueCurd\base\model\VueCurlModel
      * @throws \think\Exception
      */
-    protected function doEditSave(BaseModel $model,FieldCollection $fields,BaseModel $old,?BaseModel $parentInfo,?array $data,bool &$isNext,array &$returnSaveData)
+    protected function doEditSave(BaseModel $model,FieldCollection &$fields,BaseModel $old,?BaseModel $parentInfo,?array $data,bool &$isNext,array &$returnSaveData)
     {
         $this->editBefore($fields,$old,$parentInfo,$data);
         if(empty($old->id)){
