@@ -10,6 +10,9 @@ width: 95%;
 max-width: 720px;
 max-height: 92%;
 }
+.table-field-show-modal .arco-modal-body{
+max-height: calc(92vh - 97px);
+}
 .table-field-box-table .arco-table:not(.arco-table-border-header-cell) .arco-table-element>thead>.arco-table-tr:first-child>.arco-table-th:first-child{
     border-top-left-radius: 6px;
 }

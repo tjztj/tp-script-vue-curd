@@ -23,25 +23,7 @@ trait BaseDel
         }
         $this->md->startTrans();
         try{
-            $childControllers=$this->getChildControllers();
-            if($childControllers&&$this->request->param('delChilds/d')==1){
-                //先删除子数据再删除数据
-                foreach ($childControllers as $v){
-                    /**
-                     * @var Controller $v
-                     */
-                    $childIds=[];
-                    $parentField=$v->md::parentField();
-                    (clone $v->md)->where($parentField,'in',$ids)->field('id,'.$parentField)->select()->each(function($val)use(&$childIds,$parentField){
-                        isset($childIds[$val[$parentField]])||$childIds[$val[$parentField]]=[];
-                        $childIds[$val[$parentField]][]=$val->id;
-                    });
-
-                    foreach ($childIds as $val){
-                        $v->doDelect(clone $v->md,$val);
-                    }
-                }
-            }
+            $this->delChilds($ids);
             $this->doDelect(clone $this->md,$ids);
         }catch (\Exception $e){
             $this->md->rollback();
@@ -54,12 +36,44 @@ trait BaseDel
 
 
     /**
+     * 递归删除子表数据
+     * @param array $ids
+     * @return void
+     * @throws Exception
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function delChilds(array $ids):void{
+        $childControllers=$this->getChildControllers();
+        if($childControllers&&$this->request->param('delChilds/d')===1){
+            //先删除子数据再删除数据
+            foreach ($childControllers as $v){
+                /**
+                 * @var Controller $v
+                 */
+                $childIds=[];
+                $parentField=$v->md::parentField();
+                (clone $v->md)->where($parentField,'in',$ids)->field('id,'.$parentField)->select()->each(function($val)use(&$childIds,$parentField){
+                    isset($childIds[$val[$parentField]])||$childIds[$val[$parentField]]=[];
+                    $childIds[$val[$parentField]][]=$val->id;
+                });
+
+                foreach ($childIds as $val){
+                    $v->delChilds($val);
+                    $v->doDelect(clone $v->md,$val);
+                }
+            }
+        }
+    }
+
+    /**
      * 删除时
      * @param BaseModel $model
      * @param array $ids
      * @return \think\response\Json|void
      */
-    public function doDelect(BaseModel $model,array $ids){
+    protected function doDelect(BaseModel $model,array $ids){
         if($this->treePidField){
             $childId=$model->whereIn($this->treePidField,$ids)->value('id');
             if($childId){
