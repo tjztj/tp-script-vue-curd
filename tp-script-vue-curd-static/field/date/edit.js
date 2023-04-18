@@ -57,7 +57,7 @@ margin-right: -160px;
                         return null;
                     }
                     let val = '';
-                    if (/^\-?\d+$/g.test(this.value.toString())) {
+                    if (/^-?\d+$/g.test(this.value.toString())) {
                         //时间戳
                         val = parseTime(Math.abs(this.value).toString().length<=10?this.value*1000:this.value, this.field.showTime ? '{y}-{m}-{d} {h}:{i}:{s}' : '{y}-{m}-{d}');
                         this.$emit('update:value', val);
