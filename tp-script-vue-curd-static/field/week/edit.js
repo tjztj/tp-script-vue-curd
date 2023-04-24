@@ -7,7 +7,7 @@ define([],function(){
                     if(this.value===0||this.value==='0'){
                         return '';
                     }
-                    if(/^\d+$/g.test(this.value.toString())){
+                    if (/^-?\d+$/g.test(this.value.toString())) {
                         return parseTime(Math.abs(this.value).toString().length<=10?this.value*1000:this.value,'{y}-{m}-{d}');
                     }
                     return this.value

@@ -355,7 +355,13 @@ trait BaseEdit
         }
 
 
-        
+
+        $fields->each(function (ModelField $field){
+            $editOnChange=$field->editOnChange();
+            if($editOnChange&&!is_string($editOnChange)){
+                $field->editOnChange(request()->url());
+            }
+        });
 
         $fieldArr=array_values($fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
         $groupFields=$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;

@@ -95,7 +95,7 @@ class DateFilter extends ModelFilter
             default:
                 throw new \think\Exception('getFilterConfigDateStr传入参数错误');
         }
-        return ['start'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $begin_time) ,'end'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $end_time),'title'=>$dateType];
+        return ['start'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $begin_time) ,'end'=>\tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d', $end_time).$end_s,'title'=>$dateType];
     }
 
 

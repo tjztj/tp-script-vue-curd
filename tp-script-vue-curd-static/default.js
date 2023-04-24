@@ -54,6 +54,15 @@ define(['vueAdmin'], function (va) {
         }
         return setup;
     }
+    function getThisActionOhterComponents(){
+        return window.thisAction.components||{};
+    }
+    function getThisActionOhterProvides(vueObj){
+        if(!window.thisAction.provide){
+            return {};
+        }
+        return typeof window.thisAction.provide==='function'?window.thisAction.provide.call(vueObj):window.thisAction.provide;
+    }
     ////--------------////
 
 
@@ -209,6 +218,7 @@ define(['vueAdmin'], function (va) {
             })
         };
         return {
+            components:{...getThisActionOhterComponents()},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
@@ -281,6 +291,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides(this)},
             mounted() {
                 this.pageIsInit();
                 this.fetch();
@@ -644,7 +655,7 @@ define(['vueAdmin'], function (va) {
                 leftCateSelect(selectedKeys,e){
                     this.leftCateObj.selectedKeys=selectedKeys;
                     this.$refs['filter'].restFilter();
-                    this.refreshTable();
+                    this.doFilter();
                 },
                 leftCateRefresh(){
                     this.leftCateObj.loading=true;
@@ -767,6 +778,7 @@ define(['vueAdmin'], function (va) {
             form.id=vueData.info.id;
         }
         return {
+            components:{...getThisActionOhterComponents()},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
@@ -784,6 +796,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides(this)},
             computed:{
                 showGroup(){
                     if(!this.haveGroup){
@@ -882,6 +895,7 @@ define(['vueAdmin'], function (va) {
 
     actions.show=function(){
         return {
+            components:{...getThisActionOhterComponents()},
             setup(props,ctx){
                 return getThisActionOhterSetup(props,ctx);
             },
@@ -896,6 +910,7 @@ define(['vueAdmin'], function (va) {
                     ...getThisActionOhterData(),
                 }
             },
+            provide(){return getThisActionOhterProvides(this)},
             computed:{
                 ...getThisActionOhterComputeds(),
             },
