@@ -1205,10 +1205,11 @@ abstract class ModelField
      * 如果参数是回调函数，仅支持form下直属字段，否则(ListField、TableField情况下)请传入url
      * @param callable|string|null|EditOnChange $editOnChange
      * @param null|string|int|bool|float|array $val
+     * @param null|FieldWhere $onWhere keyVal模式下有效
      * @return $this|EditOnChange
      * @throws Exception
      */
-    public function editOnChange($editOnChange=null,$val=null){
+    public function editOnChange($editOnChange=null,$val=null,FieldWhere $onWhere=null){
         if($editOnChange===null){
             return $this->doAttr('editOnChange', $editOnChange);
         }
@@ -1231,6 +1232,7 @@ abstract class ModelField
                 $editOnChangeObj=new \tpScriptVueCurd\option\field\edit_on_change\type\KeyVal();
                 $editOnChangeObj->key=$editOnChange;
                 $editOnChangeObj->val=$val;
+                $editOnChangeObj->where=$onWhere;
             }else{
                 throw new \think\Exception($this->name().' 字段 editOnChange 的参数错误-002');
             }
