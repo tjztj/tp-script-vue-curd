@@ -75,7 +75,7 @@ class MonthField extends ModelField
         $name=$this->name();
         if (isset($data[$name])) {
             if($data[$name]){
-                $data[$name]=is_numeric($data[$name])?$data[$name]:trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
+                $data[$name]=trim(str_replace(['.','年','月','日','/'],'-',$data[$name]),'-');//让点也能当作日期符号
                 if(is_numeric($data[$name])){
                     $this->save=$data[$name];
                 }else{

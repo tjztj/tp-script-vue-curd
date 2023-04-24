@@ -10,6 +10,7 @@ use tpScriptVueCurd\field\ListField;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\field\TableField;
 use tpScriptVueCurd\filter\EmptyFilter;
+use tpScriptVueCurd\option\field\edit_on_change\EditOnChange;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldEditTip;
 use tpScriptVueCurd\option\FieldStep;
@@ -105,9 +106,9 @@ abstract class ModelField
 
     /**
      * 监听值变化
-     * @var null|callable|string
+     * @var null|EditOnChange
      */
-    protected $editOnChange=null;
+    protected ?EditOnChange $editOnChange=null;
 
     public function __construct()
     {
@@ -1182,12 +1183,42 @@ abstract class ModelField
     /**
      * 当页面中此字段的值改变时，会执行此方法，此方法与表单提交的地址有关
      * 如果参数是回调函数，仅支持form下直属字段，否则(ListField、TableField情况下)请传入url
-     * @param callable|string|null $editOnChange
-     * @return $this|string|callable
+     * @param callable|string|null|EditOnChange $editOnChange
+     * @param null|string|int|bool|float|array $val
+     * @return $this|EditOnChange
+     * @throws Exception
      */
-    public function editOnChange($editOnChange=null){
+    public function editOnChange($editOnChange=null,$val=null){
+        if($editOnChange===null){
+            return $this->doAttr('editOnChange', $editOnChange);
+        }
+        if($editOnChange instanceof EditOnChange){
+            return $this->doAttr('editOnChange', $editOnChange);
+        }
+
+        if(is_callable($editOnChange)){
+            $editOnChangeObj=new \tpScriptVueCurd\option\field\edit_on_change\type\Func();
+            $editOnChangeObj->func=$editOnChange;
+
+        }else if(is_null($val)&&is_string($editOnChange)){
+            $editOnChangeObj=new \tpScriptVueCurd\option\field\edit_on_change\type\Url();
+            $editOnChangeObj->url=$editOnChange;
+        }else if(is_string($editOnChange)&&!is_null($val)){
+            if(strpos($editOnChange,'form.')!==0&&strpos($editOnChange,'fields.')!==0){
+                throw new \think\Exception($this->name().' 字段 editOnChange 的参数错误-001');
+            }
+            if(is_array($val)||is_string($val)||is_int($val)||is_float($val)||is_bool($val)){
+                $editOnChangeObj=new \tpScriptVueCurd\option\field\edit_on_change\type\KeyVal();
+                $editOnChangeObj->key=$editOnChange;
+                $editOnChangeObj->val=$val;
+            }else{
+                throw new \think\Exception($this->name().' 字段 editOnChange 的参数错误-002');
+            }
+        }else{
+            throw new \think\Exception($this->name().' 字段 editOnChange 的参数错误-003');
+        }
         //方法与url需返回要修改的form与fields
-        return $this->doAttr('editOnChange', $editOnChange);
+        return $this->doAttr('editOnChange', $editOnChangeObj);
     }
 
 

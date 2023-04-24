@@ -8,6 +8,7 @@ use tpScriptVueCurd\field\RegionField;
 use tpScriptVueCurd\field\StringField;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\field\edit_on_change\type\Func;
 use tpScriptVueCurd\option\FieldDo;
 use tpScriptVueCurd\option\FieldStep;
 
@@ -101,10 +102,11 @@ trait BaseEdit
             try{
                 $field=$fields->findByName($this->request->param('formChangeSetField'));
                 $editOnChange=$field->editOnChange();
-                if(!is_callable($editOnChange)){
+                if(!$editOnChange instanceof Func||!is_callable($editOnChange->func)){
                     throw new \think\Exception('字段'.$field->name().'的属性editOnChange设置错误');
                 }
-                $editOnChangeReturn=$editOnChange($this->request->param('form/a',[]));
+                $editOnChangeFunc=$editOnChange->func;
+                $editOnChangeReturn=$editOnChangeFunc($this->request->param('form/a',[]));
                 $editOnChangeReturn||$editOnChangeReturn=[];
             }catch (\Exception $exception){
                 $this->error($exception->getMessage());
@@ -353,13 +355,7 @@ trait BaseEdit
         }
 
 
-
-        $fields->each(function (ModelField $field){
-            $editOnChange=$field->editOnChange();
-            if($editOnChange&&!is_string($editOnChange)){
-                $field->editOnChange(request()->url());
-            }
-        });
+        
 
         $fieldArr=array_values($fields->rendGroup()->fieldToArrayPageType('edit')->toArray());
         $groupFields=$fields->groupItems?FieldCollection::groupListByItems($fieldArr):null;

@@ -62,7 +62,7 @@ define([],function(){
         mounted(){
             this.$nextTick(e=>{
                 if(!this.field.multiple){
-                    if(this.value!==''&&this.value!==undefined){
+                    if(this.value!=='' && this.value != undefined){
                         this.val={
                             value:this.value.toString(),
                             label:this.infos[this.value.toString()]?this.infos[this.value.toString()].title:'',

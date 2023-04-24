@@ -619,7 +619,7 @@ define(requires, function (axios, Qs) {
             return service({
                 url,
                 method: 'post',
-                data: typeof data.append==='function'?data:Qs.stringify(data),
+                data: Qs.stringify(data),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'X-REQUESTED-WITH': 'xmlhttprequest'
@@ -1566,60 +1566,74 @@ define(requires, function (axios, Qs) {
                 },
                 formChangeSet(formVal,formValOld){
                     this.groupFieldItems.forEach(field => {
-                        if(!field.editOnChange||typeof field.editOnChange!=='string'){
+                        if(!field.editOnChange){
                             return;
                         }
                         let oldVal=typeof formValOld[field.name]==='undefined'||formValOld[field.name]===null?'':formValOld[field.name].toString();
                         let newVal=typeof formVal[field.name]==='undefined'||formVal[field.name]===null?'':formVal[field.name].toString();
                         if(oldVal!==newVal){
-                            this.ajaxGetFormChangeSet(field,oldVal);
+                            if(field.editOnChange.type==='Url'||field.editOnChange.type==='Func'){
+                                this.ajaxGetFormChangeSet(field.editOnChange.url,field,oldVal);
+                            }else if(field.editOnChange.type==='KeyVal'){
+                                const ks=field.editOnChange.key.split('.');
+                                let rsdata=field.editOnChange.val,rsdata2={};
+                                for(let i=ks.length-1;i>=0;i--){
+                                    rsdata2[ks[i]]=rsdata;
+                                    rsdata=rsdata2;
+                                    rsdata2={};
+                                }
+                                this.doChangeSet({data:rsdata});
+                            }
                         }
                     })
                     this.formValOld=JSON.parse(JSON.stringify(formVal));
                 },
                 '$post': vueDefMethods.$post,
-                ajaxGetFormChangeSet(field,oldVal){
-                    let fieldKeys={};
-                    this.groupFieldItems.forEach((field,key) => {
-                        fieldKeys[field.name]=key;
-                    });
-                    this.$post(field.editOnChange,{
+                ajaxGetFormChangeSet(url,field,oldVal){
+                    this.$post(url,{
                         formChangeSetField:field.name,
                         pageGuid:VUE_CURD.GUID,
                         oldVal,
                         form:this.formVal
                     }).then(res=>{
-                        let updateFormView=false;
-                        if(res.data.fields){
-                            for(let fieldName in res.data.fields){
-                                for (let key in res.data.fields[fieldName]){
-                                    if(fieldKeys[fieldName]){
-                                        updateFormView=true;
-                                        let val=typeof res.data.fields[fieldName][key]==='number'?res.data.fields[fieldName][key].toString():res.data.fields[fieldName][key];
-                                        this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]=this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]||[];
-                                        this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key].push({
-                                            value:val,
-                                            where:null
-                                        })
-                                        this.groupFieldItems[fieldKeys[fieldName]][key]=val;
-                                    }
+                        this.doChangeSet(res);
+                    })
+                },
+                doChangeSet(res){
+                    let fieldKeys={};
+                    this.groupFieldItems.forEach((field,key) => {
+                        fieldKeys[field.name]=key;
+                    });
+                    let updateFormView=false;
+                    if(res.data.fields){
+                        for(let fieldName in res.data.fields){
+                            for (let key in res.data.fields[fieldName]){
+                                if(fieldKeys[fieldName]){
+                                    updateFormView=true;
+                                    let val=typeof res.data.fields[fieldName][key]==='number'?res.data.fields[fieldName][key].toString():res.data.fields[fieldName][key];
+                                    this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]=this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]||[];
+                                    this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key].push({
+                                        value:val,
+                                        where:null
+                                    })
+                                    this.groupFieldItems[fieldKeys[fieldName]][key]=val;
                                 }
                             }
                         }
-                        if(res.data.form){
-                            for(let key in res.data.form){
-                                updateFormView=true;
-                                this.formVal[key]=typeof res.data.form[key]==='number'?res.data.form[key].toString():res.data.form[key];
-                            }
+                    }
+                    if(res.data.form){
+                        for(let key in res.data.form){
+                            updateFormView=true;
+                            this.formVal[key]=typeof res.data.form[key]==='number'?res.data.form[key].toString():res.data.form[key];
                         }
+                    }
 
-                        if(updateFormView===true){
-                            this.$nextTick(()=>{
-                                this.$forceUpdate();
-                            })
-                        }
-                    })
-                }
+                    if(updateFormView===true){
+                        this.$nextTick(()=>{
+                            this.$forceUpdate();
+                        })
+                    }
+                },
             },
             template: `
                         <div :style="gridStyle">

@@ -89,14 +89,7 @@ abstract class FieldStepBase
 
 
         $this->step->getBeforeChecks=function (){
-            $funcs=$this->beforeCheck();
-            foreach ($funcs as $k=>$v){
-                if(!is_callable($v)){
-                    continue;
-                }
-                $funcs[$k]=FieldStepBeforeCheck::make('',$v);
-            }
-            return $funcs;
+            return $this->beforeCheck();
         };
         $this->step->stepClass=static::class;
 

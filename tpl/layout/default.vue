@@ -46,6 +46,7 @@
         wrap-class-name="body-iframe-modal"
         :destroy-on-close="true"
         v-model:visible="bodyModal.visible"
+        :confirm-loading="confirmLoading"
         :footer="null"
         :keyboard="false"
         :mask-closable="false"
@@ -53,6 +54,7 @@
         :height="bodyModal.height"
         :z-index="bodyModal.zIndex"
         :after-close="bodyModal.onclose"
+        @ok="handleOk"
     >
         <template #title>
             <div v-html="bodyModal.title"></div>
