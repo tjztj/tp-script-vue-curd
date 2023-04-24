@@ -77,8 +77,8 @@ class Edit
 
         $this->fields->each(function (ModelField $field)use($info){
             $editOnChange=$field->editOnChange();
-            if($editOnChange&&!is_string($editOnChange)){
-                throw new \think\Exception('此字段的editOnChange只能设置为url');
+            if($editOnChange instanceof \tpScriptVueCurd\option\field\edit_on_change\type\Func){
+                throw new \think\Exception('此字段的editOnChange不能设置为function');
             }
         });
 

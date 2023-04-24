@@ -4,6 +4,7 @@ namespace tpScriptVueCurd\option\index_row_btn;
 
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\field\edit_on_change\type\Func;
 
 class RowBtn extends Btn
 {
@@ -29,8 +30,8 @@ class RowBtn extends Btn
         if($this->modalFields){
             $this->modalFields->each(function (ModelField $field){
                 $editOnChange=$field->editOnChange();
-                if($editOnChange&&!is_string($editOnChange)){
-                    throw new \think\Exception('此字段的editOnChange只能设置为url');
+                if($editOnChange instanceof Func){
+                    throw new \think\Exception('此字段的editOnChange不能设置为function');
                 }
             });
             $modalFields=array_values($this->modalFields->rendGroup()->fieldToArrayPageType('edit')->toArray());
