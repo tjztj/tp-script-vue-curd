@@ -1427,7 +1427,7 @@ define(requires, function (axios, Qs) {
                         fieldKeys[field.name]=key;
                     });
                     let updateFormView=false;
-                    if(res.data.fields){
+                    if(res.data.fields&&typeof res.data.fields==='object'){
                         for(let fieldName in res.data.fields){
                             for (let key in res.data.fields[fieldName]){
                                 if(fieldKeys[fieldName]){
