@@ -886,6 +886,110 @@ define(requires, function (axios, Qs) {
         app.use(ArcoVueIcon);
 
 
+
+        /****************************************/
+        const checkVal = function (fieldWhere, val) {
+            if (fieldWhere.type === 'in') {
+                for (let i in fieldWhere.valueData) {
+                    if (fieldWhere.valueData[i] == val) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            if (fieldWhere.type === 'find_in_set') {
+                if (val === '') val = [];
+                const valArr = typeof val === 'object' ? val : val.toString().split(',');
+                for (let i in valArr) {
+                    for (let n in fieldWhere.valueData) {
+                        if (fieldWhere.valueData[n] === valArr[i]) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+
+            if (fieldWhere.valueData[0] === null) {
+                return val <= fieldWhere.valueData[1];
+            }
+            if (fieldWhere.valueData[1] === null) {
+                return val >= fieldWhere.valueData[0];
+            }
+            return val <= fieldWhere.valueData[1] && val >= fieldWhere.valueData[0];
+        }
+        const checkFieldWhereSelf = (fieldWhere,formVal,info) => {
+            if (fieldWhere.field.name === fieldWhere.RETURN_FALSE_FIELD_NAME) {
+                return fieldWhere.ands && fieldWhere.ands.length > 0;
+            }
+            let val = null;
+            let formValue = formVal[fieldWhere.field.name];
+            if (fieldWhere.field.type === 'FilesField'
+                && fieldWhere.field.editShow === false&&info
+                && info.sourceData && typeof info.sourceData[fieldWhere.field.name] !== 'undefined') {
+                formValue = info.sourceData[fieldWhere.field.name];
+            }
+            if (typeof formValue === 'undefined') {
+                if (!info || typeof info[fieldWhere.field.name] === 'undefined') {
+                    return !fieldWhere.isNot;
+                }
+                val = info[fieldWhere.field.name];
+            } else {
+                val = formValue;
+            }
+            if (val === null) {
+                return !fieldWhere.isNot;
+            }
+
+            if (val) {
+                if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
+                    if (!/^\d+$/.test(val.toString())) {
+                        const d=new Date(val);
+                        if(!fieldWhere.field.showTime){
+                            d.setHours(0,0,0)
+                        }
+                        val = d.getTime()/1000;
+                    }
+                }
+            }
+            return checkVal(fieldWhere, val) !== fieldWhere.isNot;
+        };
+        const checkFieldWhere = function (fieldWhere,formVal,info) {
+            let check = checkFieldWhereSelf(fieldWhere,formVal,info);
+            if (check) {
+                for (let i in fieldWhere.ands) {
+                    if (checkFieldWhere(fieldWhere.ands[i],formVal,info) === false) {
+                        check = false;
+                        break;
+                    }
+                }
+            }
+            if (check) {
+                return true;
+            }
+            for (let i in fieldWhere.ors) {
+                if (checkFieldWhere(fieldWhere.ors[i],formVal,info)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        const getWhereFields = function (fieldWhere) {
+            const fields = [];
+            fields.push(fieldWhere.field.name);
+            for (let i in fieldWhere.ands) {
+                fields.push(...getWhereFields(fieldWhere.ands[i]));
+            }
+            for (let i in fieldWhere.ors) {
+                fields.push(...getWhereFields(fieldWhere.ors[i]));
+            }
+            return fields;
+        };
+
+
+        /*************************************/
+
         app.component('FieldGroupItem', {
             name: 'fieldGroupItem',
             props: ['groupFieldItems', 'form', 'listFieldLabelCol', 'listFieldWrapperCol', 'fieldHideList', 'info','grid'],
@@ -927,106 +1031,7 @@ define(requires, function (axios, Qs) {
                 formVal: {
                     handler(formVal,formValOld) {
                         let forceUpdate=false;
-                        const checkVal = function (fieldWhere, val) {
-                            if (fieldWhere.type === 'in') {
-                                for (let i in fieldWhere.valueData) {
-                                    if (fieldWhere.valueData[i] == val) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                            if (fieldWhere.type === 'find_in_set') {
-                                if (val === '') val = [];
-                                const valArr = typeof val === 'object' ? val : val.toString().split(',');
-                                for (let i in valArr) {
-                                    for (let n in fieldWhere.valueData) {
-                                        if (fieldWhere.valueData[n] === valArr[i]) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                                return false;
-                            }
 
-
-                            if (fieldWhere.valueData[0] === null) {
-                                return val <= fieldWhere.valueData[1];
-                            }
-                            if (fieldWhere.valueData[1] === null) {
-                                return val >= fieldWhere.valueData[0];
-                            }
-                            return val <= fieldWhere.valueData[1] && val >= fieldWhere.valueData[0];
-                        }
-                        const checkFieldWhereSelf = (fieldWhere) => {
-                            if (fieldWhere.field.name === fieldWhere.RETURN_FALSE_FIELD_NAME) {
-                                return fieldWhere.ands && fieldWhere.ands.length > 0;
-                            }
-                            let val = null;
-                            let formValue = formVal[fieldWhere.field.name];
-                            if (fieldWhere.field.type === 'FilesField'
-                                && fieldWhere.field.editShow === false
-                                && this.info.sourceData && typeof this.info.sourceData[fieldWhere.field.name] !== 'undefined') {
-                                formValue = this.info.sourceData[fieldWhere.field.name];
-                            }
-                            if (typeof formValue === 'undefined') {
-                                if (!this.info || typeof this.info[fieldWhere.field.name] === 'undefined') {
-                                    return !fieldWhere.isNot;
-                                }
-                                val = this.info[fieldWhere.field.name];
-                            } else {
-                                val = formValue;
-                            }
-                            if (val === null) {
-                                return !fieldWhere.isNot;
-                            }
-
-                            if (val) {
-                                if (fieldWhere.field.type === 'DateField' || fieldWhere.field.type === 'MonthField' || fieldWhere.field.type === 'WeekField') {
-                                    if (!/^\d+$/.test(val.toString())) {
-                                        const d=new Date(val);
-                                        if(!fieldWhere.field.showTime){
-                                            d.setHours(0,0,0)
-                                        }
-                                        val = d.getTime()/1000;
-                                    }
-                                }
-                            }
-
-
-                            return checkVal(fieldWhere, val) !== fieldWhere.isNot;
-                        };
-                        const checkFieldWhere = function (fieldWhere) {
-                            let check = checkFieldWhereSelf(fieldWhere);
-                            if (check) {
-                                for (let i in fieldWhere.ands) {
-                                    if (checkFieldWhere(fieldWhere.ands[i]) === false) {
-                                        check = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (check) {
-                                return true;
-                            }
-                            for (let i in fieldWhere.ors) {
-                                if (checkFieldWhere(fieldWhere.ors[i])) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        };
-                        const getWhereFields = function (fieldWhere) {
-                            const fields = [];
-                            fields.push(fieldWhere.field.name);
-                            for (let i in fieldWhere.ands) {
-                                fields.push(...getWhereFields(fieldWhere.ands[i]));
-                            }
-                            for (let i in fieldWhere.ors) {
-                                fields.push(...getWhereFields(fieldWhere.ors[i]));
-                            }
-                            return fields;
-                        };
                         ///////////////////////////////////////////////////////////////////////////////////////////////
                         const checkShowItemBy = function (field) {
                             if (!field.items || field.items.length === 0) {
@@ -1041,7 +1046,7 @@ define(requires, function (axios, Qs) {
                                     }
                                     return;
                                 }
-                                if (checkFieldWhere(v.showItemBy)) {
+                                if (checkFieldWhere(v.showItemBy,formVal,this.info)) {
                                     if(v.showItem!==true){
                                         v.showItem = true;
                                         forceUpdate=true;
@@ -1084,7 +1089,7 @@ define(requires, function (axios, Qs) {
                                 return;
                             }
                             let old=JSON.stringify(field.editTipArr);
-                            field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
+                            field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
                             if(forceUpdate===false&&old!==JSON.stringify(field.editTipArr)){
                                 forceUpdate=true;
                             }
@@ -1100,7 +1105,7 @@ define(requires, function (axios, Qs) {
                                 return;
                             }
                             let old=JSON.stringify(field.tipArr);
-                            field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
+                            field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
                             if(forceUpdate===false&&old!==JSON.stringify(field.tipArr)){
                                 forceUpdate=true;
                             }
@@ -1143,7 +1148,7 @@ define(requires, function (axios, Qs) {
                         }
                         const checkHideField = (field, checkVal) => {
                             if (field.hideSelf) {
-                                changeFieldHideList(field.name, getWhereFields(field.hideSelf).join(','), checkFieldWhere(field.hideSelf));
+                                changeFieldHideList(field.name, getWhereFields(field.hideSelf).join(','), checkFieldWhere(field.hideSelf,formVal,this.info));
                             }
 
                             let reversalHideFields = !!field.reversalHideFields,
@@ -1273,7 +1278,7 @@ define(requires, function (axios, Qs) {
                                 let val = typeof field[attr] === 'undefined' ? def : field[attr];
                                 for (let k = field.attrWhereValueList[attr].length - 1; k >= 0; k--) {
                                     const {value, where} = field.attrWhereValueList[attr][k];
-                                    if (where === null || checkFieldWhere(where)) {
+                                    if (where === null || checkFieldWhere(where,formVal,this.info)) {
                                         val = value;
                                         break;
                                     }
@@ -1397,14 +1402,16 @@ define(requires, function (axios, Qs) {
                             if(field.editOnChange.type==='Url'||field.editOnChange.type==='Func'){
                                 this.ajaxGetFormChangeSet(field.editOnChange.url,field,oldVal);
                             }else if(field.editOnChange.type==='KeyVal'){
-                                const ks=field.editOnChange.key.split('.');
-                                let rsdata=field.editOnChange.val,rsdata2={};
-                                for(let i=ks.length-1;i>=0;i--){
-                                    rsdata2[ks[i]]=rsdata;
-                                    rsdata=rsdata2;
-                                    rsdata2={};
+                                if(field.editOnChange.where===null||checkFieldWhere(field.editOnChange.where,formVal,this.info)){
+                                    const ks=field.editOnChange.key.split('.');
+                                    let rsdata=field.editOnChange.val,rsdata2={};
+                                    for(let i=ks.length-1;i>=0;i--){
+                                        rsdata2[ks[i]]=rsdata;
+                                        rsdata=rsdata2;
+                                        rsdata2={};
+                                    }
+                                    this.doChangeSet({data:rsdata});
                                 }
-                                this.doChangeSet({data:rsdata});
                             }
                         }
                     })
@@ -1507,7 +1514,18 @@ define(requires, function (axios, Qs) {
                     if (this.field.tips.length === 0) {
                         return [];
                     }
-                    return this.field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show));
+                    const formVal={};
+                    for(let i in this.info){
+                        if(typeof this.info['_Original_'+i]==='undefined'){
+                            formVal[i]=this.info['_Original_'+i];
+                        }else{
+                            formVal[i]=this.info[i];
+                        }
+                    }
+                    if(typeof this.info.sourceData==='undefined'){
+                        this.info.sourceData=formVal;
+                    }
+                    return this.field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
                 },
             },
             methods: {
