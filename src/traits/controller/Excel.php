@@ -47,7 +47,7 @@ trait Excel
 
 
 
-    protected function myExcelFields():FieldCollection{
+    public function myExcelFields():FieldCollection{
         if(is_null($this->getParentController())){
             return $this->fields;
         }

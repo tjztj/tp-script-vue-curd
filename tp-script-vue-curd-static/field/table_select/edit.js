@@ -13,6 +13,7 @@ display: none;
 }
 .select-table-dropdown{
     margin: 0 4px;
+    min-width: 100px;
 }
 .select-table-dropdown .arco-table-pagination{
     margin-right: 12px;
@@ -260,7 +261,7 @@ display: none;
                 }
             },
             selectChange(vals){
-                this.selectedRowKeys=vals.map(valDo);
+                this.selectedRowKeys=typeof vals==='string'?(vals?[valDo(vals)]:[]):vals.map(valDo);
                 this.$emit('update:value',this.getValueStr());
             },
             selectSearch(val){
