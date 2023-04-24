@@ -1578,15 +1578,16 @@ define(requires, function (axios, Qs) {
                             if(field.editOnChange.type==='Url'||field.editOnChange.type==='Func'){
                                 this.ajaxGetFormChangeSet(field.editOnChange.url,field,oldVal);
                             }else if(field.editOnChange.type==='KeyVal'){
-                                if(field.editOnChange.where===null||checkFieldWhere(field.editOnChange.where,formVal,this.info))
-                                const ks=field.editOnChange.key.split('.');
-                                let rsdata=field.editOnChange.val,rsdata2={};
-                                for(let i=ks.length-1;i>=0;i--){
-                                    rsdata2[ks[i]]=rsdata;
-                                    rsdata=rsdata2;
-                                    rsdata2={};
+                                if(field.editOnChange.where===null||checkFieldWhere(field.editOnChange.where,formVal,this.info)){
+                                    const ks=field.editOnChange.key.split('.');
+                                    let rsdata=field.editOnChange.val,rsdata2={};
+                                    for(let i=ks.length-1;i>=0;i--){
+                                        rsdata2[ks[i]]=rsdata;
+                                        rsdata=rsdata2;
+                                        rsdata2={};
+                                    }
+                                    this.doChangeSet({data:rsdata});
                                 }
-                                this.doChangeSet({data:rsdata});
                             }
                         }
                     })
