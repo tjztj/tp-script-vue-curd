@@ -1516,11 +1516,7 @@ define(requires, function (axios, Qs) {
                     }
                     const formVal={};
                     for(let i in this.info){
-                        if(typeof this.info['_Original_'+i]==='undefined'){
-                            formVal[i]=this.info['_Original_'+i];
-                        }else{
-                            formVal[i]=this.info[i];
-                        }
+                        formVal[i]=this.info[typeof this.info['_Original_'+i]==='undefined'?i:'_Original_'+i];
                     }
                     if(typeof this.info.sourceData==='undefined'){
                         this.info.sourceData=formVal;
