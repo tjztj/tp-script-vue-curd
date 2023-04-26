@@ -1437,7 +1437,7 @@ define(requires, function (axios, Qs) {
                     if(res.data.fields&&typeof res.data.fields==='object'){
                         for(let fieldName in res.data.fields){
                             for (let key in res.data.fields[fieldName]){
-                                if(fieldKeys[fieldName]){
+                                if(typeof fieldKeys[fieldName]!=='undefined'){
                                     updateFormView=true;
                                     let val=typeof res.data.fields[fieldName][key]==='number'?res.data.fields[fieldName][key].toString():res.data.fields[fieldName][key];
                                     this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]=this.groupFieldItems[fieldKeys[fieldName]].attrWhereValueList[key]||[];
