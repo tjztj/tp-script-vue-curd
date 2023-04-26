@@ -43,6 +43,7 @@ abstract class ModelField
     protected string $ext = '';//后缀
     protected string $placeholder = '';//输入提示
     protected string $editExplain = '';//字段编辑时下方的说明
+    protected string $editExplainColor='rgb(134,144,156)';//字段编辑时，底部显示的颜色
     protected string $explain='';//字段编辑和显示时，底部显示
     protected string $explainColor='rgb(134,144,156)';//字段编辑和显示时，底部显示
     protected bool $listShow = false;//是否在列表中显示
@@ -230,6 +231,16 @@ abstract class ModelField
     {
         return $this->doAttr('editExplain', $editExplain);
     }
+
+    /**字段编辑时下方的说明字体颜色
+     * @param string|null $editExplainColor
+     * @return $this|string
+     */
+    public function editExplainColor(string $editExplainColor = null)
+    {
+        return $this->doAttr('editExplainColor', $editExplainColor);
+    }
+
 
     /**字段编辑和显示时下方的说明
      * @param string|null $explain

@@ -1489,7 +1489,7 @@ define(requires, function (axios, Qs) {
                                         @submit="$emit('submit',$event)"
                                     ></component></div>
                                     <transition name="to-right">
-                                    <div v-if="field.editExplain" style="color: rgb(134,144,156)">{{field.editExplain}}</div>
+                                    <div v-if="field.editExplain" :style="{color:field.editExplainColor}">{{field.editExplain}}</div>
                                     </transition>
                                     <transition name="to-right">
                                     <div v-if="field.explain" :style="{color:field.explainColor}">{{field.explain}}</div>
