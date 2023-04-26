@@ -16,9 +16,9 @@ define(['/tp-script-vue-curd-static.php?field/coordinate/map.js','/tp-script-vue
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <t-map v-if="field.mapType==='TMap'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat"></t-map>
-                        <b-map v-if="field.mapType==='BMapGL'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat"></b-map>
-                        <a-map v-if="field.mapType==='AMap'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat"></a-map>
+                        <t-map v-if="field.mapType==='TMap'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat" :z-index="field.zIndex"></t-map>
+                        <b-map v-if="field.mapType==='BMapGL'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat" :z-index="field.zIndex"></b-map>
+                        <a-map v-if="field.mapType==='AMap'" v-model:value="modelVal" :disabled="field.readOnly" :placeholder="field.placeholder||'请选择位置'" :center="field.center.lng+','+field.center.lat" :z-index="field.zIndex"></a-map>
                     </div>
                     <div class="r">
                         <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>

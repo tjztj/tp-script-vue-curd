@@ -1,6 +1,6 @@
 define([], function () {
     return {
-        props: ['value', 'disabled', 'placeholder','center'],
+        props: ['value', 'disabled', 'placeholder','center','zIndex'],
         setup(props, ctx) {
             props.value = props.value || '';
             props.placeholder = props.placeholder || '还未选择位置';
@@ -76,6 +76,7 @@ define([], function () {
                 return {
                     width: this.width || '360px',
                     height: this.height || '180px',
+                    zIndex:this.zIndex?this.zIndex:undefined,
                 }
             },
         },

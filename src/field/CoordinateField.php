@@ -22,6 +22,8 @@ class CoordinateField extends ModelField
     protected string $mapType='TMap';//'TMap','AMap','BMapGL'
 
 
+    protected int $zIndex=0;
+
     public function __construct()
     {
         parent::__construct();
@@ -54,6 +56,16 @@ class CoordinateField extends ModelField
         return $this->doAttr('center', $center);
     }
 
+
+    /**
+     * 设置/获取z-index
+     * @param int|null $zIndex
+     * @return MapRangeField|int
+     */
+    public function zIndex(int $zIndex = null)
+    {
+        return $this->doAttr('zIndex', $zIndex);
+    }
 
 
     /**

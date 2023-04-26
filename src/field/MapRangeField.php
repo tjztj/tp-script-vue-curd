@@ -23,6 +23,9 @@ class MapRangeField extends ModelField
 
     protected string $mapType='TMap';//'TMap','AMap','BMapGL'
 
+
+    protected int $zIndex=0;
+
     public function __construct()
     {
         parent::__construct();
@@ -62,6 +65,16 @@ class MapRangeField extends ModelField
     public function district(string $district = null)
     {
         return $this->doAttr('district', $district);
+    }
+
+    /**
+     * 设置/获取z-index
+     * @param int|null $zIndex
+     * @return MapRangeField|int
+     */
+    public function zIndex(int $zIndex = null)
+    {
+        return $this->doAttr('zIndex', $zIndex);
     }
 
     //GCJ-02(火星，高德) 坐标转换成 BD-09(百度) 坐标//@param gg_lon 火星经度//@param gg_lat 火星纬度

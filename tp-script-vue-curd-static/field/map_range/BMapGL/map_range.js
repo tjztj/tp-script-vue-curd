@@ -3,7 +3,7 @@ define(['/tp-script-vue-curd-static.php?field/map_range/BMapGL/md5.js'], functio
         window.md5=lmd5.hex_md5;
     }
     return {
-        props: ['value', 'disabled', 'placeholder','district','center'],
+        props: ['value', 'disabled', 'placeholder','district','center','zIndex'],
         setup(props, ctx) {
             props.value = props.value || '';
             props.placeholder = props.placeholder || '还未选择区域';
@@ -81,6 +81,7 @@ define(['/tp-script-vue-curd-static.php?field/map_range/BMapGL/md5.js'], functio
                 return {
                     width: this.width || '360px',
                     height: this.height || '180px',
+                    zIndex:this.zIndex?this.zIndex:undefined,
                 }
             },
             paths() {
