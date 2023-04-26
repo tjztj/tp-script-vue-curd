@@ -470,7 +470,11 @@ trait BaseIndex
 
             $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
-            $info->stepCanEdit= $stepInfo && $stepInfo->authCheck($info, $parentInfo, $stepFields,$list);
+            if($stepInfo&&($nextStepInfo===null||$stepInfo->getStep()!==$nextStepInfo->getStep())){
+                $info->stepCanEdit= $stepInfo->authCheck($info, $parentInfo, $stepFields,$list);
+            }else{
+                $info->stepCanEdit= false;
+            }
 
 
             return $info;
