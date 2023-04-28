@@ -140,10 +140,13 @@ define(['vueAdmin'], function (va) {
 
     function openParam(btnOption,defTitle,defUrl){
         let title=defTitle;
-        let w=this.cWindow&&this.cWindow.w?this.cWindow.w:'45vw';
-        let h=this.cWindow&&this.cWindow.h?this.cWindow.h:'100vh';
+        let w='45vw',h='100vh',offset='rt';
+        if(vueData.cWindow){
+            w=vueData.cWindow.w||w;
+            h=vueData.cWindow.h||h;
+            offset=vueData.cWindow.offset||offset;
+        }
         let url=defUrl;
-        let offset=this.cWindow&&this.cWindow.f?this.cWindow.f:'rt';
         if(btnOption){
             if(btnOption.modalTitle){
                 title=btnOption.modalTitle;
