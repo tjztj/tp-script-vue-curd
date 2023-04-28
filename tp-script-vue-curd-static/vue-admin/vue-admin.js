@@ -2276,10 +2276,12 @@ define(requires, function (axios, Qs) {
                                    
                                     </slot>
                                     
-                                    <template v-for="btn in getBeforeBtns(record)">
-                                        <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                        <a-divider type="vertical"></a-divider>
-                                    </template>
+                                    <slot name="other-btn-before" :record="record">
+                                        <template v-for="btn in getBeforeBtns(record)">
+                                            <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                            <a-divider type="vertical"></a-divider>
+                                        </template>
+                                    </slot>
                                     
                                     <slot name="do" :record="record">
                                         <a v-if="isCanShowInfo(record)" @click="openShow(record)" :style="{color: showBtnColor(record)}">{{showBtnText(record)}}</a>
@@ -2311,15 +2313,19 @@ define(requires, function (axios, Qs) {
                                     </slot>
                                     
                                     
-                                    <template v-if="isCanAddChildren(record)">
-                                        <a-divider type="vertical"></a-divider>
-                                        <a @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
-                                    </template>
+                                    <slot name="tree-child-add" :record="record">
+                                        <template v-if="isCanAddChildren(record)">
+                                            <a-divider type="vertical"></a-divider>
+                                            <a @click="openAddChildren(record)" :style="{color: addChildrenBtnColor(record)}">{{addChildrenBtnText(record)}}</a>
+                                        </template>
+                                    </slot>
                                     
-                                      <template v-for="btn in getAfterBtns(record)">
-                                        <a-divider type="vertical"></a-divider>
-                                         <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                      </template>
+                                    <slot name="other-btn-after" :record="record">
+                                        <template v-for="btn in getAfterBtns(record)">
+                                            <a-divider type="vertical"></a-divider>
+                                            <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
+                                        </template>
+                                    </slot>
                                     
                                     <slot name="do-after" :record="record">
                                      
