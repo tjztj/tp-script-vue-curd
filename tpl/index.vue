@@ -331,6 +331,7 @@
                     :can-edit="canEdit"
                     :can-del="canDel"
                     :action-width="actionWidth"
+                    :lock-action-width="lockActionWidth"
                     :row-selection="showMultipleSelection===true||(canDel&&showMultipleSelection===null)?rowSelection:null"
                     :field-step-config="fieldStepConfig"
                     :action-def-width="actionDefWidth"
