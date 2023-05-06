@@ -97,11 +97,23 @@
             .toLowerCase()+'.js'
     }
 
-    require([jsPath], function (objs) {
-        if(objs[VUE_CURD.ACTION]){
-            objs[VUE_CURD.ACTION]();
+    let isInit=false,oldLoad=window.onload;
+    window.onload=function (e){
+        if(isInit){
+            return;
         }
-    });
+        isInit=true;
+        if(oldLoad){
+            oldLoad(e);
+        }
+        new Promise(()=>{
+            require([jsPath], function (objs) {
+                if(objs[VUE_CURD.ACTION]){
+                    objs[VUE_CURD.ACTION]();
+                }
+            });
+        })
+    }
 </script>
 </body>
 </html>
