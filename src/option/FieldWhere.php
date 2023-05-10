@@ -146,7 +146,18 @@ class FieldWhere
         }
     }
 
-    public static function make($field,$valueData=[],$type=self::TYPE_IN,bool $isNot=false):self{
+    /**
+     * @param ModelField|string $field  可以直接写字段名，但不推荐
+     * @param array|string|int|float $valueData
+     * @param string $type
+     * @param bool $isNot
+     * @return self
+     * @throws \think\Exception
+     */
+    public static function make($field,$valueData=[],string $type=self::TYPE_IN,bool $isNot=false):self{
+        if(is_string($field)){
+            $field=StringField::init($field);
+        }
         return new self($field,$valueData,$type,$isNot);
     }
 

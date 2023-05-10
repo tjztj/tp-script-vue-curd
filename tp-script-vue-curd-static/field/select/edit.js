@@ -52,6 +52,9 @@ define([],function(){
                         groupItems[v.group]=[];
                     }
                     v.label=v.title||v.text;
+                    if(typeof v.value==='number'){
+                        v.value=v.value.toString();
+                    }
                     groupItems[v.group].push(v);
                 });
 
