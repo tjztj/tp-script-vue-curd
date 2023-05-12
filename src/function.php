@@ -2,6 +2,8 @@
 
 use think\facade\Env;
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\option\ConfirmException;
+use tpScriptVueCurd\tool\ErrorCode;
 
 
 /**
@@ -214,6 +216,10 @@ function appIsDebug():bool{
  * @throws Exception
  */
 function errorShowThrow(\Exception $error=null):bool{
+    if($error instanceof ConfirmException||in_array((int)$error->getCode(),ErrorCode::DEBUG_NOT_OUT_ERR_INFOS,true)){
+        return false;
+    }
+
     $isThrow=appIsDebug()&& Env::get('TP_SCRIPT_VUE_CURD.DEBUG', false);
     if(!is_null($error) && $isThrow) {
         throw $error;

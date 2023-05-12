@@ -20,6 +20,7 @@ use tpScriptVueCurd\option\FieldTip;
 use tpScriptVueCurd\option\FieldWhere;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\option\grid\GridCol;
+use tpScriptVueCurd\tool\ErrorCode;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
 use tpScriptVueCurd\tool\field_tpl\Index;
@@ -987,7 +988,7 @@ abstract class ModelField
             return;
         }
         if((empty($val))||$this->nullVal() === $val){
-            throw new \think\Exception($msg);
+            throw new \think\Exception($msg,ErrorCode::SAVE_IS_REQUIRED);
         }
     }
 

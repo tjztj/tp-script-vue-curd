@@ -186,7 +186,7 @@ trait Vue
         }
 
         if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
-            $msg instanceof ConfirmException||in_array((int)$msg->getCode(),[ErrorCode::DELETE_HAVE_CHILD,ErrorCode::DELETE_TREE_HAVE_CHILD],true)||errorShowThrow($msg);
+           errorShowThrow($msg);
             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
                 'okText'=>$msg->okText,
                 'cancelText'=>$msg->cancelText,

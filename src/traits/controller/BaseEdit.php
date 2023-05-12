@@ -176,6 +176,7 @@ trait BaseEdit
         $id=$this->request->editId??$this->request->param('id/d');
         if($id){
             $info=(clone $model)->find($id);
+            $info||$this->error('未找到相关数据信息');
             if($baseModel){
                 $base_id=$info[$model::parentField()];
                 $parentInfo=$baseModel->find($info[$model::parentField()]);
