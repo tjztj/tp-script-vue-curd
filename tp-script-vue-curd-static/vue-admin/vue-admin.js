@@ -1030,274 +1030,7 @@ define(requires, function (axios, Qs) {
             watch: {
                 formVal: {
                     handler(formVal,formValOld) {
-                        let forceUpdate=false;
-
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const checkShowItemBy = function (field) {
-                            if (!field.items || field.items.length === 0) {
-                                return;
-                            }
-                            //TODO::未完成对TreeSelect的支持
-                            field.items.forEach(v => {
-                                if (!v.showItemBy) {
-                                    if(typeof v.showItem!=='undefined'){
-                                        delete v.showItem;
-                                        forceUpdate=true;
-                                    }
-                                    return;
-                                }
-                                if (checkFieldWhere(v.showItemBy,formVal,this.info)) {
-                                    if(v.showItem!==true){
-                                        v.showItem = true;
-                                        forceUpdate=true;
-                                    }
-                                } else {
-                                    if (formVal[field.name] !== undefined && formVal[field.name] !== '') {
-                                        if (field.type === 'CheckboxField' || ((field.type === 'SelectField' || field.type === 'TreeSelect') && field.multiple)) {
-                                            let newVals = [];
-                                            formVal[field.name].toString().split(',').forEach(val => {
-                                                if (val !== v.value.toString()) {
-                                                    newVals.push(val);
-                                                }
-                                            })
-                                            const newVal = newVals.join(',');
-                                            if (newVal !== formVal[field.name]) {
-                                                formVal[field.name] = this.formVal[field.name] = newVal;
-                                                forceUpdate=true;
-                                            }
-                                        } else if (formVal[field.name].toString() === v.value.toString()) {
-                                            formVal[field.name] = this.formVal[field.name] = '';
-                                            forceUpdate=true;
-                                        }
-                                    }
-
-                                    if(v.showItem!==false){
-                                        v.showItem = false;
-                                        forceUpdate=true;
-                                    }
-
-                                }
-                            });
-                        };
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const checkFieldEditTipShow = function (field) {
-                            if (field.editTips.length === 0) {
-                                if(field.editTipArr&&field.editTipArr.length>0){
-                                    forceUpdate=true;
-                                }
-                                field.editTipArr = [];
-                                return;
-                            }
-                            let old=JSON.stringify(field.editTipArr);
-                            field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
-                            if(forceUpdate===false&&old!==JSON.stringify(field.editTipArr)){
-                                forceUpdate=true;
-                            }
-                        }
-
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const checkFieldTipShow = function (field) {
-                            if (field.tips.length === 0) {
-                                if(field.tipArr&&field.tipArr.length>0){
-                                    forceUpdate=true;
-                                }
-                                field.tipArr = [];
-                                return;
-                            }
-                            let old=JSON.stringify(field.tipArr);
-                            field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
-                            if(forceUpdate===false&&old!==JSON.stringify(field.tipArr)){
-                                forceUpdate=true;
-                            }
-                        }
-
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        function arrHave(arr, val) {
-                            if (typeof arr === 'string') {
-                                arr = arr ? arr.split(',') : []
-                            }
-                            for (let i in arr) {
-                                if (arr[i].toString() === val.toString()) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
-
-                        const changeFieldHideList = (key, fieldName, hide) => {
-                            if (hide) {
-                                this.currentFieldHideList[key] = this.currentFieldHideList[key] || [];
-                                this.currentFieldHideList[key].push(fieldName);
-                                forceUpdate=true;
-                                return;
-                            }
-                            if (typeof this.currentFieldHideList[key] === 'undefined') {
-                                return;
-                            }
-                            if (this.currentFieldHideList[key].length > 0) {
-                                let old=JSON.stringify(this.currentFieldHideList[key]);
-                                this.currentFieldHideList[key] = this.currentFieldHideList[key].filter(v => v !== fieldName);
-                                if(forceUpdate===false&&old!==JSON.stringify(this.currentFieldHideList[key])){
-                                    forceUpdate=true;
-                                }
-                            }
-                            if (this.currentFieldHideList[key].length === 0) {
-                                delete this.currentFieldHideList[key]
-                                forceUpdate=true;
-                            }
-                        }
-                        const checkHideField = (field, checkVal) => {
-                            if (field.hideSelf) {
-                                changeFieldHideList(field.name, getWhereFields(field.hideSelf).join(','), checkFieldWhere(field.hideSelf,formVal,this.info));
-                            }
-
-                            let reversalHideFields = !!field.reversalHideFields,
-                                oldHideFields = Object.keys(this.currentFieldHideList);
-                            if (field.hideFields) {
-                                let allFields = [], hideFileds = [], inputVal = '';
-                                if (checkVal !== '') {
-                                    inputVal = checkVal || '';
-                                    //如果是时间格式
-                                    if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
-                                        if (!/^\d+$/.test(checkVal.toString())) {
-                                            const d=new Date(checkVal);
-                                            if(!field.showTime){
-                                                d.setHours(0,0,0)
-                                            }
-                                            inputVal = d.getTime()/1000;
-                                        }
-                                    }
-                                }
-
-                                let vueIsNull = inputVal === '' || inputVal === 0 || inputVal === '0' || inputVal === null;
-                                let isDefHideAboutFields = vueIsNull && field.defHideAboutFields;
-                                field.hideFields.filter(item => {
-                                    item.fields.forEach(f => {
-                                        if (!allFields.includes(f.name)) {
-                                            allFields.push(f.name)
-                                        }
-                                    })
-                                    if (vueIsNull) {
-                                        return field.defHideAboutFields ? true : false;
-                                    }
-                                    if (item.start === null && item.end === null) {
-                                        return false;
-                                    }
-                                    if (item.start === null) {
-                                        //无限小
-                                        return inputVal <= item.end;
-                                    }
-                                    if (item.end === null) {
-                                        //无限大
-                                        return inputVal >= item.start;
-                                    }
-                                    return inputVal >= item.start && inputVal <= item.end;
-                                }).forEach(item => {
-                                    item.fields.forEach(f => {
-                                        if (!hideFileds.includes(f.name)) {
-                                            hideFileds.push(f.name)
-                                        }
-                                    })
-                                })
-                                allFields.forEach(f => {
-                                    changeFieldHideList(f, field.name, isDefHideAboutFields ? true : reversalHideFields !== hideFileds.includes(f));
-                                });
-                            } else if (field.items && field.items.length > 0) {
-                                let hideFileds = [], allFields = [], isDefHideAboutFields = false;
-                                field.items.map(item => {
-                                    //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
-                                    if (item.hideFields && item.hideFields.length > 0) {
-                                        item.hideFields.map(hideField => {
-                                            if (!allFields.includes(hideField.name)) {
-                                                allFields.push(hideField.name)
-                                            }
-                                            if (checkVal) {
-                                                let have;
-                                                switch (field.type) {
-                                                    case 'CheckboxField':
-                                                        have = arrHave(checkVal, item.value);
-                                                        break;
-                                                    case 'SelectField':
-                                                        if (field.multiple) {
-                                                            have = arrHave(checkVal, item.value);
-                                                        } else {
-                                                            have = checkVal.toString() === item.value.toString();
-                                                        }
-                                                        break;
-                                                    default:
-                                                        have = checkVal.toString() === item.value.toString();
-                                                }
-                                                //have 是否符合条件，符合条件就隐藏
-                                                // changeFieldHideList(hideField.name,field.name,have)
-                                                if (have && !hideFileds.includes(hideField.name)) {
-                                                    hideFileds.push(hideField.name)
-                                                }
-                                            } else if (field.defHideAboutFields) {
-                                                // changeFieldHideList(hideField.name,field.name,true)
-                                                hideFileds.push(hideField.name);
-                                                isDefHideAboutFields = true;
-                                            }
-                                        })
-                                    }
-                                })
-                                allFields.forEach(f => {
-                                    changeFieldHideList(f, field.name, isDefHideAboutFields ? true : reversalHideFields !== hideFileds.includes(f))
-                                });
-                            }
-
-                            //-----------------
-                            //隐藏(显示)其他相关字段
-                            let newHideFields = Object.keys(this.currentFieldHideList);
-                            oldHideFields.forEach(f => {
-                                if (newHideFields.includes(f)) {
-                                    return;
-                                }
-                                //重新显示的字段下面要重新判断
-                                let fieldInfos = this.groupFieldItems.filter(v => v.name === f);
-                                if (fieldInfos && fieldInfos.length > 0) {
-                                    checkHideField(fieldInfos[0], formVal[field.name]);
-                                }
-                            });
-                            newHideFields.forEach(f => {
-                                if (oldHideFields.includes(f)) {
-                                    return;
-                                }
-                                //新隐藏的字段
-                                let fieldInfos = this.groupFieldItems.filter(v => v.name === f);
-                                if (fieldInfos && fieldInfos.length > 0) {
-                                    checkHideField(fieldInfos[0], '');
-                                }
-                            })
-                            //-------------------------
-                        }
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        ///////////////////////////////////////////////////////////////////////////////////////////////
-                        const setFieldAttrByWhere = (field) => {
-                            const def = '--setAttrValByWheres--def--';
-                            for (const attr in field.attrWhereValueList) {
-                                let val = typeof field[attr] === 'undefined' ? def : field[attr];
-                                for (let k = field.attrWhereValueList[attr].length - 1; k >= 0; k--) {
-                                    const {value, where} = field.attrWhereValueList[attr][k];
-                                    if (where === null || checkFieldWhere(where,formVal,this.info)) {
-                                        val = value;
-                                        break;
-                                    }
-                                }
-                                if ((typeof field[attr] === 'undefined' && val !== def) || field[attr] !== val) {
-                                    field[attr] = val;
-                                    forceUpdate=true;
-                                }
-                            }
-                        }
-
-
-                        this.groupFieldItems.forEach(field => {
-                            checkShowItemBy(field);
-                            checkFieldTipShow(field);
-                            checkFieldEditTipShow(field);
-                            checkHideField(field, this.currentFieldHideList[field.name] ? '' : formVal[field.name]);
-                            setFieldAttrByWhere(field);
-                        });
+                        let forceUpdate=this.fieldChangeDo(formVal);
                         this.$emit('update:form', formVal);
                         if(forceUpdate){
                             this.updateFormView=this.updateFormView||1;
@@ -1311,6 +1044,7 @@ define(requires, function (axios, Qs) {
                         }
 
 
+
                         if(this.formValIsImmediateed===false){
                             this.formValIsImmediateed=true;
                             this.formValOld=JSON.parse(JSON.stringify(formVal));
@@ -1322,7 +1056,8 @@ define(requires, function (axios, Qs) {
                     },
                     immediate: true,
                     deep: true,
-                }
+                },
+
             },
             mounted(){
                 this.odFormChangeSet=debounce((formVal,formValOld)=>{
@@ -1458,11 +1193,283 @@ define(requires, function (axios, Qs) {
                     }
 
                     if(updateFormView===true){
+                        this.fieldChangeDo();
                         this.$nextTick(()=>{
                             this.$forceUpdate();
                         })
                     }
                 },
+                fieldChangeDo(formVal){
+                    let forceUpdate=false;
+                    formVal=formVal||this.formVal;
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    const checkShowItemBy = function (field) {
+                        if (!field.items || field.items.length === 0) {
+                            return;
+                        }
+                        //TODO::未完成对TreeSelect的支持
+                        field.items.forEach(v => {
+                            if (!v.showItemBy) {
+                                if(typeof v.showItem!=='undefined'){
+                                    delete v.showItem;
+                                    forceUpdate=true;
+                                }
+                                return;
+                            }
+                            if (checkFieldWhere(v.showItemBy,formVal,this.info)) {
+                                if(v.showItem!==true){
+                                    v.showItem = true;
+                                    forceUpdate=true;
+                                }
+                            } else {
+                                if (formVal[field.name] !== undefined && formVal[field.name] !== '') {
+                                    if (field.type === 'CheckboxField' || ((field.type === 'SelectField' || field.type === 'TreeSelect') && field.multiple)) {
+                                        let newVals = [];
+                                        formVal[field.name].toString().split(',').forEach(val => {
+                                            if (val !== v.value.toString()) {
+                                                newVals.push(val);
+                                            }
+                                        })
+                                        const newVal = newVals.join(',');
+                                        if (newVal !== formVal[field.name]) {
+                                            formVal[field.name] = this.formVal[field.name] = newVal;
+                                            forceUpdate=true;
+                                        }
+                                    } else if (formVal[field.name].toString() === v.value.toString()) {
+                                        formVal[field.name] = this.formVal[field.name] = '';
+                                        forceUpdate=true;
+                                    }
+                                }
+
+                                if(v.showItem!==false){
+                                    v.showItem = false;
+                                    forceUpdate=true;
+                                }
+
+                            }
+                        });
+                    };
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    const checkFieldEditTipShow = function (field) {
+                        if (field.editTips.length === 0) {
+                            if(field.editTipArr&&field.editTipArr.length>0){
+                                forceUpdate=true;
+                            }
+                            field.editTipArr = [];
+                            return;
+                        }
+                        let old=JSON.stringify(field.editTipArr);
+                        field.editTipArr = field.editTips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
+                        if(forceUpdate===false&&old!==JSON.stringify(field.editTipArr)){
+                            forceUpdate=true;
+                        }
+                    }
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    const checkFieldTipShow = function (field) {
+                        if (field.tips.length === 0) {
+                            if(field.tipArr&&field.tipArr.length>0){
+                                forceUpdate=true;
+                            }
+                            field.tipArr = [];
+                            return;
+                        }
+                        let old=JSON.stringify(field.tipArr);
+                        field.tipArr = field.tips.filter(val => val.show === null ? true : checkFieldWhere(val.show,formVal,this.info));
+                        if(forceUpdate===false&&old!==JSON.stringify(field.tipArr)){
+                            forceUpdate=true;
+                        }
+                    }
+
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    function arrHave(arr, val) {
+                        if (typeof arr === 'string') {
+                            arr = arr ? arr.split(',') : []
+                        }
+                        for (let i in arr) {
+                            if (arr[i].toString() === val.toString()) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    const changeFieldHideList = (key, fieldName, hide) => {
+                        if (hide) {
+                            this.currentFieldHideList[key] = this.currentFieldHideList[key] || [];
+                            this.currentFieldHideList[key].push(fieldName);
+                            forceUpdate=true;
+                            return;
+                        }
+                        if (typeof this.currentFieldHideList[key] === 'undefined') {
+                            return;
+                        }
+                        if (this.currentFieldHideList[key].length > 0) {
+                            let old=JSON.stringify(this.currentFieldHideList[key]);
+                            this.currentFieldHideList[key] = this.currentFieldHideList[key].filter(v => v !== fieldName);
+                            if(forceUpdate===false&&old!==JSON.stringify(this.currentFieldHideList[key])){
+                                forceUpdate=true;
+                            }
+                        }
+                        if (this.currentFieldHideList[key].length === 0) {
+                            delete this.currentFieldHideList[key]
+                            forceUpdate=true;
+                        }
+                    }
+                    const checkHideField = (field, checkVal) => {
+                        if (field.hideSelf) {
+                            changeFieldHideList(field.name, getWhereFields(field.hideSelf).join(','), checkFieldWhere(field.hideSelf,formVal,this.info));
+                        }
+
+                        let reversalHideFields = !!field.reversalHideFields,
+                            oldHideFields = Object.keys(this.currentFieldHideList);
+                        if (field.hideFields) {
+                            let allFields = [], hideFileds = [], inputVal = '';
+                            if (checkVal !== '') {
+                                inputVal = checkVal || '';
+                                //如果是时间格式
+                                if (field.type === 'DateField' || field.type === 'MonthField' || field.type === 'WeekField') {
+                                    if (!/^\d+$/.test(checkVal.toString())) {
+                                        const d=new Date(checkVal);
+                                        if(!field.showTime){
+                                            d.setHours(0,0,0)
+                                        }
+                                        inputVal = d.getTime()/1000;
+                                    }
+                                }
+                            }
+
+                            let vueIsNull = inputVal === '' || inputVal === 0 || inputVal === '0' || inputVal === null;
+                            let isDefHideAboutFields = vueIsNull && field.defHideAboutFields;
+                            field.hideFields.filter(item => {
+                                item.fields.forEach(f => {
+                                    if (!allFields.includes(f.name)) {
+                                        allFields.push(f.name)
+                                    }
+                                })
+                                if (vueIsNull) {
+                                    return field.defHideAboutFields ? true : false;
+                                }
+                                if (item.start === null && item.end === null) {
+                                    return false;
+                                }
+                                if (item.start === null) {
+                                    //无限小
+                                    return inputVal <= item.end;
+                                }
+                                if (item.end === null) {
+                                    //无限大
+                                    return inputVal >= item.start;
+                                }
+                                return inputVal >= item.start && inputVal <= item.end;
+                            }).forEach(item => {
+                                item.fields.forEach(f => {
+                                    if (!hideFileds.includes(f.name)) {
+                                        hideFileds.push(f.name)
+                                    }
+                                })
+                            })
+                            allFields.forEach(f => {
+                                changeFieldHideList(f, field.name, isDefHideAboutFields ? true : reversalHideFields !== hideFileds.includes(f));
+                            });
+                        } else if (field.items && field.items.length > 0) {
+                            let hideFileds = [], allFields = [], isDefHideAboutFields = false;
+                            field.items.map(item => {
+                                //点击某一个选项时要显示那几个字段,参考桐庐非生产性开支，支出类型
+                                if (item.hideFields && item.hideFields.length > 0) {
+                                    item.hideFields.map(hideField => {
+                                        if (!allFields.includes(hideField.name)) {
+                                            allFields.push(hideField.name)
+                                        }
+                                        if (checkVal) {
+                                            let have;
+                                            switch (field.type) {
+                                                case 'CheckboxField':
+                                                    have = arrHave(checkVal, item.value);
+                                                    break;
+                                                case 'SelectField':
+                                                    if (field.multiple) {
+                                                        have = arrHave(checkVal, item.value);
+                                                    } else {
+                                                        have = checkVal.toString() === item.value.toString();
+                                                    }
+                                                    break;
+                                                default:
+                                                    have = checkVal.toString() === item.value.toString();
+                                            }
+                                            //have 是否符合条件，符合条件就隐藏
+                                            // changeFieldHideList(hideField.name,field.name,have)
+                                            if (have && !hideFileds.includes(hideField.name)) {
+                                                hideFileds.push(hideField.name)
+                                            }
+                                        } else if (field.defHideAboutFields) {
+                                            // changeFieldHideList(hideField.name,field.name,true)
+                                            hideFileds.push(hideField.name);
+                                            isDefHideAboutFields = true;
+                                        }
+                                    })
+                                }
+                            })
+                            allFields.forEach(f => {
+                                changeFieldHideList(f, field.name, isDefHideAboutFields ? true : reversalHideFields !== hideFileds.includes(f))
+                            });
+                        }
+
+                        //-----------------
+                        //隐藏(显示)其他相关字段
+                        let newHideFields = Object.keys(this.currentFieldHideList);
+                        oldHideFields.forEach(f => {
+                            if (newHideFields.includes(f)) {
+                                return;
+                            }
+                            //重新显示的字段下面要重新判断
+                            let fieldInfos = this.groupFieldItems.filter(v => v.name === f);
+                            if (fieldInfos && fieldInfos.length > 0) {
+                                checkHideField(fieldInfos[0], formVal[field.name]);
+                            }
+                        });
+                        newHideFields.forEach(f => {
+                            if (oldHideFields.includes(f)) {
+                                return;
+                            }
+                            //新隐藏的字段
+                            let fieldInfos = this.groupFieldItems.filter(v => v.name === f);
+                            if (fieldInfos && fieldInfos.length > 0) {
+                                checkHideField(fieldInfos[0], '');
+                            }
+                        })
+                        //-------------------------
+                    }
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    ///////////////////////////////////////////////////////////////////////////////////////////////
+                    const setFieldAttrByWhere = (field) => {
+                        const def = '--setAttrValByWheres--def--';
+                        for (const attr in field.attrWhereValueList) {
+                            let val = typeof field[attr] === 'undefined' ? def : field[attr];
+                            for (let k = field.attrWhereValueList[attr].length - 1; k >= 0; k--) {
+                                const {value, where} = field.attrWhereValueList[attr][k];
+                                if (where === null || checkFieldWhere(where,formVal,this.info)) {
+                                    val = value;
+                                    break;
+                                }
+                            }
+                            if ((typeof field[attr] === 'undefined' && val !== def) || field[attr] !== val) {
+                                field[attr] = val;
+                                forceUpdate=true;
+                            }
+                        }
+                    }
+
+                    this.groupFieldItems.forEach(field => {
+                        checkShowItemBy(field);
+                        checkFieldTipShow(field);
+                        checkFieldEditTipShow(field);
+                        checkHideField(field, this.currentFieldHideList[field.name] ? '' : formVal[field.name]);
+                        setFieldAttrByWhere(field);
+                    });
+
+                    return forceUpdate;
+                }
             },
             template: `
                         <div :style="gridStyle">
