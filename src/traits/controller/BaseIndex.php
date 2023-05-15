@@ -382,7 +382,7 @@ trait BaseIndex
             ->where($filterFields->getFilterWhere($filterData))
             ->where(function(Query $query){
                 $childFilterData=$this->request->param('childFilterData',null,null);
-                if($childFilterData){
+                if($childFilterData&&is_string($childFilterData)){
                     $childFilterData=json_decode($childFilterData,true);
                 }
                 if(empty($childFilterData)){
