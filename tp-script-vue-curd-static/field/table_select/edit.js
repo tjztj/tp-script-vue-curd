@@ -197,6 +197,9 @@ display: none;
                     this.pagination.total = res.data.total;
                     let showActions=false;
                     res.data.data.forEach(item=>{
+                        if(typeof item.id==='undefined'){
+                            console.error('缺少id',item);
+                        }
                         infos[valDo(item.id)]=item;
                         if(item.__actions&&item.__actions.length>0){
                             showActions=true;

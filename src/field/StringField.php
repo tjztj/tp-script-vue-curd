@@ -197,7 +197,7 @@ class StringField extends ModelField
 
 
         if(is_null($disengageSensitivityFormat)&&filter_var($val,FILTER_VALIDATE_EMAIL)){
-            switch (mb_strlen($val)){
+            switch (mb_strrpos($val, '@')){
                 case 1:
                     $beforeLen=0;
                     break;
