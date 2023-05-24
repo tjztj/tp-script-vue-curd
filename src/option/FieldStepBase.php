@@ -48,6 +48,10 @@ abstract class FieldStepBase
                         if(is_callable($funcs[''])){
                             return ($funcs[''])($info, $parentInfo, $field);
                         }
+
+                        if(is_bool($funcs[''])){
+                            return $funcs[''];
+                        }
                         return ($funcs['']->func)($info, $parentInfo, $field);
                     }
                     $currStep=endStepVal($info);
