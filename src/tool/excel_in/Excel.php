@@ -116,14 +116,14 @@ class Excel
                         $cell_arr = explode(':', $cell->getMergeRange());
                         list(, $startRow) = Coordinate::coordinateFromString($cell_arr[0]);
                         list(, $endRow) = Coordinate::coordinateFromString($cell_arr[1]);
-                        $val = $options['img_save_path'] . $imageFileName;
+                        $val =str_replace(['\\','//'],'/', $options['img_save_path'] . $imageFileName);
                         for ($i = $startRow; $i <= $endRow; $i++) {
                             isset($data[$i]) || $data[$i] = [];
                             isset($data[$i][$startColumn]) || $data[$i][$startColumn] = [];
                             $data[$i][$startColumn][] = $val;
                         }
                     } else {
-                        $data[$startRow][$startColumn][] = $options['img_save_path'] . $imageFileName;
+                        $data[$startRow][$startColumn][] = str_replace(['\\','//'],'/', $options['img_save_path'] . $imageFileName);
                     }
                 }
             }

@@ -1,329 +1,389 @@
-define([],function(){
-    const style=`<style id="table-select-field-style">
-#table-select-popup-container{
-width: 100%;
-position: relative;
+define([], function () {
+    const styleId='table-field-edit-field-style';
+    const style = `
+<style id="${styleId}">
+.table-field-box-add+.table-field-box-table{
+padding-top: 12px;
 }
-#table-select-popup-container .arco-scrollbar-container{
-max-height: none;
-overflow-y: hidden;
+.table-field-show-modal{
+width: 95%;
+max-width: 720px;
+max-height: 92%;
 }
-#table-select-popup-container .arco-scrollbar-track{
-display: none;
+.table-field-show-modal .arco-modal-body{
+max-height: calc(92vh - 97px);
 }
-.select-table-dropdown{
-    margin: 0 4px;
-    min-width: 100px;
+.table-field-box-table .arco-table:not(.arco-table-border-header-cell) .arco-table-element>thead>.arco-table-tr:first-child>.arco-table-th:first-child{
+    border-top-left-radius: 6px;
 }
-.select-table-dropdown .arco-table-pagination{
-    margin-right: 12px;
+.table-field-box-table .arco-table:not(.arco-table-border-header-cell) .arco-table-element>thead>.arco-table-tr:last-child>.arco-table-th:first-child{
+    border-bottom-left-radius: 6px;
 }
-</style>`
-    const infos={};
-    const valDo=function (v){
-        if(parseInt(v).toString()===v.toString()){
-            return parseInt(v);
-        }
-        return v;
-    };
-    const pageSize=5;
+.table-field-box-table .arco-table:not(.arco-table-border-header-cell) .arco-table-element>thead>.arco-table-tr:first-child>.arco-table-th:last-child{
+    border-top-right-radius: 6px;
+}
+.table-field-box-table .arco-table:not(.arco-table-border-header-cell) .arco-table-element>thead>.arco-table-tr:last-child>.arco-table-th:last-child{
+    border-bottom-right-radius: 6px;
+}
+</style>
+`;
     return {
-        props:['field','value','validateStatus'],
-        data(){
+        props: ['field', 'value', 'validateStatus', 'listFieldLabelCol', 'listFieldWrapperCol', 'groupFieldItems','fieldHideList','info','disabled'],
+        setup:function (props,ctx){
+            if (!document.getElementById(styleId)) {
+                document.querySelector('head').insertAdjacentHTML('beforeend', style);
+            }
+
+            window.fieldComponents=window.fieldComponents||{};
+            const componentUrl=props.field.pageData.componentUrl||{};
+            const addComponents={};
+            for(let i in componentUrl){
+                if(!window.fieldComponents[i]&&componentUrl[i].jsUrl){
+                    window.fieldComponents[componentUrl[i].name]=componentUrl[i].jsUrl;
+                    addComponents[componentUrl[i].name]=componentUrl[i].jsUrl;
+                }
+            }
+            const addComponentVals=Object.values(addComponents);0
+            const isInit=Vue.ref(false);
+            if(addComponentVals.length>0){
+                require(addComponentVals,()=>{
+                    for(let componentName in addComponents){
+                        window.app.component(componentName,typeof require(fieldComponents[componentName])==='function'?require(fieldComponents[componentName])():require(fieldComponents[componentName]))
+                    }
+                    isInit.value=true;
+                });
+            }else{
+                isInit.value=true;
+            }
+            let addMaxId=Vue.ref(0);
+            let list=Vue.ref(null);
+            Vue.watch(()=>props.info, (newValue, oldValue) => {
+                    list.value = newValue[props.field.name+'List']||newValue[props.field.name+'Arr']||null;
+                    if(list.value===null){
+                        list.value=newValue[props.field.name];
+                    }
+                    if(typeof list.value==='string'){
+                        list.value=JSON.parse(list.value);
+                    }
+                    if(!list.value){
+                        list.value=[];
+                    }
+                    for(let i in list.value){
+                        if(!list.value[i].id){
+                            addMaxId.value++;
+                            list.value[i].id=addMaxId.value;
+                        }else if(addMaxId.value<list.value[i].id){
+                            addMaxId.value=list.value[i].id;
+                        }
+                    }
+                },
+                { immediate: true }
+            )
+
+            Vue.watch(()=>props.value, (newValue, oldValue) => {
+                if(newValue=== JSON.stringify(list.value)){
+                    return;
+                }
+                list.value=JSON.parse(newValue||'[]');
+            });
+
+            const editData=Vue.ref({
+                haveGroup:!!props.field.pageData.editGroupFields,
+                groupFields:props.field.pageData.editGroupFields||{'':props.field.fields},
+                fieldHideList:{},
+            });
+            const showData=Vue.ref({
+                haveGroup:!!props.field.pageData.showGroupFields,
+                groupFields:props.field.pageData.showGroupFields||{'':props.field.pageData.showFields},
+            });
+
+            Vue.watch(()=>[props.field.pageData.editGroupFields,props.field.fields], ([editGroupFields,fields]) => {
+                editData.value.haveGroup=!!editGroupFields;
+                editData.value.groupFields=editGroupFields||{'':fields};
+            });
+
+            Vue.watch(()=>[props.field.pageData.showGroupFields,props.field.pageData.showFields], ([showGroupFields,showFields]) => {
+                showData.value.haveGroup=!!showGroupFields;
+                showData.value.groupFields=showGroupFields||{'':showFields};
+            });
+
             return {
-                data:[],
-                pagination:{
-                    pageSize,
-                    total:0,
-                    current:1,
-                    showPageSize:true,
-                    pageSizeOptions:['5','8','10','15','30','50']
-                },
-                myFilters:{
-                    pageSize,
-                    page: 1,
-                    keywords:'',
-                },
-                loading:false,
-                columns:[],
-                columnDefNum:0,
-                opened:false,
-                selectedRowKeys:[],
-                show:false,
-                id:'table-select-'+window.guid(),
-                options:[],
-                maxW:'95vw',
+                list:list,
+                tableLoading:Vue.ref(false),
+                showLook:Vue.ref(false),
+                editShow:Vue.ref(false),
+                canEdit:true,
+                canDel:true,
+                actionDefWidth:Vue.ref(0),
+                editForm:Vue.ref({}),
+                editInfo:Vue.ref({}),
+                editLabelCol: Vue.ref({ span: 4 }),
+                editWrapperCol: Vue.ref({ span: 18 }),
+                editData:editData,
+                showData:showData,
+                showInfo:Vue.ref({}),
+                addMaxId: addMaxId,
+                fieldComponents,
+                isInit,
             }
-        },
-        created(){
-            if(!document.querySelector('#table-select-field-style')){
-                document.head.insertAdjacentHTML('beforeend',style)
-            }
-            if(!document.querySelector('#table-select-popup-container')){
-                document.body.insertAdjacentHTML('beforeend','<div id="table-select-popup-container"></div>')
-            }
-
-
-            let columns=[];
-            for(let i in  this.field.fields){
-                columns.push({
-                    title: this.field.fields[i],
-                    ellipsis: true,
-                    tooltip: true,
-                    dataIndex: i,
-                    key: i,
-                })
-            }
-            this.columns=columns;
-            this.columnDefNum=columns.length;
-        },
-        watch:{
-            show(){
-                this.setShowClass()
-            },
-            selectedRowKeys(selectedRowKeys){
-                const options=[];
-                selectedRowKeys.forEach(v=>{
-                    options.push({
-                        value: valDo(v),
-                        label: infos[valDo(v)][this.showField],
-                    })
-                })
-                this.options=options;
-                this.$emit('update:value', this.getValueStr());
-            },
-            value:{
-                handler(value, oldValue) {
-                    value=value.toString().trim();
-                    let selects=this.getValueStr();
-                    if(selects===value){
-                        return;
-                    }
-                    if(value===''||value==='undefined'){
-                        this.selectedRowKeys=[];
-                        this.options=[];
-                        return;
-                    }
-                    this.loading=true;
-                    let strVals=value.split(',');
-                    let vals=strVals.map(valDo);
-                    this.$post(this.field.url,{ids:vals}).then(res=>{
-                        if(typeof res.data==='undefined'){
-                            ArcoVue.Message.warning('字段'+this.field.title+'未正确获取到选择的信息-001');
-                            return;
-                        }
-                        let options=[];
-                        if(Array.isArray(res.data)){
-                            res.data.forEach(v=>{
-                                if(!strVals.includes(v.id.toString())){
-                                    return;
-                                }
-                                options.push({
-                                    value: valDo(v.id),
-                                    label: v[this.showField],
-                                })
-                                if(typeof infos[valDo(v.id)]==='undefined'){
-                                    infos[valDo(v.id)]=v;
-                                }
-                            })
-                        }else if(typeof res.data.current_page!=='undefined'){
-                            res.data.data.forEach(v=>{
-                                if(!strVals.includes(v.id.toString())){
-                                    return;
-                                }
-                                options.push({
-                                    value: valDo(v.id),
-                                    label: v[this.showField],
-                                })
-                                if(typeof infos[valDo(v.id)]==='undefined'){
-                                    infos[valDo(v.id)]=v;
-                                }
-                            })
-                        }else{
-                            for(let k in res.data){
-                                let v=res.data[k];
-                                if(typeof v!=='string'&&typeof v!=='number'){
-                                    ArcoVue.Message.warning('字段'+this.field.title+'未正确获取到选择的信息-002');
-                                    return;
-                                }
-                                if(!strVals.includes(k.toString())){
-                                    continue;
-                                }
-                                options.push({
-                                    value: valDo(k),
-                                    label: v,
-                                })
-                                if(typeof infos[valDo(k)]==='undefined'){
-                                    infos[valDo(k)]={
-                                        [this.showField]:v
-                                    };
-                                }
-                            }
-                        }
-
-
-                        this.loading=false;
-                        this.options=options;
-                        this.selectedRowKeys=vals;
-                    });
-
-                },
-                immediate: true,
-                deep: true
-            },
         },
         computed:{
-            disabled(){
-                return this.field.readOnly||(this.loading&&this.show===false);
-            },
-            showField(){
-                return Object.keys(this.field.fields)[0];
-            },
-        },
-        methods:{
-            getValueStr(){
-                return this.selectedRowKeys.join(',');
-            },
-            '$post'(...params){
-                return window.vueDefMethods.$post.call(this,...params,)
-            },
-            getList(){
-                this.maxW= document.querySelector('#'+this.id).clientWidth+'px';
-
-                this.loading=true;
-                const params={...this.myFilters};
-                this.$post(this.field.url,params).then(res=>{
-                    this.pagination.current=res.data.current_page;
-                    this.pagination.total = res.data.total;
-                    let showActions=false;
-                    res.data.data.forEach(item=>{
-                        if(typeof item.id==='undefined'){
-                            console.error('缺少id',item)
-                        }
-                        infos[valDo(item.id)]=item;
-                        if(item.__actions&&item.__actions.length>0){
-                            showActions=true;
-                        }
-                    })
-                    if(showActions){
-                        if(this.columnDefNum===this.columns.length){
-                            this.columns.push({
-                                titleSlotName:'custom-title-action',
-                                slotName:'action',
-                                fixed: 'right',
-                            })
-                        }
-                    }else{
-                        if((this.columnDefNum+1)===this.columns.length){
-                            this.columns.pop();
+            listColumns(){
+                const returnData=this.field.pageData.editGroupColumns||{'':this.field.pageData.listColumns};
+                for(let i in returnData){
+                    for (let n in returnData[i]){
+                        if(returnData[i][n].listSort){
+                            returnData[i][n].listSort=(a, b) => a[returnData[i][n].name] - b[returnData[i][n].name];
                         }
                     }
+                }
 
-                    this.data = res.data.data;
-                    this.loading = false;
-                }).catch((error)=>{
-                    this.loading = false;
-                });
+                return returnData
             },
-            showDropdown(){
-                if(this.disabled){
-                    return;
+            editShowGroup(){
+                if(!this.editData.haveGroup){
+                    return false;
                 }
-                this.show=true;
-                if(this.opened){
-                    return;
+                let showGroupNum=0;
+                for(let i in this.editData.groupFields){
+                    if(this.checkShowGroup(this.editData.groupFields[i])){
+                        if(showGroupNum>0){
+                            return true;
+                        }
+                        showGroupNum++;
+                    }
                 }
-                this.opened=true;
-                this.loading=true;
-                this.$nextTick(()=>this.getList());
+                return false;
             },
-            pageChange(page){
-                this.pagination.current = page;
-                this.myFilters.page = page;
-                this.getList();
-            },
-            pageSizeChange(pageSize){
-                this.pagination.pageSize = pageSize;
-                this.myFilters.pageSize = pageSize;
-                this.pageChange(1);
-            },
-            sorterChange(dataIndex,direction){
-                this.myFilters.sortField=dataIndex;
-                this.myFilters.sortOrder=direction;
-                this.pageChange(1);
-            },
-
-            setShowClass(){
-                let inputClass=document.querySelector('#input-'+this.id).classList;
-                if(this.show){
-                    inputClass.add('arco-select-focused');
-                    inputClass.add('arco-select-view-focus');
-                }else{
-                    inputClass.remove('arco-select-focused');
-                    inputClass.remove('arco-select-view-focus');
-                }
-            },
-            selectChange(vals){
-                this.selectedRowKeys=typeof vals==='string'?(vals?[valDo(vals)]:[]):vals.map(valDo);
-                this.$emit('update:value',this.getValueStr());
-            },
-            selectSearch(val){
-                this.pagination.current = 1;
-                this.myFilters.page=1;
-                this.myFilters.keywords=val.toString().trim();
-                this.getList();
-            },
-            refreshTable(){
-                this.getList();
-            },
-            refreshId(id){
-                this.refreshTable();
-            },
-            openBox(...params){
-                return window.vueDefMethods.openBox.call(this,...params)
-            },
-            openOtherBtn(...params){
-                // this.show=false;
-                this.$nextTick(()=>{
-                    window.vueDefMethods.openOtherBtn.call(this,...params)
-                })
+            isDisabled(){
+                return this.disabled||this.field.disabled||this.field.readOnly;
             },
         },
-        template:`<div class="select-table-box" :id="id">
- <a-dropdown v-model:popup-visible="show" :disabled="disabled" :hide-on-select="false" popup-container="#table-select-popup-container">
- 
-  <a-select
-    :model-value="selectedRowKeys"
-    :multiple="field.multiple"
-    style="width: 100%"
-    :placeholder="field.placeholder||'请选择'+field.title"
-    :disabled="disabled"
-    allow-clear 
-    @click="showDropdown" 
-    :id="'input-'+id"
-    :options="options"
-    @change="selectChange"
-    @search="selectSearch"
-    @popup-visible-change="setShowClass"
-    ref="select"
-    allow-search
-    :popup-visible="false"
-  >
-  </a-select>
- <template #content>
-  <div class="select-table-dropdown" :style="{'max-width': maxW}" @click="setShowClass">
-    <a-table row-key="id" :loading="loading" :columns="columns" :data="data" :pagination="pagination" size="small"   v-model:selected-keys="selectedRowKeys" :row-selection="{showCheckedAll:true,type:field.multiple?'checkbox':'radio' }"  @page-change="pageChange" @page-size-change="pageSizeChange" @sorter-change="sorterChange">
-        <template #custom-title-action>操作</template>
-        <template #action="{ record }">   
-            <template v-for="(btn,benKey) in record.__actions">
-                <a-divider type="vertical" v-if="benKey>0"></a-divider>
-                <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-            </template>
-       </template>
-    </a-table>
-  </div>
- </template>
-</a-dropdown>
-</div>`,
-    }
+        watch: {
+            list:{
+                handler(list) {
+                    this.$emit('update:value', JSON.stringify(list));
+                },
+                deep: true,
+                immediate: true,
+            },
+            isInit:{
+                handler(val) {
+                    if(val){
+                        this.$nextTick(()=>{
+                            this.$refs['tablefieldeditcurdtable'].getActionWidthByProps()
+                        })
+                    }
+                },
+                immediate: true,
+            }
+        },
+        methods:{
+            refreshTable(){
+
+            },
+            pageChange(page){
+                // this.pagination.current = page;
+                // this.myFilters.page = page;
+                // this.fetch();
+            },
+            pageSizeChange(pageSize){
+                // this.pagination.pageSize = pageSize;
+                // this.myFilters.pageSize = pageSize;
+                // this.pageChange(1);
+            },
+            sorterChange(dataIndex,direction){
+                // this.myFilters.sortField=dataIndex;
+                // this.myFilters.sortOrder=direction;
+                // this.pageChange(1);
+            },
+            openShow(row){
+                this.showInfo=row;
+                this.showLook=true
+            },
+            deleteRow(row){
+                let idStr=row.id.toString();
+                for(let i in this.list){
+                    if(this.list[i].id.toString()===idStr){
+                        this.list.splice(i,1);
+                    }
+                }
+            },
+            openEdit(row){
+                this.setEditForm(row);
+                this.editShow=true
+            },
+            clickEditSub(done){
+                this.editSub(null,done);
+            },
+            editSub(option,done){
+                option=option||{};
+                this.$refs.tableEditPubForm.validate(async (errors)=>{
+                    if(errors&&Object.keys(errors).length>0){
+                        this.$message.warning(errors[Object.keys(errors)[0]].message);
+                        if(done){
+                            done(false);
+                        }
+                        return;
+                    }
+                    for(let i in this.editData.groupFields){
+                        if(this.$refs['tableEditFieldGroup'+i]){
+                            let form=this.$refs['tableEditFieldGroup'+i];
+                            if(typeof form.validateListForm==='undefined'&&form[0]&&typeof form[0].validateListForm==='function'){
+                                form=form[0];
+                            }
+                            if(await form.validateListForm()===false){
+                                return;
+                            }
+                        }
+                    }
+                    //因为数据有其他处理，所以这里返回过来的值就不再赋值到form中了
+                    if(this.editForm.id){
+                        for(let i in  this.list){
+                            if(this.list[i].id.toString()===this.editForm.id.toString()){
+                                this.list[i]=JSON.parse(JSON.stringify(this.editForm));
+                                break;
+                            }
+                        }
+                    }else{
+                        this.addMaxId++;
+                        const listData=JSON.parse(JSON.stringify(this.editForm));
+                        listData.id=-this.addMaxId;
+                        this.list.unshift(listData);
+                    }
+
+                    if(option.success){
+                        option.success(res)
+                    }
+                    this.$refs['tablefieldeditcurdtable'].getActionWidthByProps()
+                    if(done){
+                        done(true);
+                    }else{
+                        this.editShow=false;
+                    }
+                });
+            },
+            showAdd(){
+                this.setEditForm({});
+                this.editShow=true
+            },
+            setEditForm(row){
+                this.editInfo=row;
+                if(row&&row.id&&row.id<0){
+                    this.editForm=row;
+                }else{
+                    const form={};
+                    this.field.fields.forEach(function(field){
+                        form[field.name]=row&&typeof row[field.name]!=='undefined'?row[field.name]:'';
+                    })
+
+                    if(row&&row.id){
+                        form.id=row.id;
+                    }
+                    this.editForm=form;
+                }
+            },
+            checkShowGroup(groupFieldItems){
+                for(let i in groupFieldItems){
+                    if(groupFieldItems[i].editShow&&!this.editData.fieldHideList[groupFieldItems[i].name]){
+                        return true;
+                    }
+                }
+                return false;
+            },
+        },
+        template:`<div>
+                    <div class="table-field-box" v-if="isInit">
+                        <div class="table-field-box-add" v-if="!isDisabled"><a-button shape="circle" size="small" @click="showAdd"><icon-plus></icon-plus></a-button></div>
+                        <div class="table-field-box-table" v-show="list.length>0">
+                            <curd-table
+                                :data="list"
+                                :pagination="{
+                                    pageSize: field.pageSize,
+                                    total:0,
+                                    current:1,
+                                    showPageSize:false,
+                                }"
+                                :loading="tableLoading"
+                                :list-columns="listColumns"
+                                :can-edit="canEdit&&!isDisabled"
+                                :can-del="canDel&&!isDisabled"
+                                :action-def-width="actionDefWidth"
+                                :show-create-time="false"
+                                :show-action="field.showAction"
+                                @refresh-table="refreshTable"
+                                @page-change="pageChange"
+                                @page-size-change="pageSizeChange"
+                                @sorter-change="sorterChange"
+                                @open-show="openShow"
+                                @on-delete="deleteRow"
+                                @open-edit="openEdit"
+                                ref="tablefieldeditcurdtable">
+                            </curd-table>
+                        </div>
+                            <a-modal modal-class="table-field-show-modal" width="95%" v-model:visible="editShow" unmount-on-close :title="editInfo&&editInfo.id?'修改'+field.title:'添加'+field.title" :on-before-ok="clickEditSub">
+                                <div class="vuecurd-def-box">
+                                        <a-form :model="editForm" :label-col-props="editLabelCol" :wrapper-col-props="editWrapperCol" ref="tableEditPubForm">
+                                            <template v-for="(groupFieldItems,groupTitle) in editData.groupFields">
+                                                <template v-if="editShowGroup">
+                                                    <fieldset class="field-group-fieldset show-group" v-show="checkShowGroup(groupFieldItems)">
+                                                        <div class="legend-box">
+                                                            <legend>{{groupTitle}}</legend>
+                                                        </div>
+                                                        <field-group-item
+                                                            :list-field-label-col="editLabelCol"
+                                                            :list-field-wrapper-col="editWrapperCol"
+                                                            :group-field-items="groupFieldItems"
+                                                            :info="editInfo"
+                                                            v-model:field-hide-list="editData.fieldHideList"
+                                                            v-model:form="editForm"
+                                                            @submit="editSub($event)"
+                                                            :ref="'tableEditFieldGroup'+groupTitle"></field-group-item>
+                                                    </fieldset>
+                                                </template>
+                                                <template v-else>
+                                                    <field-group-item
+                                                        :list-field-label-col="editLabelCol"
+                                                        :list-field-wrapper-col="editWrapperCol"
+                                                        :group-field-items="groupFieldItems"
+                                                        :info="editInfo"
+                                                        v-model:field-hide-list="editData.fieldHideList"
+                                                        v-model:form="editForm"
+                                                        @submit="editSub($event)"
+                                                        :ref="'tableEditFieldGroup'+groupTitle"></field-group-item>
+                                                </template>
+                                            </template>
+                                        </a-form>
+                                </div>
+                            </a-modal>
+                            <a-modal modal-class="table-field-show-modal" width="95%" v-model:visible="showLook" unmount-on-close :title="'查看'+field.title" :footer="false">
+                                <div class="vuecurd-def-box vuecurd-show-def-box">
+                                    <template v-for="(groupFieldItems,groupTitle) in showData.groupFields">
+                                        <fieldset class="field-group-fieldset" :class="{'show-group':showData.haveGroup}">
+                                            <div class="legend-box">
+                                                <legend>{{groupTitle}}</legend>
+                                            </div>
+                                            <div class="show-group-field-rows">
+                                                <template v-for="showField in groupFieldItems">
+                                                    <a-row class="row" v-if="!showField.showUseComponent">
+                                                        <a-col class="l" span="4">{{showField.title}}：</a-col>
+                                                        <a-col class="r" span="20">
+                                                            <curd-show-field :field="showField" :info="showInfo"></curd-show-field>
+                                                        </a-col>
+                                                    </a-row>
+                                                    <component
+                                                        v-else-if="fieldComponents['VueCurdShow'+showField.type]"
+                                                        :is="'VueCurdShow'+showField.type"
+                                                        :field="showField"
+                                                        :info="showInfo"
+                                                    ></component>
+                                                </template>
+                                            </div>
+                                        </fieldset>
+                                    </template>
+                                </div>
+                            </a-modal>
+                    </div>
+                </div>`,
+    };
 });
