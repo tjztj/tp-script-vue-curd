@@ -56,6 +56,10 @@ abstract class FieldStepBase
                     }
                     $currStep=endStepVal($info);
                     foreach ($funcs as $k=>$v){
+                        if(is_numeric($k)&&is_string($v)&&is_subclass_of($v,self::class)){
+                            $k=$v;
+                            $v=true;
+                        }
                         if($k&&$k::name()===$currStep){
                             if(is_callable($v)){
                                 return $v($info, $parentInfo, $field);
