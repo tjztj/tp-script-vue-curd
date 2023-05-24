@@ -40,35 +40,40 @@ abstract class FieldStepBase
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
                 function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){
-                    $funcs=$this->beforeCheck();
-                    if(empty($info)||empty($info->id)){
-                        if(!isset($funcs[''])){
-                            return false;
-                        }
-                        if(is_callable($funcs[''])){
-                            return ($funcs[''])($info, $parentInfo, $field);
-                        }
+                    $currStep=empty($info)||empty($info->id)?'':endStepVal($info);
 
-                        if(is_bool($funcs[''])){
-                            return $funcs[''];
-                        }
-                        return ($funcs['']->func)($info, $parentInfo, $field);
-                    }
-                    $currStep=endStepVal($info);
-                    foreach ($funcs as $k=>$v){
-                        if(is_numeric($k)&&is_string($v)&&is_subclass_of($v,self::class)){
-                            $k=$v;
+                    foreach ($this->beforeCheck() as $k=>$v){
+                        if(is_numeric($k)){
+                            if(is_string($v)){
+                                if(is_subclass_of($v,self::class)){
+                                    $name=$v::name();
+                                }else{
+                                    throw new \think\Exception(static::class.'步骤配置不合法'.$k.'=>'.$v);
+                                }
+                            }else if(is_bool($v)){
+                                $name='';
+                            }else{
+                                //不合法，跳过
+                                continue;
+                            }
                             $v=true;
+                        }else if($k===''){
+                            $name=$k;
+                        }else if(is_subclass_of($k,self::class)){
+                            $name=$k::name();
+                        }else{
+                            throw new \think\Exception(static::class.'步骤配置不合法'.$k.'=>'.$v);
                         }
-                        if($k&&$k::name()===$currStep){
-                            if(is_callable($v)){
-                                return $v($info, $parentInfo, $field);
-                            }
-                            if(is_bool($v)){
-                                return $v;
-                            }
-                            return ($v->func)($info, $parentInfo, $field);
+                        if($name!==$currStep){
+                            continue;
                         }
+                        if(is_callable($v)){
+                            return $v($info, $parentInfo, $field);
+                        }
+                        if(is_bool($v)){
+                            return $v;
+                        }
+                        return ($v->func)($info, $parentInfo, $field);
                     }
                     return false;
                 },
