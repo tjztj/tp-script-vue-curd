@@ -113,7 +113,9 @@ abstract class FieldStepBase
      * 当前步骤的标识
      * @return string
      */
-    abstract public static function name(): string;
+    public static function name(): string{
+        return class_basename(static::class);
+    }
 
 
     /**
@@ -164,7 +166,7 @@ abstract class FieldStepBase
      */
     public function check(BaseModel $old, BaseModel $parentInfo = null, ModelField $field = null): bool
     {
-        if (!$old || empty($old->id)) {
+        if (empty($old->id)) {
             return false;
         }
         return eqEndStep(static::name(), $old);
