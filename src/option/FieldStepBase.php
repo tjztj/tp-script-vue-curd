@@ -60,6 +60,9 @@ abstract class FieldStepBase
                             if(is_callable($v)){
                                 return $v($info, $parentInfo, $field);
                             }
+                            if(is_bool($v)){
+                                return $v;
+                            }
                             return ($v->func)($info, $parentInfo, $field);
                         }
                     }
