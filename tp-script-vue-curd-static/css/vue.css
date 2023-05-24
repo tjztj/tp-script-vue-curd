@@ -443,7 +443,7 @@ a.red:hover,a.yellow:hover{
     position: absolute;
 }
 .filter-box-dropdown .arco-dropdown-list-wrapper{
-    max-height: 99vh;
+    max-height: 90vh;
 }
 .curd-filter-box.empty-filter-items .filter-box-bottom-do{
     display: none;

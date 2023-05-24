@@ -2265,8 +2265,7 @@ define(requires, function (axios, Qs) {
                         3: ['grid-column-3'],
                         4: ['grid-column-4']
                     };
-                    const countClass = Math.ceil(count / 16);
-                    return GRID_CLASSES[countClass]||GRID_CLASSES[4];
+                    return GRID_CLASSES[Math.min(Math.floor(window.innerWidth/360), Math.ceil(count / 16),4)];
                 }
             },
             watch:{
