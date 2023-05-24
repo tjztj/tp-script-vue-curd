@@ -114,6 +114,7 @@ abstract class FieldStepBase
      * @return string
      */
     public static function name(): string{
+        //默认为当前类名
         return class_basename(static::class);
     }
 
