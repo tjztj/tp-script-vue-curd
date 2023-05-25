@@ -25,34 +25,36 @@ trait InfoAuth
 
     /**
      * 为数据设置权限判断结果
-     * @param FieldCollection $field
+     * @param FieldCollection $fields
      * @param BaseModel|null $parentInfo
      * @param array|string[] $types
      * @return $this
      */
-    public function rowSetAuth(FieldCollection $field,BaseModel $parentInfo=null,array $types=['show','edit','del','add']): self
+    public function rowSetAuth(FieldCollection $fields,BaseModel $parentInfo=null,array $types=['show','edit','del','add']): self
     {
         $authCheck=new ModelInfoAuth();
         $this->authCheck($authCheck);
 
         $arr=$this->__auth??[];
 
-        if(in_array('show', $types, true) &&isset($authCheck->show)&&$authCheck->show){
-            $func=$authCheck->show;
-            $arr['show']=(!isset($arr['show'])||$arr['show'])&&$func($field,$this,$parentInfo);
+        foreach (['show','edit','del','add'] as $v) {
+            if (!in_array($v, $types, true)) {
+                continue;
+            }
+            if (!isset($authCheck->$v)) {
+                continue;
+            }
+            if (isset($arr[$v]) && $arr[$v] === false) {
+                continue;
+            }
+            if (is_callable($authCheck->$v)) {
+                $func = $authCheck->$v;
+                $arr[$v] = $func($fields, $this, $parentInfo);
+            } else if (is_bool($authCheck->$v)) {
+                $arr[$v] = $authCheck->$v;
+            }
         }
-        if(in_array('edit', $types, true) &&isset($authCheck->edit)&&$authCheck->edit){
-            $func=$authCheck->edit;
-            $arr['edit']=(!isset($arr['edit'])||$arr['edit'])&&$func($field,$this,$parentInfo);
-        }
-        if(in_array('del', $types, true) &&isset($authCheck->del)&&$authCheck->del){
-            $func=$authCheck->del;
-            $arr['del']=(!isset($arr['del'])||$arr['del'])&&$func($field,$this,$parentInfo);
-        }
-        if(in_array('add', $types, true) &&isset($authCheck->add)&&$authCheck->add){
-            $func=$authCheck->add;
-            $arr['add']=(!isset($arr['add'])||$arr['add'])&&$func($field,$this,$parentInfo);
-        }
+
 
         if(empty($arr)){
             unset($this->__auth);
