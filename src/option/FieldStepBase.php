@@ -24,7 +24,7 @@ abstract class FieldStepBase
 
     protected FieldCollection $fields;
     protected FieldStep $step;
-    protected string $listDirectSubmit='';
+    protected string $listDirectSubmit = '';
 
 
     /**
@@ -34,43 +34,43 @@ abstract class FieldStepBase
      */
     public function __construct(array $fields)
     {
-        $config=new FieldStepBaseConfig();
+        $config = new FieldStepBaseConfig();
         $this->config($config);
 
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
-                function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null){
-                    $currStep=empty($info)||empty($info->id)?'':endStepVal($info);
+                function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) {
+                    $currStep = empty($info) || empty($info->id) ? '' : endStepVal($info);
 
-                    foreach ($this->beforeCheck() as $k=>$v){
-                        if(is_numeric($k)){
-                            if(is_string($v)){
-                                if(is_subclass_of($v,self::class)){
-                                    $name=$v::name();
-                                }else{
-                                    throw new \think\Exception(static::class.'步骤配置不合法'.$k.'=>'.$v);
+                    foreach ($this->beforeCheck() as $k => $v) {
+                        if (is_numeric($k)) {
+                            if (is_string($v)) {
+                                if (is_subclass_of($v, self::class)) {
+                                    $name = $v::name();
+                                } else {
+                                    throw new \think\Exception(static::class . '步骤配置不合法' . $k . '=>' . $v);
                                 }
-                            }else if(is_bool($v)){
-                                $name='';
-                            }else{
+                                $v = true;
+                            } else if (is_bool($v)) {
+                                $name = '';
+                            } else {
                                 //不合法，跳过
                                 continue;
                             }
-                            $v=true;
-                        }else if($k===''){
-                            $name=$k;
-                        }else if(is_subclass_of($k,self::class)){
-                            $name=$k::name();
-                        }else{
-                            throw new \think\Exception(static::class.'步骤配置不合法'.$k.'=>'.$v);
+                        } else if ($k === '') {
+                            $name = $k;
+                        } else if (is_subclass_of($k, self::class)) {
+                            $name = $k::name();
+                        } else {
+                            throw new \think\Exception(static::class . '步骤配置不合法' . $k . '=>' . $v);
                         }
-                        if($name!==$currStep){
+                        if ($name !== $currStep) {
                             continue;
                         }
-                        if(is_callable($v)){
+                        if (is_callable($v)) {
                             return $v($info, $parentInfo, $field);
                         }
-                        if(is_bool($v)){
+                        if (is_bool($v)) {
                             return $v;
                         }
                         return ($v->func)($info, $parentInfo, $field);
@@ -82,42 +82,61 @@ abstract class FieldStepBase
             ),
             $config,
         )->auth(
-            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null,FieldStep $step=null,$list=null) => $this->auth($info, $parentInfo, $fields,$step,$list),
-            function (BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step=null,$list=null){
-                $fn=$step->getAuthCheckAndCheckBeforeDefVal();
-                if($fn($info,$parentInfo,$fields)){
-                    $step->config['canEditReturn']=null;
+            fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null) => $this->auth($info, $parentInfo, $fields, $step, $list),
+            function (BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null) {
+                $fn = $step->getAuthCheckAndCheckBeforeDefVal();
+                if ($fn($info, $parentInfo, $fields)) {
+                    $step->config['canEditReturn'] = null;
                     return true;
                 }
-                $step->config['canEditReturn']=$this->canEdit($info,$parentInfo,$fields);
+                $step->config['canEditReturn'] = $this->canEdit($info, $parentInfo, $fields);
                 return $step->config['canEditReturn'];
             },
         )->setListRowDo(
-            fn(BaseModel $info,?BaseModel $parentInfo,FieldCollection $fields,FieldStep $step)=> $this->listRowDo($info, $parentInfo, $fields,$step)
+            fn(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step) => $this->listRowDo($info, $parentInfo, $fields, $step)
         )->saveBefore(
-            fn(&$saveData,BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null)=> $this->saveBefore($saveData, $info,$parentInfo,$fields)
+            fn(&$saveData, BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null) => $this->saveBefore($saveData, $info, $parentInfo, $fields)
         )->saveAfter(
-            fn(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[])=> $this->saveAfter($before, $new,$parentInfo,$fields,$saveData)
+            fn(BaseModel $before, BaseModel $new, BaseModel $parentInfo = null, FieldCollection $fields = null, $saveData = []) => $this->saveAfter($before, $new, $parentInfo, $fields, $saveData)
         )->listDirectSubmit($this->listDirectSubmit)
-            ->setAuthWhere(function(Query $query){
+            ->setAuthWhere(function (Query $query) {
                 $this->authWhere($query);
             });
 
 
-        $this->step->getBeforeChecks=function (){
-            $funcs=$this->beforeCheck();
-            foreach ($funcs as $k=>$v){
-                if(!is_callable($v)){
+        $this->step->getBeforeChecks = function () {
+            $funcs = $this->beforeCheck();
+
+            foreach ($funcs as $key => $value) {
+                if ($value instanceof FieldStepBeforeCheck) {
                     continue;
                 }
-                $funcs[$k]=FieldStepBeforeCheck::make('',$v);
+                if (is_numeric($key)) {
+                    if (is_string($value)) {
+                        if (!is_subclass_of($value, self::class)) {
+                            throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                        }
+                        $key = $value;
+                        $value = true;
+                    } else if (!is_bool($value)) {
+                        throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                    }
+                } else if ($key !== '' && !is_subclass_of($key, self::class)) {
+                    throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                }
+                if (is_bool($value)) {
+                    $value = static fn()=>$value;
+                } else if (!is_callable($value)) {
+                    throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                }
+                $funcs[$key] = FieldStepBeforeCheck::make('', $value);
             }
             return $funcs;
         };
-        $this->step->stepClass=static::class;
+        $this->step->stepClass = static::class;
 
 
-        foreach ($fields as $v){
+        foreach ($fields as $v) {
             $v->steps($this->step);
         }
 
@@ -129,7 +148,8 @@ abstract class FieldStepBase
      * 当前步骤的标识
      * @return string
      */
-    public static function name(): string{
+    public static function name(): string
+    {
         //默认为当前类名
         return class_basename(static::class);
     }
@@ -146,7 +166,7 @@ abstract class FieldStepBase
      * 定义config
      * @param FieldStepBaseConfig $config
      */
-    abstract public function config(FieldStepBaseConfig $config):void;
+    abstract public function config(FieldStepBaseConfig $config): void;
 
 
     /**
@@ -165,14 +185,14 @@ abstract class FieldStepBase
      * @param Collection|\think\model\Collection|null $list
      * @return bool
      */
-    abstract protected function auth(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,FieldStep $step=null,$list=null):bool;
+    abstract protected function auth(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null): bool;
 
 
     /**
      * 权限查询条件（满足条件时，才能显示此条数据信息，默认都能查看，多个步骤时条件是 or ）
      * @param Query $query
      */
-    abstract protected function authWhere(Query $query):void;
+    abstract protected function authWhere(Query $query): void;
 
     /**
      * 验证数据是否符合当前步骤
@@ -197,10 +217,10 @@ abstract class FieldStepBase
      * @param FieldCollection|null $fields
      * @return bool
      */
-    public function canEdit(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null):bool{
+    public function canEdit(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null): bool
+    {
         return false;
     }
-
 
 
     /**
@@ -208,10 +228,11 @@ abstract class FieldStepBase
      * @param BaseModel $info
      * @param BaseModel|null $parentInfo
      * @param FieldCollection $fields
-     * @param FieldStep $step           此条数据的当前步骤，可在这里设置步骤显示的一些东西  $step->setTags([new FieldStepTag('完成','blue')]);
+     * @param FieldStep $step 此条数据的当前步骤，可在这里设置步骤显示的一些东西  $step->setTags([new FieldStepTag('完成','blue')]);
      * @return void
      */
-    public function listRowDo(BaseModel $info,?BaseModel $parentInfo,FieldCollection $fields,FieldStep $step):void{
+    public function listRowDo(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step): void
+    {
 
     }
 
@@ -223,7 +244,8 @@ abstract class FieldStepBase
      * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
      */
-    public function saveBefore(&$saveData,BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):void{
+    public function saveBefore(&$saveData, BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null): void
+    {
 
     }
 
@@ -236,7 +258,8 @@ abstract class FieldStepBase
      * @param FieldCollection|null $fields
      * @param array $saveData
      */
-    public function saveAfter(BaseModel $before,BaseModel $new,BaseModel $parentInfo=null,FieldCollection $fields=null,$saveData=[]):void{
+    public function saveAfter(BaseModel $before, BaseModel $new, BaseModel $parentInfo = null, FieldCollection $fields = null, $saveData = []): void
+    {
 
     }
 
@@ -245,8 +268,6 @@ abstract class FieldStepBase
     {
         return $this->fields;
     }
-
-
 
 
     /*function 不使用此类的步骤写法(){
