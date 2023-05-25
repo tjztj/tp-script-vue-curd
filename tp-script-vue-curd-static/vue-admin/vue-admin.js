@@ -324,60 +324,45 @@ define(requires, function (axios, Qs) {
             let appObj = box.appParam;
             //如果不是iframe,打于开当前页面
             return MyPromise(function (trigger) {
-
                 let key;
                 const openInfo = {
                     visible: false,
                     closable:true,
+                    width:option.area?option.area[0]:undefined,
+                    height:option.area?option.area[1]:undefined,
+                    title:option.title||undefined,
+                    url:option.url||option.content||undefined,
+                    zIndex:option.zIndex||undefined,
                 };
-                if (option.offset && option.offset === 'auto') {
+                if ((option.offset && option.offset === 'auto')||(openInfo.height&&!option.offset&&(openInfo.height!=='100vh'||openInfo.height!=='100%'))) {
                     key = 'bodyModals';
                 } else {
                     key = 'bodyDrawers';
-                    if (option.offset) {
-                        switch (option.offset) {
-                            case 'l':
-                            case 'lt':
-                            case 'lb':
-                                openInfo.offset = 'left';
-                                openInfo.width = openInfo.width || '45vw';
-                                break;
-                            case 'r':
-                            case 'rt':
-                            case 'rb':
-                                openInfo.offset = 'right';
-                                openInfo.width = openInfo.width || '45vw';
-                                break;
-                            case 't':
-                                openInfo.offset = 'top';
-                                break;
-                            case 'b':
-                                openInfo.offset = 'bottom';
-                                break;
-                            default:
-                                openInfo.offset = option.offset;
-                        }
-                        openInfo.placement = openInfo.offset;
-                    } else {
-                        option.area = ['45vw', '100vh'];
+                    switch (option.offset||'rt') {
+                        case 'l':
+                        case 'lt':
+                        case 'lb':
+                            openInfo.offset = 'left';
+                            break;
+                        case 'r':
+                        case 'rt':
+                        case 'rb':
+                            openInfo.offset = 'right';
+                            break;
+                        case 't':
+                            openInfo.offset = 'top';
+                            break;
+                        case 'b':
+                            openInfo.offset = 'bottom';
+                            break;
+                        default:
+                            openInfo.offset = 'right';
                     }
+                    openInfo.placement = openInfo.offset;
                 }
                 this.openType = key;
-                if (appObj[key]) {
-                    this.openIndex = appObj[key].length;
-                } else {
-                    this.openIndex = 0;
-                    appObj[key] = [];
-                }
-
-
-                openInfo.title = option.title || undefined;
-                openInfo.url = option.url || option.content || undefined;
-                if (option.area) {
-                    openInfo.width = option.area[0];
-                    openInfo.height = option.area[1];
-                }
-                openInfo.zIndex = option.zIndex || undefined;
+                appObj[key]=appObj[key]||[];
+                this.openIndex = appObj[key].length;
                 openInfo.onclose = function () {
                     trigger('close');
                 }
