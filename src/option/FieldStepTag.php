@@ -6,8 +6,8 @@ namespace tpScriptVueCurd\option;
 
 class FieldStepTag
 {
-
-    public string $color='default';//pink、red（或error）、orange（或warning）、green（或success）、cyan、blue（或processing）、purple
+    //'red' | 'orangered' | 'orange' | 'gold' | 'lime' | 'green' | 'cyan' | 'blue' | 'arcoblue' | 'purple' | 'pinkpurple' | 'magenta' | 'gray'
+    public string $color='';
     public string $text='';//显示的内容
 
     public function __construct(string $text='',string $color='')
