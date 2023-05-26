@@ -51,7 +51,7 @@ abstract class FieldStepBase
                                     throw new \think\Exception(static::class . '步骤配置不合法' . $k . '=>' . $v);
                                 }
                                 $v = true;
-                            } else if (is_bool($v)) {
+                            } else if (is_bool($v)||is_callable($v)) {
                                 $name = '';
                             } else {
                                 //不合法，跳过
@@ -124,7 +124,7 @@ abstract class FieldStepBase
                 } else if ($key !== '' && !is_subclass_of($key, self::class)) {
                     throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
                 }
-                if (is_bool($value)) {
+                if (is_bool($value)||is_callable($value)) {
                     $value = static fn()=>$value;
                 } else if (!is_callable($value)) {
                     throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
