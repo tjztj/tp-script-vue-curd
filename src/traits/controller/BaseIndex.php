@@ -36,8 +36,11 @@ use tpScriptVueCurd\option\LeftCate;
 trait BaseIndex
 {
 
-    //列表默认排序
-    public string $indexDefaultOrder='id DESC';
+    /**
+     * 列表默认排序
+     * @var string|Raw
+     */
+    public $indexDefaultOrder='id DESC';
 
     /**
      * #title 数据列表
