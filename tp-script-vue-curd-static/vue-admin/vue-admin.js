@@ -334,7 +334,7 @@ define(requires, function (axios, Qs) {
                     url:option.url||option.content||undefined,
                     zIndex:option.zIndex||undefined,
                 };
-                if ((option.offset && option.offset === 'auto')||(openInfo.height&&!option.offset&&(openInfo.height!=='100vh'||openInfo.height!=='100%'))) {
+                if ((option.offset && option.offset === 'auto')||(openInfo.height&&!option.offset&&openInfo.height!=='100vh'&&openInfo.height!=='100%')) {
                     key = 'bodyModals';
                 } else {
                     key = 'bodyDrawers';
