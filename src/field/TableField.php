@@ -27,6 +27,10 @@ class TableField extends ListField
     protected bool $showAction=true;
 
 
+    /**
+     * @var array 自定义要额外引入的字段与url
+     */
+    protected array $componentUrlArr=[];
 
     /**
      * 每页显示数量
@@ -59,6 +63,23 @@ class TableField extends ListField
     }
 
 
+    /**
+     * 设置自定义要额外引入的字段与url
+     * @param array $componentUrlArr 自定义要额外引入的字段与url集合
+     * @return $this
+     */
+    public function setComponentUrlArr(array $componentUrlArr):self{
+        $this->componentUrlArr=$componentUrlArr;
+        return $this;
+    }
+
+    /**
+     * 获取自定义要额外引入的字段与url
+     * @return array
+     */
+    public function getComponentUrlArr():array{
+        return  $this->componentUrlArr;
+    }
 
 
     public function toArray(): array
@@ -72,7 +93,7 @@ class TableField extends ListField
         $showFields=$showFields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
         $showFieldArr=array_values($showFields->toArray());
 
-        $componentUrl=[];
+        $componentUrl=[...$this->componentUrlArr];
         foreach ([$showFields->getComponents('show'),
                      $this->fields->getComponents('edit'),
                      $this->fields->getComponents('index')] as $v){
@@ -80,6 +101,8 @@ class TableField extends ListField
                 $componentUrl[]=$val;
             }
         }
+
+
 
         $arr['pageData']=[
             'listColumns'=>$listColumns,
