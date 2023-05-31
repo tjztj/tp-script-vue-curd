@@ -2,7 +2,6 @@ define([],function(){
     return {
         props:['info','field'],
         setup(props,ctx){
-            console.log(props.info[props.field.name].split(/\n/));
         },
         computed:{
 
