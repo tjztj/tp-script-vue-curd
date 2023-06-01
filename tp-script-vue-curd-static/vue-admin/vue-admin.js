@@ -359,6 +359,11 @@ define(requires, function (axios, Qs) {
                             openInfo.offset = 'right';
                     }
                     openInfo.placement = openInfo.offset;
+                    if((openInfo.placement==='left'||openInfo.placement==='right')&&typeof openInfo.width==='undefined'){
+                        openInfo.width='45vw';
+                    }else if((openInfo.placement==='top'||openInfo.placement==='bottom')&&typeof openInfo.height==='undefined'){
+                        openInfo.height='45vh';
+                    }
                 }
                 this.openType = key;
                 appObj[key]=appObj[key]||[];
