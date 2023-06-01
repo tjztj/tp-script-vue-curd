@@ -39,11 +39,11 @@ trait Excel
     /**
      * @var bool 如果是，模板中将填写子表的数据；如果否模板中指挥导入本表的数据
      */
-    private bool $baseAndChildImport=true;//是父表+子表 列表导入
+    protected bool $baseAndChildImport=false;//是否父表+子表 列表导入
     /**
      * @var BaseModel[]
      */
-    private array $importBaseInfos;//当前父表导入的数据集合
+    protected array $importBaseInfos;//当前父表导入的数据集合
 
 
 
@@ -391,33 +391,6 @@ trait Excel
         $excel->fileName=$this->getExcelFieldName();
         $excel->setData($list);
         $excel->out();
-    }
-
-    /**
-     * #title 仅本表导入模板下载
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    public function justDownBaseExcelTpl():void{
-        $this->baseAndChildImport=false;
-        $this->downExcelTpl();
-    }
-
-    /**
-     * #title 仅本表数据导入
-     * @return \think\response\Json|void
-     * @throws \think\Exception
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\DbException
-     * @throws \think\db\exception\ModelNotFoundException
-     */
-    public function justImportBaseExcelTpl(){
-        $this->baseAndChildImport=false;
-        return $this->importExcelTpl();
     }
 
 
