@@ -1,4 +1,7 @@
-define([], function () {
+define(['/tp-script-vue-curd-static.php?field/map_range/BMapGL/md5.js'], function (lmd5) {
+    if(!window.md5){
+        window.md5=lmd5.hex_md5;
+    }
     return {
         props: ['value', 'disabled', 'placeholder','center','zIndex'],
         setup(props, ctx) {
