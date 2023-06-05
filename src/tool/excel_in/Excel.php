@@ -71,7 +71,7 @@ class Excel
         $data = [];
         if (!empty($options['img_save_path'])) {
             $drawingList=$currSheet->getDrawingCollection()->getIterator();
-            if($drawingList&&!is_dir($options['img_save_path'])){
+            if($drawingList&&count($drawingList)>0&&!is_dir($options['img_save_path'])){
                 mkdir($options['img_save_path'],0777,true);
             }
             foreach ($drawingList as $drawing) {
