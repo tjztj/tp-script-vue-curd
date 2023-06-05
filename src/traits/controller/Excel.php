@@ -271,12 +271,12 @@ trait Excel
         if (empty($file)) {
             return $this->errorAndCode('未获取到上传文件');
         }
-        $base_path= public_path( '/upload');
-        is_dir($base_path) || mkdir($base_path);
-        $base_path= public_path( '/upload/excel_import');
-        is_dir($base_path) || mkdir($base_path);
-        $options = ['img_save_path' => $base_path.'/'. \tpScriptVueCurd\tool\Time::unixtimeToDate('Ymd') . '/', 'format' => []];
-        is_dir($options['img_save_path']) || mkdir($options['img_save_path']);
+//        $base_path= public_path( '/upload');
+//        is_dir($base_path) || mkdir($base_path);
+//        $base_path= public_path( '/upload/excel_import');
+//        is_dir($base_path) || mkdir($base_path);
+        $options = ['img_save_path' => public_path( '/upload/excel_import').'/'. \tpScriptVueCurd\tool\Time::unixtimeToDate('Ymd') . '/', 'format' => []];
+//        is_dir($options['img_save_path']) || mkdir($options['img_save_path']);
         try{
             $data = \tpScriptVueCurd\tool\excel_in\Excel::importExecl($file->getRealPath(), 0, 0, $options);
         }catch (\Exception $e){

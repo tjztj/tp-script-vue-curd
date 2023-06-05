@@ -70,7 +70,11 @@ class Excel
 
         $data = [];
         if (!empty($options['img_save_path'])) {
-            foreach ($currSheet->getDrawingCollection()->getIterator() as $drawing) {
+            $drawingList=$currSheet->getDrawingCollection()->getIterator();
+            if($drawingList&&!is_dir($options['img_save_path'])){
+                mkdir($options['img_save_path'],0777,true);
+            }
+            foreach ($drawingList as $drawing) {
                 $source = null;
                 list($startColumn, $startRow) = Coordinate::coordinateFromString($drawing->getCoordinates());
                 $imageFileName = $drawing->getCoordinates() . '_' . random_int(1000, 9999) . '_' . time() . '_' . $drawing->getHashCode();
