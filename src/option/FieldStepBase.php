@@ -229,9 +229,10 @@ abstract class FieldStepBase
      * @param BaseModel|null $parentInfo
      * @param FieldCollection $fields
      * @param FieldStep $step 此条数据的当前步骤，可在这里设置步骤显示的一些东西  $step->setTags([new FieldStepTag('完成','blue')]);
+     * @param FieldStep|null $nextStepInfo
      * @return void
      */
-    public function listRowDo(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step): void
+    public function listRowDo(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step,?FieldStep $nextStepInfo): void
     {
 
     }
