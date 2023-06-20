@@ -518,14 +518,15 @@ class FieldStep
      * @param BaseModel $info
      * @param BaseModel|null $parentInfo
      * @param FieldCollection|null $fields
+     * @param FieldStep|null $nextStepInfo
      * @return $this
      */
-    public function listRowDo(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null):self{
+    public function listRowDo(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null,?self $nextStepInfo=null):self{
         if(!isset($this->listRowDo)||is_null($this->listRowDo)){
             return $this;
         }
         $func=$this->listRowDo;
-        $func($info,$parentInfo,$fields,$this);
+        $func($info,$parentInfo,$fields,$this,$nextStepInfo);
         return $this;
     }
 

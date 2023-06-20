@@ -463,13 +463,18 @@ trait BaseIndex
 
             $stepInfo=$this->fields->getCurrentStepInfo($info,$parentInfo);
             $stepInfo === null ||$stepInfo=clone $stepInfo;
-            $info->stepInfo=$stepInfo?$stepInfo->listRowDo($info,$parentInfo,$this->fields)->toArray():null;
+            $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
 
             $nextStepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
             $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
-            $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit= $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo),$list);
 
+            if($stepInfo){
+                $info->stepInfo=$stepInfo->listRowDo($info,$parentInfo,$this->fields,$nextStepInfo)->toArray();
+            }else{
+                $info->stepInfo=null;
+            }
+            $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
+            $info->stepNextCanEdit=$info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo),$list);
 
             $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
