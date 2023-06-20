@@ -93,7 +93,7 @@ abstract class FieldStepBase
                 return $step->config['canEditReturn'];
             },
         )->setListRowDo(
-            fn(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step,?self $nextStepInfo) => $this->listRowDo($info, $parentInfo, $fields, $step,$nextStepInfo)
+            fn(BaseModel $info, ?BaseModel $parentInfo, FieldCollection $fields, FieldStep $step,?FieldStep $nextStepInfo) => $this->listRowDo($info, $parentInfo, $fields, $step,$nextStepInfo)
         )->saveBefore(
             fn(&$saveData, BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null) => $this->saveBefore($saveData, $info, $parentInfo, $fields)
         )->saveAfter(
