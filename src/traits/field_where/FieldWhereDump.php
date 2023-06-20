@@ -223,7 +223,14 @@ trait FieldWhereDump
                 if($dumpIsHtml){
                     $str.='<div class="wds-ors-box">';
                 }
-                foreach ($info['ors'] as $v){
+                foreach ($info['ors'] as $k=>$v){
+                    if($k>0){
+                        if($dumpIsHtml){
+                            $str.='<div class="wds-row wds-and-break">OR</div>';
+                        }else{
+                            $str.=' OR ';
+                        }
+                    }
                     if(is_array($v)){
                         if($dumpIsHtml){
                             $str.='<div class="wds-row wds-or-childs">'.$getChildHtml($v,$level,$info,'or').'</div>';
