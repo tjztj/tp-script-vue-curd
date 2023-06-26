@@ -896,14 +896,20 @@ abstract class ModelField
 
     /**
      * 设置筛选，如果要不启用筛选，传入参数 new emptyFilter
-     * @param ModelFilter|null $filter
+     * @param ModelFilter|string|null $filter
      * @return $this|ModelFilter
      */
-    public function filter(ModelFilter $filter = null)
+    public function filter($filter = null)
     {
-        if ($filter && get_class($filter) === EmptyFilter::class) {
-            $this->filter = null;
-            return $this;
+        if ($filter){
+            if(is_string($filter)){
+                $this->filter(new $filter($this));
+                return $this;
+            }
+            if(get_class($filter) === EmptyFilter::class){
+                $this->filter = null;
+                return $this;
+            }
         }
         return $this->doAttr('filter', $filter);
     }
