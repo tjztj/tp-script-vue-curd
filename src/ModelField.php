@@ -902,16 +902,22 @@ abstract class ModelField
     public function filter($filter = null)
     {
         if ($filter){
-            if(is_string($filter)){
-                $this->filter(new $filter($this));
-                return $this;
-            }
-            if(get_class($filter) === EmptyFilter::class){
+            if ((is_string($filter) && $filter === EmptyFilter::class) || $filter instanceof EmptyFilter) {
                 $this->filter = null;
-                return $this;
+            } else if (is_string($filter)) {
+                $this->filter = new $filter($this);
+            } else if(is_subclass_of($filter,ModelFilter::class)){
+                $this->filter = $filter;
+            }else{
+                throw new \think\Exception($this->name().'的'.'filter参数错误');
             }
+            return $this;
         }
-        return $this->doAttr('filter', $filter);
+
+        if (is_null($filter)) {
+            return $this->filter;
+        }
+        throw new \think\Exception($this->name().'的'.'filter参数错误');
     }
 
 
