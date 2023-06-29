@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?field/table/edit.js'],function(tableEdit){
+define(['/tpscriptvuecurd/field/table/edit.js'],function(tableEdit){
     return {
         components:{
             tableEdit,

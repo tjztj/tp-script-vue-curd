@@ -34,7 +34,7 @@ class Edit
 
     private string $guid;
     private APP $app;
-    public string $jsPath='/tp-script-vue-curd-static.php?single/edit.js';
+    public string $jsPath='/tpscriptvuecurd/single/edit.js';
 
     public function __construct()
     {

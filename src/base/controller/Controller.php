@@ -73,7 +73,7 @@ trait Controller
         $indexPageOption=new FunControllerIndexPage;
         $this->indexPageOption=$indexPageOption;
         $this->tplPath=getVCurdDir().'tpl'.DIRECTORY_SEPARATOR;
-        $this->assign('jsPath','/tp-script-vue-curd-static.php?default.js');
+        $this->assign('jsPath','/tpscriptvuecurd/default.js');
 
 
         $this->init();

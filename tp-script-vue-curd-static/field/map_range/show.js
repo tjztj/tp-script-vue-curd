@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?field/map_range/map_range.js','/tp-script-vue-curd-static.php?field/map_range/BMapGL/map_range.js','/tp-script-vue-curd-static.php?field/map_range/AMap/map_range.js'],function(tMap,bMap,aMap){
+define(['/tpscriptvuecurd/field/map_range/map_range.js','/tpscriptvuecurd/field/map_range/BMapGL/map_range.js','/tpscriptvuecurd/field/map_range/AMap/map_range.js'],function(tMap,bMap,aMap){
     return {
         components:{
             tMap,bMap,aMap

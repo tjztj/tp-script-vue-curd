@@ -25,7 +25,7 @@ class YearField extends ModelField
         return new FieldTpl($type,
             new Index($type,''),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/year/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/year/edit.js')
         );
     }
 

@@ -38,6 +38,6 @@ class ValueFilter extends ModelFilter
 
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/value.js';
+        return '/tpscriptvuecurd/filter/value.js';
     }
 }

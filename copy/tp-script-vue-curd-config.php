@@ -207,7 +207,7 @@ if (!function_exists('uEditorUpload')) {
 
         //上传失败返回示例
         return json_encode([
-            "state" => '请在tp-script-vue-curd-static.php/uEditorUpload中实现上传',
+            "state" => '请在tp-script-vue-curd-config.php/uEditorUpload中实现上传',
         ], JSON_THROW_ON_ERROR);
 
         //上传成功返回示例

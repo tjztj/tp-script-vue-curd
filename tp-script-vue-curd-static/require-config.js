@@ -5,7 +5,7 @@ require.config({
             return '?time='+(new Date()).getTime()
         }
         //可以自定义js版本号
-        if(window.VUE_CURD.SITE_VERSION!==''&&url.indexOf('tp-script-vue-curd-static.php')===-1){
+        if(window.VUE_CURD.SITE_VERSION!==''&&url.indexOf('tpscriptvuecurd/')===-1){
             return '?site_version='+window.VUE_CURD.SITE_VERSION;
         }
         return "?v=" + window.VUE_CURD.VERSION
@@ -14,22 +14,22 @@ require.config({
     waitSeconds:0,
     map: {
         '*': {
-            'css': '/tp-script-vue-curd-static.php?require-css-0.1.10/css.min.js'
+            'css': '/tpscriptvuecurd/require-css-0.1.10/css.min.js'
         }
     },
     paths: {
-        "vue": ["tp-script-vue-curd-static.php?vue3/vue.global.prod.js"],
-        "vueAdmin": ["tp-script-vue-curd-static.php?vue-admin/vue-admin.js"],
-        "axios": ["tp-script-vue-curd-static.php?axios/axios.min.js"],
-        "qs": ["tp-script-vue-curd-static.php?qs-6.9.4/qs.min.js"],
-        "g6": ["tp-script-vue-curd-static.php?antv/g6.min.js"],
-        "@wangeditor/editor": ["tp-script-vue-curd-static.php?field/editor/wangeditor/index.min.js"],
-        "@wangeditor/editor-for-vue": ["tp-script-vue-curd-static.php?field/editor/wangeditor/index_vue.js"],
+        "vue": ["/tpscriptvuecurd/vue3/vue.global.prod.js"],
+        "vueAdmin": ["/tpscriptvuecurd/vue-admin/vue-admin.js"],
+        "axios": ["/tpscriptvuecurd/axios/axios.min.js"],
+        "qs": ["/tpscriptvuecurd/qs-6.9.4/qs.min.js"],
+        "g6": ["/tpscriptvuecurd/antv/g6.min.js"],
+        "@wangeditor/editor": ["/tpscriptvuecurd/field/editor/wangeditor/index.min.js"],
+        "@wangeditor/editor-for-vue": ["/tpscriptvuecurd/field/editor/wangeditor/index_vue.js"],
         ...window.VUE_CURD.REQUIRES,
     },
     shim:{
         '@wangeditor/editor':{
-            deps: ['css!/tp-script-vue-curd-static.php?field/editor/wangeditor/style']
+            deps: ['css!/tpscriptvuecurd/field/editor/wangeditor/style']
         },
     }
 });

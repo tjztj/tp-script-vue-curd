@@ -116,7 +116,7 @@ trait Bpmn
 
         return $this->fetch(getVCurdDir().'tpl/step/bpmn.vue',[
             'data'=>$data,
-            'jsPath'=>'/tp-script-vue-curd-static.php?actions/step.js',
+            'jsPath'=>'/tpscriptvuecurd/actions/step.js',
         ]);
     }
 }

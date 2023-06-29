@@ -178,8 +178,8 @@ class EditorField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/editor/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/editor/edit.js')
+            new Show($type,'/tpscriptvuecurd/field/editor/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/editor/edit.js')
         );
     }
 

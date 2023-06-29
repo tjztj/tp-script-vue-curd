@@ -151,9 +151,9 @@ class ListField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/list/index.js'),
-            new Show($type,'/tp-script-vue-curd-static.php?field/list/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/list/edit.js')
+            new Index($type,'/tpscriptvuecurd/field/list/index.js'),
+            new Show($type,'/tpscriptvuecurd/field/list/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/list/edit.js')
         );
     }
 

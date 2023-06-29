@@ -1,5 +1,5 @@
 
-define(['/tp-script-vue-curd-static.php?field/table/show.js'],function(tableShow){
+define(['/tpscriptvuecurd/field/table/show.js'],function(tableShow){
     const styleId='table-field-index-field-style';
     const style = `
 <style id="${styleId}">

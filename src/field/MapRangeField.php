@@ -177,8 +177,8 @@ class MapRangeField extends ModelField
         $type=class_basename(static::class);
         return new FieldTpl($type,
             new Index($type,''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/map_range/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/map_range/edit.js')
+            new Show($type,'/tpscriptvuecurd/field/map_range/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/map_range/edit.js')
         );
     }
 

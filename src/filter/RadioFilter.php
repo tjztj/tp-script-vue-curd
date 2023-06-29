@@ -151,7 +151,7 @@ class RadioFilter extends ModelFilter
     }
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/radio.js';
+        return '/tpscriptvuecurd/filter/radio.js';
     }
 
 

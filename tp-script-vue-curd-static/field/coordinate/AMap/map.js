@@ -97,7 +97,7 @@ define([], function () {
                 this.openBox({
                     title: '请选择相关地点',
                     offset: 'lt',
-                    content: '/tp-script-vue-curd-static.php?field/coordinate/AMap/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
+                    content: '/tpscriptvuecurd/field/coordinate/AMap/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
                 }).on('success', (layero, index) => {
                     let mapWindow;
                     if(layero.iframe&&layero.iframe.contentWindow){

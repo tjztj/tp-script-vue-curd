@@ -56,9 +56,9 @@ class TableField extends ListField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/table/index.js'),
-            new Show($type,'/tp-script-vue-curd-static.php?field/table/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/table/edit.js')
+            new Index($type,'/tpscriptvuecurd/field/table/index.js'),
+            new Show($type,'/tpscriptvuecurd/field/table/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/table/edit.js')
         );
     }
 

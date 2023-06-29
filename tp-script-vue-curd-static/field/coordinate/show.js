@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?field/coordinate/map.js','/tp-script-vue-curd-static.php?field/coordinate/BMapGL/map.js','/tp-script-vue-curd-static.php?field/coordinate/AMap/map.js'],function(tMap,bMap,aMap){
+define(['/tpscriptvuecurd/field/coordinate/map.js','/tpscriptvuecurd/field/coordinate/BMapGL/map.js','/tpscriptvuecurd/field/coordinate/AMap/map.js'],function(tMap,bMap,aMap){
     return {
         components:{
             tMap,bMap,aMap

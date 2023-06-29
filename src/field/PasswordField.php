@@ -84,7 +84,7 @@ class PasswordField extends ModelField
         return new FieldTpl($type,
             new Index($type,''),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/password/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/password/edit.js')
         );
     }
 

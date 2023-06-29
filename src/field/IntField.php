@@ -101,9 +101,9 @@ class IntField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/int/index.js'),
+            new Index($type,'/tpscriptvuecurd/field/int/index.js'),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/int/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/int/edit.js')
         );
     }
 

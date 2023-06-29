@@ -64,7 +64,7 @@ class YearFilter extends ModelFilter
     }
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/year.js';
+        return '/tpscriptvuecurd/filter/year.js';
     }
 
 }

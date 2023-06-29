@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?listEdit/text.js'],function(listEdit){
+define(['/tpscriptvuecurd/listEdit/text.js'],function(listEdit){
     return {
         components:{
             listEdit,

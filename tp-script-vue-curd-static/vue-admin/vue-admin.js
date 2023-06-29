@@ -771,7 +771,7 @@ define(requires, function (axios, Qs) {
                 title: btn.modalTitle,
                 area: [w, h],
                 offset: offset,
-                content: '/tp-script-vue-curd-static.php?row_other_btn/show_inputs.vue?'+(window.VUE_CURD.DEBUG?'t='+(new Date()).getTime():'v='+(window.VUE_CURD.VERSION||'')),
+                content: '/tpscriptvuecurd/row_other_btn/show_inputs.vue?'+(window.VUE_CURD.DEBUG?'t='+(new Date()).getTime():'v='+(window.VUE_CURD.VERSION||'')),
             }).on('success', function (layero) {
                 const iframe = layero.iframe ? layero.iframe : layero.find('iframe')[0];
                 const win = iframe.contentWindow;
@@ -834,9 +834,9 @@ define(requires, function (axios, Qs) {
                 }
                 setHTMLWithScript(win.document.querySelector('head'), "<style id='init-before-style'>body{display: none}</style>"
                     + headHtml
-                    + "<script src=\"/tp-script-vue-curd-static.php?require-2.3.6/require.js\" charset=\"utf-8\"></script>"
-                    + "<script src=\"/tp-script-vue-curd-static.php?require-config.js\" charset=\"utf-8\"></script>"
-                    + "<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tp-script-vue-curd-static.php?row_other_btn/show_inputs.js']);},100);"
+                    + "<script src=\"/tpscriptvuecurd/require-2.3.6/require.js\" charset=\"utf-8\"></script>"
+                    + "<script src=\"/tpscriptvuecurd/require-config.js\" charset=\"utf-8\"></script>"
+                    + "<script>window.beforeInit();setTimeout(()=>{document.querySelector('#init-before-style').remove();require(['/tpscriptvuecurd/row_other_btn/show_inputs.js']);},100);"
                     + "</script>");
 
 

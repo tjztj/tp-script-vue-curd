@@ -84,7 +84,7 @@ class StringAutoCompleteField extends ModelField
         return new FieldTpl($type,
             new Index($type,''),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/string_auto_complete/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/string_auto_complete/edit.js')
         );
     }
 

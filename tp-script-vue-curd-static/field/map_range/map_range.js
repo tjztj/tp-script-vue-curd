@@ -97,7 +97,7 @@ define([], function () {
                 this.openBox({
                     title: '请绘制相关区域',
                     offset: 'lt',
-                    content: '/tp-script-vue-curd-static.php?field/map_range/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
+                    content: '/tpscriptvuecurd/field/map_range/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
                 }).on('success', (layero, index) => {
                     let mapWindow;
                     if(layero.iframe&&layero.iframe.contentWindow){

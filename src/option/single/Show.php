@@ -32,7 +32,7 @@ class Show
 
     private string $guid;
     private APP $app;
-    public string $jsPath='/tp-script-vue-curd-static.php?single/show.js';
+    public string $jsPath='/tpscriptvuecurd/single/show.js';
 
 
 

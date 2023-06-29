@@ -282,9 +282,9 @@ class TreeSelectField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/tree_select/index.js'),
-            new Show($type,'/tp-script-vue-curd-static.php?field/tree_select/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/tree_select/edit.js')
+            new Index($type,'/tpscriptvuecurd/field/tree_select/index.js'),
+            new Show($type,'/tpscriptvuecurd/field/tree_select/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/tree_select/edit.js')
         );
     }
 

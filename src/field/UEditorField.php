@@ -116,8 +116,8 @@ class UEditorField extends EditorField
         $type = class_basename(static::class);
         return new FieldTpl($type,
             new Index($type, ''),
-            new Show($type,'/tp-script-vue-curd-static.php?field/u_editor/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/u_editor/edit.js')
+            new Show($type,'/tpscriptvuecurd/field/u_editor/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/u_editor/edit.js')
         );
     }
 }

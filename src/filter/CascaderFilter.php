@@ -93,6 +93,6 @@ class CascaderFilter extends ModelFilter
     }
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/cascader.js';
+        return '/tpscriptvuecurd/filter/cascader.js';
     }
 }

@@ -191,9 +191,9 @@
         </div>
     </div>
 </div>
-<script src="/tp-script-vue-curd-static.php?vue3/vue.global.prod.js?3.2.47" charset="utf-8"></script>
-<script src="/tp-script-vue-curd-static.php?arco/arco-vue.min.js?2.44.2" charset="utf-8"></script>
-<script src="/tp-script-vue-curd-static.php?arco/arco-vue-icon.min.js?2.44.2" charset="utf-8"></script>
+<script src="/tpscriptvuecurd/vue3/vue.global.prod.js?3.2.47" charset="utf-8"></script>
+<script src="/tpscriptvuecurd/arco/arco-vue.min.js?2.44.2" charset="utf-8"></script>
+<script src="/tpscriptvuecurd/arco/arco-vue-icon.min.js?2.44.2" charset="utf-8"></script>
 <script>
     function getQueryVariable(variable)
     {
@@ -283,8 +283,8 @@
         },
         mounted(){
             let v= getQueryVariable('v');
-            ['/tp-script-vue-curd-static.php?arco/arco.min.css?v='+v,
-                '/tp-script-vue-curd-static.php?css/vue.css?v='+v,
+            ['/tpscriptvuecurd/arco/arco.min.css?v='+v,
+                '/tpscriptvuecurd/css/vue.css?v='+v,
             ].forEach(val=>{
                 if(!val)return;
                 let styleEl = document.createElement('link');

@@ -167,7 +167,7 @@ class SelectFilter extends ModelFilter
     }
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/select.js';
+        return '/tpscriptvuecurd/filter/select.js';
     }
 
 }

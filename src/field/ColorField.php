@@ -28,9 +28,9 @@ class ColorField extends ModelField
     {
         $type=class_basename(static::class);
         return new FieldTpl($type,
-            new Index($type,'/tp-script-vue-curd-static.php?field/color/index.js'),
-            new Show($type,'/tp-script-vue-curd-static.php?field/color/show.js'),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/color/edit.js')
+            new Index($type,'/tpscriptvuecurd/field/color/index.js'),
+            new Show($type,'/tpscriptvuecurd/field/color/show.js'),
+            new Edit($type,'/tpscriptvuecurd/field/color/edit.js')
         );
     }
 

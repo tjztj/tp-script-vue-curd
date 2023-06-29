@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/config.js','/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/vue-ueditor-wrap.js'], function (config) {
+define(['/tpscriptvuecurd/field/u_editor/ueditor-plus-2.9.0/config.js','/tpscriptvuecurd/field/u_editor/ueditor-plus-2.9.0/vue-ueditor-wrap.js'], function (config) {
     const styleId='u-editor-field-edit-stype';
     const style = `
 <style id="${styleId}">
@@ -32,7 +32,7 @@ define(['/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/config
                     zIndex:props.field.zIndex,
                     serverUrl: props.field.uploadUrl,
                     // 配置UEditorPlus的惊天资源
-                    UEDITOR_HOME_URL: '/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/'
+                    UEDITOR_HOME_URL: '/tpscriptvuecurd/field/u_editor/ueditor-plus-2.9.0/'
                 },
                 content: Vue.ref(props.value||''),
             }

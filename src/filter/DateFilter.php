@@ -114,6 +114,6 @@ class DateFilter extends ModelFilter
 
 
     public static function componentUrl():string{
-        return '/tp-script-vue-curd-static.php?filter/date.js';
+        return '/tpscriptvuecurd/filter/date.js';
     }
 }

@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?field/map_range/BMapGL/md5.js'], function (lmd5) {
+define(['/tpscriptvuecurd/field/map_range/BMapGL/md5.js'], function (lmd5) {
     if(!window.md5){
         window.md5=lmd5.hex_md5;
     }
@@ -97,7 +97,7 @@ define(['/tp-script-vue-curd-static.php?field/map_range/BMapGL/md5.js'], functio
                 this.openBox({
                     title: '请绘制相关区域',
                     offset: 'lt',
-                    content: '/tp-script-vue-curd-static.php?field/map_range/BMapGL/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
+                    content: '/tpscriptvuecurd/field/map_range/BMapGL/map_open.html&center='+this.centerArr.join(',')+'&v='+v,
                 }).on('success', (layero, index) => {
                     let mapWindow;
                     if(layero.iframe&&layero.iframe.contentWindow){

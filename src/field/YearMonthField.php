@@ -148,7 +148,7 @@ class YearMonthField extends ModelField
         return new FieldTpl($type,
             new Index($type,''),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/year_month/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/year_month/edit.js')
         );
     }
 

@@ -175,7 +175,7 @@ class DateField extends ModelField
         return new FieldTpl($type,
             new Index($type,''),
             new Show($type,''),
-            new Edit($type,'/tp-script-vue-curd-static.php?field/date/edit.js')
+            new Edit($type,'/tpscriptvuecurd/field/date/edit.js')
         );
     }
 
