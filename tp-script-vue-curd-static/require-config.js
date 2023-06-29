@@ -24,7 +24,7 @@ require.config({
         "qs": ["tp-script-vue-curd-static.php?qs-6.9.4/qs.min.js"],
         "g6": ["tp-script-vue-curd-static.php?antv/g6.min.js"],
         "@wangeditor/editor": ["tp-script-vue-curd-static.php?field/editor/wangeditor/index.min.js"],
-        "@wangeditor/editor-for-vue": ["tp-script-vue-curd-static.php?editor/edit/wangeditor/index_vue.js"],
+        "@wangeditor/editor-for-vue": ["tp-script-vue-curd-static.php?field/editor/wangeditor/index_vue.js"],
         ...window.VUE_CURD.REQUIRES,
     },
     shim:{
