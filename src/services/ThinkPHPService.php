@@ -8,7 +8,7 @@ class ThinkPHPService extends \think\Service
     public function register()
     {
         $this->registerRoutes(function (){
-            Route::any('tp-script-vue-curd/:c/:a','tpScriptVueCurd\actions\:c@:a');
+            Route::any('tp-script-vue-curd/:c/:a','tpScriptVueCurd\actions\:c@:a')->pattern(['c' => '\w+', 'a' => '\w+']);;;
         });
     }
 

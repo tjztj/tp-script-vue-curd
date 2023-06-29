@@ -197,3 +197,28 @@ if (!function_exists('tsvcThemCssPath')) {
     }
 }
 ########################################################################################################################
+if (!function_exists('uEditorUpload')) {
+    /**
+     * 百度文本编辑器实现文件上传
+     * @return string
+     */
+    function uEditorUpload():string{
+        $file=request()->file('upfile');
+
+        //上传失败返回示例
+        return json_encode([
+            "state" => '请在tp-script-vue-curd-static.php/uEditorUpload中实现上传',
+        ], JSON_THROW_ON_ERROR);
+
+        //上传成功返回示例
+        return json_encode([
+            "state" => 'SUCCESS',
+            "url" => '',
+            "title" => '',
+            "original" => '',
+            "type" => '',
+            "size" => ''
+        ], JSON_THROW_ON_ERROR);
+    }
+}
+########################################################################################################################
