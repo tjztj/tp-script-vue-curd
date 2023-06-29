@@ -1,4 +1,4 @@
-define(['/tp-script-vue-curd-static.php?/field/u_editor/ueditor-plus-2.9.0/config.js','/tp-script-vue-curd-static.php?/field/u_editor/ueditor-plus-2.9.0/vue-ueditor-wrap.js'], function (config) {
+define(['/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/config.js','/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/vue-ueditor-wrap.js'], function (config) {
     const styleId='u-editor-field-edit-stype';
     const style = `
 <style id="${styleId}">
