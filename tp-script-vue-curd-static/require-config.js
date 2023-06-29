@@ -14,7 +14,7 @@ require.config({
     waitSeconds:0,
     map: {
         '*': {
-            'css': 'plugs/require-css-0.1.10/css.min'
+            'css': '/tp-script-vue-curd-static.php?require-css-0.1.10/css.min.js'
         }
     },
     paths: {
@@ -23,6 +23,13 @@ require.config({
         "axios": ["tp-script-vue-curd-static.php?axios/axios.min.js"],
         "qs": ["tp-script-vue-curd-static.php?qs-6.9.4/qs.min.js"],
         "g6": ["tp-script-vue-curd-static.php?antv/g6.min.js"],
+        "@wangeditor/editor": ["tp-script-vue-curd-static.php?wangeditor/index.min.js"],
+        "@wangeditor/editor-for-vue": ["tp-script-vue-curd-static.php?wangeditor/index_vue.js"],
         ...window.VUE_CURD.REQUIRES,
     },
+    shim:{
+        '@wangeditor/editor':{
+            deps: ['css!/tp-script-vue-curd-static.php?wangeditor/style']
+        },
+    }
 });

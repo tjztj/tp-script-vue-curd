@@ -22,5 +22,12 @@
         "psr-4": {
             "tpScriptVueCurd\\": "src/"
         }
+    },
+    "extra": {
+        "think": {
+            "services": [
+                "hg\\apidoc\\providers\\ThinkPHPService"
+            ]
+        }
     }
 }
