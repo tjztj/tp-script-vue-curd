@@ -32,7 +32,7 @@ define(['/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/config
                     zIndex:props.field.zIndex,
                     serverUrl: props.field.uploadUrl,
                     // 配置UEditorPlus的惊天资源
-                    UEDITOR_HOME_URL: '/tp-script-vue-curd-static.php?/field/u_editor/ueditor-plus-2.9.0/'
+                    UEDITOR_HOME_URL: '/tp-script-vue-curd-static.php?field/u_editor/ueditor-plus-2.9.0/'
                 },
                 content: Vue.ref(props.value||''),
             }
