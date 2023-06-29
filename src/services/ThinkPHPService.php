@@ -3,9 +3,11 @@
 namespace tpScriptVueCurd\services;
 
 use think\facade\Route;
+use tpScriptVueCurd\traits\Func;
 
 class ThinkPHPService extends \think\Service
 {
+    use Func;
     public function register()
     {
         $this->registerRoutes(function () {

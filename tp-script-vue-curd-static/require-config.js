@@ -14,17 +14,17 @@ require.config({
     waitSeconds:0,
     map: {
         '*': {
-            'css': '/tpscriptvuecurd/require-css-0.1.10/css.min.js'
+            'css': '/tpscriptvuecurd/require-css-0.1.10/css.min'
         }
     },
     paths: {
-        "vue": ["/tpscriptvuecurd/vue3/vue.global.prod.js"],
-        "vueAdmin": ["/tpscriptvuecurd/vue-admin/vue-admin.js"],
-        "axios": ["/tpscriptvuecurd/axios/axios.min.js"],
-        "qs": ["/tpscriptvuecurd/qs-6.9.4/qs.min.js"],
-        "g6": ["/tpscriptvuecurd/antv/g6.min.js"],
-        "@wangeditor/editor": ["/tpscriptvuecurd/field/editor/wangeditor/index.min.js"],
-        "@wangeditor/editor-for-vue": ["/tpscriptvuecurd/field/editor/wangeditor/index_vue.js"],
+        "vue": ["/tpscriptvuecurd/vue3/vue.global.prod"],
+        "vueAdmin": ["/tpscriptvuecurd/vue-admin/vue-admin"],
+        "axios": ["/tpscriptvuecurd/axios/axios.min"],
+        "qs": ["/tpscriptvuecurd/qs-6.9.4/qs.min"],
+        "g6": ["/tpscriptvuecurd/antv/g6.min"],
+        "@wangeditor/editor": ["/tpscriptvuecurd/field/editor/wangeditor/index.min"],
+        "@wangeditor/editor-for-vue": ["/tpscriptvuecurd/field/editor/wangeditor/index_vue"],
         ...window.VUE_CURD.REQUIRES,
     },
     shim:{

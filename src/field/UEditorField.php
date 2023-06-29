@@ -107,7 +107,7 @@ class UEditorField extends EditorField
         ]
     ];
 
-    protected string $uploadUrl = '/tp-script-vue-curd/Ueditor/index';
+    protected string $uploadUrl = '/tp-script-vue-curd/UeditorDo/index';
 
     protected int $height=420;
 
@@ -116,7 +116,7 @@ class UEditorField extends EditorField
         $type = class_basename(static::class);
         return new FieldTpl($type,
             new Index($type, ''),
-            new Show($type,'/tpscriptvuecurd/field/u_editor/show.js'),
+            new Show($type,'/tpscriptvuecurd/field/editor/show.js'),
             new Edit($type,'/tpscriptvuecurd/field/u_editor/edit.js')
         );
     }

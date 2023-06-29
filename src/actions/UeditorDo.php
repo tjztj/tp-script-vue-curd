@@ -2,7 +2,7 @@
 
 namespace tpScriptVueCurd\actions;
 
-class Ueditor
+class UeditorDo
 {
     public function index(){
         $action=request()->param('action');
