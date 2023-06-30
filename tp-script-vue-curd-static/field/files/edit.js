@@ -115,7 +115,7 @@ define([],function(){
                             :disabled="field.readOnly"
                             :response-url-key="responseUrlKey"
                             with-credentials
-                            download="field.canDown"
+                            :download="field.canDown"
                             @change="change"
                             @success="uploadSuccess"
                         >
