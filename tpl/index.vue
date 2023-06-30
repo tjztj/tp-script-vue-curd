@@ -274,14 +274,24 @@ body{
                             {/block}
                         </template>
 
-                        <a-button v-if="auth.importExcelTpl" type="primary" status="warning"  @click="importExcelTpl">
-                            <template #icon><icon-import></icon-import></template>
-                            <span> Excel导入数据</span>
-                        </a-button>
-                        <a-button v-if="auth.downExcelTpl" type="primary" status="success"  @click="downExcelTpl">
-                            <template #icon><icon-download></icon-download></template>
-                            <span> Excel模板下载</span>
-                        </a-button>
+                        <template v-if="auth.importExcelTpl&&auth.downExcelTpl">
+                            <a-dropdown-button type="primary" status="success" @click="importExcelTpl">
+                                <svg width="1em" height="1em" fill="currentColor" aria-hidden="true" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2292"><path d="M601.152 708.288 400 568 344 568l0 112-224 0 0 112 224 0 0 112L400 904l201.152-140.288C624 749.504 624 722.496 601.152 708.288L601.152 708.288zM891.264 331.2 638.656 76.864C630.528 68.608 619.456 64 607.936 64L232 64C196.032 64 176 83.712 176 120L176 512 288 512 288 176l280 0 0 168c0 24.192 32 56 56 56l168 0 0.768 448L624 848 624 960l224 0c35.968 0 56-19.712 56-56L904 362.176C904 350.528 899.392 339.392 891.264 331.2L891.264 331.2z" p-id="2293"></path></svg>&nbsp;Excel导入数据
+                                <template #content>
+                                    <a-doption @click="downExcelTpl"><template #icon><icon-download></icon-download></template>Excel模板下载</a-doption>
+                                </template>
+                            </a-dropdown-button>
+                        </template>
+                        <template v-else>
+                            <a-button v-if="auth.importExcelTpl" type="primary" status="warning"  @click="importExcelTpl">
+                                <template #icon><icon-import></icon-import></template>
+                                <span> Excel导入数据</span>
+                            </a-button>
+                            <a-button v-if="auth.downExcelTpl" type="primary" status="success"  @click="downExcelTpl">
+                                <template #icon><icon-download></icon-download></template>
+                                <span> Excel模板下载</span>
+                            </a-button>
+                        </template>
 
                         <a-button v-if="auth.export" @click="exportData" :disabled="!pagination.total">
                             <template #icon><icon-export></icon-export></template>
