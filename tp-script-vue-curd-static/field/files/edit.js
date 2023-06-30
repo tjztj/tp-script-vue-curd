@@ -116,6 +116,7 @@ define([],function(){
                             :response-url-key="responseUrlKey"
                             with-credentials
                             :download="field.canDown"
+                            :show-link="field.canDown"
                             @change="change"
                             @success="uploadSuccess"
                         >
