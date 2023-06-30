@@ -37,7 +37,8 @@ define([], function () {
                                 <div class="arco-upload-list-item-content" style="border: 1px solid #fff">
                                     <div class="arco-upload-list-item-name">
                                         <span class="arco-upload-list-item-file-icon"><icon-cloud-download /></span>
-                                        <a class="arco-upload-list-item-name-link" target="_blank" :href="vo" :download="getUrlTitle(vo)">{{getUrlTitle(vo)}}</a>
+                                        <a v-if="field.canDown" class="arco-upload-list-item-name-link" target="_blank" :href="vo" :download="getUrlTitle(vo)">{{getUrlTitle(vo)}}</a>
+                                        <a v-else class="arco-upload-list-item-name-link">{{getUrlTitle(vo)}}</a>
                                     </div>
                                 </div>
                             </div>

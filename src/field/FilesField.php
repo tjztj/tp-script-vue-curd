@@ -26,6 +26,7 @@ class FilesField extends ModelField
     protected bool $canExport=false;//不能导出此字段数据
     protected string $accept='';//上传文件类型
     protected bool $multiple=true;//是否可多选
+    protected bool $canDown=true;//上传成功后与详情页面是否可下载
 
     protected bool $checkFilesIsLocal=true;//验证上传的文件是否为本地文件
 
@@ -69,7 +70,7 @@ class FilesField extends ModelField
     private static array $doShowFields=[];
 
 
-    /**最小值
+    /**上传地址
      * @param string|null $url
      * @return $this|string
      */
@@ -108,6 +109,16 @@ class FilesField extends ModelField
     public function acceptTexts(array $acceptTexts=null){
         return $this->doAttr('acceptTexts',$acceptTexts);
     }
+
+    /**
+     * 上传成功后与详情页面是否可下载
+     * @param bool|null $canDown
+     * @return FilesField
+     */
+    public function canDown(bool $canDown=null){
+        return $this->doAttr('canDown',$canDown);
+    }
+
 
     /**
      * 设置保存的值
