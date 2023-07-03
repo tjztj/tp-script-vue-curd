@@ -53,15 +53,16 @@
 <div style="width: 100%;max-width: 960px">
     <div class="btns" style="padding-left: 33.33333333%;">
         <a-button type="primary" @click="onSubmit" :loading="loading">
-            <icon-check v-show="!loading"></icon-check>
+            <template #icon><icon-check></icon-check></template>
             <span>{$subBtnTitle}</span></a-button>
-
         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
         {if $refreshBtnTitle}<a-button  @click="reload" :loading="loading">
-            <icon-refresh v-show="!loading"></icon-refresh>
+        <template #icon><icon-refresh></icon-refresh></template>
             <span>{$refreshBtnTitle}</span></a-button>{/if}
     </div>
 </div>
 
 
 </div>
+<script setup>
+</script>

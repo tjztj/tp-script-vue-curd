@@ -48,7 +48,7 @@
     <a-divider style="margin-top: 0;border-bottom-style: dotted"></a-divider>
     {block name="footBefore"}{/block}
     <div class="btns">
-        <a-button type="primary" @click="onSubmit" :loading="loading"><icon-check v-show="!loading"></icon-check> <span>{{form.id?'{$isStepNext?"提交":"确定修改"}':'执行添加'}}</span></a-button>
+        <a-button type="primary" @click="onSubmit" :loading="loading"><template #icon><icon-check></icon-check></template>><span>{{form.id?'{$isStepNext?"提交":"确定修改"}':'执行添加'}}</span></a-button>
     </div>
     {block name="footAfter"}{/block}
 </div>
