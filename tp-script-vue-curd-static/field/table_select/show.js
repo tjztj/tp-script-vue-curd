@@ -41,7 +41,7 @@ define([],function(){
                     }
                     let showField=Object.keys(props.field.fields)[0];
                     let texts=[];
-                    if(Array.isArray(res.data)){
+                    if(Array.isArray(res.data)&&typeof res.data[0]==='object'){
                         res.data.forEach(v=>{
                             if(!vals.includes(v.id.toString())){
                                 return;

@@ -113,7 +113,7 @@ display: none;
                             return;
                         }
                         let options=[];
-                        if(Array.isArray(res.data)){
+                        if(Array.isArray(res.data)&&typeof res.data[0]==='object'){
                             res.data.forEach(v=>{
                                 if(!strVals.includes(v.id.toString())){
                                     return;
