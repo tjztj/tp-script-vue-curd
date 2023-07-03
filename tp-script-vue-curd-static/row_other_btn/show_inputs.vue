@@ -98,7 +98,7 @@
         <div class="foot">
             <a-divider style="margin-top: 0;border-bottom-style: dotted"></a-divider>
             <div class="btns">
-                <a-button type="primary" @click="onSubmit" :loading="loading"><template #icon><icon-check></icon-check></template>><span>{{subBtnTitle}}</span></a-button>
+                <a-button type="primary" @click="onSubmit" :loading="loading"><template #icon><icon-check></icon-check></template><span>{{subBtnTitle}}</span></a-button>
             </div>
         </div>
     </div>
