@@ -14,7 +14,7 @@ require.config({
     waitSeconds:0,
     map: {
         '*': {
-            'css': '/tpscriptvuecurd/require-css-0.1.10/css.min'
+            'css': '/tpscriptvuecurd/require-css-0.1.10/css.min.js'
         }
     },
     paths: {

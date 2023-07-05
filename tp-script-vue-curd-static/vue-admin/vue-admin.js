@@ -1459,6 +1459,12 @@ define(requires, function (axios, Qs) {
                     });
 
                     return forceUpdate;
+                },
+                strNToArr(str){
+                    if(str===''||typeof str!=='string'){
+                        return [];
+                    }
+                    return str.split(/\n/).filter(v=>v!=='');
                 }
             },
             template: `
@@ -1486,10 +1492,14 @@ define(requires, function (axios, Qs) {
                                         @submit="$emit('submit',$event)"
                                     ></component></div>
                                     <transition name="to-right">
-                                    <div v-if="field.editExplain" :style="{color:field.editExplainColor}">{{field.editExplain}}</div>
+                                    <div v-if="field.editExplain" :style="{color:field.editExplainColor}">
+                                        <template v-for="(v,i) in strNToArr(field.editExplain)"><br v-if="i>0"/>{{v}}</template>
+                                    </div>
                                     </transition>
                                     <transition name="to-right">
-                                    <div v-if="field.explain" :style="{color:field.explainColor}">{{field.explain}}</div>
+                                    <div v-if="field.explain" :style="{color:field.explainColor}">
+                                         <template v-for="(v,i) in strNToArr(field.explain)"><br v-if="i>0"/>{{v}}</template>
+                                    </div>
                                     </transition>
                                 </a-form-item>
                                 </transition>
