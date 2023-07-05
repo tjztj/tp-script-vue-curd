@@ -136,7 +136,8 @@ class EditorField extends ModelField
      */
     public function doShowData(array &$dataBaseData): void
     {
-        if(isset($dataBaseData[$this->name()])){
+        $filter=request()->filter();
+        if(isset($dataBaseData[$this->name()])&&((is_string($filter)&&strpos($filter,'htmlspecialchars')!==false)||(is_array($filter)&&in_array('htmlspecialchars',$filter)))){
             $dataBaseData[$this->name()]=htmlspecialchars_decode($dataBaseData[$this->name()]);
         }
     }
