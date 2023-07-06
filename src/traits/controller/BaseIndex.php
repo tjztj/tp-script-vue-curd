@@ -461,11 +461,11 @@ trait BaseIndex
             }
 
 
-            $stepInfo=$this->fields->getCurrentStepInfo($info,$parentInfo);
+            $stepInfo=$this->fields->getCurrentStepInfo($info,$parentInfo,$list);
             $stepInfo === null ||$stepInfo=clone $stepInfo;
             $info->stepInfo=$stepInfo?$stepInfo->toArray():null;
 
-            $nextStepInfo=$this->fields->getNextStepInfo($info,$parentInfo);
+            $nextStepInfo=$this->fields->getNextStepInfo($info,$parentInfo,$list);
             $nextStepInfo === null || $nextStepInfo=clone $nextStepInfo;
 
             if($stepInfo){
@@ -474,9 +474,9 @@ trait BaseIndex
                 $info->stepInfo=null;
             }
             $info->nextStepInfo=$nextStepInfo?$nextStepInfo->toArray():null;
-            $info->stepNextCanEdit=$info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo),$list);
+            $info->stepNextCanEdit=$info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $this->fields->getFilterStepFields($nextStepInfo, true, $info,$parentInfo,$list),$list);
 
-            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
+            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo,$list):FieldCollection::make();
             $info->stepFields=$stepFields->column('name');
             if($stepInfo&&($nextStepInfo===null||$stepInfo->getStep()!==$nextStepInfo->getStep())){
                 $info->stepCanEdit= $stepInfo->authCheck($info, $parentInfo, $stepFields,$list);

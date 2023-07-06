@@ -81,10 +81,10 @@ trait FieldCollectionStep
      * @return \tpScriptVueCurd\FieldCollection
      * @throws \think\Exception
      */
-    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,BaseModel $old,BaseModel $parentInfo=null):self{
+    public function getFilterStepFields(FieldStep $fieldStep,bool $isNextStep,BaseModel $old,BaseModel $parentInfo=null,$list=null):self{
         $hideFields=$old?$this->getFiledHideList($old):[];
-        $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$parentInfo){
-            return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$parentInfo){
+        $fields=$this->filter(function (ModelField $v)use($fieldStep,$isNextStep,$old,$parentInfo,$list){
+            return $v->steps()->filter(function(FieldStep $val)use($fieldStep,$isNextStep,$v,$old,$parentInfo,$list){
                     if($val->getStep()!==$fieldStep->getStep()){
                         return false;
                     }
@@ -93,7 +93,7 @@ trait FieldCollectionStep
                         //不需要再验证
                         return true;
                     }
-                    return $isNextStep?$check->beforeCheck($old,$parentInfo,$v):$check->check($old,$parentInfo,$v);
+                    return $isNextStep?$check->beforeCheck($old,$parentInfo,$v,$this,$val,$list):$check->check($old,$parentInfo,$v,$this,$val,$list);
                 })->count()>0;
         });
 
@@ -125,11 +125,11 @@ trait FieldCollectionStep
      * @return FieldStep|null
      * @throws \think\Exception
      */
-    public function getNextStepInfo(BaseModel $old,BaseModel $parentInfo=null):?FieldStep{
+    public function getNextStepInfo(BaseModel $old,BaseModel $parentInfo=null,$list=null):?FieldStep{
         $nextFieldStep=null;
-        $this->each(function(ModelField $v)use(&$nextFieldStep,$old,$parentInfo){
-            $v->steps()->each(function(FieldStep $val)use($v,&$nextFieldStep,$old,$parentInfo){
-                if($val->getCheckFunc()->beforeCheck($old,$parentInfo,$v)===true){
+        $this->each(function(ModelField $v)use(&$nextFieldStep,$old,$parentInfo,$list){
+            $v->steps()->each(function(FieldStep $val)use($v,&$nextFieldStep,$old,$parentInfo,$list){
+                if($val->getCheckFunc()->beforeCheck($old,$parentInfo,$v,$this,$val,$list)===true){
                     if(is_null($nextFieldStep)){
                         $nextFieldStep=$val;
                     }else if($nextFieldStep->getStep()!==$val->getStep()){
@@ -150,11 +150,11 @@ trait FieldCollectionStep
      * @return null|FieldStep
      * @throws \think\Exception
      */
-    public function getCurrentStepInfo(BaseModel $old,BaseModel $parentInfo=null):?FieldStep{
+    public function getCurrentStepInfo(BaseModel $old,BaseModel $parentInfo=null,$list=null):?FieldStep{
         $currentFieldStep=null;
-        $this->each(function(ModelField $v)use(&$currentFieldStep,$old,$parentInfo){
-            $v->steps()->each(function(FieldStep $val)use($v,&$currentFieldStep,$old,$parentInfo){
-                if($val->getCheckFunc()->check($old,$parentInfo,$v)===true){
+        $this->each(function(ModelField $v)use(&$currentFieldStep,$old,$parentInfo,$list){
+            $v->steps()->each(function(FieldStep $val)use($v,&$currentFieldStep,$old,$parentInfo,$list){
+                if($val->getCheckFunc()->check($old,$parentInfo,$v,$this,$val,$list)===true){
                     if(is_null($currentFieldStep)){
                         $currentFieldStep=$val;
                     }else if($currentFieldStep->getStep()!==$val->getStep()){

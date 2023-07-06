@@ -39,7 +39,10 @@ abstract class FieldStepBase
 
         $this->step = FieldStep::make(static::name(),
             StepCheck::make(
-                function (BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) {
+                function (BaseModel $info,BaseModel $parentInfo=null,ModelField $field=null,FieldCollection $fields=null,FieldStep $step = null,$list=null) {
+                    if(!$this->premiseByBeforeCheck($info,$parentInfo,$fields,$step,$list)){
+                        return false;
+                    }
                     $currStep = empty($info) || empty($info->id) ? '' : endStepVal($info);
 
                     foreach ($this->beforeCheck() as $k => $v) {
@@ -77,15 +80,15 @@ abstract class FieldStepBase
                     }
                     return false;
                 },
-//                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->beforeCheck($info, $parentInfo, $field),
-                fn(BaseModel $info, BaseModel $parentInfo = null, ModelField $field = null) => $this->check($info, $parentInfo, $field)
+                fn(BaseModel $info,BaseModel $parentInfo=null,ModelField $field=null,FieldCollection $fields=null,FieldStep $step = null,$list=null)
+                    => $this->premiseByCheck($info,$parentInfo,$fields,$step,$list)&&$this->check($info, $parentInfo, $field)
             ),
             $config,
         )->auth(
             fn(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null) => $this->auth($info, $parentInfo, $fields, $step, $list),
             function (BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null) {
                 $fn = $step->getAuthCheckAndCheckBeforeDefVal();
-                if ($fn($info, $parentInfo, $fields)) {
+                if ($fn($info, $parentInfo, $fields,$step,$list)) {
                     $step->config['canEditReturn'] = null;
                     return true;
                 }
@@ -270,6 +273,31 @@ abstract class FieldStepBase
         return $this->fields;
     }
 
+    /**
+     * beforeCheck 的前置判断
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
+     * @param FieldCollection|null $fields
+     * @param FieldStep|null $step
+     * @param $list
+     * @return bool
+     */
+    protected function premiseByBeforeCheck(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null):bool{
+        return true;
+    }
+
+    /**
+     * check 的前置判断
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
+     * @param FieldCollection|null $fields
+     * @param FieldStep|null $step
+     * @param $list
+     * @return bool
+     */
+    protected function premiseByCheck(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null):bool{
+        return true;
+    }
 
     /*function 不使用此类的步骤写法(){
         $step3=FieldStep::make('project_approval_leader',StepCheck::make(function (?self $info)use($step2){

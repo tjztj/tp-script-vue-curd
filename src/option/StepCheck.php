@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\option;
 
 
 use tpScriptVueCurd\base\model\BaseModel;
+use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
 
 class StepCheck
@@ -33,9 +34,9 @@ class StepCheck
      * @param ModelField|null $field
      * @return mixed
      */
-    public function beforeCheck(BaseModel $info,BaseModel $parentInfo=null,ModelField $field=null){
+    public function beforeCheck(BaseModel $info,BaseModel $parentInfo=null,ModelField $field=null,FieldCollection $fields=null,FieldStep $step = null,$list=null){
         $func=$this->beforeCheck;
-        return $func($info,$parentInfo,$field);
+        return $func($info,$parentInfo,$field,$fields,$step,$list);
     }
 
 
@@ -46,12 +47,12 @@ class StepCheck
      * @param ModelField|null $field
      * @return mixed
      */
-    public function check(BaseModel $old,BaseModel $parentInfo=null,ModelField $field=null){
+    public function check(BaseModel $old,BaseModel $parentInfo=null,ModelField $field=null,FieldCollection $fields=null,FieldStep $step = null,$list=null){
         if(!isset($this->check)||is_null($this->check)){
             throw new \think\Exception('未设置check');
         }
         $func=$this->check;
-        return $func($old,$parentInfo,$field);
+        return $func($old,$parentInfo,$field,$fields,$step,$list);
     }
 
 

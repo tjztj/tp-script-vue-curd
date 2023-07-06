@@ -222,7 +222,7 @@ class FieldStep
      */
     public function getAuthCheckAndCheckBeforeDefVal(){
         //如有修改，需同步修改 FieldStepBase 下 auth、beforeAuthCheckFunc相关
-        return fn(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null)=>$this->getCheckFunc()->beforeCheck($info,$parentInfo);
+        return fn(BaseModel $info,BaseModel $parentInfo=null,FieldCollection $fields=null, FieldStep $step = null,$list=null)=>$this->getCheckFunc()->beforeCheck($info,$parentInfo,null,$fields,$step,$list);
     }
 
     /**
