@@ -571,7 +571,7 @@ trait BaseEdit
      */
     protected function getStepEditFields(FieldCollection $fields,BaseModel $info,?BaseModel $parentInfo,bool &$isNext=null): FieldCollection
     {
-        if(empty($old->id)) {
+        if(empty($info->id)) {
             $isNext = true;
         }else{
             $isNext=$this->autoGetSaveStepIsNext($fields,$info,$parentInfo);
