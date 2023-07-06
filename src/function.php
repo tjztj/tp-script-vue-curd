@@ -216,12 +216,13 @@ function appIsDebug():bool{
  * @throws Exception
  */
 function errorShowThrow(\Exception $error=null):bool{
-    if($error instanceof ConfirmException||in_array((int)$error->getCode(),ErrorCode::DEBUG_NOT_OUT_ERR_INFOS,true)){
+//    $error instanceof ConfirmException||  已继承\think\Exception，不需要写进条件
+    if($error instanceof \think\Exception||in_array((int)$error->getCode(),ErrorCode::DEBUG_NOT_OUT_ERR_INFOS,true)){
         return false;
     }
 
     $isThrow=appIsDebug()&& Env::get('TP_SCRIPT_VUE_CURD.DEBUG', false);
-    if(is_null($error)||!$isThrow||$error instanceof \think\Exception){
+    if(is_null($error)||!$isThrow){
         return $isThrow;
     }
     throw $error;
