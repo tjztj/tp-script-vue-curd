@@ -41,7 +41,7 @@ class MapRangeField extends ModelField
     {
         if($mapType!==null){
             if(!in_array($mapType,['TMap','AMap','BMapGL'])){
-                throw new \Exception('地图类型只能是（TMap,AMap,BMapGL），当前传入的值为'.$mapType);
+                throw new \think\Exception('地图类型只能是（TMap,AMap,BMapGL），当前传入的值为'.$mapType);
             }
         }
         return $this->doAttr('mapType', $mapType);

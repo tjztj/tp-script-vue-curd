@@ -221,7 +221,7 @@ function errorShowThrow(\Exception $error=null):bool{
     }
 
     $isThrow=appIsDebug()&& Env::get('TP_SCRIPT_VUE_CURD.DEBUG', false);
-    if(!is_null($error) && $isThrow) {
+    if(!is_null($error) && $isThrow&&!$error instanceof \think\Exception) {
         throw $error;
     }
     return $isThrow;
