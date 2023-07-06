@@ -580,9 +580,9 @@ trait BaseEdit
             }
         }
         if($isNext){
-            $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
+            $fields=$fields->filterNextStepFields($info,$parentInfo,$stepInfo);
         }else{
-            $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
+            $fields=$fields->filterCurrentStepFields($info,$parentInfo,$stepInfo);
         }
         $fields->saveStepInfo=$stepInfo;
         return $fields;
