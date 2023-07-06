@@ -25,12 +25,21 @@ class FieldStepBaseConfig
     public array $canEditActions=[];//可以提交此步骤字段信息的action集合
 
 
+    /**
+     * 步骤与数据关联后将会执行 = function(FieldStepBaseConfig $config,BaseModel $old,BaseModel $parentInfo=null,FieldStep $step,bool $isNext){}
+     * @var \Closure|null
+     */
+    public ?\Closure $onInfo=null;
+
     public function __construct(array $config=[]){
         $arr=$this->toArray();
         foreach ($config as $k=>$v){
             if(isset($arr[$k])){
                 $this->$k=$v;
             }
+        }
+        if(isset($config['onInfo'])){
+            $this->onInfo=$config['onInfo'];
         }
     }
 

@@ -95,62 +95,33 @@ trait BaseEdit
         if(is_null($model)){
             $model=$this->md;
         }
-
-
-
-        if($this->request->param('formChangeSetField')){
-            try{
-                $field=$fields->findByName($this->request->param('formChangeSetField'));
-                $editOnChange=$field->editOnChange();
-                if(!$editOnChange instanceof Func||!is_callable($editOnChange->func)){
-                    throw new \think\Exception('字段'.$field->name().'的属性editOnChange设置错误');
-                }
-                $editOnChangeFunc=$editOnChange->func;
-                $editOnChangeReturn=$editOnChangeFunc($this->request->param('form/a',[]));
-                $editOnChangeReturn||$editOnChangeReturn=[];
-            }catch (\Exception $exception){
-                $this->error($exception->getMessage());
-            }
-            $this->success(['form'=>$editOnChangeReturn['form']??null,'fields'=>$editOnChangeReturn['fields']??null]);
-        }
-
-
-
         if(is_null($baseModel)&&$this->getParentController()){
             $baseModel=clone $this->getParentController()->md;
         }
 
+
+        ['info'=>$info,'parentInfo'=>$parentInfo,'baseId'=>$baseId]=$this->getEditInfos($model,$baseModel);
+
+        if($this->request->param('formChangeSetField')){
+            $this->formChangeSetField($fields,$info,$parentInfo);
+        }
+
+
+
+
         if($this->request->isAjax()){
             $data=$this->request->post();
-            if(isset($this->request->editId)){
-                $data['id']=$this->request->editId;
-            }
+            empty($info->id)||$data['id']=$info->id;
+            empty($baseId)||$data[$model::parentField()]=$baseId;
+
             $this->setPostDataBefore($data);
 
-            $model->startTrans();
-            $savedInfo=null;
-            $parentInfo=null;
-            $returnSaveData=[];
             $isNext=false;
+            $returnSaveData=[];
+
+            $model->startTrans();
             try{
-                if(empty($data['id'])){
-                    $old=clone $model;
-                    if($baseModel){
-                        if(empty($data[$this->md::parentField()])){
-                            throw new \think\Exception('缺少关键信息');
-                        }
-                        $parentInfo=$baseModel->find($data[$model::parentField()]);
-                        if(is_null($parentInfo)){
-                            throw new \think\Exception('未找到所属数据');
-                        }
-                    }
-                }else{
-                    $old=(clone $model)->find($data['id']);
-                    if($baseModel){
-                        $parentInfo=$baseModel->find($old[$model::parentField()]);
-                    }
-                }
-                $savedInfo=$this->doEditSave($model,$fields,$old,$parentInfo,$data,$isNext,$returnSaveData);
+                $savedInfo=$this->doEditSave($model,$fields,$info,$parentInfo,$data,$isNext,$returnSaveData);
             }catch (\Exception $e){
                 $model->rollback();
                 $this->error($e);
@@ -158,8 +129,8 @@ trait BaseEdit
             $model->commit();
 
             //提交后
-            $msg=(empty($data['id'])?'添加':($isNext?'提交':'修改')).'成功';
-            $this->editCommitAfter($msg,$old,$savedInfo,$parentInfo,$returnSaveData);
+            $msg=(empty($info->id)?'添加':($isNext?'提交':'修改')).'成功';
+            $this->editCommitAfter($msg,$info,$savedInfo,$parentInfo,$returnSaveData);
 
             $refreshList=$this->request->refreshList??false;
             if($fields->stepIsEnable()&&$fields->saveStepInfo){
@@ -173,37 +144,8 @@ trait BaseEdit
                 'refreshList'=> $this->treePidField?true:$refreshList,
             ]);
         }
-
-        $id=$this->request->editId??$this->request->param('id/d');
-        if($id){
-            $info=(clone $model)->find($id);
-            $info||$this->error('未找到相关数据信息');
-            if($baseModel){
-                $base_id=$info[$model::parentField()];
-                $parentInfo=$baseModel->find($info[$model::parentField()]);
-            }else{
-                $parentInfo=null;
-            }
-        }else{
-            $info=clone $model;
-            if($baseModel){
-                //可以在外面赋值
-                $base_id=$this->request->get('base_id/d',0);
-                $base_id||$base_id=$this->request->param('base_id/d',0);
-                $base_id||$this->errorAndCode('缺少必要参数');
-                $parentInfo=$baseModel->find($base_id);
-            }else{
-                $parentInfo=null;
-            }
-
-            if($this->treePidField&&$this->request->param('pid')){
-                $info[$this->treePidField]=$this->request->param('pid');
-            }
-        }
-
+        $id=empty($info->id)?0:$info->id;
         $this->editBefore($fields,$info,$parentInfo);
-
-
 
 
         try{
@@ -214,7 +156,7 @@ trait BaseEdit
         $fetchData=$this->createEditFetchData($fields,$info,$parentInfo);
 
         if($baseModel){
-            $fetchData['baseId']=$base_id;
+            $fetchData['baseId']=$baseId;
             $fetchData['baseInfo']=$parentInfo;
             $fetchData['parentField']=$this->md::parentField();
             $fetchData['vueCurdAction']='childEdit';
@@ -237,22 +179,11 @@ trait BaseEdit
      */
     protected function createEditFetchData(FieldCollection $fields,BaseModel $data,BaseModel $baseModel=null){
         $fields->each(function (ModelField $v)use($data,$baseModel){$v->onEditShow($data,$baseModel);});
+        $fields=$this->getStepEditFields($fields,$data,$baseModel,$isStepNext);
 
-        $isStepNext=$this->autoGetSaveStepIsNext($fields,$data,$baseModel);
-        if(is_null($isStepNext)){
-            return $this->error('数据不满足当前步骤');
-        }
-        if($isStepNext){
-            $fields=$fields->filterNextStepFields($data,$baseModel,$stepInfo);
-        }else{
-            $fields=$fields->filterCurrentStepFields($data,$baseModel,$stepInfo);
-        }
-
-        if(!$this->checkEditUrl($fields,$stepInfo)){
+        if(!$this->checkEditUrl($fields,$fields->saveStepInfo)){
             return $this->error('您不能进行此操作-063');
         }
-
-        $fields->saveStepInfo=$stepInfo;
 
         $sourceData=clone $data;//用来验证，防止被修改
         try{
@@ -260,7 +191,6 @@ trait BaseEdit
         }catch(\Exception $e){
             return $this->error($e);
         }
-
 
 
         //data可能在上面改变为有值
@@ -337,7 +267,7 @@ trait BaseEdit
             'info'=>$info,
             'fieldComponents'=>$fields->getComponents('edit'),
             'isStepNext'=>$isStepNext,
-            'stepInfo'=>$stepInfo?$stepInfo->toArray():null,
+            'stepInfo'=>$fields->saveStepInfo?$fields->saveStepInfo->toArray():null,
         ];
     }
 
@@ -541,46 +471,120 @@ trait BaseEdit
     protected function doEditSave(BaseModel $model,FieldCollection &$fields,BaseModel $old,?BaseModel $parentInfo,?array $data,bool &$isNext,array &$returnSaveData)
     {
         $this->editBefore($fields,$old,$parentInfo,$data);
+        $fields=$this->getStepEditFields($fields,$old,$parentInfo,$isNext);
+        if(!empty($old->id) && !$this->checkEditUrl($fields, $fields->saveStepInfo)) {
+            $this->error('您不能进行此操作-061');
+        }
+        //步骤权限验证
+        if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
+            $this->error('您不能进行此操作-01');
+        }
+        $fields->each(function (ModelField $v)use(&$data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo);});
         if(empty($old->id)){
-
-            $isNext=true;
-            //步骤字段
-            $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
-            $fields->saveStepInfo=$stepInfo;
-
-            //步骤权限验证
-            if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
-                $this->error('您不能进行此操作-01');
-            }
-
-
-            $fields->each(function (ModelField $v)use(&$data,$parentInfo){$v->onEditSave($data,$old,$parentInfo);});
             $savedInfo=$model->addInfo($data,$parentInfo,$fields,false,$returnSaveData);
             $this->addAfter($savedInfo);
         }else{
-            $isNext=$this->autoGetSaveStepIsNext($fields,$old,$parentInfo);
-            if(is_null($isNext)){
-                $this->error('数据不满足当前步骤');
-            }
-            if($isNext){
-                $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
-            }else{
-                $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
-            }
-            if(!$this->checkEditUrl($fields,$stepInfo)){
-                $this->error('您不能进行此操作-061');
-            }
-            $fields->saveStepInfo=$stepInfo;
-
-
-            //步骤权限验证
-            if($fields->saveStepInfo&&$fields->saveStepInfo->authCheck($old,$parentInfo,$fields)===false){
-                $this->error('您不能进行此操作-02');
-            }
-            $fields->each(function (ModelField $v)use(&$data,$parentInfo,$old){$v->onEditSave($data,$old,$parentInfo,);});
             $savedInfo=$model->saveInfo($data,$fields,$parentInfo,$old,$returnSaveData);
             $this->editAfter($savedInfo);
         }
         return $savedInfo;
+    }
+
+
+    /**
+     * 编辑字段变更监听后处理（需要PHP处理时）
+     * @param FieldCollection $fields
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
+     * @return void
+     */
+    protected function formChangeSetField(FieldCollection $fields,BaseModel $info,BaseModel $parentInfo=null): void
+    {
+        $fields=$this->getStepEditFields($fields,$info,$parentInfo,$isStepNext);
+        try{
+            $field=$fields->findByName($this->request->param('formChangeSetField'));
+            $editOnChange=$field->editOnChange();
+            if(!$editOnChange instanceof Func||!is_callable($editOnChange->func)){
+                throw new \think\Exception('字段'.$field->name().'的属性editOnChange设置错误');
+            }
+            $editOnChangeFunc=$editOnChange->func;
+            $editOnChangeReturn=$editOnChangeFunc($this->request->param('form/a',[]));
+            $editOnChangeReturn||$editOnChangeReturn=[];
+        }catch (\Exception $exception){
+            $this->error($exception->getMessage());
+        }
+        $this->success(['form'=>$editOnChangeReturn['form']??null,'fields'=>$editOnChangeReturn['fields']??null]);
+    }
+
+
+    /**
+     * 获取编辑页面的数据信息对象与父表数据信息对象
+     * @param BaseModel $model
+     * @param BaseModel|null $baseModel
+     * @return array
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\DbException
+     * @throws \think\db\exception\ModelNotFoundException
+     */
+    protected function getEditInfos(BaseModel $model,BaseModel $baseModel=null): array
+    {
+        $id=$this->request->editId??$this->request->param('id/d');
+
+        $parentInfo=null;
+        $baseId=null;
+        if($id){
+            $info=(clone $model)->find($id);
+            $info||$this->error('未找到相关数据信息');
+            if($baseModel){
+                $baseId=$info[$model::parentField()];
+                $parentInfo=$baseModel->find($info[$model::parentField()]);
+            }
+        }else{
+            $info=clone $model;
+            if($baseModel){
+                //可以在外面赋值
+                $baseId=$this->request->get('base_id/d',0);
+                $baseId||$baseId=$this->request->param('base_id/d',0);
+                $baseId||$this->errorAndCode('缺少必要参数');
+                $parentInfo=$baseModel->find($baseId);
+                if(is_null($parentInfo)){
+                    $this->error('未找到所属数据');
+                }
+            }
+
+            if($this->treePidField&&$this->request->param('pid')){
+                $info[$this->treePidField]=$this->request->param('pid');
+            }
+        }
+        return ['info'=>$info,'parentInfo'=>$parentInfo,'baseId'=>$baseId];
+    }
+
+
+    /**
+     * 获取编辑页面的步骤所有字段信息
+     * @param FieldCollection $fields
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
+     * @param bool|null $isNext
+     * @return FieldCollection
+     * @throws \think\Exception
+     */
+    protected function getStepEditFields(FieldCollection $fields,BaseModel $info,?BaseModel $parentInfo,bool &$isNext=null): FieldCollection
+    {
+        if(empty($old->id)) {
+            $isNext = true;
+        }else{
+            $isNext=$this->autoGetSaveStepIsNext($fields,$info,$parentInfo);
+            if(is_null($isNext)){
+                $this->error('数据不满足当前步骤');
+            }
+        }
+        if($isNext){
+            $fields=$fields->filterNextStepFields($old,$parentInfo,$stepInfo);
+        }else{
+            $fields=$fields->filterCurrentStepFields($old,$parentInfo,$stepInfo);
+        }
+        $fields->saveStepInfo=$stepInfo;
+        return $fields;
     }
 }

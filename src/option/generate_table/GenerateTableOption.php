@@ -160,6 +160,21 @@ class GenerateTableOption extends Collection
         }
 
 
+        //字段重名过滤
+        $colByNameArr=[];
+        foreach ($this->items as $k=>$v){
+            $sql=$v->getSql('');
+            if(isset($colByNameArr[$v->getName()])){
+                if($colByNameArr[$v->getName()]!==$sql){
+                    throw new \think\Exception('数据库'.$tableName.'表自动生成字段失败：'.$v->getName().'字段配置存在多个且字段的类型或注释不一样');
+                }
+                unset($this->items[$k]);
+            }else{
+                $colByNameArr[$v->getName()]=$sql;
+            }
+        }
+
+
         if($tableOld){
             $before='';
             $hasFields=$model->getFields();
@@ -215,14 +230,8 @@ class GenerateTableOption extends Collection
                 $sql='';
             }
         }else{
-            $cols=[];
-            $this->each(function (GenerateColumnOption $v)use(&$cols){
-                $cols[]=$v->getSql('');
-            });
 
-
-
-            $sql="CREATE TABLE `$tableName`  ( `id` int NOT NULL AUTO_INCREMENT, \n ".implode(" ,\n ",$cols).", \n 
+            $sql="CREATE TABLE `$tableName`  ( `id` int NOT NULL AUTO_INCREMENT, \n ".implode(" ,\n ",$colByNameArr).", \n 
   `create_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '创建时间',
   `".$model::getCreateLoginUserField()."` int(11) NOT NULL DEFAULT 0 COMMENT '创建人',
   `update_time` bigint(10) NOT NULL DEFAULT 0 COMMENT '更新时间',

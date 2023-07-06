@@ -1148,7 +1148,9 @@ define(requires, function (axios, Qs) {
                         formChangeSetField:field.name,
                         pageGuid:VUE_CURD.GUID,
                         oldVal,
-                        form:this.formVal
+                        form:this.formVal,
+                        id:this.formVal.id||0,
+                        base_id:this.formVal.base_id||0,
                     }).then(res=>{
                         this.doChangeSet(res);
                     })

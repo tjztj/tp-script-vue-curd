@@ -55,6 +55,15 @@ class FieldStep
 //            break;
 //    }
 
+
+
+    /**
+     * 步骤与数据关联后将会执行 function(FieldStepBaseConfig $config,BaseModel $old,BaseModel $parentInfo=null,FieldStep $step,bool $isNext){}
+     * @var \Closure|null
+     */
+    public ?\Closure $onInfo=null;
+
+
     /**
      * FieldStep constructor.
      * @param string $step
@@ -83,6 +92,9 @@ class FieldStep
         }
 
         $this->config=vueCurdMergeArrays($this->config,$stepConfig->toArray());
+        if($stepConfig->onInfo){
+            $this->onInfo=$stepConfig->onInfo;
+        }
     }
 
 
@@ -580,5 +592,33 @@ class FieldStep
      */
     public function getAuthWhere():?callable{
         return $this->authWhere??null;
+    }
+
+
+    /**
+     * 当步骤与数据绑定时，触发onInfo事件的执行
+     * @param FieldStep|null $step
+     * @param BaseModel $info
+     * @param BaseModel|null $parentInfo
+     * @param bool $isNext 步骤是否下一步
+     * @return void
+     */
+    public static function doOnInfo(?self $step,BaseModel $info,?BaseModel $parentInfo,bool $isNext):void{
+        if(!$step||!isset($step->onInfo)||is_null($step->onInfo)){
+            return;
+        }
+        $config = new FieldStepBaseConfig();
+        $oldConfig=$config->toArray();
+        $func=$step->onInfo;
+        $func($config,$info,$parentInfo,$step,$isNext);
+        $newConfig=[];
+        foreach ($config->toArray() as $k=>$v){
+            if(json_encode($v)!==json_encode($oldConfig[$k])){
+                $newConfig[$k]=$v;
+            }
+        }
+        if($newConfig){
+            $step->config=vueCurdMergeArrays($step->config,$newConfig);
+        }
     }
 }

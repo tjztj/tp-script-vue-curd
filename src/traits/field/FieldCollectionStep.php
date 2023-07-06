@@ -7,6 +7,7 @@ namespace tpScriptVueCurd\traits\field;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ModelField;
 use tpScriptVueCurd\option\FieldStep;
+use tpScriptVueCurd\option\FieldStepBaseConfig;
 
 trait FieldCollectionStep
 {
@@ -137,6 +138,7 @@ trait FieldCollectionStep
                 }
             });
         });
+        FieldStep::doOnInfo($nextFieldStep,$old,$parentInfo,true);
         return $nextFieldStep;
     }
 
@@ -161,6 +163,7 @@ trait FieldCollectionStep
                 }
             });
         });
+        FieldStep::doOnInfo($currentFieldStep,$old,$parentInfo,false);
         return $currentFieldStep;
 
     }
@@ -298,6 +301,7 @@ trait FieldCollectionStep
             case 'dataStepHistory':
                 return $this->showSortStepsFieldsDataStepHistory($info,$parentInfo);
             default:
+                //自定义字段的显示回调函数
                 if(is_callable($this->getStepConfig()['showSortSteps'])){
                     $this->getStepConfig()['showSortSteps']($this,$info,$parentInfo);
                     return $this;
