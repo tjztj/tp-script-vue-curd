@@ -9,6 +9,9 @@ use think\db\Query;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use IteratorAggregate;
+use Traversable;
+use ArrayIterator;
 
 
 /**
@@ -19,7 +22,7 @@ use tpScriptVueCurd\ModelField;
  * Class FieldStepBase
  * @package tpScriptVueCurd\option
  */
-abstract class FieldStepBase
+abstract class FieldStepBase implements IteratorAggregate
 {
 
     protected FieldCollection $fields;
@@ -297,6 +300,14 @@ abstract class FieldStepBase
      */
     protected function premiseByCheck(BaseModel $info, BaseModel $parentInfo = null, FieldCollection $fields = null, FieldStep $step = null, $list = null):bool{
         return true;
+    }
+
+
+    //IteratorAggregate
+    #[\ReturnTypeWillChange]
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator($this->getFields()->all());
     }
 
     /*function 不使用此类的步骤写法(){
