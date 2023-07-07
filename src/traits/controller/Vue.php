@@ -23,7 +23,7 @@ use tpScriptVueCurd\traits\Func;
 trait Vue
 {
     use Func;
-    private $vue_data = [];
+    private static $vue_data = [];
 
     /***
      * 子类重写这个控制，判断当前action是否启用vue action
@@ -56,8 +56,10 @@ trait Vue
             $this->app->view->config(['view_suffix' => 'vue']);
             $this->app->view->engine()->layout(static::getTplPath().'layout'.DIRECTORY_SEPARATOR.'default.vue');
         }
+        if(empty(self::$vue_data['vueCurdAction'])){
+            $this->assign('vueCurdAction',$this->request->action());
+        }
         $this->assign('vueCurdVersion',static::vueCurdVersion());
-        $this->assign('vueCurdAction',$this->request->action());
         $this->assign('vueCurdController',$this->request->controller());
         $this->assign('vueCurdModule',$this->app->http->getName());
         $this->assign('guid',$this->guid);
@@ -76,9 +78,9 @@ trait Vue
     {
         if ($this->checkIsVueAction()) {
             if (is_array($name) && is_null($value)) {
-                $this->vue_data = array_merge($this->vue_data, $name);
+                self::$vue_data = array_merge(self::$vue_data, $name);
             } else {
-                $this->vue_data[$name] = $value;
+                self::$vue_data[$name] = $value;
             }
         }
 
@@ -95,8 +97,8 @@ trait Vue
     public function fetch($template = '', $vars = [])
     {
         if ($this->checkIsVueAction()) {
-            $this->vue_data = array_merge($this->vue_data, $vars);
-            $this->app->view->assign('vue_data_json', json_encode($this->vue_data));
+            self::$vue_data = array_merge(self::$vue_data, $vars);
+            $this->app->view->assign('vue_data_json', json_encode(self::$vue_data));
         }
         return $this->app->view->fetch($template, $vars);
     }
@@ -111,8 +113,8 @@ trait Vue
     public function display($content = '', $vars = [])
     {
         if ($this->checkIsVueAction()) {
-            $this->vue_data = array_merge($this->vue_data, $vars);
-            $this->app->view->assign('vue_data_json', json_encode($this->vue_data));
+            self::$vue_data = array_merge(self::$vue_data, $vars);
+            $this->app->view->assign('vue_data_json', json_encode(self::$vue_data));
         }
         return  $this->app->view->display($content, $vars);
     }
@@ -186,7 +188,7 @@ trait Vue
         }
 
         if(($msg instanceof \Exception)||is_subclass_of($msg,\Exception::class)){
-           errorShowThrow($msg);
+            errorShowThrow($msg);
             $this->errorAndCode($msg->getMessage(), $msg->getCode(),$msg instanceof ConfirmException?[
                 'okText'=>$msg->okText,
                 'cancelText'=>$msg->cancelText,
