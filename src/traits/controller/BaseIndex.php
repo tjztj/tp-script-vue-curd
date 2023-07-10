@@ -372,11 +372,20 @@ trait BaseIndex
                 $query->where($leftCate->where);
             })
             ->where(function (Query $query)use($parentInfo,$searchIdKey){
-                if($searchIdKey){
-                    $id=$this->request->param($searchIdKey.'/d');
-                    empty($id)||$query->where('id',$id);
-                }
                 $parentInfo === null || $query->where($this->md::parentField(),$parentInfo->id);
+                if(!$searchIdKey){
+                    return;
+                }
+                $idStr=$this->request->param($searchIdKey);
+                if(empty($idStr)){
+                    return;
+                }
+                $idArr=is_array($idStr)?$idStr:explode(',',$idStr);
+                $idArr=array_filter($idArr);
+                if(empty($idArr)){
+                    return;
+                }
+                $query->whereIn('id',$idArr);
             })
             ->where(function(Query $query){
                 //这里不应该抛出异常
