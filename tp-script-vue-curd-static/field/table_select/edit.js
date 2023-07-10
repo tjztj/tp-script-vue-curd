@@ -63,6 +63,8 @@ display: none;
                 document.body.insertAdjacentHTML('beforeend','<div id="table-select-popup-container"></div>')
             }
 
+            this.pagination.pageSize=this.field.pageSize;
+            this.myFilters.pageSize=this.field.pageSize;
 
             let columns=[];
             for(let i in  this.field.fields){
@@ -192,6 +194,9 @@ display: none;
 
                 this.loading=true;
                 const params={...this.myFilters};
+                if(!this.field.pageSize){
+                    params.pageSize='';
+                }
                 this.$post(this.field.url,params).then(res=>{
                     this.pagination.current=res.data.current_page;
                     this.pagination.total = res.data.total;
@@ -312,7 +317,7 @@ display: none;
   </a-select>
  <template #content>
   <div class="select-table-dropdown" :style="{'max-width': maxW}" @click="setShowClass">
-    <a-table row-key="id" :loading="loading" :columns="columns" :data="data" :pagination="pagination" size="small"   v-model:selected-keys="selectedRowKeys" :row-selection="{showCheckedAll:true,type:field.multiple?'checkbox':'radio' }"  @page-change="pageChange" @page-size-change="pageSizeChange" @sorter-change="sorterChange">
+    <a-table row-key="id" :loading="loading" :columns="columns" :data="data" :pagination="field.pageSize>0?pagination:false" size="small"   v-model:selected-keys="selectedRowKeys" :row-selection="{showCheckedAll:true,type:field.multiple?'checkbox':'radio' }"  @page-change="pageChange" @page-size-change="pageSizeChange" @sorter-change="sorterChange">
         <template #custom-title-action>操作</template>
         <template #action="{ record }">   
             <template v-for="(btn,benKey) in record.__actions">

@@ -19,7 +19,7 @@ class TableSelectField extends ModelField
      * 如果设置为0，代表不启用分页
      * @var int
      */
-    protected int $pageSize=10;
+    protected int $pageSize=5;//每页显示数量，为0不分页
     protected array $fields=[];//字段集合
     protected string $url='';
     protected bool $multiple=false;//是否可多选
@@ -80,6 +80,15 @@ class TableSelectField extends ModelField
      */
     public function multiple(bool $multiple=null){
         return $this->doAttr('multiple',$multiple);
+    }
+
+    /**
+     * 每页显示数量，为0不分页
+     * @param int|null $pageSize
+     * @return TableSelectField
+     */
+    public function pageSize(int $pageSize=null){
+        return $this->doAttr('pageSize',$pageSize);
     }
 
 
