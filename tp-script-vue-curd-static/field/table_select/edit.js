@@ -198,10 +198,17 @@ display: none;
                     params.pageSize='';
                 }
                 this.$post(this.field.url,params).then(res=>{
-                    this.pagination.current=res.data.current_page;
-                    this.pagination.total = res.data.total;
-                    let showActions=false;
-                    res.data.data.forEach(item=>{
+                    let showActions=false,data=[];
+                    if(params.pageSize||res.data.current_page){
+                        this.pagination.current=res.data.current_page;
+                        this.pagination.total = res.data.total;
+                        data= res.data.data;
+                    }else{
+                        data=res.data;
+                    }
+
+
+                    data.forEach(item=>{
                         if(typeof item.id==='undefined'){
                             console.error('缺少id',item);
                         }
@@ -223,8 +230,7 @@ display: none;
                             this.columns.pop();
                         }
                     }
-
-                    this.data = res.data.data;
+                    this.data = data;
                     this.loading = false;
                 }).catch(()=>{
                     this.loading = false;
