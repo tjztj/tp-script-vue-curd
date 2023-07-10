@@ -73,6 +73,14 @@ abstract class FieldStepBase implements IteratorAggregate
                         if ($name !== $currStep) {
                             continue;
                         }
+                        if(is_array($v)){
+                            foreach ($v as $key=>$val){
+                                if(!isset($info[$key])||(!is_string($info[$key])&&!is_numeric($info[$key]))||(string)$info[$key]!==(string)$val){
+                                    return false;
+                                }
+                            }
+                            return !empty($v);
+                        }
                         if (is_callable($v)) {
                             return $v($info, $parentInfo, $field);
                         }

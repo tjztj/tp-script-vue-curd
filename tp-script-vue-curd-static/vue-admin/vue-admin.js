@@ -110,7 +110,11 @@ define(requires, function (axios, Qs) {
             error = {code: 0, msg: error, data: [],}
         } else if (!error.msg) {
             console.error(error);
-            error = {code: 0, msg: '发生错误', data: [],}
+            let msg='发生错误';
+            if(error.response&&error.response.data&&typeof error.response.data.message==='string'){
+                msg+='：'+error.response.data.message
+            }
+            error = {code: 0, msg:msg, data: [],}
         }
         ArcoVue.Message.error({
             content:error.msg,
