@@ -235,6 +235,9 @@ define(['vueAdmin'], function (va) {
         return {
             components:{...getThisActionOhterComponents()},
             setup(props,ctx){
+                if(self.frameElement && self.frameElement.tagName == "IFRAME"&&self.frameElement.parentElement.classList.contains('arco-modal-body')){
+                    document.body.classList.add('arco-modal-iframe-body');
+                }
                 return getThisActionOhterSetup(props,ctx);
             },
             data(){

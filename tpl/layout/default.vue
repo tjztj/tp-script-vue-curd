@@ -35,7 +35,7 @@
     </svg>
 </div>
 <div id="app" style="display: none">
-    <div style="width: 100%">
+    <div style="width: 100%" class="app-content-box">
         {__CONTENT__}
     </div>
     <a-modal

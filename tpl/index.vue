@@ -7,7 +7,25 @@ body{
 .box {
     background-color: #f0f2f5;
 }
-
+body.arco-modal-iframe-body{
+    background-color: #fff;
+    padding: 0;
+}
+body.arco-modal-iframe-body .box{
+    background-color: #fff;
+}
+/**body.arco-modal-iframe-body .box>.body>.curd-table-box{
+    padding: 0 1px 24px 1px;
+}
+body.arco-modal-iframe-body .box>.head:not(.have-filter-items)+.body .arco-table-list-toolbar{
+    padding-right: 18px;
+}
+body.arco-modal-iframe-body .box>.head.head:not(.have-filter-items) .filter-sub-btn-box{
+    right: 26px;
+}
+body.arco-modal-iframe-body .box>.body>.arco-table-list-toolbar>.arco-table-list-toolbar-container{
+    padding: 0 16px;
+}**/
 .head {
     padding-top: 16px;
     padding-bottom: 16px;
