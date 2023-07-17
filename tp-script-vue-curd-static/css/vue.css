@@ -543,6 +543,12 @@ a.red:hover,a.yellow:hover{
 .curd-table-action-divider{
     margin: 0;
 }
+.curd-table-action-btns a:hover,a.arco-dropdown-link:hover,.arco-table-list-toolbar a:hover{
+    opacity: .65;
+}
+.curd-table-action-btns a:active,a.arco-dropdown-link:active,.arco-table-list-toolbar a:active{
+    opacity: 1;
+}
 /****************************************************************/
 .body-iframe-drawer .arco-drawer .arco-drawer-body{
     padding: 0;
@@ -917,14 +923,14 @@ a.red:hover,a.yellow:hover{
 }
 /****************************************************************/
 .pub-remove-icon{
-    color: #F53F3F;
+    color: #F53F3F!important;
     cursor: pointer;
 }
 .pub-remove-icon:hover{
-    color: #F98981;
+    color: #F98981!important;;
 }
 .pub-remove-icon:active{
-    color: #A1151E;
+    color: #A1151E!important;;
 }
 /****************************************************************/
 .curd-table-action-btns .arco-divider-vertical.curd-table-action-divider{
