@@ -249,7 +249,7 @@ class FieldWhere
 
     private function checkVal($val):bool{
         if($this->type===self::TYPE_IN){
-            return in_array($val,$this->valueData);
+            return in_array((string)$val, array_map(static fn($v) => (string)$v, $this->valueData), true);
         }
         if($this->type===self::TYPE_FIND_IN_SET){
             $vals=is_array($val)?$val:explode(',',$val);
@@ -257,14 +257,14 @@ class FieldWhere
             return (bool)array_intersect($this->valueData,$vals);
         }
         if(is_null($this->valueData[0])){
-            return $val<=$this->valueData[1];
+            return bccomp($val,$this->valueData[1],6)!==1;
         }
 
         if(is_null($this->valueData[1])){
-            return $val>=$this->valueData[0];
+            return bccomp($val,$this->valueData[0],6)!==-1;
         }
 
-        return $val<=$this->valueData[1]&&$val>=$this->valueData[0];
+        return bccomp($val,$this->valueData[1],6)!==1&&bccomp($val,$this->valueData[0],6)!==-1;
     }
 
 

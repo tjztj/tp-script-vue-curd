@@ -885,7 +885,13 @@ define(requires, function (axios, Qs) {
         const checkVal = function (fieldWhere, val) {
             if (fieldWhere.type === 'in') {
                 for (let i in fieldWhere.valueData) {
-                    if (fieldWhere.valueData[i] == val) {
+                    let whereVal=fieldWhere.valueData[0];
+                    if(whereVal===undefined||whereVal===null){
+                        whereVal='';
+                    }else{
+                        whereVal=whereVal.toString();
+                    }
+                    if (whereVal === val.toString()) {
                         return true;
                     }
                 }
@@ -896,7 +902,7 @@ define(requires, function (axios, Qs) {
                 const valArr = typeof val === 'object' ? val : val.toString().split(',');
                 for (let i in valArr) {
                     for (let n in fieldWhere.valueData) {
-                        if (fieldWhere.valueData[n] === valArr[i]) {
+                        if (fieldWhere.valueData[n].toString() === valArr[i]) {
                             return true;
                         }
                     }
@@ -905,13 +911,22 @@ define(requires, function (axios, Qs) {
             }
 
 
-            if (fieldWhere.valueData[0] === null) {
-                return val <= fieldWhere.valueData[1];
+            if (typeof val === 'string') {
+                val = parseFloat(val);
             }
-            if (fieldWhere.valueData[1] === null) {
-                return val >= fieldWhere.valueData[0];
+
+            const minVal = typeof fieldWhere.valueData[0] === 'string' ? parseFloat(fieldWhere.valueData[0]) : fieldWhere.valueData[0];
+            const maxVal = typeof fieldWhere.valueData[1] === 'string' ? parseFloat(fieldWhere.valueData[1]) : fieldWhere.valueData[1];
+
+            if (minVal === null) {
+                return val <= maxVal;
             }
-            return val <= fieldWhere.valueData[1] && val >= fieldWhere.valueData[0];
+
+            if (maxVal === null) {
+                return val >= minVal;
+            }
+
+            return val >= minVal && val <= maxVal;
         }
         const checkFieldWhereSelf = (fieldWhere,formVal,info) => {
             if (fieldWhere.field.name === fieldWhere.RETURN_FALSE_FIELD_NAME) {
