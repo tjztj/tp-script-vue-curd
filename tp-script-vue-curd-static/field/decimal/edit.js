@@ -30,13 +30,14 @@ define([],function(){
             }
         },
         template:`<div>
-                   <a-input-number v-model:model-value="modelVal"
+                   <a-input-number v-model="modelVal"
                         :hide-button="!!field.ext"
                         :min="field.min"
                         :max="field.max"
                         :precision="field.precision"
                         :placeholder="field.placeholder||(field.precision?'保留'+field.precision+'位小数':'填入整数')"
                         :disabled="field.readOnly"
+                        model-event="input"
                         style="width: 100%;">
                            <template v-if="field.ext" #suffix>{{field.ext}}</template>
                         </a-input-number>
