@@ -58,7 +58,14 @@ class IframeField extends ModelField
         );
     }
 
+    /**
+     * @param string|\think\route\Url $url
+     * @return IframeField|string
+     */
     public function url($url=null){
+        if($url instanceof \think\route\Url){
+            $url=$url->build();
+        }
         return $this->doAttr('url',$url);
     }
 
