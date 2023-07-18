@@ -1822,6 +1822,11 @@ define(requires, function (axios, Qs) {
                 }
             },
             watch: {
+                listColumns(){
+                    this.$nextTick(()=>{
+                        this.getActionWidthByProps()
+                    })
+                },
                 actionWidth(val) {
                     this.getActionWidthByProps()
                 },

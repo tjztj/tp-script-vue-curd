@@ -5,6 +5,7 @@ namespace tpScriptVueCurd\field;
 
 use tpScriptVueCurd\FieldCollection;
 use tpScriptVueCurd\ModelField;
+use tpScriptVueCurd\option\FieldWhere;
 use tpScriptVueCurd\option\generate_table\GenerateColumnOption;
 use tpScriptVueCurd\tool\field_tpl\Edit;
 use tpScriptVueCurd\tool\field_tpl\FieldTpl;
@@ -85,36 +86,18 @@ class TableField extends ListField
     public function toArray(): array
     {
         $arr=parent::toArray();
-
-        $listColumns=array_values($this->fields->listShowItems()->toArray());
-        $editFieldArr=array_values($this->fields->toArray());
-
-        $showFields=clone $this->fields;
-        $showFields=$showFields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
-        $showFieldArr=array_values($showFields->toArray());
-
-        $componentUrl=[...$this->componentUrlArr];
-        foreach ([$showFields->getComponents('show'),
-                     $this->fields->getComponents('edit'),
-                     $this->fields->getComponents('index')] as $v){
-            foreach ($v as $val){
-                $componentUrl[]=$val;
-            }
-        }
-
-
-
-        $arr['pageData']=[
-            'listColumns'=>$listColumns,
-            'editGroupColumns'=>$this->fields->groupItems? FieldCollection::groupListByItems($listColumns):null,//不管显示是不是一个组，只要groupItems有，列表就分组
-            'editGroupFields'=>$this->fields->groupItems?FieldCollection::groupListByItems($editFieldArr):null,
-            'showFields'=>$showFieldArr,
-            'showGroupFields'=>$showFields->groupItems?FieldCollection::groupListByItems($showFieldArr):null,
-            'componentUrl'=>$componentUrl
-        ];
+        $arr['pageData']=$this->getPageData($this->fields);
 
 
         return $arr;
+    }
+
+    public function pushAttrByWhere(string $attr, $val, ?FieldWhere $where): ModelField
+    {
+        if($attr==='fields'){
+            parent::pushAttrByWhere('pageData', $this->getPageData($val), $where);
+        }
+        return parent::pushAttrByWhere($attr, $val, $where);
     }
 
 
@@ -125,5 +108,34 @@ class TableField extends ListField
      */
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeJson();
+    }
+
+
+    private function getPageData(FieldCollection $fields): array
+    {
+        $listColumns=array_values($fields->listShowItems()->toArray());
+        $editFieldArr=array_values($fields->toArray());
+
+        $showFields=clone $fields;
+        $showFields=$showFields->filter(fn(ModelField $v)=>$v->showPage())->rendGroup();
+        $showFieldArr=array_values($showFields->toArray());
+
+        $componentUrl=[...$this->componentUrlArr];
+        foreach ([$showFields->getComponents('show'),
+                     $fields->getComponents('edit'),
+                     $fields->getComponents('index')] as $v){
+            foreach ($v as $val){
+                $componentUrl[]=$val;
+            }
+        }
+        $this->componentUrlArr=$componentUrl;
+        return [
+            'listColumns'=>$listColumns,
+            'editGroupColumns'=>FieldCollection::groupListByItems($listColumns)?:null,//不管显示是不是一个组，只要groupItems有，列表就分组
+            'editGroupFields'=>FieldCollection::groupListByItems($editFieldArr)?:null,
+            'showFields'=>$showFieldArr,
+            'showGroupFields'=>FieldCollection::groupListByItems($showFieldArr)?:null,
+            'componentUrl'=>$componentUrl
+        ];
     }
 }

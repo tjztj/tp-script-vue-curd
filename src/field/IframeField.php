@@ -77,13 +77,6 @@ class IframeField extends ModelField
         $this->canExcelImport = $canExcelImport;
     }
 
-    public function showPage(bool $showPage = null)
-    {
-        if ($showPage === true) {
-            throw new \think\Exception('字段不可设置$showPage为true');
-        }
-        return parent::showPage($showPage);
-    }
 
     public function listShow(bool $listShow = null)
     {

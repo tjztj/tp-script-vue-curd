@@ -523,10 +523,11 @@ abstract class ModelField
 
     /**
      * 根据条件设置字段的属性（只能设置下面几种值的属性，），将会在前台显示时、数据保存时，编辑显示时，满足条件的时候设置为 这里的$val
-     * @param string $attr                  属性
-     * @param string|int|bool|float|null $val    值只能是这三种类型
-     * @param FieldWhere $where             条件，如果为null，表示直接达成条件
+     * @param string $attr 属性
+     * @param string|int|bool|float|null|array $val 值只能是这三种类型
+     * @param FieldWhere|null $where 条件，如果为null，表示直接达成条件
      * @return $this
+     * @throws Exception
      */
     public function pushAttrByWhere(string $attr,$val,?FieldWhere $where):self{
 //        if(!is_string($val) && !is_int($val) && !is_float($val) && !is_bool($val) && !is_null($val) && !($this instanceof ListField && $attr === 'fields' && $val instanceof FieldCollection)) {
