@@ -1646,12 +1646,16 @@ define(requires, function (axios, Qs) {
                             columnsCount++;
                             column.children.push(col);
                         })
-                        columns.push(column);
+                        if(groupTtitle===''||groupTtitle==='基本信息'){
+                            columns.push(...column.children);
+                        }else{
+                            columns.push(column);
+                        }
                     }
                     isGroup.value = groupTitles.length > 1 || (!listColumns[''] && groupTitles.length > 0);
 
                     if (!isGroup.value && columns[0]) {
-                        columns = columns[0].children;
+                        columns = columns[0].children?columns[0].children:columns;
                     }
 
 

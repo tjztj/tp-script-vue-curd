@@ -2,6 +2,7 @@
 
 
 namespace tpScriptVueCurd\field;
+use think\Exception;
 use tpScriptVueCurd\base\model\BaseModel;
 use tpScriptVueCurd\ExcelFieldTpl;
 use tpScriptVueCurd\filter\LikeFilter;
@@ -26,19 +27,37 @@ class StringAutoCompleteField extends ModelField
     protected bool $beginGetOptions=false;////在开始时，如果值为空，先获取所有选项
 
     /**
-     * 要搜索的url,如果不需要url也能搜索的话，建议使用select
+     * 要搜索的url,如果不需要url也能搜索的话，建议使用select，也可以对当前字段的items赋值
      * @var string
      */
     protected string $url='';
 
+    /**
+     * 默认就有的选项，一维数组['选项1','选项2','选项3']
+     * @var array
+     */
+    protected array $items=[];
 
-    /**要搜索的url
+
+    /**
+     * 要搜索的url,如果不需要url也能搜索的话，建议使用select，也可以对当前字段的items赋值
      * @param string|null $url
      * @return $this|int
      */
     public function url(string $url = null)
     {
         return $this->doAttr('url', $url);
+    }
+
+
+    /**
+     * 默认就有的选项，一维数组['选项1','选项2','选项3']
+     * @param array|null $items
+     * @return $this|int
+     */
+    public function items(array $items = null)
+    {
+        return $this->doAttr('items', $items);
     }
 
     /**在开始时，如果值为空，先获取所有选项
@@ -52,8 +71,10 @@ class StringAutoCompleteField extends ModelField
 
     /**
      * 设置保存的值
-     * @param array $data  数据值集合
+     * @param array $data 数据值集合
+     * @param BaseModel $old
      * @return $this
+     * @throws Exception
      */
     public function setSaveVal(array $data,BaseModel $old): self
     {

@@ -105,4 +105,12 @@ class IframeField extends ModelField
     {
         $option->setTypeVarchar();
     }
+
+    public function toArray(): array
+    {
+        if($this->title===''){
+            $this->showUseComponent(true);
+        }
+        return parent::toArray();
+    }
 }

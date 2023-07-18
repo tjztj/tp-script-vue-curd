@@ -17,6 +17,9 @@ define([],function(){
             }
         },
         mounted(){
+            this.autoCompleteOptions=this.field.items.map(v=>{
+                return {value:v}
+            });
             if(this.field.beginGetOptions&&(this.value===''||typeof this.value==='undefined')){
                 this.onAutoCompleteSearch('');
             }
@@ -32,17 +35,19 @@ define([],function(){
                 this.autoCompleteSearch(event,this.field.url)
             },
             autoCompleteSearch(val,url){
-                this.autoCompleteOptions=[];
-                if(!url){
-                    return ;
-                }
-                this.$get(url,{search:val}).then(res=>{
-                    let arr=[];
-                    res.data.forEach(function(v){
-                        arr.push({value:v});
+                if(url){
+                    this.autoCompleteOptions=[];
+                    let arr=this.field.items.map(v=>{
+                        return {value:v}
+                    });
+                    this.$get(url,{search:val}).then(res=>{
+                        res.data.forEach(function(v){
+                            arr.push({value:v});
+                        })
+                        this.autoCompleteOptions=arr;
                     })
-                    this.autoCompleteOptions=arr;
-                })
+                }
+
             },
         },
         template:`<div class="field-box">
