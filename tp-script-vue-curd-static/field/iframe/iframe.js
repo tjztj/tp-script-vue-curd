@@ -16,17 +16,38 @@ padding-bottom: 0;
 </style>
 `;
     return {
-        props: ['field'],
+        props: ['field','info'],
         data(){
-          return {
-              iframeId:window.guid(),
-              height:200,
-              loading:true,
-          }
+            return {
+                iframeId:window.guid(),
+                height:200,
+                loading:true,
+            }
         },
         created(){
             if (!document.getElementById(styleId)) {
                 document.querySelector('head').insertAdjacentHTML('afterend', style);
+            }
+        },
+        computed:{
+            url(){
+                if(!this.field.url){
+                    return '';
+                }
+                const result = this.field.url.match(/(\$\{|%24%7B)(.+?)(\}|%7D)/g);
+                if(!result||!result.length||!this.info){
+                    return this.field.url;
+                }
+
+                let url=this.field.url;
+                result.forEach(v=>{
+                    let item=this.info[v.match(/(\$\{|%24%7B)(.+?)(\}|%7D)/)[2]];
+                    if(item===null||item===undefined){
+                        item='';
+                    }
+                    url=url.split(v).join(item);
+                })
+                return url;
             }
         },
         methods:{
@@ -66,9 +87,9 @@ padding-bottom: 0;
         template:`
 <div>
     <a-divider v-if="field.topHrText!=''">{{field.topHrText}}</a-divider>
-    <template v-if="field.url">
+    <template v-if="url">
         <a-spin tip="加载中..." :loading="loading" style="display: block">
-            <iframe v-if="field.url" :src="field.url" :onload="iframeLoad" width="100%" :height="height+'px'" frameborder="0" :id="iframeId" class="url_page-iframe"></iframe>
+            <iframe v-if="field.url" :src="url" :onload="iframeLoad" width="100%" :height="height+'px'" frameborder="0" :id="iframeId" class="url_page-iframe"></iframe>
         </a-spin>
     </template>
     <a-divider v-if="field.bottomHrText!=''">{{field.bottomHrText}}</a-divider>

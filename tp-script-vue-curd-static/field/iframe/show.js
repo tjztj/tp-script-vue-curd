@@ -4,6 +4,6 @@ define(['/tpscriptvuecurd/field/iframe/iframe.js'],function(iframeBox){
             iframeBox
         },
         props: ['info','field'],
-        template:`<iframeBox :field="field"></iframeBox>`,
+        template:`<iframeBox :field="field" :info="info"></iframeBox>`,
     }
 });
