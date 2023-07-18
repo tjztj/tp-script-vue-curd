@@ -74,4 +74,4 @@ padding-bottom: 0;
     <a-divider v-if="field.bottomHrText!=''">{{field.bottomHrText}}</a-divider>
 </div>`
     }
-}
+})
