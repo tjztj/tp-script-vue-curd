@@ -1754,7 +1754,11 @@ define(requires, function (axios, Qs) {
                             }
                         });
                         if(scrollX.value!==undefined&&!haveNotSetWidth&&scrollX.value>listSetWidth){
-                            scrollX.value=undefined;
+                            let boxW=document.body.querySelector('#' + id).clientWidth;
+                            if(props.rowSelection){
+                                boxW-=84;
+                            }
+                            scrollX.value=boxW>listSetWidth?undefined:listSetWidth;
                         }
                         if (scrollX.value === undefined) {
                             const tablePath = '#' + id + '>.curd-table table.arco-table-element';
