@@ -1652,7 +1652,7 @@ define(requires, function (axios, Qs) {
                             columns.push(column);
                         }
                     }
-                    isGroup.value = groupTitles.length > 1 || (!listColumns[''] && groupTitles.length > 0);
+                    isGroup.value = groupTitles.length > 1 || (!listColumns[''] &&!listColumns['基本信息'] && groupTitles.length > 0);
 
                     if (!isGroup.value && columns[0]) {
                         columns = columns[0].children?columns[0].children:columns;
@@ -1745,6 +1745,17 @@ define(requires, function (axios, Qs) {
                     columnsVals.value = columns;
                     onresize = () => {
                         scrollX.value = getX();
+                        let listSetWidth=0,haveNotSetWidth=false;
+                        columnsVals.value.forEach(col => {
+                            if(col.width){
+                                listSetWidth+=parseInt(col.width);
+                            }else{
+                                haveNotSetWidth=true;
+                            }
+                        });
+                        if(scrollX.value!==undefined&&!haveNotSetWidth&&scrollX.value>listSetWidth){
+                            scrollX.value=undefined;
+                        }
                         if (scrollX.value === undefined) {
                             const tablePath = '#' + id + '>.curd-table table.arco-table-element';
                             if (!document.querySelector('#' + id)
