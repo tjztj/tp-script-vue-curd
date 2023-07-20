@@ -94,7 +94,8 @@ define([],function(){
                 }
             },
             treeData(){
-                const doTreeItem=(arr)=>{
+                const doTreeItem=(arr,pTitles)=>{
+                    pTitles=pTitles||[];
                     arr.map(item=>{
                         item.key=item.value;
                         this.infos[item.value]=item;
@@ -103,11 +104,12 @@ define([],function(){
                             if(!this.field.multiple){
                                 item.disableCheckbox=!this.field.canCheckParent;
                             }
-                            item.children=doTreeItem(item.children);
+                            item.children=doTreeItem(item.children,[...pTitles,item.title]);
                         }else{
                             item.selectable=typeof item.selectable==='undefined'?true:item.selectable;
                             item.disableCheckbox=false;
                         }
+                        item.pTitles=pTitles;
                         // item.customTitle=item.title;
                         // item.title=undefined;
                         // item.slots={ title: 'custom-title'};
@@ -123,7 +125,12 @@ define([],function(){
                 if(typeof nodeData.title==='undefined'){
                     return false;
                 }
-                return nodeData.title.toLowerCase().indexOf(searchValue.toLowerCase()) > -1;
+                for(v of [...nodeData.pTitles,nodeData.title]){
+                    if(v.toLowerCase().indexOf(searchValue.toLowerCase()) > -1){
+                        return true;
+                    }
+                }
+                return false;
             },
             log(v){
                 console.log(v)
