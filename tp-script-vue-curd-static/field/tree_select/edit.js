@@ -125,7 +125,7 @@ define([],function(){
                 if(typeof nodeData.title==='undefined'){
                     return false;
                 }
-                for(v of [...nodeData.pTitles,nodeData.title]){
+                for(let v of [...nodeData.pTitles,nodeData.title]){
                     if(v.toLowerCase().indexOf(searchValue.toLowerCase()) > -1){
                         return true;
                     }
