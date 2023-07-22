@@ -15,4 +15,6 @@ class FunControllerImportAfter
     public BaseModel $saveObjects;
 
     public ?BaseModel $base=null;
+
+    public array $all=[];
 }

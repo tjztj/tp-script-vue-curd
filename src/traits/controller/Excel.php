@@ -132,6 +132,7 @@ trait Excel
         $option=new FunControllerImportBefore();
         $option->saveArr=$saveData;
         $option->base=$this->excelBaseInfo;
+        $option->all=$this->allData;
         $this->importBefore($option);
 
         /**
@@ -144,6 +145,7 @@ trait Excel
         $optionAfter=new FunControllerImportAfter();
         $optionAfter->saveObjects=$info;
         $optionAfter->base=$this->excelBaseInfo;
+        $optionAfter->all=$this->allData;
         $this->importAfter($optionAfter);
 
         return $info;
@@ -194,12 +196,14 @@ trait Excel
                 $option=new FunControllerImportBefore();
                 $option->saveArr=$datas[$modelName];
                 $option->base=$base;
+                $option->all=$this->allData;
                 $childController->importBefore($option);
                 $infos[$modelClass]=$model->addInfo($option->saveArr,$option->base,$childController->myExcelFields()->excelFilter(),true);
 
                 $optionAfter=new FunControllerImportAfter();
                 $optionAfter->saveObjects=$infos[$modelClass];
                 $optionAfter->base=$option->base;
+                $optionAfter->all=$this->allData;
 
                 $childController->importAfter($optionAfter);
             }
@@ -310,8 +314,10 @@ trait Excel
 
 
         $this->md->startTrans();
-        $last_do_row=4;
+        $saveI=4;
         try{
+            $last_do_row=$saveI;
+            $saveArr=[];
             //因为$data排序已经乱了，所以我用while遍历
             while (isset($data[$last_do_row])){
                 $saveData=[];
@@ -329,12 +335,17 @@ trait Excel
                     //各行之间不能又空行，防止有些excel空行过多，资源不足
                     break;
                 }
-                $this->excelSave($saveData);//执行之类或自己的方法
+                $saveArr[$last_do_row]=$saveData;
                 $last_do_row++;
+            }
+            $this->allData=$saveArr;
+            foreach ($saveArr as $i=>$v){
+                $saveI=$i;
+                $this->excelSave($v);//执行之类或自己的方法
             }
         }catch (\Exception $e){
             $this->md->rollback();
-            $this->errorAndCode('Excel第'.$last_do_row.'行 '.$e->getMessage(),$e->getCode());
+            $this->errorAndCode('Excel第'.$saveI.'行 '.$e->getMessage(),$e->getCode());
         }
 
         $this->md->commit();

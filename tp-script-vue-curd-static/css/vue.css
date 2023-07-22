@@ -967,3 +967,10 @@ a.red:hover,a.yellow:hover{
 .edit-padding-top-label{
     padding-top: 5px;
 }
+/****************************************************************/
+.arco-tree-node-minus-icon, .arco-tree-node-plus-icon{
+    transition: all .3s;
+}
+.arco-tree-node-minus-icon:hover, .arco-tree-node-plus-icon:hover{
+    background: var(--color-text-4);
+}
