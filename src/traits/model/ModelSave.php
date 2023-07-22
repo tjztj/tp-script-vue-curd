@@ -139,7 +139,7 @@ trait ModelSave
         //为了防止在doSaveData中被删除，在这里先获取了
         $saveStepInfo=$fields->saveStepInfo??null;
 
-        $data=$this->doSaveData($postData,$beforeInfo,$fields,false,$parentInfo,$saveFields);
+        $data=$this->doSaveData($postData,$beforeInfo,$fields,$this->isExcelDo??false,$parentInfo,$saveFields);
 
         if(empty($postData['id'])){
             throw new \think\Exception('缺少ID');
