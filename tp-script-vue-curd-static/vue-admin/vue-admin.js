@@ -1889,10 +1889,27 @@ define(requires, function (axios, Qs) {
                 const columnsVals = Vue.ref(columns);
                 let onresize = () => {
                     scrollX.value = getX();
+
+                    let listSetWidth=0,haveNotSetWidth=false;
+                    columnsVals.value.forEach(col => {
+                        if(col.width){
+                            listSetWidth+=parseInt(col.width);
+                        }else{
+                            haveNotSetWidth=true;
+                        }
+                    });
+                    if(scrollX.value!==undefined&&!haveNotSetWidth&&scrollX.value>listSetWidth){
+                        let boxW=document.body.querySelector('#' + id).clientWidth;
+                        if(props.rowSelection){
+                            boxW-=84;
+                        }
+                        scrollX.value=boxW>listSetWidth?undefined:listSetWidth;
+                    }
+
                     if (scrollX.value === undefined) {
                         const tablePath = '#' + id + '>.curd-table .ant-table-default>.ant-table-content>.ant-table-body>table';
                         if (!document.querySelector('#' + id)
-                        || !document.querySelector('#' + id), document.querySelector(tablePath)) {
+                            || !document.querySelector('#' + id)||! document.querySelector(tablePath)) {
                             if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table .ant-table-body')) {
                                 setTimeout(() => {
                                     onresize();
@@ -2183,6 +2200,9 @@ define(requires, function (axios, Qs) {
                 colStyle(field,row){
                     return Object.assign(Array.isArray(field.listColStyle)?{}:JSON.parse(JSON.stringify(field.listColStyle)),row.__style&&row.__style[field.name]&&typeof row.__style[field.name]==='object'?row.__style[field.name]:{})
                 },
+                checkHaveOtherBtn(btnw){
+                    return btnw<(this.actionW-32+14);
+                }
             },
             template: `<div :id="id">
                         <a-table
@@ -2283,7 +2303,7 @@ define(requires, function (axios, Qs) {
                                     <slot name="other-btn-before" :record="record">
                                         <template v-for="btn in getBeforeBtns(record)">
                                             <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                            <a-divider type="vertical"></a-divider>
+                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getBeforeBtnsW(record))"></a-divider>
                                         </template>
                                     </slot>
                                     
@@ -2326,7 +2346,7 @@ define(requires, function (axios, Qs) {
                                     
                                     <slot name="other-btn-after" :record="record">
                                         <template v-for="btn in getAfterBtns(record)">
-                                            <a-divider type="vertical"></a-divider>
+                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getAfterBtnsW(record))"></a-divider>
                                             <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
                                         </template>
                                     </slot>
