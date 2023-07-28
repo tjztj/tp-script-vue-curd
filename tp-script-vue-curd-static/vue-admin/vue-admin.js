@@ -303,6 +303,11 @@ define(requires, function (axios, Qs) {
                     }
                 }
                 box.layer.open(option);
+                const lb=box.document.getElementById('layui-layer'+box.layer.index);
+                if(lb){
+                    lb.setAttribute('data-offset',option.offset)
+                    lb.setAttribute('data-type',option.type)
+                }
             })
         } else {
             if (!box.appParam.bodyModals || !box.appParam.bodyDrawers) {
