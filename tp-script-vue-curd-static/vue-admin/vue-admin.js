@@ -1763,7 +1763,8 @@ define(requires, function (axios, Qs) {
                         if (scrollX.value === undefined) {
                             const tablePath = '#' + id + '>.curd-table table.arco-table-element';
                             if (!document.querySelector('#' + id)
-                            || !document.querySelector('#' + id), document.querySelector(tablePath)) {
+                            || !document.querySelector('#' + id)
+                                ||! document.querySelector(tablePath)) {
                                 if (!document.querySelector('#' + id + '>.curd-table table') || !document.querySelector('#' + id + '>.curd-table tbody')) {
                                     setTimeout(() => {
                                         onresize();
