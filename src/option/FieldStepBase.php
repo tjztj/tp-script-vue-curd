@@ -140,8 +140,17 @@ abstract class FieldStepBase implements IteratorAggregate
                 }
                 if (is_bool($value)) {
                     $value = static fn()=>$value;
+                }else if(is_array($value)){
+                    $value= static function ($info)use($value){
+                        foreach ($value as $key=>$val){
+                            if(!isset($info[$key])||(!is_string($info[$key])&&!is_numeric($info[$key]))||(string)$info[$key]!==(string)$val){
+                                return false;
+                            }
+                        }
+                        return !empty($value);
+                    };
                 } else if (!is_callable($value)) {
-                    throw  new  \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                    throw new \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
                 }
                 $funcs[$key] = FieldStepBeforeCheck::make('', $value);
             }
