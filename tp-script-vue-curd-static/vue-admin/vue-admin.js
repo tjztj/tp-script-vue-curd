@@ -885,7 +885,7 @@ define(requires, function (axios, Qs) {
         const checkVal = function (fieldWhere, val) {
             if (fieldWhere.type === 'in') {
                 for (let i in fieldWhere.valueData) {
-                    let whereVal=fieldWhere.valueData[0];
+                    let whereVal=fieldWhere.valueData[i];
                     if(whereVal===undefined||whereVal===null){
                         whereVal='';
                     }else{
