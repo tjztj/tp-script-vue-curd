@@ -88,7 +88,7 @@ trait ModelSave
 
         if($parentInfo){
             $data[static::parentField()]=$parentInfo->id;
-            $allFields=static::getTableFields();
+//            $allFields=static::getTableFields();
         }
 
         if(static::getCreateLoginUserField()){
@@ -184,7 +184,7 @@ trait ModelSave
 
         foreach (['create_time','update_time','delete_time'] as $v){
             try{
-                $fields->getFieldByNmae('create_time');
+                $fields->getFieldByNmae($v);
                 if(!empty($beforeInfo->readonly))unset($beforeInfo->readonly[array_search($v,$beforeInfo->readonly)]);
             }catch (\Exception $e){
                 unset($data[$v]);
