@@ -129,11 +129,6 @@ define(['vueAdmin','g6'], function (va,G6) {
                         },
                     });
 
-                    graph.layout(()=>{
-                        return {
-                            align:this.align
-                        }
-                    })
 
                     graph.node((node) => {
                         return {
@@ -207,7 +202,9 @@ define(['vueAdmin','g6'], function (va,G6) {
                     changanIng=false;
                 },
                 alignChange(){
-                    graph.render(); // 渲染图
+                    graph.updateLayout({
+                        align:this.align
+                    })
                 },
             },
         }

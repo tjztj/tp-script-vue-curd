@@ -69,9 +69,8 @@ svg.icon{
     <div class="tool-item-text">节点对齐方式</div>
     <div class="tool-item-btns" style="padding: 0">
         <a-select v-model="align" @change="alignChange" size="small" :style="{width:'80px',backgroundColor:'#fff',border:0}" >
-            <a-option :value="undefined">无</a-option>
             <a-option value="UL">左上</a-option>
-            <a-option value="UR">又上</a-option>
+            <a-option value="UR">右上</a-option>
             <a-option value="DL">左下</a-option>
             <a-option value="DR">右下</a-option>
         </a-select>
