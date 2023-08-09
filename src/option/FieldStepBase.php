@@ -125,6 +125,7 @@ abstract class FieldStepBase implements IteratorAggregate
                 if ($value instanceof FieldStepBeforeCheck) {
                     continue;
                 }
+                $oldKey=$key;
                 if (is_numeric($key)) {
                     if (is_string($value)) {
                         if (!is_subclass_of($value, self::class)) {
@@ -151,6 +152,9 @@ abstract class FieldStepBase implements IteratorAggregate
                     };
                 } else if (!is_callable($value)) {
                     throw new \think\Exception(static::class . '步骤配置不合法' . $key . '=>' . $value);
+                }
+                if($oldKey!==$key){
+                    unset( $funcs[$oldKey]);
                 }
                 $funcs[$key] = FieldStepBeforeCheck::make('', $value);
             }

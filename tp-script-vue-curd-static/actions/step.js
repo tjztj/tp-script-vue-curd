@@ -62,6 +62,7 @@ define(['vueAdmin','g6'], function (va,G6) {
                     defWidth:document.documentElement.clientWidth-54,
                     defHeight:document.documentElement.clientHeight-62,
                     showAnimation:true,
+                    align:undefined,
                 }
             },
             watch:{
@@ -128,7 +129,11 @@ define(['vueAdmin','g6'], function (va,G6) {
                         },
                     });
 
-
+                    graph.layout(()=>{
+                        return {
+                            align:this.align
+                        }
+                    })
 
                     graph.node((node) => {
                         return {
@@ -200,7 +205,10 @@ define(['vueAdmin','g6'], function (va,G6) {
                     }
                     changan=null;
                     changanIng=false;
-                }
+                },
+                alignChange(){
+                    graph.render(); // 渲染图
+                },
             },
         }
     };
