@@ -109,5 +109,3 @@ svg.icon{
 </div>
 </div>
 <div id="mountNode"></div>
-<script setup>
-</script>
