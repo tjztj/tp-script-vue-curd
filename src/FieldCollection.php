@@ -632,11 +632,11 @@ class FieldCollection extends Collection
             }
             $tpl=$field->componentTpls();
             isset($tpl->$type)&&$return[$field->name()]=$tpl->toArray($tpl->$type);
-            if($field instanceof ListField||is_subclass_of($field,ListField::class)){
-                foreach ($field->fields()->getComponents($type) as $k=>$v){
-                    $return[$field->name().'['.$k.']']=$v;
+            $otherComponentJsFields=$field->getOtherComponentJsFields();
+            if($otherComponentJsFields&&!$otherComponentJsFields->isEmpty()){
+                foreach ($otherComponentJsFields->getComponents($type) as $k => $v) {
+                    $return[$field->name() . '[' . $k . ']'] = $v;
                 }
-                $return=array_merge($return,);
             }
         });
         return $return;

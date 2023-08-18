@@ -13,6 +13,7 @@ class ExcelFieldTpl
 
     public string $name='';//字段名称
     public string $title='';//字段标题
+    public string $group='';//分组
     public int $width=0;//0代表不设定
     public string $explain='填写任意字符';//字段导出备注信息
     public bool $wrapText=false;//单元格内是否可换行

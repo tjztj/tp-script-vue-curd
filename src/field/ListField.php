@@ -165,4 +165,9 @@ class ListField extends ModelField
     public function getGenerateColumnConfig(GenerateColumnOption $option):void{
         $option->setTypeJson();
     }
+
+    public function getOtherComponentJsFields(): ?FieldCollection
+    {
+        return $this->fields();
+    }
 }

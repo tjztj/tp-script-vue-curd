@@ -143,7 +143,7 @@ class ExportExcel
      * @return array
      * @throws \think\Exception
      */
-    private function doTh(array $ths,string $colNum='A',int $haveLevel=0,int $rowNum=0){
+    private function doTh(array $ths,string $colNum='A',int $haveLevel=0,int $rowNum=0,bool $getLevel=true){
         if(empty($ths)){
             throw new \think\Exception('表头不能设置为空');
         }
@@ -155,6 +155,27 @@ class ExportExcel
             $this->thMaxRow=$rowNum;
             $this->maxRow=$rowNum;
         }
+        $getMaxLevel=function (&$ths,$thMaxLevel)use(&$getMaxLevel){
+            $maxList=[];
+            foreach ($ths as $k=>$v){
+                if(empty($v['childs'])){
+                    $ths[$k]['level']=$thMaxLevel;
+                }else{
+                    $ths[$k]['level']=$getMaxLevel($ths[$k]['childs'],$thMaxLevel+1);
+                }
+                $maxList[]=$ths[$k]['level'];
+            }
+            $maxVal=max($maxList);
+            foreach ($ths as $k=>$v){
+                $ths[$k]['maxLevel']=$maxVal;
+            }
+            return $maxVal;
+        };
+        if($getLevel){
+            $getMaxLevel($ths,0);
+        }
+
+
         foreach ($ths as $v){
             /**
              * @var ExportThCell $cell
@@ -171,7 +192,7 @@ class ExportExcel
 
             $this->ths[]=$cell;
             if($cell->childs){
-                [$colNum,$newHaveLevel]=$this->doTh($cell->childs,$colNum,$haveLevel+1,$rowNum+1);
+                [$colNum,$newHaveLevel]=$this->doTh($cell->childs,$colNum,$haveLevel+1,$cell->row+($cell->maxLevel-$cell->level)+1,false);
                 $cell->mergeCellsCol=ExportOperation::operationSubGetNum($colNum,$cell->col);
                 $cell->haveLevel=$newHaveLevel-$haveLevel;
                 $haveLevel=$newHaveLevel;

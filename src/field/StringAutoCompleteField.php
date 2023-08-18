@@ -39,6 +39,13 @@ class StringAutoCompleteField extends ModelField
     protected array $items=[];
 
 
+
+    /**
+     * url返回的结果是否会被筛选
+     * @var bool
+     */
+    protected bool $willFilter=true;
+
     /**
      * 要搜索的url,如果不需要url也能搜索的话，建议使用select，也可以对当前字段的items赋值
      * @param string|null $url
@@ -47,6 +54,17 @@ class StringAutoCompleteField extends ModelField
     public function url(string $url = null)
     {
         return $this->doAttr('url', $url);
+    }
+
+
+    /**
+     * url返回的结果是否会被筛选
+     * @param bool|null $willFilter
+     * @return bool|StringAutoCompleteField
+     */
+    public function willFilter(bool $willFilter = null)
+    {
+        return $this->doAttr('willFilter', $willFilter);
     }
 
 

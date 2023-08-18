@@ -6,10 +6,11 @@ namespace tpScriptVueCurd\traits\controller;
 
 
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
-use PhpOffice\PhpSpreadsheet\NamedRange;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use think\db\exception\DataNotFoundException;
+use think\db\exception\DbException;
 use tpScriptVueCurd\tool\excel_out\ExportCell;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use tpScriptVueCurd\base\controller\Controller;
@@ -284,32 +285,13 @@ trait Excel
         try{
             $data = \tpScriptVueCurd\tool\excel_in\Excel::importExecl($file->getRealPath(), 0, 0, $options);
         }catch (\Exception $e){
-            return $this->error($e);
+             $this->error($e);
         }
 
 
-
-        ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
-        //判断标题是否一致，有些表字段一样的，防止导错
-        if(preg_replace('/\s+/','',current($data[1]))!==preg_replace('/\s+/','',$this->getExcelTilte())){
-            return $this->errorAndCode('模版错误，请重新下载最新的模版-001');
-        }
-
-
-        $names=[];
-        foreach ($expCellName as $v) {
-            //对比模版，老模版提示错误
-            if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v['name']])) {
-                return $this->errorAndCode('模版错误，请重新下载最新的模版-002');
-            }
-            $names[key($data[2])]=$v['name'];
-            next($data[2]);
-            next($data[3]);
-        }
-        //去掉模版上的提示行
-        unset($data[1],$data[2], $data[3]);
+        $names=$this->checkExcelTpl($data);
         if(empty($data)){
-            return $this->errorAndCode('未找到可导入的数据');
+             $this->errorAndCode('未找到可导入的数据');
         }
 
 
@@ -369,19 +351,31 @@ trait Excel
 
         ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
         $emptyItem=[];
-        foreach ($expCellName as $k=>$v){
+
+        $do=function (&$v)use(&$emptyItem,$row){
             $cell=['name'=>$v['name'],'value'=>$row[$v['name']]?:'','wrapText'=>true,'fontBold'=>false];
             if(isset($v['format'])){
                 $cell['format']=$v['format'];
             }
-            $expCellName[$k]['childs']=[$cell];
+            $v['childs']=[$cell];
             //空数据
             $emptyItem[$v['name']]='';
+        };
+        $haveGroup=false;
+        foreach ($expCellName as $k=>$v){
+            if(empty($v['childs'])){
+                $do($expCellName[$k]);
+            }else{
+                $haveGroup=true;
+                foreach ($v['childs'] as $key=>$val){
+                    $do($expCellName[$k]['childs'][$key]);
+                }
+            }
         }
         $list=[];
         //生成2000条空数据
         ini_set('memory_limit','-1');
-        for($i=0;$i<2000;$i++){
+        for($i=0;$i<100;$i++){
             $list[]=$emptyItem;
         }
 
@@ -397,7 +391,7 @@ trait Excel
         $excel->defFormatText=true;
         $excel->title->alignmentHorizontal=Alignment::HORIZONTAL_LEFT;
         $excel->title->wrapText=true;
-        $excel->title->height=60;
+        $excel->title->height=30;
         $excel->setThead($expCellName);
         $excel->fileName=$this->getExcelFieldName();
         $excel->setData($list);
@@ -433,6 +427,7 @@ trait Excel
             $excelFieldTpl->items=$v->excelSelectItems();
             $excelFieldTpl->type=$v->getType();
             $excelFieldTpl->field=$v;
+            $excelFieldTpl->group=$v->group();
             $expFields[]=$excelFieldTpl;
         });
         return $expFields;
@@ -446,6 +441,7 @@ trait Excel
         $expFields=$this->getTHeadExpFields();
         $expCellName=[];
         $row=[];
+        $groupKeys=[];
         foreach ($expFields as $v){
             $th=['name'=>$v->name,'value'=>$v->title,'fontSize'=>13,'fontColor'=>'FF000000','alignmentVertical'=>Alignment::VERTICAL_CENTER,'fontBold'=>true,'fontName'=>'Microsoft YaHei UI Light'];
             if($v->width){
@@ -515,7 +511,13 @@ trait Excel
                 };
             }
 
-            $expCellName[]=$th;
+            if($v->group&&$v->group!=='基本信息'){
+                isset($groupKeys[$v->group])||$groupKeys[$v->group]=count($expCellName);
+                isset($expCellName[$groupKeys[$v->group]])||$expCellName[$groupKeys[$v->group]]=['value'=>$v->group,'childs'=>[]];
+                $expCellName[$groupKeys[$v->group]]['childs'][]=$th;
+            }else{
+                $expCellName[]=$th;
+            }
             $row[$v->name]=$v->explain;
         }
 
@@ -546,7 +548,9 @@ trait Excel
     private function getExcelTilte():string{
         static $return;
         if(!isset($return)){
-            $return=" ".$this->excelTilte()."\n（合并行的单元格，将看成是同样的值；列合并暂不支持）";
+            $return=" ".$this->excelTilte()
+//                ."\n（合并行的单元格，将看成是同样的值；列合并暂不支持）"
+            ;
         }
         return $return;
     }
@@ -566,6 +570,80 @@ trait Excel
             $return='导入模版__' .$this->excelTilte() . \tpScriptVueCurd\tool\Time::unixtimeToDate('Y-m-d_H时i分s秒');
         }
         return $return;
+    }
+
+
+    /**
+     * 验证导入模板是否合法
+     * @param array $data
+     * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     */
+    private function checkExcelTpl(array $data):array{
+        ['cell'=>$expCellName,'row'=>$row]=$this->parseExpFields();
+        //判断标题是否一致，有些表字段一样的，防止导错
+        if(preg_replace('/\s+/','',current($data[1]))!==preg_replace('/\s+/','',$this->getExcelTilte())){
+            $this->error('模版错误，请重新下载最新的模版-001');
+        }
+
+        $names=[];
+        $haveGroup=false;
+        foreach ($expCellName as $v) {
+            if(empty($v['name'])&&!empty($v['childs'])){
+                $haveGroup=true;
+                break;
+            }
+        }
+
+        ksort($data[2]);
+        ksort($data[3]);
+        if($haveGroup){
+            ksort($data[4]);
+            foreach ($expCellName as $v) {
+                if(empty($v['name'])&&!empty($v['childs'])){
+                    if(preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])){
+                        $this->error('模版错误，请重新下载最新的模版-002');
+                    }
+                    foreach ($v['childs'] as $val){
+                        if (preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$val['value'])||preg_replace('/\s+/','',current($data[4])) !== preg_replace('/\s+/','',$row[$val['name']])) {
+
+                            $this->error('模版错误，请重新下载最新的模版-003');
+                        }
+                        $names[key($data[3])]=$val['name'];
+                        next($data[2]);
+                        next($data[3]);
+                        next($data[4]);
+                    }
+                }else{
+                    //对比模版，老模版提示错误
+                    if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])||preg_replace('/\s+/','',current($data[4])) !== preg_replace('/\s+/','',$row[$v['name']])) {
+                        $this->error('模版错误，请重新下载最新的模版-004');
+                    }
+                    $names[key($data[2])]=$v['name'];
+                    next($data[2]);
+                    next($data[3]);
+                    next($data[4]);
+                }
+            }
+            unset($data[4]);
+        }else{
+            foreach ($expCellName as $v) {
+                //对比模版，老模版提示错误
+                if (preg_replace('/\s+/','',current($data[2])) !== preg_replace('/\s+/','',$v['value'])||preg_replace('/\s+/','',current($data[3])) !== preg_replace('/\s+/','',$row[$v['name']])) {
+                    $this->error('模版错误，请重新下载最新的模版-005');
+                }
+                $names[key($data[2])]=$v['name'];
+                next($data[2]);
+                next($data[3]);
+            }
+        }
+        //去掉模版上的提示行
+        unset($data[1],$data[2], $data[3]);
+        if(empty($data)){
+            $this->error('未找到可导入的数据');
+        }
+        return $names;
     }
 
 }

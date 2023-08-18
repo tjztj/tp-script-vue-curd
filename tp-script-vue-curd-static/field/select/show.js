@@ -15,7 +15,11 @@ define([],function(){
               if(typeof this.info['_Original_'+this.field.name]==='undefined'||this.info['_Original_'+this.field.name]===''){
                   return this.info[this.field.name]?[this.info[this.field.name]]:[];
               }
-              return this.info['_Original_'+this.field.name].toString().split(',');
+              const val=this.info['_Original_'+this.field.name].toString();
+              if(val===this.field.nullVal.toString()){
+                  return [];
+              }
+              return val.split(',');
           }
         },
         methods:{

@@ -32,19 +32,19 @@ class DecimalField extends ModelField
 
 
     /**最小值
-     * @param int|null $min
-     * @return $this|int
+     * @param float|null $min
+     * @return $this|float
      */
-    public function min(int $min = null)
+    public function min(float $min = null)
     {
         return $this->doAttr('min', $min);
     }
 
     /**最大值
-     * @param int|null $max
-     * @return $this|int
+     * @param float|null $max
+     * @return $this|float
      */
-    public function max(int $max = null)
+    public function max(float $max = null)
     {
         return $this->doAttr('max', $max);
     }

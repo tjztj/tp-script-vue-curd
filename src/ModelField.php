@@ -67,7 +67,7 @@ abstract class ModelField
     protected bool $editColon = true;//是否显示label后面的冒号
     protected bool $showUseComponent = false;//查看页面这一行，完全使用组件自己的显示（不显示左边的标题）
     protected $validateRule = null;//数据验证
-    protected $nullVal = '';//字段在数据库中为空时的值
+    protected $nullVal;//字段在数据库中为空时的值
     protected bool $canSaveZero=false;//是否可保存为0，验证为空的时候跳过0
     /**
      * @var FieldDo[] $fieldDoList
@@ -768,6 +768,19 @@ abstract class ModelField
      */
     public function nullVal()
     {
+        if(!isset($this->nullVal)){
+            $generateColumn=$this->generateColumn;
+            try{
+                $field=new GenerateColumnOption($this->name());
+            }catch (\Exception $exception){}
+            if(isset($field)){
+                $this->getGenerateColumnConfig($field);
+                is_callable($generateColumn)&&$generateColumn($field);
+                $this->nullVal=$field->getDefaultStr()??'';
+            }else{
+                $this->nullVal='';
+            }
+        }
         return $this->nullVal;
     }
 
@@ -1304,6 +1317,15 @@ abstract class ModelField
                 break;
         }
         return $this;
+    }
+
+
+    /**
+     * 子类重写用的。子类需要额外载入字段js文件时使用
+     * @return FieldCollection|null
+     */
+    public function getOtherComponentJsFields():?FieldCollection{
+        return null;
     }
 
 }

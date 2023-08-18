@@ -52,7 +52,7 @@ define([],function(){
         },
         template:`<div class="field-box">
                     <div class="l">
-                        <a-auto-complete v-model="val" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :data="autoCompleteOptions" @search="onAutoCompleteSearch"/>
+                        <a-auto-complete v-model="val" :placeholder="field.placeholder||'请填写'+field.title" :disabled="field.readOnly" :data="autoCompleteOptions" @search="onAutoCompleteSearch" :filter-option="field.willFilter"/>
                     </div>
                     <div class="r">
                         <span v-if="field.ext" class="ext-span">{{ field.ext }}</span>

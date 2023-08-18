@@ -612,15 +612,26 @@ define(['vueAdmin'], function (va) {
                             return;
                         }
                         //为了触发watch
-                        let rows=[],isChange=false;
-                        for(let i in this.data){
-                            if(this.data[i].id==id){
-                                rows.push(data.data.data[0])
-                                isChange=true;
-                            }else{
-                                rows.push(this.data[i])
+                        let isChange=false;
+                        const getRows=function (list){
+                            const rows=[];
+                            for(let i in list){
+                                let row=list[i];
+                                if(row.id==id){
+                                    const children=row.children;
+                                    row=data.data.data[0];
+                                    if(children){
+                                        row.children=children;
+                                    }
+                                    isChange=true;
+                                }else if(row.children&&Array.isArray(row.children)&&row.children.length>0){
+                                    row.children=getRows(row.children)
+                                }
+                                rows.push(row);
                             }
+                            return rows;
                         }
+                        const rows=getRows(this.data);
                         if(isChange===false){
                             this.loading = false;
                             return;
