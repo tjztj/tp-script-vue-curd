@@ -123,7 +123,7 @@ class ListField extends ModelField
                 $fieldsObj->setSave($v,$old);
                 $list[$k]=$fieldsObj->getSave();
                 foreach ($fieldsObj as $val){
-                    unset($val->save);
+                    $val->save=null;
                 }
             }
             if(empty($list)){
