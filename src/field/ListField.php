@@ -26,6 +26,9 @@ class ListField extends ModelField
 
     protected bool $canExcelImport=false;//不能使用excel导入数据
     protected bool $canExport=false;//不能导出此字段数据
+    /**
+     * @var FieldCollection |ModelField[]
+     */
     protected FieldCollection $fields;//字段集合
     protected $nullVal='null';//字段在数据库中为空时的值
 
@@ -122,6 +125,9 @@ class ListField extends ModelField
                 $fieldsObj=clone $this->fields;
                 $fieldsObj->setSave($v,$old);
                 $list[$k]=$fieldsObj->getSave();
+                foreach ($fieldsObj as $val){
+                    unset($val->save);
+                }
             }
             if(empty($list)){
                 $this->save=$this->nullVal();
