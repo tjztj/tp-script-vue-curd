@@ -135,7 +135,7 @@ class SelectFilter extends ModelFilter
 
 
     public function generateWhere(Query $query,$value):void{
-        if($value||$value===0||$value==='0'||($value===''&&in_array('',array_column($this->field->items(),'value'),true))){
+        if($value||$value===0||$value==='0'||($value===''&&  method_exists($this->field,'items')&&in_array('',array_column($this->field->items(),'value'),true))){
             if($this->field instanceof CheckboxField||is_subclass_of($this->field,CheckboxField::class)||(method_exists($this->field,'multiple')&&$this->field->multiple())){
                 if(is_array($value)){
                     if($this->multiple()){
