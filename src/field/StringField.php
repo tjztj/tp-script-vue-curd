@@ -223,8 +223,8 @@ class StringField extends ModelField
         }
 
         $val=str_replace(['a','b'],['α','β'],$val);
-        $formatArr=mb_str_split($format);
-        $beforeArr=mb_str_split($val);
+        $formatArr=preg_split('//u', $format, -1, PREG_SPLIT_NO_EMPTY);
+        $beforeArr=preg_split('//u',$val, -1, PREG_SPLIT_NO_EMPTY);
 
 
         $newBefore=[];

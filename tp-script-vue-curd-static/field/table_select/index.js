@@ -24,7 +24,10 @@ define([],function(){
             const tableGuid=Vue.inject('table-guid')||'';
             window.tableSelectIndexValuesLastChangeTime=window.tableSelectIndexValuesLastChangeTime||{};
             window.tableSelectIndexValuesLastChangeTime[tableGuid]=window.tableSelectIndexValuesLastChangeTime[tableGuid]||null;
+            window.tableSelectIndexValuesNeedGets=window.tableSelectIndexValuesNeedGets||{};
             Vue.watch(()=>props.list,(list)=>{
+                window.tableSelectIndexValuesNeedGets[props.field.url]=window.tableSelectIndexValuesNeedGets[props.field.url]||[];
+
                 if(window.tableSelectIndexValuesLastChangeTime[tableGuid]&&(new Date).getTime()-window.tableSelectIndexValuesLastChangeTime[tableGuid]>3500){
                     //防止更改选项里面的值后缓存
                     window.tableSelectIndexValues.value[props.field.url]={};
@@ -55,48 +58,57 @@ define([],function(){
                     setTextByVal();
                     return;
                 }
-                window.vueDefMethods.$post.call(window.appPage||ctx,props.field.url,{ids:needGet}).then(res=>{
-                    if(typeof res.data==='undefined'){
-                        needGet.forEach(v=>{window.tableSelectIndexValues.value[props.field.url][v]={id:v,[showField]:''}})
-                        setTextByVal();
+                window.tableSelectIndexValuesNeedGets[props.field.url].push(...needGet);
+                setTimeout(()=>{
+                    if(window.tableSelectIndexValuesNeedGets[props.field.url].length===0){
                         return;
                     }
-                    if(Array.isArray(res.data)){
-                        res.data.forEach(v=>{
-                            if(typeof v[showField]==='undefined'){
-                                v[showField]='';
-                            }
-                            window.tableSelectIndexValues.value[props.field.url][v.id]=v;
-                        })
-                        setTextByVal();
-                        return;
-                    }
+                    const idArr=window.tableSelectIndexValuesNeedGets[props.field.url];
+                    window.tableSelectIndexValuesNeedGets[props.field.url]=[];
 
-                    if(typeof res.data.current_page!=='undefined'){
-                        res.data.data.forEach(v=>{
-                            if(typeof v[showField]==='undefined'){
-                                v[showField]='';
-                            }
-                            window.tableSelectIndexValues.value[props.field.url][v.id]=v;
-                        })
-                        setTextByVal();
-                        return;
-                    }
-                    for(let k in res.data){
-                        let v=res.data[k];
-                        if(typeof v!=='string'&&typeof v!=='number'){
-                            if(typeof v[showField]==='undefined'){
-                                v[showField]='';
-                            }
-                            window.tableSelectIndexValues.value[props.field.url][v.id]=v;
-                        }else{
-                            window.tableSelectIndexValues.value[props.field.url][k]={
-                                id:k,[showField]:v,
-                            };
+                    window.vueDefMethods.$post.call(window.appPage||ctx,props.field.url,{ids:idArr}).then(res=>{
+                        if(typeof res.data==='undefined'){
+                            idArr.forEach(v=>{window.tableSelectIndexValues.value[props.field.url][v]={id:v,[showField]:''}})
+                            setTextByVal();
+                            return;
                         }
-                    }
-                    setTextByVal();
-                })
+                        if(Array.isArray(res.data)){
+                            res.data.forEach(v=>{
+                                if(typeof v[showField]==='undefined'){
+                                    v[showField]='';
+                                }
+                                window.tableSelectIndexValues.value[props.field.url][v.id]=v;
+                            })
+                            setTextByVal();
+                            return;
+                        }
+
+                        if(typeof res.data.current_page!=='undefined'){
+                            res.data.data.forEach(v=>{
+                                if(typeof v[showField]==='undefined'){
+                                    v[showField]='';
+                                }
+                                window.tableSelectIndexValues.value[props.field.url][v.id]=v;
+                            })
+                            setTextByVal();
+                            return;
+                        }
+                        for(let k in res.data){
+                            let v=res.data[k];
+                            if(typeof v!=='string'&&typeof v!=='number'){
+                                if(typeof v[showField]==='undefined'){
+                                    v[showField]='';
+                                }
+                                window.tableSelectIndexValues.value[props.field.url][v.id]=v;
+                            }else{
+                                window.tableSelectIndexValues.value[props.field.url][k]={
+                                    id:k,[showField]:v,
+                                };
+                            }
+                        }
+                        setTextByVal();
+                    })
+                },40)
             },{immediate:true,deep: true})
 
             return {
@@ -111,7 +123,7 @@ define([],function(){
         <template #title>
           <div>{{text}}</div>
         </template>
-         <div style="display: initial">{{text}}</div>
+         <div style="display: inline">{{text}}</div>
     </a-tooltip>
 </div>`,
     }
