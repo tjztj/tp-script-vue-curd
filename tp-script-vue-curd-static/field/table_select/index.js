@@ -25,8 +25,9 @@ define([],function(){
             window.tableSelectIndexValuesLastChangeTime=window.tableSelectIndexValuesLastChangeTime||{};
             window.tableSelectIndexValuesLastChangeTime[tableGuid]=window.tableSelectIndexValuesLastChangeTime[tableGuid]||null;
 
-            window.tableSelectIndexValuesNeedGets=window.tableSelectIndexValuesNeedGets||[];
+            window.tableSelectIndexValuesNeedGets=window.tableSelectIndexValuesNeedGets||{};
             Vue.watch(()=>props.list,(list)=>{
+                window.tableSelectIndexValuesNeedGets[props.field.url]=window.tableSelectIndexValuesNeedGets[props.field.url]||[];
                 if(window.tableSelectIndexValuesLastChangeTime[tableGuid]&&(new Date).getTime()-window.tableSelectIndexValuesLastChangeTime[tableGuid]>3500){
                     //防止更改选项里面的值后缓存
                     window.tableSelectIndexValues.value[props.field.url]={};
@@ -57,13 +58,13 @@ define([],function(){
                     setTextByVal();
                     return;
                 }
-                window.tableSelectIndexValuesNeedGets.push(...needGet);
+                window.tableSelectIndexValuesNeedGets[props.field.url].push(...needGet);
                 setTimeout(()=>{
-                    if(window.tableSelectIndexValuesNeedGets.length===0){
+                    if(window.tableSelectIndexValuesNeedGets[props.field.url].length===0){
                         return;
                     }
-                    const idArr=window.tableSelectIndexValuesNeedGets;
-                    window.tableSelectIndexValuesNeedGets=[];
+                    const idArr=window.tableSelectIndexValuesNeedGets[props.field.url];
+                    window.tableSelectIndexValuesNeedGets[props.field.url]=[];
 
                     window.vueDefMethods.$post.call(window.appPage||ctx,props.field.url,{ids:idArr}).then(res=>{
                         if(typeof res.data==='undefined'){
