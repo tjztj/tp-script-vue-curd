@@ -4,10 +4,66 @@ define([],function(){
         setup:function (props,ctx){
             const loading=Vue.ref(true);
             const text=Vue.ref('');
-            const textObjs={};
+            window.tableSelectIndexTextObjs=Vue.ref({});
             window.tableSelectIndexValuesNeedGets=window.tableSelectIndexValuesNeedGets||{};
-            Vue.watch( () => props.info[props.field.name], (newValue, oldValue) => {
-                let vals=[];
+
+            const pushTexts=function (id,val){
+                window.tableSelectIndexTextObjs.value[props.field.url]=window.tableSelectIndexTextObjs.value[props.field.url]||{};
+                window.tableSelectIndexTextObjs.value[props.field.url][id]=val;
+            };
+            const getText=function (id){
+                window.tableSelectIndexTextObjs.value[props.field.url]=window.tableSelectIndexTextObjs.value[props.field.url]||{};
+                if(typeof window.tableSelectIndexTextObjs.value[props.field.url][id]==='undefined'){
+                    return null;
+                }
+                return window.tableSelectIndexTextObjs.value[props.field.url][id];
+            }
+
+
+            const setTitles=function (vals){
+                if(!vals||vals.length===0){
+                    return;
+                }
+                window.tableSelectIndexValuesNeedGets[props.field.url]=window.tableSelectIndexValuesNeedGets[props.field.url]||[];
+                window.tableSelectIndexValuesNeedGets[props.field.url].push(...vals);
+                setTimeout(()=>{
+                    if(window.tableSelectIndexValuesNeedGets[props.field.url].length===0){
+                        return;
+                    }
+                    const idArr=window.tableSelectIndexValuesNeedGets[props.field.url];
+                    window.tableSelectIndexValuesNeedGets[props.field.url]=[];
+
+                    window.vueDefMethods.$post.call(window.appPage||ctx,props.field.url,{ids:idArr}).then(res=>{
+                        if(typeof res.data==='undefined'){
+                            for(let id of idArr){
+                                pushTexts(id,'');
+                            }
+                            return;
+                        }
+                        let showField=Object.keys(props.field.fields)[0];
+                        let texts=[];
+                        if(Array.isArray(res.data)&&typeof res.data[0]==='object'){
+                            res.data.forEach(v=>{
+                                if(!idArr.includes(v.id.toString())){
+                                    return;
+                                }
+                                texts.push(v[showField])
+                            })
+                        }else if(typeof res.data.current_page!=='undefined'){
+                            res.data.data.forEach(v=>{
+                                pushTexts(v.id,v[showField]);
+                            })
+                        }else{
+                            for(let k in res.data){
+                                pushTexts(k,typeof res.data[k]!=='string'&&typeof res.data[k]!=='number'?'':res.data[k]);
+                            }
+                        }
+                    });
+                },40);
+            }
+
+            Vue.watchEffect(function (){
+                let vals=[],newValue=props.info[props.field.name];
                 switch (typeof newValue){
                     case 'undefined':
                         break;
@@ -26,65 +82,23 @@ define([],function(){
                     text.value='';
                     return;
                 }
-                if(typeof textObjs[newValue]!=='undefined'){
+                let newVals=[],texts=[];
+                for (let id of vals){
+                    let t=getText(id);
+                    if(t===null){
+                        newVals.push(id)
+                    }else{
+                        texts.push(t)
+                    }
+                }
+                if(newVals.length===0){
                     loading.value=false;
-                    text.value=textObjs[newValue];
+                    text.value=texts.join('，');
                     return;
                 }
-                window.tableSelectIndexValuesNeedGets[props.field.url]=window.tableSelectIndexValuesNeedGets[props.field.url]||[];
-                window.tableSelectIndexValuesNeedGets[props.field.url].push(...vals);
-                setTimeout(()=>{
-                    if(window.tableSelectIndexValuesNeedGets[props.field.url].length===0){
-                        return;
-                    }
-                    const idArr=window.tableSelectIndexValuesNeedGets[props.field.url];
-                    window.tableSelectIndexValuesNeedGets[props.field.url]=[];
+                setTitles(newVals)
+            },{ flush: 'post'})
 
-                    window.vueDefMethods.$post.call(window.appPage||ctx,props.field.url,{ids:idArr}).then(res=>{
-                        if(typeof res.data==='undefined'){
-                            loading.value=false;
-                            text.value='';
-                            textObjs[newValue]='';
-                            return;
-                        }
-                        let showField=Object.keys(props.field.fields)[0];
-                        let texts=[];
-                        if(Array.isArray(res.data)&&typeof res.data[0]==='object'){
-                            res.data.forEach(v=>{
-                                if(!idArr.includes(v.id.toString())){
-                                    return;
-                                }
-                                texts.push(v[showField])
-                            })
-                        }else if(typeof res.data.current_page!=='undefined'){
-                            res.data.data.forEach(v=>{
-                                if(!idArr.includes(v.id.toString())){
-                                    return;
-                                }
-                                texts.push(v[showField])
-                            })
-                        }else{
-                            for(let k in res.data){
-                                let v=res.data[k];
-                                if(typeof v!=='string'&&typeof v!=='number'){
-                                    loading.value=false;
-                                    text.value='';
-                                    textObjs[newValue]='';
-                                    return;
-                                }
-                                if(!idArr.includes(k.toString())){
-                                    return;
-                                }
-                                texts.push(v)
-                            }
-                        }
-
-                        loading.value=false;
-                        text.value=texts.join('，');
-                        textObjs[newValue]=text.value;
-                    });
-                },40);
-            },{immediate:true,deep: true});
 
             return {
                 loading,
