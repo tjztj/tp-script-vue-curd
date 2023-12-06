@@ -76,6 +76,25 @@ define(requires, function (axios, Qs) {
     });
     service.interceptors.response.use(async response => {
         const res = response.data;
+        if(response.request.responseType==='arraybuffer'||response.request.responseType==='blob'){
+            // 这里 data 是返回来的二进制数据
+            const blob = new Blob([response.data], response.headers);
+            // 创建一个blob的对象链接
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const match=response.headers['content-disposition'].match(/;?\s*filename="?([^;]+)"?/);
+            // 把获得的blob的对象链接赋值给新创建的这个 a 链接
+            link.setAttribute('download', match[1]?.trim()?.replace(/"/g,'')||'下载'); // 设置下载文件名
+            document.body.appendChild(link);
+            // 使用js点击这个链接
+            link.click();
+            setTimeout(()=>{
+                document.body.removeChild(link) // 下载完成移除元素
+                window.URL.revokeObjectURL(url) // 释放blob对象
+            })
+            return Promise.reject(res)
+        }
         if (parseInt(res.code) === 1) {
             return res
         }
@@ -645,13 +664,18 @@ define(requires, function (axios, Qs) {
             if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false&&/^https?:/.test(url)===false) {
                 url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
-            return service({url, method: 'get', params, headers: {'X-REQUESTED-WITH': 'xmlhttprequest'}})
+            const option={url, method: 'get', params, headers: {'X-REQUESTED-WITH': 'xmlhttprequest'}};
+            if(/[?&]curd_download=1/.test(url)||url.indexOf('/curd_download/1')>-1){
+                option.responseType='arraybuffer';
+            }
+            return service(option)
         },
         '$post'(url, data) {
             if (window.VUE_CURD.MODULE&&url.indexOf('/' + window.VUE_CURD.MODULE + '/') !== 0&&/^\/?\w+\.php/.test(url)===false&&/^https?:/.test(url)===false) {
                 url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
-            return service({
+
+            const option={
                 url,
                 method: 'post',
                 data: typeof data === 'undefined'||typeof data.append==='function'?data:Qs.stringify(data),
@@ -659,7 +683,11 @@ define(requires, function (axios, Qs) {
                     'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
                     'X-REQUESTED-WITH': 'xmlhttprequest'
                 }
-            })
+            };
+            if(/[?&]curd_download=1/.test(url)||url.indexOf('/curd_download/1')>-1){
+                option.responseType='arraybuffer';
+            }
+            return service(option)
         },
         '$request'() {
             return service;
