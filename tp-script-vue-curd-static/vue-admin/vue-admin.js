@@ -2177,7 +2177,7 @@ define(requires, function (axios, Qs) {
                     return typeof row.__auth === 'undefined' || typeof row.__auth.show === 'undefined' || row.__auth.show === true;
                 },
                 isCanEdit(row) {
-                    return this.canEdit !== false && (!row.__auth || typeof row.__auth.edit === 'undefined' || row.__auth.edit === true) && (!this.fieldStepConfig || !this.fieldStepConfig.enable || (row.stepFields && row.stepFields.length > 0 && row.stepCanEdit))
+                    return this.canEdit !== false && (!row.__auth || typeof row.__auth.edit === 'undefined' || row.__auth.edit === true) && (!this.fieldStepConfig || !this.fieldStepConfig.enable || (row.stepHaveField && row.stepCanEdit))
                 },
                 isCanDel(row) {
                     return this.canDel && (!row.__auth || typeof row.__auth.del === 'undefined' || row.__auth.del === true)

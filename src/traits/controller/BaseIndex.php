@@ -450,7 +450,7 @@ trait BaseIndex
             null === $nextStepInfo || $nextStepInfo = clone $nextStepInfo;
             $info->nextStepInfo = $nextStepInfo ? $nextStepInfo->toArray() : null;
             $info->stepNextCanEdit = $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $fields->getFilterStepFields($nextStepInfo, true, $info, $parentInfo), $list);
-
+            $info->stepHaveField = $stepInfo && $this->fields->stepHaveField($stepInfo, false, $info, $parentInfo);
             //            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             //            $info->stepFields=$stepFields->column('name');
             if ($stepInfo && (null === $nextStepInfo || $stepInfo->getStep() !== $nextStepInfo->getStep())) {

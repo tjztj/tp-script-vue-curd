@@ -70,6 +70,37 @@ trait FieldCollectionStep
      */
     public ?FieldStep $saveStepInfo;
 
+    public function stepHaveField(FieldStep $fieldStep, bool $isNextStep, BaseModel $old, BaseModel $parentInfo = null): bool
+    {
+        $hideFields = $old ? $this->getFiledHideList($old) : [];
+        foreach ($hideFields as $k => $v) {
+            foreach ($v as $val) {
+                $arr = explode(',', $val);
+                $arr <= 1 || array_push($hideFields[$k], ...$arr);
+            }
+        }
+        foreach ($this->all() as $v) {
+            if (isset($hideFields[$v->name()])) {
+                continue;
+            }
+            foreach ($v->steps() as $val) {
+                if ($val->getStep() !== $fieldStep->getStep()) {
+                    continue;
+                }
+                $check = $val->getFieldCheckFunc();
+                if (!$check) {
+                    // 不需要再验证
+                    return true;
+                }
+                if ($isNextStep ? $check->beforeCheck($old, $parentInfo, $v) : $check->check($old, $parentInfo, $v)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /**
      * 根据步骤筛选相关字段.
      *
