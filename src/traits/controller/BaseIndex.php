@@ -434,12 +434,13 @@ trait BaseIndex
     {
         $fields = $this->fields;
         if (!$fields->stepIsEnable()) {
-            return $info;
+            return $list;
         }
+        $parentField=$this->md::parentField();
 
-        return $list->map(static function (BaseModel $info) use ($parentInfo, $list, $fields) {
+        return $list->map(static function (BaseModel $info) use ($parentInfo, $list, $fields,$parentField) {
             if (is_array($parentInfo)) {
-                $parentInfo = $parentInfo[$info[$this->md::parentField()]] ?? null;
+                $parentInfo = $parentInfo[$info[$parentField]] ?? null;
             }
 
             $stepInfo = $fields->getCurrentStepInfo($info, $parentInfo);
@@ -450,7 +451,7 @@ trait BaseIndex
             null === $nextStepInfo || $nextStepInfo = clone $nextStepInfo;
             $info->nextStepInfo = $nextStepInfo ? $nextStepInfo->toArray() : null;
             $info->stepNextCanEdit = $info->nextStepInfo && $nextStepInfo->authCheck($info, $parentInfo, $fields->getFilterStepFields($nextStepInfo, true, $info, $parentInfo), $list);
-            $info->stepHaveField = $stepInfo && $this->fields->stepHaveField($stepInfo, false, $info, $parentInfo);
+            $info->stepHaveField = $stepInfo && $fields->stepHaveField($stepInfo, false, $info, $parentInfo);
             //            $stepFields=$stepInfo?$this->fields->getFilterStepFields($stepInfo,false,$info,$parentInfo):FieldCollection::make();
             //            $info->stepFields=$stepFields->column('name');
             if ($stepInfo && (null === $nextStepInfo || $stepInfo->getStep() !== $nextStepInfo->getStep())) {
