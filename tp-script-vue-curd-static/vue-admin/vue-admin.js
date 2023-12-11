@@ -85,7 +85,14 @@ define(requires, function (axios, Qs) {
             link.href = url;
             const match=response.headers['content-disposition'].match(/;?\s*filename="?([^;]+)"?/);
             // 把获得的blob的对象链接赋值给新创建的这个 a 链接
-            link.setAttribute('download', match[1]?.trim()?.replace(/"/g,'')||'下载'); // 设置下载文件名
+            let fname=match?match[1]?.trim()?.replace(/"/g,''):null;
+            if(fname){
+                try{name=decodeURIComponent(fname);}catch ($e){}
+            }else{
+                const match2=response.config.url.match(/[&?/]curd_download[=/](.+)\.([a-zA-Z0-9]+).+$/);
+                fname=match2&&match2[1]&&match2[2]?match2[1]+'.'+match2[2]:'下载';
+            }
+            link.setAttribute('download', fname); // 设置下载文件名
             document.body.appendChild(link);
             // 使用js点击这个链接
             link.click();
@@ -635,7 +642,7 @@ define(requires, function (axios, Qs) {
                 url = '/' + window.VUE_CURD.MODULE + '/'+url;
             }
             const option={url, method: 'get', params, headers: {'X-REQUESTED-WITH': 'xmlhttprequest'}};
-            if(/[?&]curd_download=1/.test(url)||url.indexOf('/curd_download/1')>-1){
+            if(/[?&/]curd_download[=/].+/.test(url)){
                 option.responseType='arraybuffer';
             }
             return service(option);
@@ -653,7 +660,7 @@ define(requires, function (axios, Qs) {
                     'X-REQUESTED-WITH': 'xmlhttprequest'
                 }
             };
-            if(/[?&]curd_download=1/.test(url)||url.indexOf('/curd_download/1')>-1){
+            if(/[?&/]curd_download[=/].+/.test(url)){
                 option.responseType='arraybuffer';
             }
             return service(option)
