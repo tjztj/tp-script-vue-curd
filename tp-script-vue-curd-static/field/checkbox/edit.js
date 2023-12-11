@@ -9,7 +9,7 @@ define([],function(){
         watch:{
             value:{
                 handler(value){
-                    this.modelVal=value?value.split(','):[];
+                    this.modelVal=value?value.toString().split(','):[];
                 },
                 immediate:true,
             },

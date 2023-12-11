@@ -87,7 +87,7 @@ define(requires, function (axios, Qs) {
             // 把获得的blob的对象链接赋值给新创建的这个 a 链接
             let fname=match?match[1]?.trim()?.replace(/"/g,''):null;
             if(fname){
-                try{name=decodeURIComponent(fname);}catch ($e){}
+                try{fname=decodeURIComponent(fname);}catch ($e){}
             }else{
                 const match2=response.config.url.match(/[&?/]curd_download[=/](.+)\.([a-zA-Z0-9]+).+$/);
                 fname=match2&&match2[1]&&match2[2]?match2[1]+'.'+match2[2]:'下载';
@@ -100,7 +100,7 @@ define(requires, function (axios, Qs) {
                 document.body.removeChild(link) // 下载完成移除元素
                 window.URL.revokeObjectURL(url) // 释放blob对象
             })
-            return Promise.reject(res)
+            return Promise.resolve({code: 1, msg: '操作成功', data: [],})
         }
         if (parseInt(res.code) === 1) {
             return res
