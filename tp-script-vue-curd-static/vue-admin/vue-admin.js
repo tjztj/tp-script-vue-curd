@@ -1929,6 +1929,11 @@ define(requires, function (axios, Qs) {
                 let onresize = () => {
                     scrollX.value = getX();
 
+                    const tableW=document.querySelector('#'+id+' table')?.scrollWidth;
+                    if(tableW&&scrollX.value===undefined&&document.getElementById(id).scrollWidth<tableW){
+                        scrollX.value=tableW
+                    }
+
                     let listSetWidth=0,haveNotSetWidth=false;
                     columnsVals.value.forEach(col => {
                         if(col.width){
