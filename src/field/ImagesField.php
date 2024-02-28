@@ -38,6 +38,9 @@ class ImagesField extends ModelField
 
     protected string $accept = 'image/*'; // 上传文件类型
 
+    protected int $saveMaxW = 0;
+    protected int $saveMaxH = 0;
+
     /**最小值
      * @param string|null $url
      * @return $this|string
@@ -45,7 +48,10 @@ class ImagesField extends ModelField
     public function url(string $url = null)
     {
         if (is_null($url)) {
-            return $this->url ?: tpScriptVueCurdUploadDefaultUrl();
+            $url = $this->url ?: tpScriptVueCurdUploadDefaultUrl();
+            $url .= (false !== strpos($url, '?') ? '&' : '?').'max_w='.$this->saveMaxW().'&max_h='.$this->saveMaxH();
+
+            return $url;
         }
         $this->url = $url;
         $this->fieldPushAttrByWhere('url', $this->url);
@@ -241,5 +247,25 @@ class ImagesField extends ModelField
         $this->checkFilesIsLocal = $checkFilesIsLocal;
 
         return $this;
+    }
+
+    /**
+     * 文件上传后保存时的最大宽度，需自己实现.
+     *
+     * @return int|self
+     */
+    public function saveMaxW(int $saveMaxW = null)
+    {
+        return $this->doAttr('saveMaxW', $saveMaxW);
+    }
+
+    /**
+     * 文件上传后保存时的最大高度，需自己实现.
+     *
+     * @return int|self
+     */
+    public function saveMaxH(int $saveMaxH = null)
+    {
+        return $this->doAttr('saveMaxH', $saveMaxH);
     }
 }
