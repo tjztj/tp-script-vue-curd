@@ -2347,7 +2347,7 @@ define(requires, function (axios, Qs) {
                                     <slot name="other-btn-before" :record="record">
                                         <template v-for="btn in getBeforeBtns(record)">
                                             <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
-                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getBeforeBtnsW(record))"></a-divider>
+                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getBeforeBtnsW(record))&&(isCanEdit(record)||isCanShowInfo(record)||getBeforeBtns(record).length>1)"></a-divider>
                                         </template>
                                     </slot>
                                     
@@ -2390,7 +2390,7 @@ define(requires, function (axios, Qs) {
                                     
                                     <slot name="other-btn-after" :record="record">
                                         <template v-for="btn in getAfterBtns(record)">
-                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getAfterBtnsW(record))"></a-divider>
+                                            <a-divider type="vertical" v-if="checkHaveOtherBtn(getAfterBtnsW(record))&&(isCanEdit(record)||isCanShowInfo(record)||(getAfterBtns(record).length>1||getBeforeBtns(record).length>0))"></a-divider>
                                             <a @click="openOtherBtn(btn,record)" :style="{color: btn.btnColor}">{{btn.btnTitle}}</a>
                                         </template>
                                     </slot>
