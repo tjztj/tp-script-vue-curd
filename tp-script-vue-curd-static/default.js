@@ -232,6 +232,7 @@ define(['vueAdmin'], function (va) {
                     sortField: '',
                     sortOrder: '',
                     showSizeChanger:vueData.indexPageOption.canGetRequestOption,
+                    pageSizeOptions:['10','30','50','100','200'],
                 }
                 return {
                     listColumns:vueData.groupGroupColumns||{'':vueData.listColumns},
