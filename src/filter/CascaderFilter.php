@@ -87,9 +87,9 @@ class CascaderFilter extends ModelFilter
                     });
                 }
             } elseif ($canCheckParent) {
-                $query->whereIn($this->whereName(), $list[$value]['childLastVals'] ?: [$value]);
-            } else {
                 $query->where($this->whereName(), $value);
+            } else {
+                $query->whereIn($this->whereName(), $list[$value]['childLastVals'] ?: [$value]);
             }
         }
     }
