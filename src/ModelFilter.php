@@ -24,8 +24,11 @@ abstract class ModelFilter
     protected ?string $title=null;
     protected ?string $group=null;
     public GridCol $gridCol;
+    protected string $guid;
+    protected string $fieldPrefix = '';
 
     public function __construct(ModelField $field=null){
+        $this->guid = create_guid();
         if(static::class===EmptyFilter::class){
             return;
         }
@@ -138,4 +141,18 @@ abstract class ModelFilter
      * @return string
      */
     abstract public static function componentUrl():string;
+
+
+    public function setFieldPrefix(string $prefix)
+    {
+        if($prefix){
+            $prefix=rtrim($prefix,'.').'.';
+        }
+        $this->fieldPrefix = $prefix;
+        return $this;
+    }
+    protected function whereName():string
+    {
+        return str_contains($this->field->name(),',')?$this->field->name():$this->fieldPrefix.$this->field->name();
+    }
 }
