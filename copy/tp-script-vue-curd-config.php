@@ -21,7 +21,7 @@ if (!function_exists('tpScriptVueCurdGetLoginUrl')) {
      * @return string
      */
     function tpScriptVueCurdGetLoginUrl():string{
-        return '/admin/login/index';
+        return request()->root().'/login/index';
     }
 }
 

@@ -508,7 +508,7 @@ trait BaseEdit
         }
         if(!empty($stepInfo->config['canEditActions'])){
             // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
-            $app=app('http')->getName();
+            $app=trim(request()->root(),'/');
             $app&&$app.='/';
             $controllerList=[$this->request->controller()];
 
@@ -547,7 +547,7 @@ trait BaseEdit
                 $urlArr=explode('/',$stepInfo->config['listBtnUrl']);
             }
             $urlArr=array_values(array_filter($urlArr));
-            if(app('http')->getName()&&count($urlArr)>3){
+            if(trim(request()->root(),'/')&&count($urlArr)>3){
                 $listBtnUrlArr=[
                     $urlArr[0],$urlArr[1],current(explode('.',$urlArr[2]))
                 ];
