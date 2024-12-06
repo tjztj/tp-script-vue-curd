@@ -61,7 +61,7 @@ trait Vue
         }
         $this->assign('vueCurdVersion',static::vueCurdVersion());
         $this->assign('vueCurdController',$this->request->controller());
-        $this->assign('vueCurdModule',$this->app->http->getName());
+        $this->assign('vueCurdModule',trim(request()->root(),'/'));
         $this->assign('guid',$this->guid);
         $this->assign('loginUrl',tpScriptVueCurdGetLoginUrl());
         $this->assign('vueCurdDebug',static::debug());

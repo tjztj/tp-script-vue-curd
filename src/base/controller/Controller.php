@@ -197,7 +197,7 @@ trait Controller
             return $this->fetch($this->fetchPath,$data);
         }
 
-        $appName = $this->app->http->getName();
+        $appName = trim(request()->root(),'/');
         $view    = $this->app->view->getConfig('view_dir_name');
         $depr =$this->app->view->getConfig('view_depr');
 

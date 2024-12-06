@@ -102,7 +102,7 @@ class Edit
             'vueCurdVersion'=>\tpScriptVueCurd\traits\controller\Vue::vueCurdVersion(),
             'vueCurdAction'=>$request->action(),
             'vueCurdController'=>$request->controller(),
-            'vueCurdModule'=>$this->app->http->getName(),
+            'vueCurdModule'=>trim(request()->root(),'/'),
             'themCssPath'=>tsvcThemCssPath(),
             'guid'=>$this->guid,
             'loginUrl'=>tpScriptVueCurdGetLoginUrl(),
