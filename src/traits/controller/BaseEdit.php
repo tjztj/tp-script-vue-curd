@@ -395,7 +395,7 @@ trait BaseEdit
         }
         if(!empty($stepInfo->config['canEditActions'])){
             // dump(app('http')->getName(),$this->request->controller(),$this->request->action());
-            $app=app('http')->getName();
+            $app=trim(request()->root(),'/');
             $app&&$app.='/';
             $controllerList=[$this->request->controller()];
 
