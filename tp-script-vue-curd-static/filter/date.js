@@ -37,6 +37,7 @@ define([],function(){
         methods: {
             change(value,date,dateString){
                 // console.log(value, date, dateString);
+                value=value||[];
                 this.$emit('search',{
                     start:value[0]||'',
                     end:value[1]||'',
