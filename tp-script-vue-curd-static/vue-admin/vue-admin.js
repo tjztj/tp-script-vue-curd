@@ -2264,36 +2264,48 @@ define(requires, function (axios, Qs) {
 
         /*** 筛选组件 ***/
         app.component('CurdFilter', {
-            props: ['filterConfig', 'name', 'class', 'title', 'childs', 'filterValues', 'loading'],
+            props: ['filterConfig', 'name', 'class', 'title', 'childs', 'filterValues','filterValueHaveShow', 'loading', 'size'],
             setup(props, ctx) {
                 const filterSource = Vue.ref({});
-                const modelTitles=Vue.ref({});
-                Vue.watchEffect(()=>{
-                    const fs = {filterConfig:props.filterConfig.map(function (v) {
+                const modelTitles = Vue.ref({});
+                Vue.watchEffect(() => {
+                    const fs = {
+                        filterConfig: props.filterConfig.map(function (v) {
                             if (v.group) {
-                                v.title = v.group + ' >' + v.title
+                                v.title = v.group + ' >' + v.title;
+                            }
+                            if (props.filterValues && props.filterValues[v.name]) {
+                                v.activeValue = props.filterValues[v.name];
                             }
                             return v;
-                        })}
+                        }),
+                    };
                     const mt = {
                         [props.class]: props.title,
                         [props.name]: props.title,
                     };
-                    let childFList=props.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0)
+                    let childFList = props.childs.filter(v => v.filterConfig && v.filterConfig.length > 0);
                     for (let i in childFList) {
                         fs[childFList[i].name] = childFList[i].filterConfig.map(function (v) {
                             if (v.group) {
-                                v.title = v.group + ' >' + v.title
+                                v.title = v.group + ' >' + v.title;
                             }
+                            if (v.filterData && v.filterData[v.name]) {
+                                v.activeValue = v.filterData[v.name];
+                            }
+
                             return v;
-                        })
+                        });
 
                         mt[childFList[i].class] = childFList[i].title;
                         mt[childFList[i].name] = childFList[i].title;
                     }
-                    filterSource.value=fs;
-                    modelTitles.value=mt;
-                })
+                    filterSource.value = fs;
+                    modelTitles.value = mt;
+                });
+                if (!props.size) {
+                    props.size = 'mini';
+                }
 
                 return {
                     filterSource,
@@ -2301,90 +2313,90 @@ define(requires, function (axios, Qs) {
                     filterData: Vue.ref({}),
                     childFilterData: Vue.ref({}),
                     showMoreFilter: Vue.ref(false),
-                    oldFilterConfig:Vue.ref({}),
-                }
+                    oldFilterConfig: Vue.ref({}),
+                };
             },
             computed: {
                 base() {
                     return {
                         name: 'filterConfig',
                         filterConfig: this.filterSource.filterConfig,
-                        filterData: this.filterData
-                    }
+                        filterData: this.filterData,
+                    };
                 },
-                childFilterEmptys(){
-                    if(!this.childs){
+                childFilterEmptys() {
+                    if (!this.childs) {
                         return [];
                     }
-                    return this.childs.filter(v=>v.filterConfig&&v.filterConfig.length>0);
+                    return this.childs.filter(v => v.filterConfig && v.filterConfig.length > 0);
                 },
-                haveFielter(){
+                haveFielter() {
                     return this.filterSource.filterConfig.some(item => this.filterGroupBaseItemIsShow(item)) ||
-                        this.childFilterEmptys.some(child => Object.values(this.filterSource[child.name]).some(item => this.filterGroupItemIsShow(item,child)));
+                      this.childFilterEmptys.some(child => Object.values(this.filterSource[child.name]).some(item => this.filterGroupItemIsShow(item, child)));
                 },
-                hideFilterList(){
-                    const returns=[];
-                    for(const key in this.filterSource){
-                        const vo=this.filterSource[key];
-                        const items=this.moreShowItems(vo);
-                        if(items.length===0){
+                hideFilterList() {
+                    const returns = [];
+                    for (const key in this.filterSource) {
+                        const vo = this.filterSource[key];
+                        const items = this.moreShowItems(vo);
+                        if (items.length === 0) {
                             continue;
                         }
                         returns.push({
-                            key:key,
-                            modelTitle:this.modelTitles[key]||'',
-                            items:items,
-                        })
+                            key: key,
+                            modelTitle: this.modelTitles[key] || '',
+                            items: items,
+                        });
                     }
                     return returns;
                 },
-                filterMenuBoxClass(){
+                filterMenuBoxClass() {
                     const count = this.hideFilterList.reduce((count, vo) => count + vo.items.length, 0);
                     const GRID_CLASSES = {
                         1: ['no-grid'],
                         2: ['grid-column-2'],
                         3: ['grid-column-3'],
-                        4: ['grid-column-4']
+                        4: ['grid-column-4'],
                     };
-                    return GRID_CLASSES[Math.min(Math.floor(window.innerWidth/360), Math.ceil(count / 16),4)];
-                }
+                    return GRID_CLASSES[Math.min(Math.floor(window.innerWidth / 360), Math.ceil(count / 16), 4)];
+                },
             },
-            watch:{
-                haveFielter:{
+            watch: {
+                haveFielter: {
                     immediate: true,
                     handler(newVal) {
-                        this.$emit('haveFielterShowChange',newVal);
+                        this.$emit('haveFielterShowChange', newVal);
                     },
                 },
             },
-            created(){
+            created() {
 
-                this.oldFilterConfig={
-                    filterSource:JSON.parse(JSON.stringify(this.filterSource)),
-                    filterData:JSON.parse(JSON.stringify(this.filterData)),
-                    childFilterData:JSON.parse(JSON.stringify(this.childFilterData)),
-                    showMoreFilter:!!this.showMoreFilter,
-                }
+                this.oldFilterConfig = {
+                    filterSource: JSON.parse(JSON.stringify(this.filterSource)),
+                    filterData: JSON.parse(JSON.stringify(this.filterData)),
+                    childFilterData: JSON.parse(JSON.stringify(this.childFilterData)),
+                    showMoreFilter: !!this.showMoreFilter,
+                };
             },
             methods: {
-                restFilter(){
-                    const filterSource=JSON.parse(JSON.stringify(this.oldFilterConfig.filterSource));
-                    for(let i in this.filterSource){
-                        filterSource[i].forEach(v=>{
-                            v.rest=true;
-                        })
+                restFilter() {
+                    const filterSource = JSON.parse(JSON.stringify(this.oldFilterConfig.filterSource));
+                    for (let i in this.filterSource) {
+                        filterSource[i].forEach(v => {
+                            v.rest = true;
+                        });
                     }
-                    this.filterSource=filterSource;
-                    this.filterData=JSON.parse(JSON.stringify(this.oldFilterConfig.filterData));
-                    this.childFilterData=JSON.parse(JSON.stringify(this.oldFilterConfig.childFilterData));
-                    this.showMoreFilter=!!this.oldFilterConfig.showMoreFilter;
-                    setTimeout(()=>{
-                        for(let i in this.filterSource){
-                            this.filterSource[i].forEach(v=>{
-                                v.rest=false;
-                            })
+                    this.filterSource = filterSource;
+                    this.filterData = JSON.parse(JSON.stringify(this.oldFilterConfig.filterData));
+                    this.childFilterData = JSON.parse(JSON.stringify(this.oldFilterConfig.childFilterData));
+                    this.showMoreFilter = !!this.oldFilterConfig.showMoreFilter;
+                    setTimeout(() => {
+                        for (let i in this.filterSource) {
+                            this.filterSource[i].forEach(v => {
+                                v.rest = false;
+                            });
                         }
-                    })
+                    });
                 },
                 filterGroupIsShow(child) {
                     for (let i in this.filterSource[child.name]) {
@@ -2392,13 +2404,13 @@ define(requires, function (axios, Qs) {
                             return true;
                         }
                     }
-                    return false
+                    return false;
                 },
                 filterGroupItemIsShow(item, child) {
                     return item.show && (!child.filterData || !child.filterData[item.name]);
                 },
-                filterGroupBaseItemIsShow(item){
-                    return item.show&&(!this.filterValues||!this.filterValues[item.name]);
+                filterGroupBaseItemIsShow(item) {
+                    return item.show && (item.defValShown || this.filterValueHaveShow || !this.filterValues || !this.filterValues[item.name]);
                 },
                 search(val, item) {
                     item.activeValue = val;
@@ -2413,7 +2425,8 @@ define(requires, function (axios, Qs) {
                     this.$emit('search', data);
                 },
                 getFilterData() {
-                    let curdFilters = [], curdChildFilters = {}, haveHide = false;
+                    let curdFilters = [], curdChildFilters = {},
+                      haveHide = false;
                     if (this.filterSource.filterConfig && this.filterSource.filterConfig.length > 0) {
                         curdFilters = this.filterSource.filterConfig.filter(v => v.show);
                         haveHide = curdFilters.length !== this.filterSource.filterConfig.length;
@@ -2427,25 +2440,36 @@ define(requires, function (axios, Qs) {
                         }
                     }
 
-                    let filterData = {};
+                    let filterData = {}, defValChanges = {};
                     curdFilters.forEach(function (v) {
                         if (typeof v.activeValue !== 'undefined' && v.activeValue !== null) {
                             filterData[v.name] = v.activeValue;
+                            if (v.defValShown) {
+                                defValChanges[v.name] = v.activeValue;
+                            }
                         }
-                    })
+                    });
                     if (this.filterValues) {
-                        filterData = Object.assign(filterData, this.filterValues);
+                        if(this.filterValueHaveShow){
+                            filterData = Object.assign(this.filterValues,filterData);
+                        }else{
+                            filterData = Object.assign(filterData,this.filterValues);
+                        }
+                        filterData = Object.assign(filterData, defValChanges);
                     }
 
-
-                    let childFilterData = {};
+                    let childFilterData = {}, childDefValChanges = {};
+                    ;
                     for (let key in curdChildFilters) {
                         curdChildFilters[key].forEach(function (v) {
                             if (typeof v.activeValue !== 'undefined' && v.activeValue !== null) {
                                 childFilterData[key] = childFilterData[key] || {};
                                 childFilterData[key][v.name] = v.activeValue;
+                                if (v.defValShown) {
+                                    childDefValChanges[key][v.name] = v.activeValue;
+                                }
                             }
-                        })
+                        });
                     }
                     if (this.childs) {
                         let allFilterChildValues = {};
@@ -2453,8 +2477,11 @@ define(requires, function (axios, Qs) {
                             if (v.filterData) {
                                 //如果filterData有，不能筛选，只能是filterData的值
                                 childFilterData[v.name] = Object.assign(childFilterData[v.name], v.filterData);
+                                if (childDefValChanges[v.name]) {
+                                    childFilterData[v.name] = Object.assign(childFilterData[v.name], childDefValChanges[v.name]);
+                                }
                             }
-                        })
+                        });
                     }
 
                     if (this.showMoreFilter === false && haveHide) {
@@ -2462,58 +2489,58 @@ define(requires, function (axios, Qs) {
                     }
 
                     return {
-                        filterData, childFilterData
-                    }
+                        filterData, childFilterData,
+                    };
                 },
                 moreShowItems(items) {
                     if (!items) {
                         return [];
                     }
-                    if (!this.filterValues) {
+                    if (this.filterValueHaveShow||!this.filterValues) {
                         return items;
                     }
                     return items.filter(vo => {
-                        return !this.filterValues[vo.name];
-                    })
+                        return vo.defValShown || !this.filterValues[vo.name];
+                    });
                 },
-                createWidthEl(box,widthElId){
-                    let widthEl=box.document.getElementById(widthElId);
-                    if(!widthEl){
-                        widthEl=box.document.createElement('span');
-                        widthEl.style='font-size:14px;position:fixed;z-index:-1;opacity:0;'
-                        widthEl.id=widthElId;
+                createWidthEl(box, widthElId) {
+                    let widthEl = box.document.getElementById(widthElId);
+                    if (!widthEl) {
+                        widthEl = box.document.createElement('span');
+                        widthEl.style = 'font-size:14px;position:fixed;z-index:-1;opacity:0;';
+                        widthEl.id = widthElId;
                         box.document.body.appendChild(widthEl);
                     }
                     return widthEl;
                 },
-                getItems(items,group,child){
-                    const w={l:0,r:0};
-                    const newItems=child?items.filter(item=>this.filterGroupItemIsShow(item, child)):items.filter(item=>this.filterGroupBaseItemIsShow(item));
-                    const widthElId='filter-lable-width-el';
+                getItems(items, group, child) {
+                    const w = { l: 0, r: 0 };
+                    const newItems = child ? items.filter(item => this.filterGroupItemIsShow(item, child)) : items.filter(item => this.filterGroupBaseItemIsShow(item));
+                    const widthElId = 'filter-lable-width-el';
 
-                    let widthEl=this.createWidthEl(window,widthElId);
-                    widthEl.innerText='check-width';
-                    if(widthEl.clientWidth===0){
-                        widthEl=this.createWidthEl(top,widthElId);
+                    let widthEl = this.createWidthEl(window, widthElId);
+                    widthEl.innerText = 'check-width';
+                    if (widthEl.clientWidth === 0) {
+                        widthEl = this.createWidthEl(top, widthElId);
                     }
 
-                    newItems.forEach((item,index)=>{
-                        widthEl.innerText=item.title.toString();
-                        const width=widthEl.clientWidth;
-                        const n=index%2>0?'r':'l';
-                        if(w[n]<width){
-                            w[n]=width;
+                    newItems.forEach((item, index) => {
+                        widthEl.innerText = item.title.toString();
+                        const width = widthEl.clientWidth;
+                        const n = index % 2 > 0 ? 'r' : 'l';
+                        if (w[n] < width) {
+                            w[n] = width;
                         }
-                    })
-                    widthEl.innerText='';
-                    return newItems.map((item,index)=>{
-                        const n=index%2>0?'r':'l';
-                        item.labelWidth=w[n];
+                    });
+                    widthEl.innerText = '';
+                    return newItems.map((item, index) => {
+                        const n = index % 2 > 0 ? 'r' : 'l';
+                        item.labelWidth = w[n];
                         return item;
                     });
-                }
+                },
             },
-            template: `<div class="curd-filter-box" :class="{'empty-filter-items':!haveFielter}">
+            template: `<div class="curd-filter-box" :class="{'empty-filter-items':!haveFielter,['filter-size-'+size]:true}">
                         <a-spin :loading="loading">
                             <div class="filter-box-title" v-if="childFilterEmptys.length>0&&filterGroupIsShow(base)">{{title}}：</div>
                             <div class="filter-box-div" v-if="filterGroupIsShow(base)">
@@ -2527,6 +2554,7 @@ define(requires, function (axios, Qs) {
                                                             :is="item.type" 
                                                             :config="item"
                                                             :ref="'filters.filterConfig.'+item.name"
+                                                            :size="size"
                                                             @search="search($event,item)"
                                                     ></component>
                                                 </div>
@@ -2549,6 +2577,7 @@ define(requires, function (axios, Qs) {
                                                                     :is="item.type" 
                                                                     :config="item"
                                                                     :ref="'filters.'+child.name+'.'+item.name"
+                                                                    :size="size"
                                                                     @search="search($event,item)"
                                                             ></component>
                                                         </div>
@@ -2591,6 +2620,7 @@ define(requires, function (axios, Qs) {
                         </div>
                     </div>`,
         });
+
 
         for (let componentName in fieldComponents) {
             app.component(componentName, typeof require(fieldComponents[componentName]) === 'function' ? require(fieldComponents[componentName])() : require(fieldComponents[componentName]))

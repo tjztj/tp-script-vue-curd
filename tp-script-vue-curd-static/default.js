@@ -271,6 +271,8 @@ define(['vueAdmin'], function (va) {
                         name:vueData.modelName,
                         title:vueData.title,
                         filterValues:vueData.filter_data||{},//如果有值，filter-item不显示
+                        filterValueHaveShow:vueData.filter_value_have_show||false,
+                        size:'mini',
                     },
                     showMultipleSelection:typeof vueData.showMultipleSelection==='undefined'?null:vueData.showMultipleSelection,
                     selectedRowKeys:[],
@@ -435,7 +437,7 @@ define(['vueAdmin'], function (va) {
                 getWhere(){
                     const filter=JSON.parse(JSON.stringify(this.myFilters));
                     if(this.showFilter){
-                        const filterData=this.$refs['filter'].getFilterData();
+                        const filterData=this.$refs['filter']?this.$refs['filter'].getFilterData():{};
                         filter.filterData=filterData.filterData;
                         filter.childFilterData=filterData.childFilterData;
                     }else{
@@ -713,7 +715,7 @@ define(['vueAdmin'], function (va) {
                 },
                 leftCateSelect(selectedKeys,e){
                     this.leftCateObj.selectedKeys=selectedKeys;
-                    this.$refs['filter'].restFilter();
+                    this.$refs['filter']?.restFilter();
                     this.doFilter();
                 },
                 leftCateRefresh(){

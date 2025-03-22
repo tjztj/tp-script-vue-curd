@@ -212,6 +212,7 @@ body{
                      :title="filterBase.title"
                      :childs="childs"
                      :filter-values="filterBase.filterValues"
+                     :filter-value-have-show="filterBase.filterValueHaveShow"
                      :loading="loading"
                      @have-fielter-show-change="haveFielterShow=$event"
         ></curd-filter>

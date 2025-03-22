@@ -257,6 +257,7 @@ trait BaseIndex
             'childs'=>[],//会在BaseHaveChildController中更改
             'filterConfig'=>$filterFields->getFilterShowData(),
             'filter_data'=>$filterData?:null,
+            'filter_value_have_show'=>$this->request->param('filter_value_have_show/d')===1,
             'showFilter'=>$showFilter,
             'showTableTool'=>$showTableTool,
             'tableThemIsColor'=>tableThemIsColor(),
